@@ -77,8 +77,19 @@ export default class ComfyApp {
     }
 
     resizeCanvas() {
-        this.canvasEl.width = this.canvasEl.parentElement.clientWidth;
-        this.canvasEl.height = this.canvasEl.parentElement.clientHeight;
+        // get current size of the canvas
+        let rect = this.canvasEl.parentElement.getBoundingClientRect();
+
+        // increase the actual size of our canvas
+        this.canvasEl.width = rect.width * window.devicePixelRatio;
+        this.canvasEl.height = rect.height * window.devicePixelRatio;
+
+        // ensure all drawing operations are scaled
+        this.canvasCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+        // scale everything down using CSS
+        this.canvasEl.style.width = rect.width + 'px';
+        this.canvasEl.style.height = rect.height + 'px';
         this.lCanvas.draw(true, true);
     }
 

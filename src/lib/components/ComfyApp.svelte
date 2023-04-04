@@ -76,10 +76,16 @@
  #comfy-graph {
  }
 
+ #graph-canvas {
+     width: 100%;
+     height: 100%;
+ }
+
  :global(html, body) {
      width: 100%;
      height: 100%;
      margin: 0px;
+     font-family: Arial;
  }
 
  :global(.splitpanes__pane) {
