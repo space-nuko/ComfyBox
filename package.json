@@ -29,8 +29,12 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@svelteuidev/composables": "^0.11.1",
+		"@svelteuidev/core": "^0.11.1",
 		"litegraph.js": "^0.7.12",
+		"radix-icons-svelte": "^1.2.1",
 		"svelte-preprocess": "^5.0.3",
+		"svelte-splitpanes": "^0.7.13",
 		"vite-plugin-full-reload": "^1.0.5"
 	}
 }

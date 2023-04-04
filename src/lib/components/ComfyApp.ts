@@ -36,10 +36,6 @@ export default class ComfyApp {
 
 		this.lGraph.start();
 
-		// Ensure the canvas fills the window
-        this.resizeCanvas();
-		window.addEventListener("resize", this.resizeCanvas.bind(this));
-
 		// await this.#invokeExtensionsAsync("init");
 		await this.registerNodes();
 
@@ -73,12 +69,16 @@ export default class ComfyApp {
 
 		// await this.#invokeExtensionsAsync("setup");
 
+		// Ensure the canvas fills the window
+        this.resizeCanvas();
+		window.addEventListener("resize", this.resizeCanvas.bind(this));
+
         return Promise.resolve();
     }
 
-    private resizeCanvas() {
-        this.canvasEl.width = window.innerWidth;
-        this.canvasEl.height = window.innerHeight;
+    resizeCanvas() {
+        this.canvasEl.width = this.canvasEl.parentElement.clientWidth;
+        this.canvasEl.height = this.canvasEl.parentElement.clientHeight;
         this.lCanvas.draw(true, true);
     }
 
