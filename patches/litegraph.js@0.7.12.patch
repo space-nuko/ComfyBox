@@ -1,0 +1,14 @@
+diff --git a/src/litegraph.d.ts b/src/litegraph.d.ts
+index c9fbe0ced078548f95382eaa39be2b736be2a1bd..3ee29f82d614cd9f460f56228c56ea4eadc1b3fb 100644
+--- a/src/litegraph.d.ts
++++ b/src/litegraph.d.ts
+@@ -1260,6 +1260,9 @@ export declare class LGraphCanvas {
+     visible_nodes: LGraphNode[];
+     zoom_modify_alpha: boolean;
+ 
++    release_link_on_empty_shows_menu: boolean;
++    alt_drag_do_clone_nodes: boolean;
++
+     /** clears all the data inside */
+     clear(): void;
+     /** assigns a graph, you can reassign graphs to the same canvas */
