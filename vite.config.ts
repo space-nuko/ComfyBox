@@ -5,7 +5,7 @@ import FullReload from 'vite-plugin-full-reload'
 export default defineConfig({
     plugins: [
         sveltekit()
-        // FullReload(["src/**/*.{js,ts,svelte}"])
+        FullReload(["src/**/*.{js,ts,svelte}"])
     ],
     build: {
         sourcemap: true,

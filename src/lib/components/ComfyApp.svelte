@@ -1,6 +1,7 @@
 <script lang="ts">
  import { onMount } from "svelte";
  import { Pane, Splitpanes } from 'svelte-splitpanes';
+ import { Button } from "@gradio/button";
  import { Backpack, Gear } from 'radix-icons-svelte';
  import ComfyUIPane from "./ComfyUIPane.svelte";
  import ComfyApp from "./ComfyApp";
@@ -12,6 +13,24 @@
 
  function refreshView(event) {
      app.resizeCanvas();
+ }
+
+ function queuePrompt() {
+     const state = uiPane.getState();
+     console.log("Queuing!", state);
+     app.queuePrompt(0, 1, state);
+ }
+
+ let graphSize = null;
+
+ function toggleGraph() {
+     if (graphSize == 0) {
+         graphSize = 100;
+         app.resizeCanvas();
+     }
+     else {
+         graphSize = 0;
+     }
  }
 
  onMount(async () => {
@@ -53,12 +72,20 @@
                 <Pane minSize={15}>
                     <ComfyUIPane bind:this={uiPane} {app} />
                 </Pane>
-                <Pane minSize={10}>
+                <Pane snapSize={10} bind:size={graphSize}>
                     <canvas id="graph-canvas" />
                 </Pane>
             </Splitpanes>
         </Pane>
     </Splitpanes>
+</div>
+<div id="bottombar">
+    <Button variant="primary" on:click={queuePrompt}>
+        Run
+    </Button>
+    <Button variant="secondary" on:click={toggleGraph}>
+        Show/Hide Graph
+    </Button>
 </div>
 
 <style>
@@ -82,6 +109,10 @@
  #graph-canvas {
      width: 100%;
      height: 100%;
+ }
+
+ #bottombar {
+     margin: 10px;
  }
 
  .dropzone {

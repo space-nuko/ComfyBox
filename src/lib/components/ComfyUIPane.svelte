@@ -1,22 +1,26 @@
 <script lang="ts">
- import { Button } from "@gradio/button";
- import { Block, BlockTitle } from "@gradio/atoms";
- import { Dropdown, Range, TextBox } from "@gradio/form";
  import { LGraphNode, LGraph } from "litegraph.js";
  import type { IWidget } from "litegraph.js";
  import ComfyApp from "./ComfyApp";
+ import ComfyPane from "./ComfyPane.svelte";
 
  export let app: ComfyApp;
+
+ let dragItems = [];
 
  export function clear() {
      nodes = {};
      items = {};
      state = {};
+     dragItems = []
  }
 
  export function addNodeUI(node: LGraphNode) {
      if (node.widgets) {
          for (const [i, widget] of node.widgets.entries()) {
+             if (!nodes[node.id]) {
+                 dragItems.push({ id: node.id, node: node })
+             }
              nodes[node.id] = node;
 
              node.onPropertyChanged = (k, v) => {
@@ -45,6 +49,9 @@
      delete state[node.id]
      delete items[node.id]
 
+     dragItems = Array.from(dragItems.filter(e => e.id != node.id));
+     console.log("REM", node.id, dragItems)
+
      nodes = nodes;
      items = items;
      state = state;
@@ -63,13 +70,8 @@
      state = state;
  }
 
- function getState() {
-
- }
-
- function queuePrompt() {
-     console.log("Queuing!", state);
-     app.queuePrompt(0, 1, state);
+ export function getState() {
+     return state;
  }
 
  let nodes: Record<number, LGraphNode> = {};
@@ -77,70 +79,10 @@
  let state: Record<number, any[]> = {};
 </script>
 
-<div id="comfy-ui-panes">
-    <div class="v-pane">
-        {#each Object.keys(items) as id}
-            {@const node = nodes[id]}
-            <Block>
-                <label for={id}>
-                    <BlockTitle>{node.title}</BlockTitle>
-                </label>
-                {#each items[id] as item, i}
-                    {#if item.widget.type == "combo"}
-                        <div class="wrapper">
-                            <Dropdown
-                                bind:value={state[id][i]}
-                                choices={item.widget.options.values}
-                                multiselect={false}
-                                max_choices={1},
-                                label={item.widget.name}
-                                show_label={true}
-                                disabled={item.widget.options.values.length === 0}
-                                on:change
-                                on:select
-                                on:blur
-                            />
-                        </div>
-                    {:else if item.widget.type == "number"}
-                        <div class="wrapper">
-                            <Range
-                                bind:value={state[id][i]}
-                                minimum={item.widget.options.min}
-                                maximum={item.widget.options.max}
-                                step={item.widget.options.step}
-                                label={item.widget.name}
-                                show_label={true}
-                                on:change
-                                on:release
-                            />
-                        </div>
-                    {:else if item.widget.type == "text"}
-                        <div class="wrapper">
-                            <TextBox
-                                bind:value={state[id][i]}
-                                label={item.widget.name}
-                                lines={item.widget.options.multiline ? 5 : 1}
-                                show_label={true}
-                                on:change
-                                on:submit
-                                on:blur
-                                on:select
-                            />
-                        </div>
-                    {/if}
-                {/each}
-            </Block>
-        {/each}
-    </div>
-    <div class="v-pane">
-    </div>
-    <div class="v-pane">
-        <div class="wrapper">
-            <Button variant="primary" on:click={queuePrompt}>
-                Run
-            </Button>
-        </div>
-    </div>
+<div id="comfy-ui-panes" >
+    <ComfyPane {dragItems} {items} {state} />
+    <ComfyPane {items} {state} />
+    <ComfyPane {items} {state} />
 </div>
 
 <style>
@@ -156,6 +98,15 @@
      overflow: auto;
      position: relative;
      width: 33%;
+ }
+
+ .handle {
+     cursor: grab;
+     position: absolute;
+     right: 0;
+     width: 1em;
+     height: 0.5em;
+     background-color: grey;
  }
 
  .wrapper {
