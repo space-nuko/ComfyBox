@@ -23,18 +23,26 @@
 		"prettier-plugin-svelte": "^2.8.1",
 		"svelte": "^3.54.0",
 		"svelte-check": "^3.2.0",
+		"svelte-dnd-action": "^0.9.22",
 		"typescript": "^5.0.0",
 		"vite": "^4.2.0",
 		"vitest": "^0.25.3"
 	},
 	"type": "module",
 	"dependencies": {
-		"@svelteuidev/composables": "^0.11.1",
-		"@svelteuidev/core": "^0.11.1",
+		"@gradio/atoms": "workspace:^0.0.1",
+		"@gradio/button": "workspace:^0.0.1",
+		"@gradio/form": "workspace:^0.0.1",
+		"@gradio/icons": "workspace:^0.0.1",
+		"@gradio/theme": "workspace:^0.0.1",
+		"@gradio/utils": "workspace:^0.0.1",
+		"events": "^3.3.0",
 		"litegraph.js": "^0.7.12",
 		"radix-icons-svelte": "^1.2.1",
 		"svelte-preprocess": "^5.0.3",
 		"svelte-splitpanes": "^0.7.13",
+		"tailwindcss": "^3.0.12",
+		"typed-emitter": "github:andywer/typed-emitter",
 		"vite-plugin-full-reload": "^1.0.5"
 	}
 }

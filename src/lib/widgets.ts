@@ -1,7 +1,7 @@
 import type { IWidget, LGraphNode } from "litegraph.js";
 import type ComfyApp from "$lib/components/ComfyApp";
 
-interface WidgetData {
+export interface WidgetData {
     widget: IWidget,
     minWidth?: number,
     minHeight?: number
@@ -55,7 +55,7 @@ const STRING: WidgetFactory = (node: LGraphNode, inputName: string, inputData: a
     // if (multiline) {
     //     return addMultilineWidget(node, inputName, { defaultVal, ...inputData[1] }, app);
     // } else {
-    return { widget: node.addWidget("text", inputName, defaultVal, () => {}, {}) };
+    return { widget: node.addWidget("text", inputName, defaultVal, () => {}, { multiline }) };
     // }
 };
 

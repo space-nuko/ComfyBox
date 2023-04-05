@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config';
 import FullReload from 'vite-plugin-full-reload'
 
 export default defineConfig({
-	plugins: [
+    plugins: [
         sveltekit()
         // FullReload(["src/**/*.{js,ts,svelte}"])
     ],
@@ -11,7 +11,10 @@ export default defineConfig({
         sourcemap: true,
     },
     server: {
-        port: 3000
+        port: 3000,
+        fs: {
+            allow: ["./gradio"]
+        }
     },
     test: {
         include: ['src/**/*.{test,spec}.{js,ts}']

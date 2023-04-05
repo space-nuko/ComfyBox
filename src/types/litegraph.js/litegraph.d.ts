@@ -409,6 +409,8 @@ declare module "litegraph.js" {
             version: typeof LiteGraph.VERSION;
         };
 
+    export type LConnectionKind = LiteGraph.INPUT | LiteGraph.OUTPUT;
+
     export declare class LGraph {
         static supported_types: string[];
         static STATUS_STOPPED: 1;
@@ -436,7 +438,7 @@ declare module "litegraph.js" {
         starttime: number;
         status: typeof LGraph.STATUS_RUNNING | typeof LGraph.STATUS_STOPPED;
 
-        /* private */ _nodes: LGraphNode[];
+        private _nodes: LGraphNode[];
         private _groups: LGraphGroup[];
         private _nodes_by_id: Record<number, LGraphNode>;
         /** nodes that are executable sorted in execution order */
@@ -515,10 +517,34 @@ declare module "litegraph.js" {
          */
         add(node: LGraphNode, skip_compute_order?: boolean): void;
         /**
+         * Called before the graph is changed
+         */
+        onBeforeChange(graph: LGraph, info: any): void;
+        /**
+         * Called after the graph is changed
+         */
+        onAfterChange(graph: LGraph, info: any): void;
+        /**
          * Called when a new node is added
          * @param node the instance of the node
          */
         onNodeAdded(node: LGraphNode): void;
+        /**
+         * Called when a node is removed
+         * @param node the instance of the node
+         */
+        onNodeRemoved(node: LGraphNode): void;
+        /**
+         * Called when a node's connection is changed
+         * @param node the instance of the node
+         */
+        onNodeConnectionChange(kind: LConnectionKind,
+                               node: LGraphNode,
+                               slot: INodeSlot,
+                               target_node: LGraphNode,
+                               target_slot: INodeSlot): void;
+        /** Called by `LGraph.configure` */
+        onConfigure?(o: SerializedLGraphNode): void;
         /** Removes a node from the graph */
         remove(node: LGraphNode): void;
         /** Returns a node by its id. */
@@ -677,6 +703,7 @@ declare module "litegraph.js" {
         id: number;
 
         widgets: IWidget[] | null | undefined;
+        widgets_values?: IWidget["value"][];
 
         //inputs available: array of inputs
         inputs: INodeInputSlot[];
@@ -1270,6 +1297,8 @@ declare module "litegraph.js" {
         node_over: LGraphNode | null;
         node_title_color: string;
         node_widget: [LGraphNode, IWidget] | null;
+        /** Called by `LGraphCanvas.clear` */
+        onClear?(): void;
         /** Called by `LGraphCanvas.drawBackCanvas` */
         onDrawBackground:
             | ((ctx: CanvasRenderingContext2D, visibleArea: Vector4) => void)
