@@ -331,10 +331,6 @@ export default class ComfyApp {
         // Process nodes in order of execution
         for (const node of this.lGraph.computeExecutionOrder(false, null)) {
             const fromFrontend = frontendState[node.id];
-            if (fromFrontend) {
-                console.log("Set values!", node, fromFrontend)
-                node.widgets_values = fromFrontend;
-            }
 
             const n = workflow.nodes.find((n) => n.id === node.id);
 
@@ -359,7 +355,13 @@ export default class ComfyApp {
                 for (const i in widgets) {
                     const widget = widgets[i];
                     if (!widget.options || widget.options.serialize !== false) {
-                        inputs[widget.name] = widget.serializeValue ? await widget.serializeValue(n, i) : widget.value;
+                        // TODO serializeValue API
+                        let value = widget.serializeValue ? await widget.serializeValue(n, i) : widget.value;
+                        if (fromFrontend) {
+                            console.log("Set values!", value, fromFrontend[i])
+                            value = fromFrontend[i];
+                        }
+                        inputs[widget.name] = value
                     }
                 }
             }
