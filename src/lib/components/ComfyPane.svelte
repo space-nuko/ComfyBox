@@ -1,13 +1,11 @@
 <script lang="ts">
- import { Button } from "@gradio/button";
+ import { onDestroy } from "svelte";
  import { Block, BlockTitle } from "@gradio/atoms";
  import { Dropdown, Range, TextBox } from "@gradio/form";
+ import widgetState from "$lib/stores/widgetState";
 
  import { dndzone } from 'svelte-dnd-action';
- import { flip } from 'svelte/animate';
-
- export let state: Record<number, any[]> = {};
- export let items: Record<number, { node: LGraphNode, widget: IWidget }[]> = {};
+ import {flip} from 'svelte/animate';
 
  export let dragItems = [];
  let dragDisabled = true;
@@ -29,6 +27,12 @@
  const stopDrag = () => {
      dragDisabled = true;
  };
+
+ const unsubscribe = widgetState.subscribe(state => {
+     dragItems = dragItems.filter(item => item.node.id in state);
+ });
+
+ onDestroy(unsubscribe);
 </script>
 
 
@@ -40,56 +44,59 @@
     {#each dragItems as dragItem(dragItem.id)}
         {@const node = dragItem.node}
         {@const id = node.id}
-        <Block>
-            <div class="handle" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
-            <label for={id}>
-                <BlockTitle>{node.title}</BlockTitle>
-            </label>
-            {#each items[id] as item, i}
-                {#if item.widget.type == "combo"}
-                    <div class="wrapper">
-                        <Dropdown
-                            bind:value={state[id][i]}
-                            choices={item.widget.options.values}
-                            multiselect={false}
-                            max_choices={1},
-                            label={item.widget.name}
-                            show_label={true}
-                            disabled={item.widget.options.values.length === 0}
-                            on:change
-                            on:select
-                            on:blur
-                        />
-                    </div>
-                {:else if item.widget.type == "number"}
-                    <div class="wrapper">
-                        <Range
-                            bind:value={state[id][i]}
-                            minimum={item.widget.options.min}
-                            maximum={item.widget.options.max}
-                            step={item.widget.options.step}
-                            label={item.widget.name}
-                            show_label={true}
-                            on:change
-                            on:release
-                        />
-                    </div>
-                {:else if item.widget.type == "text"}
-                    <div class="wrapper">
-                        <TextBox
-                            bind:value={state[id][i]}
-                            label={item.widget.name}
-                            lines={item.widget.options.multiline ? 5 : 1}
-                            show_label={true}
-                            on:change
-                            on:submit
-                            on:blur
-                            on:select
-                        />
-                    </div>
-                {/if}
-            {/each}
-        </Block>
+        <div class="animation-wrapper" animate:flip={{duration:flipDurationMs}}>
+            <Block>
+                <div class="handle" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+                <label for={id}>
+                    <BlockTitle>{node.title}</BlockTitle>
+                </label>
+                {#each $widgetState[id] as item, i}
+                    {#if item.widget.type == "combo"}
+                        <div class="wrapper">
+                            <Dropdown
+                                bind:value={item.value}
+                                choices={item.widget.options.values}
+                                multiselect={false}
+                                max_choices={1},
+                                label={item.widget.name}
+                                show_label={true}
+                                disabled={item.widget.options.values.length === 0}
+                                on:change
+                                on:select
+                                on:blur
+                            />
+                        </div>
+                    {:else if item.widget.type == "number"}
+                        <div class="wrapper">
+                            <Range
+                                bind:value={item.value}
+                                minimum={item.widget.options.min}
+                                maximum={item.widget.options.max}
+                                step={item.widget.options.step}
+                                label={item.widget.name}
+                                show_label={true}
+                                on:change
+                                on:release
+                            />
+                        </div>
+                    {:else if item.widget.type == "text"}
+                        <div class="wrapper">
+                            <TextBox
+                                bind:value={item.value}
+                                label={item.widget.name}
+                                lines={item.widget.options.multiline ? 5 : 1}
+                                max_lines={item.widget.options.multiline ? 5 : 1}
+                                show_label={true}
+                                on:change
+                                on:submit
+                                on:blur
+                                on:select
+                            />
+                        </div>
+                    {/if}
+                {/each}
+            </Block>
+        </div>
     {/each}
 </div>
 

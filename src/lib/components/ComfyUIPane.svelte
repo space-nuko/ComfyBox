@@ -3,86 +3,26 @@
  import type { IWidget } from "litegraph.js";
  import ComfyApp from "./ComfyApp";
  import ComfyPane from "./ComfyPane.svelte";
+ import widgetState from "$lib/stores/widgetState";
 
  export let app: ComfyApp;
+ let dragConfigured: boolean = false;
+ export let dragItemss: any[][] = []
 
- let dragItems = [];
+ export let totalId = 0;
 
- export function clear() {
-     nodes = {};
-     items = {};
-     state = {};
-     dragItems = []
+ $: if(app && !dragConfigured) {
+     dragConfigured = true;
+     app.eventBus.on("nodeAdded", (node: LGraphNode) => {
+         dragItemss[0].push({ id: totalId++, node: node });
+     });
  }
-
- export function addNodeUI(node: LGraphNode) {
-     if (node.widgets) {
-         for (const [i, widget] of node.widgets.entries()) {
-             if (!nodes[node.id]) {
-                 dragItems.push({ id: node.id, node: node })
-             }
-             nodes[node.id] = node;
-
-             node.onPropertyChanged = (k, v) => {
-                 console.log("PROPCHANGE", k, v)
-             };
-
-             if (!items[node.id]) {
-                 items[node.id] = []
-             }
-             items[node.id].push({ node, widget })
-
-             if (!state[node.id]) {
-                 state[node.id] = []
-             }
-             state[node.id].push(widget.value);
-         }
-     }
-
-     nodes = nodes;
-     items = items;
-     state = state;
- }
-
- export function removeNodeUI(node: LGraphNode) {
-     delete nodes[node.id]
-     delete state[node.id]
-     delete items[node.id]
-
-     dragItems = Array.from(dragItems.filter(e => e.id != node.id));
-     console.log("REM", node.id, dragItems)
-
-     nodes = nodes;
-     items = items;
-     state = state;
- }
-
- export function configureFinished(graph: LGraph) {
-     for (const node of graph.computeExecutionOrder(false, null)) {
-         if (node.widgets_values) {
-             for (const [j, value] of node.widgets_values.entries()) {
-                 state[node.id][j] = value;
-             }
-         }
-     }
-
-     nodes = nodes;
-     state = state;
- }
-
- export function getState() {
-     return state;
- }
-
- let nodes: Record<number, LGraphNode> = {};
- let items: Record<number, { node: LGraphNode, widget: IWidget }[]> = {};
- let state: Record<number, any[]> = {};
 </script>
 
 <div id="comfy-ui-panes" >
-    <ComfyPane {dragItems} {items} {state} />
-    <ComfyPane {items} {state} />
-    <ComfyPane {items} {state} />
+    <ComfyPane bind:dragItems={dragItemss[0]} />
+    <ComfyPane bind:dragItems={dragItemss[1]} />
+    <ComfyPane bind:dragItems={dragItemss[2]} />
 </div>
 
 <style>
@@ -105,7 +45,7 @@
      position: absolute;
      right: 0;
      width: 1em;
-     height: 0.5em;
+     height: 1em;
      background-color: grey;
  }
 

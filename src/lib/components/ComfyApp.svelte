@@ -5,6 +5,7 @@
  import { Backpack, Gear } from 'radix-icons-svelte';
  import ComfyUIPane from "./ComfyUIPane.svelte";
  import ComfyApp from "./ComfyApp";
+ import widgetState from "$lib/stores/widgetState";
 
  import { LGraphNode } from "litegraph.js";
 
@@ -36,21 +37,10 @@
  onMount(async () => {
      app = new ComfyApp();
 
-     app.eventBus.on("nodeAdded", (node: LGraphNode) => {
-         uiPane.addNodeUI(node);
-     });
-
-     app.eventBus.on("nodeRemoved", (node: LGraphNode) => {
-         uiPane.removeNodeUI(node);
-     });
-
-     app.eventBus.on("configured", (graph: LGraph) => {
-         uiPane.configureFinished(graph);
-     });
-
-     app.eventBus.on("cleared", () => {
-         uiPane.clear();
-     });
+     app.eventBus.on("nodeAdded", widgetState.nodeAdded);
+     app.eventBus.on("nodeRemoved", widgetState.nodeRemoved);
+     app.eventBus.on("configured", widgetState.configureFinished);
+     app.eventBus.on("cleared", widgetState.clear);
 
      await app.setup();
      refreshView();
