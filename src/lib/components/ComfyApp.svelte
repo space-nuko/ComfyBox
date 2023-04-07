@@ -12,9 +12,11 @@
  let app: ComfyApp = undefined;
  let uiPane: ComfyUIPane = undefined;
  let containerElem: HTMLDivElement;
+ let resizeTimeout: typeof Timer = -1;
 
  function refreshView(event) {
-     app.resizeCanvas();
+     clearTimeout(resizeTimeout);
+     resizeTimeout = setTimeout(app.resizeCanvas.bind(app), 250);
  }
 
  function queuePrompt() {
@@ -35,10 +37,6 @@
      }
  }
 
- function testtr() {
-     console.warn("TESTTR!")
- }
-
  let graphResizeTimer: typeof Timer = -1;
 
  onMount(async () => {
@@ -54,7 +52,7 @@
 
      (window as any).app = app;
 
-     let graphPaneDiv = containerElem.querySelector("canvas").parentNode as HTMLDivNode;
+     let graphPaneDiv = containerElem.querySelector(".canvas-wrapper").parentNode as HTMLDivNode;
      graphPaneDiv.ontransitionend = () => {
          app.resizeCanvas()
      }
@@ -64,20 +62,22 @@
 <div id="dropzone" class="dropzone"></div>
 <div id="container" bind:this={containerElem}>
     <Splitpanes theme="comfy" on:resize={refreshView}>
-        <Pane size={20} minSize={10}>
-            <div>
-                Sidebar
-            </div>
-        </Pane>
         <Pane>
             <Splitpanes theme="comfy" on:resize={refreshView} horizontal="{true}">
                 <Pane minSize={15}>
                     <ComfyUIPane bind:this={uiPane} {app} />
                 </Pane>
                 <Pane snapSize={10} bind:size={graphSize}>
-                    <canvas id="graph-canvas" />
+                    <div class="canvas-wrapper">
+                        <canvas id="graph-canvas" />
+                    </div>
                 </Pane>
             </Splitpanes>
+        </Pane>
+        <Pane size={20} snapSize={10}>
+            <div>
+                Sidebar
+            </div>
         </Pane>
     </Splitpanes>
 </div>
@@ -93,6 +93,7 @@
 <style>
  #container {
      height: calc(100vh - 60px);
+     max-width: 100vw;
      display: grid;
      width: 100%;
  }
@@ -109,12 +110,16 @@
  }
 
  #graph-canvas {
-     width: 100%;
-     height: 100%;
  }
 
  #bottombar {
      margin: 10px;
+ }
+
+ .canvas-wrapper {
+     width: 100%;
+     height: 100%;
+     background-color: #333;
  }
 
  .dropzone {
@@ -149,6 +154,7 @@
 
  :global(.splitpanes.comfy) {
      max-height: calc(100vh - 60px);
+     max-width: 100vw;
  }
 
  :global(.splitpanes__pane) {
