@@ -4,6 +4,8 @@ An alternative UI to the backend server of the Stable Diffusion webapp [ComfyUI]
 
 This project is *still under construction* and many features are missing, be aware of the tradeoffs if you're interested in using it.
 
+![Screenshot](./static/screenshot.png)
+
 ## NOTE
 
 This frontend isn't compatible with regular ComfyUI's workflow format since extra metadata is saved like panel layout, so you'll have to spend a bit of time recreating them. This project also isn't compatible with regular ComfyUI's frontend extension format, but useful extensions can be integrated into this repo with some effort.
@@ -33,7 +35,3 @@ git clone https://github.com/space-nuko/ComfyBox
 3. `pnpm dev`
 4. Start ComfyUI as usual with `python main.py --enable-cors-header`
 5. Visit `http://localhost:3000` in your browser
-
-## Screenshot (WIP)
-
-![Screenshot](./static/screenshot.png)
