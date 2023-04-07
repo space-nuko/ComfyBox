@@ -30,6 +30,7 @@ export type SerializedPanes = {
 }
 
 export type SerializedAppState = {
+    version: number,
     panes: SerializedPanes,
     workflow: SerializedLGraph
 }

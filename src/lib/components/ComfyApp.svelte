@@ -55,19 +55,38 @@
 
  let graphResizeTimer: typeof Timer = -1;
 
- function doAutosave(graph: LGraph): void {
-     // We will merge in the state of the frontend instead of what's inside the
-     // LGraph structure.
+ function serializeAppState(graph: LGraph): SerializedAppState {
      const frontendState = get(widgetState);
 
      const serializedGraph = graph.serialize()
      const serializedPaneOrder = uiPane.serialize()
 
-     const savedWorkflow = {
-         graph: serializedGraph,
-         panes: serializedPaneOrder
+     // Override the saved graph widget state with the properties set in the
+     // frontend panels.
+     for (let i = 0; i < serializedGraph.nodes.length; i++) {
+         let serializedNode = serializedGraph.nodes[i];
+         let frontendWidgetStates = frontendState[serializedNode.id];
+         if (frontendWidgetStates) {
+             for (let j = 0; j < serializedNode.widgets_values.length; j++) {
+                 let frontendWidgetState = frontendWidgetStates[j];
+
+                 // Virtual widgets always come after real widgets in the current design
+                 if (frontendWidgetState && !frontendWidgetState.isVirtual) {
+                     serializedNode.widgets_values[j] = frontendWidgetState.value;
+                 }
+             }
+         }
      }
 
+     return {
+         version: 1,
+         workflow: serializedGraph,
+         panes: serializedPaneOrder
+     }
+ }
+
+ function doAutosave(graph: LGraph): void {
+     const savedWorkflow = serializeAppState(graph);
      localStorage.setItem("workflow", JSON.stringify(savedWorkflow))
  }
 
@@ -135,6 +154,9 @@
         </Button>
         <Button variant="secondary" on:click={toggleSidebar}>
             Toggle Sidebar
+        </Button>
+        <Button variant="secondary" on:click={() => { if (app?.lGraph) doAutosave(app.lGraph) }}>
+            Save
         </Button>
     </div>
     <LightboxModal />
