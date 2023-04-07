@@ -1,5 +1,6 @@
 <script lang="ts">
  import { onMount } from "svelte";
+ import { get } from "svelte/store";
  import { Pane, Splitpanes } from 'svelte-splitpanes';
  import { Button } from "@gradio/button";
  import { Backpack, Gear } from 'radix-icons-svelte';
@@ -7,7 +8,7 @@
  import ComfyApp from "./ComfyApp";
  import widgetState from "$lib/stores/widgetState";
 
- import { LGraphNode } from "litegraph.js";
+ import { LGraphNode } from "@litegraph-ts/core";
 
  let app: ComfyApp = undefined;
  let uiPane: ComfyUIPane = undefined;
@@ -17,7 +18,7 @@
  }
 
  function queuePrompt() {
-     const state = uiPane.getState();
+     const state = get(widgetState);
      console.log("Queuing!", state);
      app.queuePrompt(0, 1, state);
  }

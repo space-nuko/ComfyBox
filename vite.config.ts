@@ -6,7 +6,7 @@ import FullReload from 'vite-plugin-full-reload';
 export default defineConfig({
     clearScreen: false,
     plugins: [
-        tsconfigPaths({loose: true}),
+        tsconfigPaths({ loose: true }),
         sveltekit(),
         FullReload(["src/**/*.{js,ts,svelte}"])
     ],
@@ -16,7 +16,10 @@ export default defineConfig({
     server: {
         port: 3000,
         fs: {
-            allow: ["./gradio"]
+            allow: [
+                "./gradio",
+                "./litegraph",
+            ]
         }
     },
     test: {

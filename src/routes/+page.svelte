@@ -1,6 +1,6 @@
 <script lang="ts">
  import ComfyApp from "$lib/components/ComfyApp.svelte"
- import "litegraph.js/css/litegraph.css";
+ import "@litegraph-ts/core/css/litegraph.css";
 </script>
 
 <ComfyApp/>

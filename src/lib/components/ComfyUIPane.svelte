@@ -1,6 +1,6 @@
 <script lang="ts">
- import { LGraphNode, LGraph } from "litegraph.js";
- import type { IWidget } from "litegraph.js";
+ import { LGraphNode, LGraph } from "@litegraph-ts/core";
+ import type { IWidget } from "@litegraph-ts/core";
  import ComfyApp from "./ComfyApp";
  import ComfyPane from "./ComfyPane.svelte";
  import widgetState from "$lib/stores/widgetState";

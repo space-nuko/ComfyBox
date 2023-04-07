@@ -1,5 +1,5 @@
 import { writable, get } from 'svelte/store';
-import type { LGraph, LGraphNode, IWidget } from "litegraph.js";
+import type { LGraph, LGraphNode, IWidget } from "@litegraph-ts/core";
 import type { Readable, Writable } from 'svelte/store';
 
 export type WidgetUIState = {
@@ -64,10 +64,10 @@ function configureFinished(graph: LGraph) {
 }
 
 export default
-{
-    ...store,
-    nodeAdded,
-    nodeRemoved,
-    configureFinished,
-    clear
-} as WidgetStateStore;
+    {
+        ...store,
+        nodeAdded,
+        nodeRemoved,
+        configureFinished,
+        clear
+    } as WidgetStateStore;

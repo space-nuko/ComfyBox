@@ -1,3 +1,4 @@
 packages:
   - 'gradio/js/*'
-  - 'litegraph/packages/*'
+  - 'litegraph/packages/core'
+  - 'litegraph/packages/nodes-basic'

@@ -4,4 +4,4 @@
 	branch = v3.24.1
 [submodule "litegraph"]
 	path = litegraph
-	url = https://github.com/space-nuko/litegraph.js
+	url = https://github.com/space-nuko/litegraph.ts

@@ -1,4 +1,4 @@
-import type { IWidget, LGraphNode } from "litegraph.js";
+import type { IWidget, LGraphNode } from "@litegraph-js/core";
 import type ComfyApp from "$lib/components/ComfyApp";
 
 export interface WidgetData {
@@ -28,7 +28,7 @@ function getNumberDefaults(inputData: any, defaultStep: number): NumberDefaults 
 
 const FLOAT: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any): WidgetData => {
     const { val, config } = getNumberDefaults(inputData, 0.5);
-    return { widget: node.addWidget("number", inputName, val, () => {}, config) };
+    return { widget: node.addWidget("number", inputName, val, () => { }, config) };
 }
 
 
@@ -39,7 +39,7 @@ const INT: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any)
             "number",
             inputName,
             val,
-            function (v) {
+            function(v) {
                 const s = this.options.step / 10;
                 this.value = Math.round(v / s) * s;
             },
@@ -55,7 +55,7 @@ const STRING: WidgetFactory = (node: LGraphNode, inputName: string, inputData: a
     // if (multiline) {
     //     return addMultilineWidget(node, inputName, { defaultVal, ...inputData[1] }, app);
     // } else {
-    return { widget: node.addWidget("text", inputName, defaultVal, () => {}, { multiline }) };
+    return { widget: node.addWidget("text", inputName, defaultVal, () => { }, { multiline }) };
     // }
 };
 
@@ -65,7 +65,7 @@ const COMBO: WidgetFactory = (node: LGraphNode, inputName: string, inputData: an
     if (inputData[1] && inputData[1].default) {
         defaultValue = inputData[1].default;
     }
-    return { widget: node.addWidget("combo", inputName, defaultValue, () => {}, { values: type }) };
+    return { widget: node.addWidget("combo", inputName, defaultValue, () => { }, { values: type }) };
 }
 
 const IMAGEUPLOAD: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any, app): WidgetData => {
