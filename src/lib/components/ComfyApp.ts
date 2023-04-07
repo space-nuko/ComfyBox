@@ -10,6 +10,8 @@ import type TypedEmitter from "typed-emitter";
 // Import nodes
 import * as basic from "@litegraph-ts/nodes-basic"
 import * as nodes from "$lib/nodes/index"
+import ComfyGraphCanvas from "$lib/ComfyGraphCanvas";
+import type ComfyGraphNode from "$lib/ComfyGraphNode";
 
 LiteGraph.catch_exceptions = false;
 
@@ -34,6 +36,11 @@ interface ComfyGraphNodeExecutable extends LGraphNodeExecutable {
     applyToGraph(workflow: SerializedLGraph<SerializedLGraphNode<LGraphNode>, SerializedLLink, SerializedLGraphGroup>): void;
 }
 
+export type Progress = {
+    value: number,
+    max: number
+}
+
 export default class ComfyApp {
     api: ComfyAPI;
     canvasEl: HTMLCanvasElement | null = null;
@@ -44,6 +51,12 @@ export default class ComfyApp {
     nodeOutputs: Record<string, any> = {};
     eventBus: TypedEmitter<ComfyAppEvents> = new EventEmitter() as TypedEmitter<ComfyAppEvents>;
 
+    runningNodeId: number | null = null;
+    dragOverNode: LGraphNode | null = null;
+    progress: Progress | null = null;
+    shiftDown: boolean = false;
+    selectedGroupMoving: boolean = false;
+
     private queueItems: QueueItem[] = [];
     private processingQueue: boolean = false;
 
@@ -52,12 +65,9 @@ export default class ComfyApp {
     }
 
     async setup(): Promise<void> {
-        this.addProcessMouseHandler();
-        this.addProcessKeyHandler();
-
         this.canvasEl = document.getElementById("graph-canvas") as HTMLCanvasElement;
         this.lGraph = new LGraph();
-        this.lCanvas = new LGraphCanvas(this.canvasEl, this.lGraph);
+        this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl, this.lGraph);
         this.canvasCtx = this.canvasEl.getContext("2d");
 
         this.addGraphLifecycleHooks();
@@ -91,12 +101,10 @@ export default class ComfyApp {
         // Save current workflow automatically
         setInterval(() => localStorage.setItem("workflow", JSON.stringify(this.lGraph.serialize())), 1000);
 
-        // this.#addDrawNodeHandler();
-        // this.#addDrawGroupsHandler();
-        // this.#addApiUpdateHandlers();
+        this.addApiUpdateHandlers();
         this.addDropHandler();
-        // this.#addPasteHandler();
-        // this.#addKeyboardHandler();
+        this.addPasteHandler();
+        this.addKeyboardHandler();
 
         // await this.#invokeExtensionsAsync("setup");
 
@@ -113,14 +121,6 @@ export default class ComfyApp {
         this.canvasEl.style.width = ""
         this.canvasEl.style.height = ""
         this.lCanvas.draw(true, true);
-    }
-
-    private addProcessMouseHandler() {
-
-    }
-
-    private addProcessKeyHandler() {
-
     }
 
     private graphOnConfigure() {
@@ -290,6 +290,82 @@ export default class ComfyApp {
         this.dropZone.addEventListener('dragover', this.allowDrag.bind(this));
         this.dropZone.addEventListener('dragleave', this.hideDropZone.bind(this));
         this.dropZone.addEventListener('drop', this.handleDrop.bind(this));
+    }
+
+    /**
+     * Adds a handler on paste that extracts and loads workflows from pasted JSON data
+     */
+    private addPasteHandler() {
+        document.addEventListener("paste", (e) => {
+            let data = (e.clipboardData || (window as any).clipboardData).getData("text/plain");
+            let workflow;
+            try {
+                data = data.slice(data.indexOf("{"));
+                workflow = JSON.parse(data);
+            } catch (err) {
+                try {
+                    data = data.slice(data.indexOf("workflow\n"));
+                    data = data.slice(data.indexOf("{"));
+                    workflow = JSON.parse(data);
+                } catch (error) { }
+            }
+
+            if (workflow && workflow.version && workflow.nodes && workflow.extra) {
+                this.loadGraphData(workflow);
+            }
+        });
+    }
+
+    /**
+     * Handles updates from the API socket
+     */
+    private addApiUpdateHandlers() {
+        this.api.addEventListener("status", ({ detail }: CustomEvent) => {
+            // this.ui.setStatus(detail);
+        });
+
+        this.api.addEventListener("reconnecting", () => {
+            // this.ui.dialog.show("Reconnecting...");
+        });
+
+        this.api.addEventListener("reconnected", () => {
+            // this.ui.dialog.close();
+        });
+
+        this.api.addEventListener("progress", ({ detail }: CustomEvent) => {
+            this.progress = detail;
+            this.lGraph.setDirtyCanvas(true, false);
+        });
+
+        this.api.addEventListener("executing", ({ detail }: CustomEvent) => {
+            this.progress = null;
+            this.runningNodeId = detail;
+            this.lGraph.setDirtyCanvas(true, false);
+        });
+
+        this.api.addEventListener("executed", ({ detail }: CustomEvent) => {
+            this.nodeOutputs[detail.node] = detail.output;
+            const node = this.lGraph.getNodeById(detail.node) as ComfyGraphNode;
+            if (node?.onExecuted) {
+                node.onExecuted(detail.output);
+            }
+        });
+
+        this.api.init();
+    }
+
+    private addKeyboardHandler() {
+        window.addEventListener("keydown", (e) => {
+            this.shiftDown = e.shiftKey;
+
+            // Queue prompt using ctrl or command + enter
+            if ((e.ctrlKey || e.metaKey) && (e.key === "Enter" || e.keyCode === 13 || e.keyCode === 10)) {
+                this.queuePrompt(e.shiftKey ? -1 : 0);
+            }
+        });
+        window.addEventListener("keyup", (e) => {
+            this.shiftDown = e.shiftKey;
+        });
     }
 
     /**
