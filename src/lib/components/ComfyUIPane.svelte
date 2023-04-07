@@ -12,25 +12,34 @@
 
  export let totalId = 0;
 
+ function addUIForNewNode(node: LGraphNode) {
+     let minWidgetCount = 2 ** 64;
+     let minIndex = 0;
+     let state = get(widgetState);
+     for (let i = 0; i < dragItemss.length; i++) {
+         let widgetCount = 0;
+         for (let j = 0; j < dragItemss[i].length; j++) {
+             const nodeID = dragItemss[i][j].node.id;
+             widgetCount += state[nodeID].length;
+         }
+         if (widgetCount < minWidgetCount) {
+             minWidgetCount = widgetCount
+             minIndex = i;
+         }
+     }
+     dragItemss[minIndex].push({ id: totalId++, node: node });
+ }
+
  $: if(app && !dragConfigured) {
      dragConfigured = true;
-     app.eventBus.on("nodeAdded", (node: LGraphNode) => {
-         let minWidgetCount = 2 ** 64;
-         let minIndex = 0;
-         let state = get(widgetState);
-         for (let i = 0; i < dragItemss.length; i++) {
-             let widgetCount = 0;
-             for (let j = 0; j < dragItemss[i].length; j++) {
-                 const nodeID = dragItemss[i][j].node.id;
-                 widgetCount += state[nodeID].length;
-             }
-             if (widgetCount < minWidgetCount) {
-                 minWidgetCount = widgetCount
-                 minIndex = i;
-             }
-         }
-         dragItemss[minIndex].push({ id: totalId++, node: node });
-     });
+     app.eventBus.on("nodeAdded", addUIForNewNode);
+ }
+
+ /*
+  * Serialize UI panel order so it can be restored when workflow is loaded
+  */
+ function getUIState(): any {
+
  }
 </script>
 

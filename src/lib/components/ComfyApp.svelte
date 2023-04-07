@@ -64,9 +64,12 @@
 
      (window as any).app = app;
 
-     let graphPaneDiv = containerElem.querySelector(".canvas-wrapper").parentNode as HTMLDivNode;
-     graphPaneDiv.ontransitionend = () => {
-         app.resizeCanvas()
+     let wrappers = containerElem.querySelectorAll<HTMLDivNode>(".pane-wrapper")
+     for (const wrapper of wrappers) {
+         const paneNode = wrapper.parentNode; // get the node inside the <Pane/>
+         paneNode.ontransitionend = () => {
+             app.resizeCanvas()
+         }
      }
  })
 </script>
@@ -80,14 +83,14 @@
                     <ComfyUIPane bind:this={uiPane} {app} />
                 </Pane>
                 <Pane bind:size={graphSize}>
-                    <div class="canvas-wrapper">
+                    <div class="canvas-wrapper pane-wrapper">
                         <canvas id="graph-canvas" />
                     </div>
                 </Pane>
             </Splitpanes>
         </Pane>
-        <Pane bind size={sidebarSize}>
-            <div>
+        <Pane bind:size={sidebarSize}>
+            <div class="sidebar-wrapper pane-wrapper">
                 Sidebar
             </div>
         </Pane>
@@ -137,6 +140,11 @@
      width: 100%;
      height: 100%;
      background-color: #333;
+ }
+
+ .sidebar-wrapper {
+     width: 100%;
+     height: 100%;
  }
 
  .dropzone {

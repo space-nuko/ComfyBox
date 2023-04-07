@@ -1,8 +1,10 @@
 <script lang="ts">
  import { onDestroy } from "svelte";
  import { Block, BlockTitle } from "@gradio/atoms";
- import { Dropdown, Range, TextBox } from "@gradio/form";
  import { Move } from 'radix-icons-svelte';
+ import ComboWidget from "./widgets/ComboWidget.svelte";
+ import RangeWidget from "./widgets/RangeWidget.svelte";
+ import TextWidget from "./widgets/TextWidget.svelte";
  import widgetState from "$lib/stores/widgetState";
 
  import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME } from 'svelte-dnd-action';
@@ -59,47 +61,11 @@
                 </label>
                 {#each $widgetState[id] as item, i}
                     {#if item.widget.type == "combo"}
-                        <div class="wrapper">
-                            <Dropdown
-                                bind:value={item.value}
-                                choices={item.widget.options.values}
-                                multiselect={false}
-                                max_choices={1},
-                                label={item.widget.name}
-                                show_label={true}
-                                disabled={item.widget.options.values.length === 0}
-                                on:change
-                                on:select
-                                on:blur
-                            />
-                        </div>
+                        <ComboWidget {item} />
                     {:else if item.widget.type == "number"}
-                        <div class="wrapper">
-                            <Range
-                                bind:value={item.value}
-                                minimum={item.widget.options.min}
-                                maximum={item.widget.options.max}
-                                step={item.widget.options.step}
-                                label={item.widget.name}
-                                show_label={true}
-                                on:change
-                                on:release
-                            />
-                        </div>
+                        <RangeWidget {item} />
                     {:else if item.widget.type == "text"}
-                        <div class="wrapper">
-                            <TextBox
-                                bind:value={item.value}
-                                label={item.widget.name}
-                                lines={item.widget.options.multiline ? 5 : 1}
-                                max_lines={item.widget.options.multiline ? 5 : 1}
-                                show_label={true}
-                                on:change
-                                on:submit
-                                on:blur
-                                on:select
-                            />
-                        </div>
+                        <TextWidget {item} />
                     {/if}
                     {#if dragItem[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
                         <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
@@ -144,10 +110,5 @@
      background: lightblue;
      opacity: 0.5;
      margin: 0;
- }
-
- .wrapper {
-     padding: 2px;
-     width: 100%;
  }
 </style>
