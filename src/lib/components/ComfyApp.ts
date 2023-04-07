@@ -22,12 +22,25 @@ if (typeof window !== "undefined") {
 
 type QueueItem = { num: number, batchCount: number }
 
+export type SerializedPanes = {
+    panels: { nodeId: number }[][]
+}
+
+export type SerializedAppState = {
+    panes: SerializedPanes,
+    workflow: SerializedLGraph
+}
+
 type ComfyAppEvents = {
     configured: (graph: LGraph) => void
     nodeAdded: (node: LGraphNode) => void
     nodeRemoved: (node: LGraphNode) => void
     nodeConnectionChanged: (kind: LConnectionKind, node: LGraphNode, slot: INodeSlot, targetNode: LGraphNode, targetSlot: INodeSlot) => void
     cleared: () => void
+    beforeChange: (graph: LGraph, param: any) => void
+    afterChange: (graph: LGraph, param: any) => void
+    autosave: (graph: LGraph) => void
+    restored: (workflow: SerializedAppState) => void
 }
 
 interface ComfyGraphNodeExecutable extends LGraphNodeExecutable {
@@ -85,8 +98,9 @@ export default class ComfyApp {
         try {
             const json = localStorage.getItem("workflow");
             if (json) {
-                const workflow = JSON.parse(json);
-                this.loadGraphData(workflow);
+                const workflow = JSON.parse(json) as SerializedAppState;
+                this.loadGraphData(workflow["workflow"]);
+                this.eventBus.emit("restored", workflow);
                 restored = true;
             }
         } catch (err) {
@@ -99,7 +113,7 @@ export default class ComfyApp {
         }
 
         // Save current workflow automatically
-        setInterval(() => localStorage.setItem("workflow", JSON.stringify(this.lGraph.serialize())), 1000);
+        setInterval(this.requestAutosave.bind(this), 1000);
 
         this.addApiUpdateHandlers();
         this.addDropHandler();
@@ -156,6 +170,10 @@ export default class ComfyApp {
     private canvasOnClear() {
         console.log("CanvasClear");
         this.eventBus.emit("cleared");
+    }
+
+    private requestAutosave() {
+        this.eventBus.emit("autosave", this.lGraph);
     }
 
     private addGraphLifecycleHooks() {
@@ -372,11 +390,11 @@ export default class ComfyApp {
      * Populates the graph with the specified workflow data
      * @param {*} graphData A serialized graph object
      */
-    loadGraphData(graphData: any = null) {
+    loadGraphData(graphData?: SerializedLGraph) {
         this.clean();
 
         if (!graphData) {
-            graphData = structuredClone(defaultGraph);
+            graphData = structuredClone(defaultGraph) as SerializedLGraph;
         }
 
         // Patch T2IAdapterLoader to ControlNetLoader since they are the same node now

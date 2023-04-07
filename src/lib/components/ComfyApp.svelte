@@ -4,10 +4,10 @@
  import { Pane, Splitpanes } from 'svelte-splitpanes';
  import { Button } from "@gradio/button";
  import ComfyUIPane from "./ComfyUIPane.svelte";
- import ComfyApp from "./ComfyApp";
+ import ComfyApp, { type SerializedAppState } from "./ComfyApp";
  import widgetState from "$lib/stores/widgetState";
 
- import { LGraphNode } from "@litegraph-ts/core";
+ import { LGraph, LGraphNode } from "@litegraph-ts/core";
 
  let app: ComfyApp = undefined;
  let uiPane: ComfyUIPane = undefined;
@@ -51,6 +51,22 @@
 
  let graphResizeTimer: typeof Timer = -1;
 
+ function doAutosave(graph: LGraph): void {
+     const serializedGraph = graph.serialize()
+     const serializedPaneOrder = uiPane.serialize()
+
+     const savedWorkflow = {
+         graph: serializedGraph,
+         panes: serializedPaneOrder
+     }
+
+     localStorage.setItem("workflow", JSON.stringify(savedWorkflow))
+ }
+
+ function doRestore(workflow: SerializedAppState) {
+     uiPane.restore(workflow.panes);
+ }
+
  onMount(async () => {
      app = new ComfyApp();
 
@@ -58,11 +74,14 @@
      app.eventBus.on("nodeRemoved", widgetState.nodeRemoved);
      app.eventBus.on("configured", widgetState.configureFinished);
      app.eventBus.on("cleared", widgetState.clear);
+     app.eventBus.on("autosave", doAutosave);
+     app.eventBus.on("restored", doRestore);
 
      await app.setup();
      refreshView();
 
      (window as any).app = app;
+     (window as any).appPane = uiPane;
 
      let wrappers = containerElem.querySelectorAll<HTMLDivNode>(".pane-wrapper")
      for (const wrapper of wrappers) {
