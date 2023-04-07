@@ -5,17 +5,22 @@
  import { Button } from "@gradio/button";
  import ComfyUIPane from "./ComfyUIPane.svelte";
  import ComfyApp, { type SerializedAppState } from "./ComfyApp";
+ import { Checkbox } from "@gradio/form"
  import widgetState from "$lib/stores/widgetState";
  import { ImageViewer } from "$lib/ImageViewer";
+ import { download } from "$lib/utils"
 
  import { LGraph, LGraphNode } from "@litegraph-ts/core";
 	import LightboxModal from "./LightboxModal.svelte";
+	import { Block } from "@gradio/atoms";
 
  let app: ComfyApp = undefined;
  let imageViewer: ImageViewer;
  let uiPane: ComfyUIPane = undefined;
  let mainElem: HTMLDivElement;
  let containerElem: HTMLDivElement;
+ let nodesLocked: boolean = false;
+ let graphLocked: boolean = false;
  let resizeTimeout: typeof Timer = -1;
 
  function refreshView(event?: Event) {
@@ -28,6 +33,9 @@
      console.log("Queuing!", state);
      app.queuePrompt(0, 1, state);
  }
+
+ $: if (app) app.lCanvas.allow_dragnodes = !nodesLocked;
+ $: if (app) app.lCanvas.allow_interaction = !graphLocked;
 
  let graphSize = null;
 
@@ -55,7 +63,8 @@
 
  let graphResizeTimer: typeof Timer = -1;
 
- function serializeAppState(graph: LGraph): SerializedAppState {
+ function serializeAppState(): SerializedAppState {
+     const graph = app.lGraph;
      const frontendState = get(widgetState);
 
      const serializedGraph = graph.serialize()
@@ -79,6 +88,7 @@
      }
 
      return {
+         createdBy: "ComfyBox",
          version: 1,
          workflow: serializedGraph,
          panes: serializedPaneOrder
@@ -86,12 +96,22 @@
  }
 
  function doAutosave(graph: LGraph): void {
-     const savedWorkflow = serializeAppState(graph);
+     const savedWorkflow = serializeAppState();
      localStorage.setItem("workflow", JSON.stringify(savedWorkflow))
  }
 
  function doRestore(workflow: SerializedAppState) {
      uiPane.restore(workflow.panes);
+ }
+
+ function doSave(): void {
+     if (!app?.lGraph)
+         return;
+
+     const date = new Date();
+     const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
+
+     download(`workflow-${formattedDate}.json`, JSON.stringify(serializeAppState()), "application/json")
  }
 
  onMount(async () => {
@@ -155,9 +175,11 @@
         <Button variant="secondary" on:click={toggleSidebar}>
             Toggle Sidebar
         </Button>
-        <Button variant="secondary" on:click={() => { if (app?.lGraph) doAutosave(app.lGraph) }}>
+        <Button variant="secondary" on:click={doSave}>
             Save
         </Button>
+        <Checkbox label="Lock Nodes" bind:value={nodesLocked}/>
+        <Checkbox label="Disable Interaction" bind:value={graphLocked}/>
     </div>
     <LightboxModal />
 </div>
@@ -187,6 +209,9 @@
  }
 
  #bottombar {
+     display: flex;
+     flex-wrap: wrap;
+     gap: var(--layout-gap);
      margin: 10px;
  }
 

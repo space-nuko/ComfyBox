@@ -30,6 +30,7 @@ importers:
       svelte-check: ^3.2.0
       svelte-dnd-action: ^0.9.22
       svelte-preprocess: ^5.0.3
+      svelte-select: ^5.5.3
       svelte-splitpanes: ^0.7.13
       tailwindcss: ^3.3.1
       typed-emitter: github:andywer/typed-emitter
@@ -54,6 +55,7 @@ importers:
       pollen-css: 4.6.2
       radix-icons-svelte: 1.2.1
       svelte-preprocess: 5.0.3_3gubijbxbisgisegeglxqngyuq
+      svelte-select: 5.5.3
       svelte-splitpanes: 0.7.13_svelte@3.58.0
       tailwindcss: 3.3.1
       typed-emitter: github.com/andywer/typed-emitter/9a139b6fa0ec6b0db6141b5b756b784e4f7ef4e4
@@ -289,6 +291,16 @@ packages:
     resolution: {integrity: sha512-x5vzdtOOGgFVDCUs81QRB2+liax8rFg3+7hqM+QhBG0/G3F1ZsoYl97UrqgHgQ9KKT7G6c4V+aTUCgu/n22v1A==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
+
+  /@floating-ui/core/1.2.6:
+    resolution: {integrity: sha512-EvYTiXet5XqweYGClEmpu3BoxmsQ4hkj3QaYA6qEnigCWffTP3vNRwBReTdrwDwo7OoJ3wM8Uoe9Uk4n+d4hfg==}
+    dev: false
+
+  /@floating-ui/dom/1.2.6:
+    resolution: {integrity: sha512-02vxFDuvuVPs22iJICacezYJyf7zwwOCWkPNkWNBr1U0Qt1cKFYzWvxts0AmqcOQGwt/3KJWcWIgtbUU38keyw==}
+    dependencies:
+      '@floating-ui/core': 1.2.6
+    dev: false
 
   /@humanwhocodes/config-array/0.11.8:
     resolution: {integrity: sha512-UybHIJzJnR5Qc/MsD9Kr+RpO2h+/P1GhOwdiLPXK5TWk5sgTdu88bTD9UP+CKbPPh5Rni1u0GjAdYQLemG8g+g==}
@@ -1637,6 +1649,13 @@ packages:
       svelte: 3.58.0
     dev: true
 
+  /svelte-floating-ui/1.2.8:
+    resolution: {integrity: sha512-8Ifi5CD2Ui7FX7NjJRmutFtXjrB8T/FMNoS2H8P81t5LHK4I9G4NIs007rLWG/nRl7y+zJUXa3tWuTjYXw/O5A==}
+    dependencies:
+      '@floating-ui/core': 1.2.6
+      '@floating-ui/dom': 1.2.6
+    dev: false
+
   /svelte-hmr/0.15.1_svelte@3.58.0:
     resolution: {integrity: sha512-BiKB4RZ8YSwRKCNVdNxK/GfY+r4Kjgp9jCLEy0DuqAKfmQtpL38cQK3afdpjw4sqSs4PLi3jIPJIFp259NkZtA==}
     engines: {node: ^12.20 || ^14.13.1 || >= 16}
@@ -1692,6 +1711,13 @@ packages:
       strip-indent: 3.0.0
       svelte: 3.58.0
       typescript: 5.0.3
+
+  /svelte-select/5.5.3:
+    resolution: {integrity: sha512-0QIiEmyon3bqoenFtR/BhamMpMmzOWWg1ctE7xxwP7nEnZhAGGoTra1HPPfEyT6C6gVaOFgCpdBaZoM8DEHlEw==}
+    dependencies:
+      '@floating-ui/dom': 1.2.6
+      svelte-floating-ui: 1.2.8
+    dev: false
 
   /svelte-splitpanes/0.7.13_svelte@3.58.0:
     resolution: {integrity: sha512-LiAf4OEZqRJanoax9mextXtQ0JzrdCqX2tOgVO+yJu2XNyGz5j5fGbw8+5AXgOasPi/m1nv8n2Lt+XYFRfvIGg==}

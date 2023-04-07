@@ -30,6 +30,7 @@ export type SerializedPanes = {
 }
 
 export type SerializedAppState = {
+    createdBy: "ComfyBox",
     version: number,
     panes: SerializedPanes,
     workflow: SerializedLGraph
