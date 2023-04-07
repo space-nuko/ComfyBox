@@ -6,7 +6,7 @@ importers:
     specifiers:
       '@gradio/atoms': workspace:*
       '@gradio/button': workspace:*
-      '@gradio/client': ^0.0.1
+      '@gradio/client': workspace:*
       '@gradio/form': workspace:*
       '@gradio/gallery': workspace:*
       '@gradio/icons': workspace:*
@@ -41,7 +41,7 @@ importers:
     dependencies:
       '@gradio/atoms': link:gradio/js/atoms
       '@gradio/button': link:gradio/js/button
-      '@gradio/client': 0.0.1
+      '@gradio/client': link:gradio/client/js
       '@gradio/form': link:gradio/js/form
       '@gradio/gallery': link:gradio/js/gallery
       '@gradio/icons': link:gradio/js/icons
@@ -289,10 +289,6 @@ packages:
     resolution: {integrity: sha512-x5vzdtOOGgFVDCUs81QRB2+liax8rFg3+7hqM+QhBG0/G3F1ZsoYl97UrqgHgQ9KKT7G6c4V+aTUCgu/n22v1A==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
-
-  /@gradio/client/0.0.1:
-    resolution: {integrity: sha512-JWa2CRVtr62jtoqBNBHRLwE44HmnvYrUpw7p7S0jJdSpy51IPvG4yoYXrFB7YgsSA7erUoWuz/H3oub6Ja6gwQ==}
-    dev: false
 
   /@humanwhocodes/config-array/0.11.8:
     resolution: {integrity: sha512-UybHIJzJnR5Qc/MsD9Kr+RpO2h+/P1GhOwdiLPXK5TWk5sgTdu88bTD9UP+CKbPPh5Rni1u0GjAdYQLemG8g+g==}

@@ -35,7 +35,7 @@
   "dependencies": {
     "@gradio/atoms": "workspace:*",
     "@gradio/button": "workspace:*",
-    "@gradio/client": "^0.0.1",
+    "@gradio/client": "workspace:*",
     "@gradio/form": "workspace:*",
     "@gradio/icons": "workspace:*",
     "@gradio/theme": "workspace:*",
