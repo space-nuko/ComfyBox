@@ -2,10 +2,15 @@
  import { onDestroy } from "svelte";
  import { Block, BlockTitle } from "@gradio/atoms";
  import { Dropdown, Range, TextBox } from "@gradio/form";
+ import { Move } from 'radix-icons-svelte';
  import widgetState from "$lib/stores/widgetState";
 
- import { dndzone } from 'svelte-dnd-action';
- import {flip} from 'svelte/animate';
+ import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME } from 'svelte-dnd-action';
+
+ import {fade} from 'svelte/transition';
+ // notice - fade in works fine but don't add svelte's fade-out (known issue)
+ import {cubicIn} from 'svelte/easing';
+ import { flip } from 'svelte/animate';
 
  export let dragItems = [];
  let dragDisabled = true;
@@ -46,7 +51,9 @@
         {@const id = node.id}
         <div class="animation-wrapper" animate:flip={{duration:flipDurationMs}}>
             <Block>
-                <div class="handle" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+                <div class="handle" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}>
+                    <Move/>
+                </div>
                 <label for={id}>
                     <BlockTitle>{node.title}</BlockTitle>
                 </label>
@@ -94,6 +101,9 @@
                             />
                         </div>
                     {/if}
+                    {#if dragItem[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
+                        <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
+                    {/if}
                 {/each}
             </Block>
         </div>
@@ -113,14 +123,31 @@
  .handle {
      cursor: grab;
      position: absolute;
+     top: 0;
      right: 0;
-     width: 1em;
-     height: 0.5em;
-     background-color: grey;
+     width: 32px;
+     height: 32px;
+     padding: 0.5em;
+     margin-right: 0.5em;
+     margin-top: 0.25em;
+ }
+
+ .handle:hover {
+     background-color: lightblue;
+ }
+
+ .drag-item-shadow {
+     position: absolute;
+     top: 0; left:0; right: 0; bottom: 0;
+     visibility: visible;
+     border: 1px dashed grey;
+     background: lightblue;
+     opacity: 0.5;
+     margin: 0;
  }
 
  .wrapper {
-     padding: 10px;
+     padding: 2px;
      width: 100%;
  }
 </style>

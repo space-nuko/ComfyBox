@@ -3,7 +3,6 @@
  import { get } from "svelte/store";
  import { Pane, Splitpanes } from 'svelte-splitpanes';
  import { Button } from "@gradio/button";
- import { Backpack, Gear } from 'radix-icons-svelte';
  import ComfyUIPane from "./ComfyUIPane.svelte";
  import ComfyApp from "./ComfyApp";
  import widgetState from "$lib/stores/widgetState";
@@ -12,6 +11,7 @@
 
  let app: ComfyApp = undefined;
  let uiPane: ComfyUIPane = undefined;
+ let containerElem: HTMLDivElement;
 
  function refreshView(event) {
      app.resizeCanvas();
@@ -35,6 +35,12 @@
      }
  }
 
+ function testtr() {
+     console.warn("TESTTR!")
+ }
+
+ let graphResizeTimer: typeof Timer = -1;
+
  onMount(async () => {
      app = new ComfyApp();
 
@@ -47,11 +53,16 @@
      refreshView();
 
      (window as any).app = app;
+
+     let graphPaneDiv = containerElem.querySelector("canvas").parentNode as HTMLDivNode;
+     graphPaneDiv.ontransitionend = () => {
+         app.resizeCanvas()
+     }
  })
 </script>
 
 <div id="dropzone" class="dropzone"></div>
-<div id="container">
+<div id="container" bind:this={containerElem}>
     <Splitpanes theme="comfy" on:resize={refreshView}>
         <Pane size={20} minSize={10}>
             <div>

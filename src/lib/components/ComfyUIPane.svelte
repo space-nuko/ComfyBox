@@ -1,4 +1,5 @@
 <script lang="ts">
+ import { get } from "svelte/store";
  import { LGraphNode, LGraph } from "@litegraph-ts/core";
  import type { IWidget } from "@litegraph-ts/core";
  import ComfyApp from "./ComfyApp";
@@ -14,7 +15,21 @@
  $: if(app && !dragConfigured) {
      dragConfigured = true;
      app.eventBus.on("nodeAdded", (node: LGraphNode) => {
-         dragItemss[0].push({ id: totalId++, node: node });
+         let minWidgetCount = 2 ** 64;
+         let minIndex = 0;
+         let state = get(widgetState);
+         for (let i = 0; i < dragItemss.length; i++) {
+             let widgetCount = 0;
+             for (let j = 0; j < dragItemss[i].length; j++) {
+                 const nodeID = dragItemss[i][j].node.id;
+                 widgetCount += state[nodeID].length;
+             }
+             if (widgetCount < minWidgetCount) {
+                 minWidgetCount = widgetCount
+                 minIndex = i;
+             }
+         }
+         dragItemss[minIndex].push({ id: totalId++, node: node });
      });
  }
 </script>
@@ -29,28 +44,5 @@
  #comfy-ui-panes {
      width: 100%;
      height: 100%;
- }
-
- .v-pane {
-     border: 1px solid grey;
-     float: left;
-     height: 100%;
-     overflow: auto;
-     position: relative;
-     width: 33%;
- }
-
- .handle {
-     cursor: grab;
-     position: absolute;
-     right: 0;
-     width: 1em;
-     height: 1em;
-     background-color: grey;
- }
-
- .wrapper {
-     padding: 10px;
-     width: 100%;
  }
 </style>
