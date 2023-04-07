@@ -59,6 +59,7 @@ export type Progress = {
 
 export default class ComfyApp {
     api: ComfyAPI;
+    rootEl: HTMLDivElement | null = null;
     canvasEl: HTMLCanvasElement | null = null;
     canvasCtx: CanvasRenderingContext2D | null = null;
     lGraph: LGraph | null = null;
@@ -81,6 +82,7 @@ export default class ComfyApp {
     }
 
     async setup(): Promise<void> {
+        this.rootEl = document.getElementById("main") as HTMLDivElement;
         this.canvasEl = document.getElementById("graph-canvas") as HTMLCanvasElement;
         this.lGraph = new LGraph();
         this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl, this.lGraph);

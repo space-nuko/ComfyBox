@@ -22,7 +22,7 @@ function getNumberDefaults(inputData: any, defaultStep: number): NumberDefaults 
     if (max == undefined) max = 2048;
     if (step == undefined) step = defaultStep;
 
-    return { val: defaultVal, config: { min, max, step: 10.0 * step, precision: 0 } };
+    return { val: defaultVal, config: { min, max, step: step, precision: 0 } };
 }
 
 
@@ -40,7 +40,7 @@ const INT: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any)
             inputName,
             val,
             function(v) {
-                const s = this.options.step / 10;
+                const s = this.options.step;
                 this.value = Math.round(v / s) * s;
             },
             config

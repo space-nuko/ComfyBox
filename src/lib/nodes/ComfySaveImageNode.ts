@@ -24,7 +24,9 @@ export default class ComfySaveImageNode extends ComfyGraphNode {
         this._imageResults = Array.from(output.images); // TODO append?
         const galleryItems = this._imageResults.map(r => {
             // TODO
-            let entry: ComfyGalleryEntry = ["http://localhost:8188/" + r.type + "/" + r.filename, null]
+            const url = "http://localhost:8188/view?"
+            const params = new URLSearchParams(r)
+            let entry: ComfyGalleryEntry = [url + params, null]
             return entry
         });
         this._galleryWidget.setValue(galleryItems)

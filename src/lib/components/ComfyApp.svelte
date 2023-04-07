@@ -6,15 +6,19 @@
  import ComfyUIPane from "./ComfyUIPane.svelte";
  import ComfyApp, { type SerializedAppState } from "./ComfyApp";
  import widgetState from "$lib/stores/widgetState";
+ import { ImageViewer } from "$lib/ImageViewer";
 
  import { LGraph, LGraphNode } from "@litegraph-ts/core";
+	import LightboxModal from "./LightboxModal.svelte";
 
  let app: ComfyApp = undefined;
+ let imageViewer: ImageViewer;
  let uiPane: ComfyUIPane = undefined;
+ let mainElem: HTMLDivElement;
  let containerElem: HTMLDivElement;
  let resizeTimeout: typeof Timer = -1;
 
- function refreshView(event) {
+ function refreshView(event?: Event) {
      clearTimeout(resizeTimeout);
      resizeTimeout = setTimeout(app.resizeCanvas.bind(app), 250);
  }
@@ -87,9 +91,11 @@
      (window as any).app = app;
      (window as any).appPane = uiPane;
 
-     let wrappers = containerElem.querySelectorAll<HTMLDivNode>(".pane-wrapper")
+     imageViewer = new ImageViewer(app.rootEl);
+
+     let wrappers = containerElem.querySelectorAll<HTMLDivElement>(".pane-wrapper")
      for (const wrapper of wrappers) {
-         const paneNode = wrapper.parentNode; // get the node inside the <Pane/>
+         const paneNode = wrapper.parentNode as HTMLElement; // get the node inside the <Pane/>
          paneNode.ontransitionend = () => {
              app.resizeCanvas()
          }
@@ -97,38 +103,41 @@
  })
 </script>
 
-<div id="dropzone" class="dropzone"></div>
-<div id="container" bind:this={containerElem}>
-    <Splitpanes theme="comfy" on:resize={refreshView}>
-        <Pane>
-            <Splitpanes theme="comfy" on:resize={refreshView} horizontal="{true}">
-                <Pane>
-                    <ComfyUIPane bind:this={uiPane} {app} />
-                </Pane>
-                <Pane bind:size={graphSize}>
-                    <div class="canvas-wrapper pane-wrapper">
-                        <canvas id="graph-canvas" />
-                    </div>
-                </Pane>
-            </Splitpanes>
-        </Pane>
-        <Pane bind:size={sidebarSize}>
-            <div class="sidebar-wrapper pane-wrapper">
-                Sidebar
-            </div>
-        </Pane>
-    </Splitpanes>
-</div>
-<div id="bottombar">
-    <Button variant="primary" on:click={queuePrompt}>
-        Run
-    </Button>
-    <Button variant="secondary" on:click={toggleGraph}>
-        Toggle Graph
-    </Button>
-    <Button variant="secondary" on:click={toggleSidebar}>
-        Toggle Sidebar
-    </Button>
+<div id="main" bind:this={mainElem}>
+    <div id="dropzone" class="dropzone"></div>
+    <div id="container" bind:this={containerElem}>
+        <Splitpanes theme="comfy" on:resize={refreshView}>
+            <Pane>
+                <Splitpanes theme="comfy" on:resize={refreshView} horizontal="{true}">
+                    <Pane>
+                        <ComfyUIPane bind:this={uiPane} {app} />
+                    </Pane>
+                    <Pane bind:size={graphSize}>
+                        <div class="canvas-wrapper pane-wrapper">
+                            <canvas id="graph-canvas" />
+                        </div>
+                    </Pane>
+                </Splitpanes>
+            </Pane>
+            <Pane bind:size={sidebarSize}>
+                <div class="sidebar-wrapper pane-wrapper">
+                    Sidebar
+                </div>
+            </Pane>
+        </Splitpanes>
+    </div>
+    <div id="bottombar">
+        <Button variant="primary" on:click={queuePrompt}>
+            Run
+        </Button>
+        <Button variant="secondary" on:click={toggleGraph}>
+            Toggle Graph
+        </Button>
+        <Button variant="secondary" on:click={toggleSidebar}>
+            Toggle Sidebar
+        </Button>
+    </div>
+    <LightboxModal />
 </div>
 
 <style lang="scss">
