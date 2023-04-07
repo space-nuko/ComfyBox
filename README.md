@@ -28,7 +28,7 @@ This frontend isn't compatible with regular ComfyUI's workflow format since extr
 1. Clone the repo with submodules:
 
 ```
-git clone https://github.com/space-nuko/ComfyBox
+git clone https://github.com/space-nuko/ComfyBox --recursive
 ```
 
 2. `pnpm install`
