@@ -8,8 +8,10 @@ importers:
       '@gradio/button': workspace:*
       '@gradio/client': ^0.0.1
       '@gradio/form': workspace:*
+      '@gradio/gallery': workspace:*
       '@gradio/icons': workspace:*
       '@gradio/theme': workspace:*
+      '@gradio/upload': workspace:*
       '@gradio/utils': workspace:*
       '@litegraph-ts/core': workspace:*
       '@litegraph-ts/nodes-basic': workspace:*
@@ -41,8 +43,10 @@ importers:
       '@gradio/button': link:gradio/js/button
       '@gradio/client': 0.0.1
       '@gradio/form': link:gradio/js/form
+      '@gradio/gallery': link:gradio/js/gallery
       '@gradio/icons': link:gradio/js/icons
       '@gradio/theme': link:gradio/js/theme
+      '@gradio/upload': link:gradio/js/upload
       '@gradio/utils': link:gradio/js/utils
       '@litegraph-ts/core': link:litegraph/packages/core
       '@litegraph-ts/nodes-basic': link:litegraph/packages/nodes-basic

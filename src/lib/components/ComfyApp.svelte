@@ -52,6 +52,10 @@
  let graphResizeTimer: typeof Timer = -1;
 
  function doAutosave(graph: LGraph): void {
+     // We will merge in the state of the frontend instead of what's inside the
+     // LGraph structure.
+     const frontendState = get(widgetState);
+
      const serializedGraph = graph.serialize()
      const serializedPaneOrder = uiPane.serialize()
 

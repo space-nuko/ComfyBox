@@ -60,14 +60,14 @@ export default class ComfyAPI extends EventTarget {
         let opened = false;
         let existingSession = sessionStorage["Comfy.SessionId"] || "";
         if (existingSession) {
-            existingSession = "/" + existingSession;
+            existingSession = "?clientId=" + existingSession;
         }
 
         const hostname = this.hostname || location.hostname;
         const port = this.port || location.port;
 
         this.socket = new WebSocket(
-            `ws${window.location.protocol === "https:" ? "s" : ""}://${hostname}:${port}/ws?clientId=${existingSession}`
+            `ws${window.location.protocol === "https:" ? "s" : ""}://${hostname}:${port}/ws${existingSession}`
         );
 
         this.socket.addEventListener("open", () => {

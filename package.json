@@ -39,6 +39,8 @@
     "@gradio/form": "workspace:*",
     "@gradio/icons": "workspace:*",
     "@gradio/theme": "workspace:*",
+    "@gradio/gallery": "workspace:*",
+    "@gradio/upload": "workspace:*",
     "@gradio/utils": "workspace:*",
     "@litegraph-ts/core": "workspace:*",
     "@litegraph-ts/nodes-basic": "workspace:*",

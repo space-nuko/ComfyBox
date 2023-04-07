@@ -2,10 +2,10 @@
  import { onDestroy } from "svelte";
  import { Block, BlockTitle } from "@gradio/atoms";
  import { Move } from 'radix-icons-svelte';
- import ComboWidget from "./widgets/ComboWidget.svelte";
- import RangeWidget from "./widgets/RangeWidget.svelte";
- import TextWidget from "./widgets/TextWidget.svelte";
- import widgetState from "$lib/stores/widgetState";
+ import ComboWidget from "$lib/widgets/ComboWidget.svelte";
+ import RangeWidget from "$lib/widgets/RangeWidget.svelte";
+ import TextWidget from "$lib/widgets/TextWidget.svelte";
+ import widgetState, { type WidgetUIState } from "$lib/stores/widgetState";
 
  import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME } from 'svelte-dnd-action';
 
@@ -13,6 +13,7 @@
  // notice - fade in works fine but don't add svelte's fade-out (known issue)
  import {cubicIn} from 'svelte/easing';
  import { flip } from 'svelte/animate';
+	import ComfyApp from "./ComfyApp";
 
  export let dragItems = [];
  let dragDisabled = true;
@@ -40,6 +41,30 @@
  });
 
  onDestroy(unsubscribe);
+
+ function getComponentForWidgetState(item: WidgetUIState): any {
+     let ctor: any = null;
+
+     // custom widgets with TypeScript sources
+     if (item.isVirtual) {
+         let override = ComfyApp.widget_type_overrides[item.widget.type]
+         if (override) {
+             return override;
+         }
+     }
+
+     // litegraph.ts built-in widgets
+     switch (item.widget.type) {
+             case "combo":
+             return ComboWidget;
+             case "number":
+             return RangeWidget;
+             case "text":
+             return TextWidget;
+     }
+
+     return null;
+ }
 </script>
 
 
@@ -59,14 +84,8 @@
                 <label for={id}>
                     <BlockTitle>{node.title}</BlockTitle>
                 </label>
-                {#each $widgetState[id] as item, i}
-                    {#if item.widget.type == "combo"}
-                        <ComboWidget {item} />
-                    {:else if item.widget.type == "number"}
-                        <RangeWidget {item} />
-                    {:else if item.widget.type == "text"}
-                        <TextWidget {item} />
-                    {/if}
+                {#each $widgetState[id] as item}
+                    <svelte:component this={getComponentForWidgetState(item)} {item} />
                     {#if dragItem[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
                         <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
                     {/if}

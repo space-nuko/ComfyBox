@@ -12,6 +12,9 @@ import * as basic from "@litegraph-ts/nodes-basic"
 import * as nodes from "$lib/nodes/index"
 import ComfyGraphCanvas from "$lib/ComfyGraphCanvas";
 import type ComfyGraphNode from "$lib/ComfyGraphNode";
+import type { WidgetStateStore, WidgetUIState } from "$lib/stores/widgetState";
+import * as widgets from "$lib/widgets/index"
+import type ComfyWidget from "$lib/widgets/ComfyWidget";
 
 LiteGraph.catch_exceptions = false;
 
@@ -87,10 +90,13 @@ export default class ComfyApp {
 
         LiteGraph.release_link_on_empty_shows_menu = true;
         LiteGraph.alt_drag_do_clone_nodes = true;
+        LiteGraph.ignore_all_widget_events = true;
 
         this.lGraph.start();
 
         // await this.#invokeExtensionsAsync("init");
+        this.registerNodeTypeOverrides();
+        this.registerWidgetTypeOverrides();
         await this.registerNodes();
 
         // Load previous workflow
@@ -119,6 +125,7 @@ export default class ComfyApp {
         this.addDropHandler();
         this.addPasteHandler();
         this.addKeyboardHandler();
+
 
         // await this.#invokeExtensionsAsync("setup");
 
@@ -187,6 +194,17 @@ export default class ComfyApp {
         this.lCanvas.onClear = this.canvasOnClear.bind(this);
     }
 
+    static node_type_overrides: Record<string, typeof ComfyGraphNode> = {}
+    static widget_type_overrides: Record<string, Function> = {}
+
+    private registerNodeTypeOverrides() {
+        ComfyApp.node_type_overrides["SaveImage"] = nodes.ComfySaveImageNode;
+    }
+
+    private registerWidgetTypeOverrides() {
+        ComfyApp.widget_type_overrides["comfy/gallery"] = widgets.ComfyGalleryWidget_Svelte;
+    }
+
     private async registerNodes() {
         const app = this;
 
@@ -206,7 +224,12 @@ export default class ComfyApp {
         for (const nodeId in defs) {
             const nodeData = defs[nodeId];
 
-            const ctor = class extends LGraphNode {
+            const typeOverride = ComfyApp.node_type_overrides[nodeId]
+            if (typeOverride)
+                console.debug("Attaching custom type to received node:", nodeId, typeOverride)
+            const baseClass: typeof LGraphNode = typeOverride || LGraphNode;
+
+            const ctor = class extends baseClass {
                 constructor(title?: string) {
                     super(title);
                     this.type = nodeId; // XXX: workaround dependency in LGraphNode.addInput()
@@ -432,13 +455,13 @@ export default class ComfyApp {
      * Converts the current graph workflow for sending to the API
      * @returns The workflow and node links
      */
-    async graphToPrompt(frontendState: Record<number, any[]> = {}) {
+    async graphToPrompt(frontendState: WidgetStateStore = {}) {
         const workflow = this.lGraph.serialize();
 
         const output = {};
         // Process nodes in order of execution
         for (const node of this.lGraph.computeExecutionOrder<ComfyGraphNodeExecutable>(false, null)) {
-            const fromFrontend = frontendState[node.id];
+            const fromFrontend: WidgetUIState[] | null = frontendState[node.id];
 
             const n = workflow.nodes.find((n) => n.id === node.id);
 
@@ -465,7 +488,7 @@ export default class ComfyApp {
                     const widget = widgets[i];
                     if (!widget.options || widget.options.serialize !== false) {
                         let value = widget.serializeValue ? await widget.serializeValue(n, i) : widget.value;
-                        if (fromFrontend) {
+                        if (fromFrontend && !fromFrontend[i].isVirtual) {
                             value = fromFrontend[i].value;
                         }
                         inputs[widget.name] = value
@@ -514,7 +537,7 @@ export default class ComfyApp {
         return { workflow, output };
     }
 
-    async queuePrompt(num: number, batchCount: number = 1, frontendState: Record<number, any[]> = {}) {
+    async queuePrompt(num: number, batchCount: number = 1, frontendState: WidgetStateStore = {}) {
         this.queueItems.push({ num, batchCount });
 
         // Only have one action process the items so each one gets a unique seed correctly
