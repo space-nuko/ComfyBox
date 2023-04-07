@@ -2,14 +2,13 @@
     "extends": "./.svelte-kit/tsconfig.json",
     "exclude": ["node_modules/litegraph.js/src/*"],
     "compilerOptions": {
-        "baseUrl": "./src",
         "typeRoots": [
             "types",
             "../node_modules/@types"
         ],
         "paths": {
-			"$lib": ["../src/lib"],
-			"$lib/*": ["../src/lib/*"]
+			"$lib": ["./src/lib"],
+			"$lib/*": ["./src/lib/*"]
         }
     }
 }

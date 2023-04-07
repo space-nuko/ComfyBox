@@ -2,3 +2,6 @@
 	path = gradio
 	url = https://github.com/gradio-app/gradio
 	branch = v3.24.1
+[submodule "litegraph"]
+	path = litegraph
+	url = https://github.com/space-nuko/litegraph.js

@@ -4,19 +4,21 @@ importers:
 
   .:
     specifiers:
-      '@gradio/atoms': workspace:^0.0.1
-      '@gradio/button': workspace:^0.0.1
-      '@gradio/form': workspace:^0.0.1
-      '@gradio/icons': workspace:^0.0.1
-      '@gradio/theme': workspace:^0.0.1
-      '@gradio/utils': workspace:^0.0.1
+      '@gradio/atoms': workspace:*
+      '@gradio/button': workspace:*
+      '@gradio/client': ^0.0.1
+      '@gradio/form': workspace:*
+      '@gradio/icons': workspace:*
+      '@gradio/theme': workspace:*
+      '@gradio/utils': workspace:*
+      '@litegraph-ts/core': workspace:*
+      '@litegraph-ts/nodes-basic': workspace:*
       '@sveltejs/adapter-auto': ^2.0.0
       '@sveltejs/kit': ^1.5.0
       eslint: ^8.28.0
       eslint-config-prettier: ^8.5.0
       eslint-plugin-svelte3: ^4.0.0
       events: ^3.3.0
-      litegraph.js: ^0.7.12
       pollen-css: ^4.6.2
       prettier: ^2.8.0
       prettier-plugin-svelte: ^2.8.1
@@ -31,16 +33,19 @@ importers:
       typescript: ^5.0.0
       vite: ^4.2.0
       vite-plugin-full-reload: ^1.0.5
+      vite-tsconfig-paths: ^4.0.8
       vitest: ^0.25.3
     dependencies:
       '@gradio/atoms': link:gradio/js/atoms
       '@gradio/button': link:gradio/js/button
+      '@gradio/client': 0.0.1
       '@gradio/form': link:gradio/js/form
       '@gradio/icons': link:gradio/js/icons
       '@gradio/theme': link:gradio/js/theme
       '@gradio/utils': link:gradio/js/utils
+      '@litegraph-ts/core': link:litegraph/packages/core
+      '@litegraph-ts/nodes-basic': link:litegraph/packages/nodes-basic
       events: 3.3.0
-      litegraph.js: 0.7.12
       pollen-css: 4.6.2
       radix-icons-svelte: 1.2.1
       svelte-preprocess: 5.0.3_ex2livsgfbezl6rd73hucsky7y
@@ -61,7 +66,16 @@ importers:
       svelte-dnd-action: 0.9.22_svelte@3.58.0
       typescript: 5.0.3
       vite: 4.2.1
+      vite-tsconfig-paths: 4.0.8_mqt6hr36lqfsnn3kcfure5ceka
       vitest: 0.25.8
+
+  litegraph/packages/editor:
+    specifiers:
+      typescript: ^5.0.3
+      vite: ^4.2.1
+    dependencies:
+      typescript: 5.0.3
+      vite: 4.2.1
 
 packages:
 
@@ -277,6 +291,10 @@ packages:
     resolution: {integrity: sha512-x5vzdtOOGgFVDCUs81QRB2+liax8rFg3+7hqM+QhBG0/G3F1ZsoYl97UrqgHgQ9KKT7G6c4V+aTUCgu/n22v1A==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
+
+  /@gradio/client/0.0.1:
+    resolution: {integrity: sha512-JWa2CRVtr62jtoqBNBHRLwE44HmnvYrUpw7p7S0jJdSpy51IPvG4yoYXrFB7YgsSA7erUoWuz/H3oub6Ja6gwQ==}
+    dev: false
 
   /@humanwhocodes/config-array/0.11.8:
     resolution: {integrity: sha512-UybHIJzJnR5Qc/MsD9Kr+RpO2h+/P1GhOwdiLPXK5TWk5sgTdu88bTD9UP+CKbPPh5Rni1u0GjAdYQLemG8g+g==}
@@ -1085,10 +1103,6 @@ packages:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
     dev: false
 
-  /litegraph.js/0.7.12:
-    resolution: {integrity: sha512-aQUj5jxKtQLzY0+qQ6YmIfa6EOqhI8lXlJPwEpJFFUir893ulVcDt9YIMFA9rwBDg4/HlFyAUGmwktAduebm9Q==}
-    dev: false
-
   /local-pkg/0.4.3:
     resolution: {integrity: sha512-SFppqq5p42fe2qcZQqqEOiVRXl+WCP1MdT6k7BDEW1j++sp5fIY+/fdRQitvKgB5BrBcmrs5m/L0v2FrU5MY1g==}
     engines: {node: '>=14'}
@@ -1767,6 +1781,19 @@ packages:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
     dev: false
 
+  /tsconfck/2.1.1_typescript@5.0.3:
+    resolution: {integrity: sha512-ZPCkJBKASZBmBUNqGHmRhdhM8pJYDdOXp4nRgj/O0JwUwsMq50lCDRQP/M5GBNAA0elPrq4gAeu4dkaVCuKWww==}
+    engines: {node: ^14.13.1 || ^16 || >=18}
+    hasBin: true
+    peerDependencies:
+      typescript: ^4.3.5 || ^5.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      typescript: 5.0.3
+    dev: true
+
   /tslib/2.5.0:
     resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
     dev: false
@@ -1820,6 +1847,23 @@ packages:
       picomatch: 2.3.1
       vite: 4.2.1
     dev: false
+
+  /vite-tsconfig-paths/4.0.8_mqt6hr36lqfsnn3kcfure5ceka:
+    resolution: {integrity: sha512-p04zH+Ey+NT78571x0pdX7nVRIJSlmKVvYryFglSWOK3Hc72eDL0+JJfbyQiugaIBApJkaEqbBQvqpsFZOSVGg==}
+    peerDependencies:
+      vite: '*'
+    peerDependenciesMeta:
+      vite:
+        optional: true
+    dependencies:
+      debug: 4.3.4
+      globrex: 0.1.2
+      tsconfck: 2.1.1_typescript@5.0.3
+      vite: 4.2.1
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+    dev: true
 
   /vite/4.2.1:
     resolution: {integrity: sha512-7MKhqdy0ISo4wnvwtqZkjke6XN4taqQ2TBaTccLIpOKv7Vp2h4Y+NpmWCnGDeSvvn45KxvWgGyb0MkHvY1vgbg==}

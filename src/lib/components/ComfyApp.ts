@@ -32,6 +32,7 @@ export default class ComfyApp {
 
     constructor() {
         this.api = new ComfyAPI();
+        this.eventBus.
     }
 
     async setup(): Promise<void> {
