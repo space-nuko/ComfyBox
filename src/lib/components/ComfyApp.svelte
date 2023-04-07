@@ -37,6 +37,18 @@
      }
  }
 
+ let sidebarSize = 20;
+
+ function toggleSidebar() {
+     if (sidebarSize == 0) {
+         sidebarSize = 20;
+         app.resizeCanvas();
+     }
+     else {
+         sidebarSize = 0;
+     }
+ }
+
  let graphResizeTimer: typeof Timer = -1;
 
  onMount(async () => {
@@ -64,17 +76,17 @@
     <Splitpanes theme="comfy" on:resize={refreshView}>
         <Pane>
             <Splitpanes theme="comfy" on:resize={refreshView} horizontal="{true}">
-                <Pane minSize={15}>
+                <Pane>
                     <ComfyUIPane bind:this={uiPane} {app} />
                 </Pane>
-                <Pane snapSize={10} bind:size={graphSize}>
+                <Pane bind:size={graphSize}>
                     <div class="canvas-wrapper">
                         <canvas id="graph-canvas" />
                     </div>
                 </Pane>
             </Splitpanes>
         </Pane>
-        <Pane size={20} snapSize={10}>
+        <Pane bind size={sidebarSize}>
             <div>
                 Sidebar
             </div>
@@ -86,11 +98,16 @@
         Run
     </Button>
     <Button variant="secondary" on:click={toggleGraph}>
-        Show/Hide Graph
+        Toggle Graph
+    </Button>
+    <Button variant="secondary" on:click={toggleSidebar}>
+        Toggle Sidebar
     </Button>
 </div>
 
-<style>
+<style lang="scss">
+ @import '../../scss/shared.scss';
+
  #container {
      height: calc(100vh - 60px);
      max-width: 100vw;
@@ -140,6 +157,17 @@
      height: 100%;
      margin: 0px;
      font-family: Arial;
+ }
+
+ :global(.splitpanes.comfy>.splitpanes__splitter) {
+     background-color: var(--secondary-100);
+
+     &:hover:not([disabled]) {
+         background-color: var(--secondary-300);
+     }
+     &:active:not([disabled]) {
+         background-color: var(--secondary-400);
+     }
  }
 
  :global(.splitpanes.comfy.splitpanes--horizontal>.splitpanes__splitter) {
