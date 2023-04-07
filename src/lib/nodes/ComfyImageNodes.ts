@@ -10,13 +10,16 @@ export type ComfyImageExecOutput = {
     images: ComfyImageResult[]
 }
 
-export default class ComfySaveImageNode extends ComfyGraphNode {
+/*
+ * Node with a single extra image output widget
+ */
+class ComfyImageNode extends ComfyGraphNode {
     private _imageResults: Array<ComfyImageResult> = [];
     private _galleryWidget: ComfyGalleryWidget;
 
     constructor(title?: any) {
         super(title)
-        this._galleryWidget = new ComfyGalleryWidget("Images", this._imageResults, this);
+        this._galleryWidget = new ComfyGalleryWidget("Images", [], this);
         this.virtualWidgets.push(this._galleryWidget)
     }
 
@@ -31,4 +34,10 @@ export default class ComfySaveImageNode extends ComfyGraphNode {
         });
         this._galleryWidget.setValue(galleryItems)
     }
+}
+
+export class ComfySaveImageNode extends ComfyImageNode {
+}
+
+export class ComfyPreviewImageNode extends ComfyImageNode {
 }

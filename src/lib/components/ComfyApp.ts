@@ -201,6 +201,7 @@ export default class ComfyApp {
 
     private registerNodeTypeOverrides() {
         ComfyApp.node_type_overrides["SaveImage"] = nodes.ComfySaveImageNode;
+        ComfyApp.node_type_overrides["PreviewImage"] = nodes.ComfyPreviewImageNode;
     }
 
     private registerWidgetTypeOverrides() {

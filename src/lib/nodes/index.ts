@@ -1,2 +1,2 @@
 export { default as ComfyReroute } from "./ComfyReroute"
-export { default as ComfySaveImageNode } from "./ComfySaveImageNode"
+export { ComfySaveImageNode, ComfyPreviewImageNode } from "./ComfyImageNodes"

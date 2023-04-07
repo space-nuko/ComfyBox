@@ -26,7 +26,7 @@
  }
 </script>
 
-<div id="lightboxModal" on:keydown={handleKey}>
+<div id="lightboxModal" on:keydown={handleKey} on:click={closeModal}>
     <div class="modalControls gradio-container" on:keydown={handleKey}>
         <span class="modalZoom cursor" title="Toggle zoomed view" on:click={toggleZoom} on:keydown={handleKey}>&#10529;</span>
         <span class="modalTileImage cursor" title="Preview tiling" on:click={previewTiling} on:keydown={handleKey}>&#8862;</span>
