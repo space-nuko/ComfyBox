@@ -13,10 +13,14 @@
  import { LGraph, LGraphNode } from "@litegraph-ts/core";
 	import LightboxModal from "./LightboxModal.svelte";
 	import { Block } from "@gradio/atoms";
+	import ComfyQueue from "./ComfyQueue.svelte";
+	import type { ComfyAPIStatus } from "$lib/api";
+	import queueState from "$lib/stores/queueState";
 
  let app: ComfyApp = undefined;
  let imageViewer: ImageViewer;
  let uiPane: ComfyUIPane = undefined;
+ let queue: ComfyQueue = undefined;
  let mainElem: HTMLDivElement;
  let containerElem: HTMLDivElement;
  let nodesLocked: boolean = false;
@@ -124,6 +128,10 @@
      app.eventBus.on("autosave", doAutosave);
      app.eventBus.on("restored", doRestore);
 
+     app.api.addEventListener("status", (ev: CustomEvent) => {
+         queueState.statusUpdated(ev.detail as ComfyAPIStatus);
+     });
+
      await app.setup();
      refreshView();
 
@@ -160,7 +168,7 @@
             </Pane>
             <Pane bind:size={sidebarSize}>
                 <div class="sidebar-wrapper pane-wrapper">
-                    Sidebar
+                    <ComfyQueue bind:this={queue} />
                 </div>
             </Pane>
         </Splitpanes>

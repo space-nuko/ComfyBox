@@ -15,6 +15,7 @@ import type ComfyGraphNode from "$lib/ComfyGraphNode";
 import type { WidgetStateStore, WidgetUIState } from "$lib/stores/widgetState";
 import * as widgets from "$lib/widgets/index"
 import type ComfyWidget from "$lib/widgets/ComfyWidget";
+import queueState from "$lib/stores/queueState";
 
 LiteGraph.catch_exceptions = false;
 
@@ -70,9 +71,7 @@ export default class ComfyApp {
     nodeOutputs: Record<string, any> = {};
     eventBus: TypedEmitter<ComfyAppEvents> = new EventEmitter() as TypedEmitter<ComfyAppEvents>;
 
-    runningNodeId: number | null = null;
     dragOverNode: LGraphNode | null = null;
-    progress: Progress | null = null;
     shiftDown: boolean = false;
     selectedGroupMoving: boolean = false;
 
@@ -366,7 +365,7 @@ export default class ComfyApp {
      * Handles updates from the API socket
      */
     private addApiUpdateHandlers() {
-        this.api.addEventListener("status", ({ detail }: CustomEvent) => {
+        this.api.addEventListener("status", ({ detail: ComfyAPIStatus }: CustomEvent) => {
             // this.ui.setStatus(detail);
         });
 
@@ -379,13 +378,12 @@ export default class ComfyApp {
         });
 
         this.api.addEventListener("progress", ({ detail }: CustomEvent) => {
-            this.progress = detail;
+            queueState.progressUpdated(detail);
             this.lGraph.setDirtyCanvas(true, false);
         });
 
         this.api.addEventListener("executing", ({ detail }: CustomEvent) => {
-            this.progress = null;
-            this.runningNodeId = detail;
+            queueState.executingUpdated(detail);
             this.lGraph.setDirtyCanvas(true, false);
         });
 

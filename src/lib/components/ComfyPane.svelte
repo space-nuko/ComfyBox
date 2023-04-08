@@ -1,11 +1,13 @@
 <script lang="ts">
  import { onDestroy } from "svelte";
+ import { get } from "svelte/store"
  import { Block, BlockTitle } from "@gradio/atoms";
  import { Move } from 'radix-icons-svelte';
  import ComboWidget from "$lib/widgets/ComboWidget.svelte";
  import RangeWidget from "$lib/widgets/RangeWidget.svelte";
  import TextWidget from "$lib/widgets/TextWidget.svelte";
- import widgetState, { type WidgetUIState } from "$lib/stores/widgetState";
+ import widgetState, { type WidgetDrawState, type WidgetUIState } from "$lib/stores/widgetState";
+ import queueState from "$lib/stores/queueState";
 
  import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME } from 'svelte-dnd-action';
 
@@ -14,8 +16,10 @@
  import {cubicIn} from 'svelte/easing';
  import { flip } from 'svelte/animate';
 	import ComfyApp from "./ComfyApp";
+	import type { LGraphNode } from "@litegraph-ts/core";
+	import type { DragItem } from "./ComfyUIPane";
 
- export let dragItems = [];
+ export let dragItems: DragItem[] = [];
  let dragDisabled = true;
  const flipDurationMs = 200;
 
@@ -41,6 +45,13 @@
  });
 
  onDestroy(unsubscribe);
+
+ $: if ($queueState.runningNodeId) {
+     for (let dragItem of dragItems) {
+         dragItem.isNodeExecuting = $queueState.runningNodeId === dragItem.node.id;
+     }
+     dragItems = dragItems;
+ }
 
  function getComponentForWidgetState(item: WidgetUIState): any {
      let ctor: any = null;
@@ -76,12 +87,12 @@
     {#each dragItems as dragItem(dragItem.id)}
         {@const node = dragItem.node}
         {@const id = node.id}
-        <div class="animation-wrapper" animate:flip={{duration:flipDurationMs}}>
+        <div class="animation-wrapper" class:is-executing={dragItem.isNodeExecuting} animate:flip={{duration:flipDurationMs}}>
             <Block>
                 <div class="handle" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}>
                     <Move/>
                 </div>
-                <label for={id}>
+                <label for={String(id)}>
                     <BlockTitle>{node.title}</BlockTitle>
                 </label>
                 {#each $widgetState[id] as item}
@@ -103,6 +114,10 @@
      overflow: auto;
      position: relative;
      width: 33%;
+ }
+
+ .is-executing :global(.block) {
+     border: 5px dashed var(--color-green-600) !important;
  }
 
  .handle {

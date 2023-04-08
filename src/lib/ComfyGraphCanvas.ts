@@ -1,5 +1,7 @@
 import { BuiltInSlotShape, LGraph, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type MouseEventExt, type Vector2, type Vector4 } from "@litegraph-ts/core";
 import type ComfyApp from "./components/ComfyApp";
+import queueState from "./stores/queueState";
+import { get } from "svelte/store";
 
 export default class ComfyGraphCanvas extends LGraphCanvas {
     app: ComfyApp
@@ -30,8 +32,10 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     ): void {
         super.drawNodeShape(node, ctx, size, fgColor, bgColor, selected, mouseOver);
 
+        let state = get(queueState);
+
         let color = null;
-        if (node.id === +this.app.runningNodeId) {
+        if (node.id === +state.runningNodeId) {
             color = "#0f0";
         } else if (this.app.dragOverNode && node.id === this.app.dragOverNode.id) {
             color = "dodgerblue";
@@ -68,9 +72,9 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
             ctx.strokeStyle = fgColor;
             ctx.globalAlpha = 1;
 
-            if (this.app.progress) {
+            if (state.progress) {
                 ctx.fillStyle = "green";
-                ctx.fillRect(0, 0, size[0] * (this.app.progress.value / this.app.progress.max), 6);
+                ctx.fillRect(0, 0, size[0] * (state.progress.value / state.progress.max), 6);
                 ctx.fillStyle = bgColor;
             }
         }

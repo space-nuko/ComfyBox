@@ -6,11 +6,7 @@
  import type { SerializedPanes } from "./ComfyApp"
  import ComfyPane from "./ComfyPane.svelte";
  import widgetState, { type WidgetUIState } from "$lib/stores/widgetState";
-
- type DragItem = {
-     id: number,
-     node: LGraphNode
- }
+	import type { DragItem } from "./ComfyUIPane";
 
  export let app: ComfyApp;
  let dragConfigured: boolean = false;
@@ -84,7 +80,7 @@
 
      // Put everything left over into other columns
      if (Object.keys(nodeIdToDragItem).length > 0) {
-         console.warn("Extra panels without ordering found", nodeIdToDragItem)
+         console.warn("Extra panels without ordering found", nodeIdToDragItem, panels)
          for (const nodeId in nodeIdToDragItem) {
              const dragItem = nodeIdToDragItem[nodeId];
              const paneIndex = findLeastPopulatedPaneIndex();

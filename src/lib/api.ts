@@ -8,6 +8,12 @@ type PromptRequestBody = {
 
 export type QueueItemType = "queue" | "history";
 
+export type ComfyAPIQueueStatus = {
+    exec_info: {
+        queue_remaining: number | "X";
+    }
+}
+
 export default class ComfyAPI extends EventTarget {
     private registered: Set<string> = new Set<string>();
 

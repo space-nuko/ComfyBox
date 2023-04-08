@@ -11,6 +11,10 @@ export type WidgetUIState = {
     isVirtual: boolean
 }
 
+export type WidgetDrawState = {
+    isNodeExecuting: boolean
+}
+
 type NodeID = number;
 
 type WidgetStateOps = {
@@ -24,7 +28,7 @@ type WidgetStateOps = {
 export type WidgetStateStore = Record<NodeID, WidgetUIState[]>;
 type WritableWidgetStateStore = Writable<WidgetStateStore> & WidgetStateOps;
 
-const store: Writable<Record<NodeID, WidgetUIState[]>> = writable({})
+const store: Writable<WidgetStateStore> = writable({})
 
 function clear() {
     store.set({})
