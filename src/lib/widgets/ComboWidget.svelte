@@ -9,18 +9,23 @@
  let option: any;
 
  $: if(item) {
-     option = get(item.value);
-     itemValue = item.value
+     if (!itemValue)
+         itemValue = item.value;
+     if (!option)
+         option = get(item.value);
  };
+
+ $: if (option && itemValue) {
+     $itemValue = option.value
+ }
 </script>
 
 <div class="wrapper">
-    {#if item}
+    {#if item && $itemValue}
         <label>
             <BlockTitle show_label={true}>{item.widget.name}</BlockTitle>
             <Select
                 bind:value={option}
-                bind:justValue={$itemValue}
                 bind:items={item.widget.options.values}
                 disabled={item.widget.options.values.length === 0}
                 clearable={false}

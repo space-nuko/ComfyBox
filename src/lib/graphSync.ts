@@ -1,5 +1,5 @@
 import type { LGraph } from "@litegraph-ts/core";
-import widgetState, { type WidgetStateStore, type WidgetUIStateStore } from "./stores/widgetState";
+import widgetState, { type WidgetStateStore, type WidgetUIState, type WidgetUIStateStore } from "./stores/widgetState";
 import type ComfyApp from "./components/ComfyApp";
 import type { Unsubscriber } from "svelte/store";
 
@@ -9,12 +9,18 @@ type WidgetSubStore = {
 }
 
 /*
- * Responsible for watching and synchronizing state changes from the frontend to the litegraph instance.
- * The other way around is unnecessary since the nodes in ComfyBox can't be interacted with.
+ * Responsible for watching for and synchronizing state changes from the
+ * frontend to the litegraph instance.
+ *
+ * The other way around is unnecessary since the nodes in ComfyBox can't be
+ * interacted with. If that were true the implementation would be way more
+ * complex since litegraph doesn't (currently) expose a global
+ * event-emitter-like thing for when nodes/widgets are changed.
  *
  * Assumptions:
- * - Widgets can't be added to a node after they're created
+ * - Widgets can't be added to a node after they're created (messes up the indices in WidgetSubStore[])
  * - Widgets can't be interacted with from the graph, only from the frontend
+ * - Only one workflow/graph can ever be loaded into the program
  */
 export default class GraphSync {
     graph: LGraph;
@@ -26,17 +32,18 @@ export default class GraphSync {
 
     constructor(app: ComfyApp) {
         this.graph = app.lGraph;
-        this._unsubscribe = widgetState.subscribe(this.onWidgetStateChanged.bind(this));
+        this._unsubscribe = widgetState.subscribe(this.onAllWidgetStateChanged.bind(this));
         this._finalizer = new FinalizationRegistry((id: number) => {
             console.log(`${this} has been garbage collected`);
             this._unsubscribe();
         });
     }
 
-    private onWidgetStateChanged(state: WidgetStateStore) {
+    /*
+     * Fired when the entire widget graph changes.
+     */
+    private onAllWidgetStateChanged(state: WidgetStateStore) {
         // TODO assumes only a single graph's widget state.
-
-        console.warn("ONWIDGETSTATECHANGE")
 
         for (let nodeId in state) {
             if (!this.stores[nodeId]) {
@@ -59,10 +66,8 @@ export default class GraphSync {
         this.stores[nodeId] = []
 
         for (const wuis of state[nodeId]) {
-            const unsub = wuis.value.subscribe((v) => {
-                console.log("CHANGE", v)
-            })
-            this.stores[nodeId].push({ store: wuis.value, unsubscribe: unsub });
+            const unsub = wuis.value.subscribe((v) => this.onWidgetStateChanged(wuis, v))
+            this.stores[nodeId].push({ store: wuis.vlue, unsubscribe: unsub });
         }
 
         console.log("NEWSTORES", this.stores[nodeId])
@@ -74,5 +79,13 @@ export default class GraphSync {
             ss.unsubscribe();
         }
         delete this.stores[nodeId]
+    }
+
+    /*
+     * Fired when a single widget's value changes.
+     */
+    private onWidgetStateChanged(wuis: WidgetUIState, value: any) {
+        wuis.widget.value = value;
+        this.graph.setDirtyCanvas(true, true);
     }
 }

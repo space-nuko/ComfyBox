@@ -10,9 +10,19 @@ import { subStore } from "immer-loves-svelte"
 export type WidgetUIStateStore = Writable<any>
 
 export type WidgetUIState = {
+    /** position in the node's list of widgets */
+    index: number,
+    /** parent node containing the widget */
     node: LGraphNode,
+    /** actual widget instance */
     widget: IWidget,
+    /** widget value as a store, to react to changes */
     value: WidgetUIStateStore,
+    /**
+     * true if this widget was added purely from the frontend. what this means:
+     * - this widget's state will not be saved to the workflow
+     * - the widget was added on startup by some subclass of ComfyGraphNode
+     */
     isVirtual: boolean
 }
 

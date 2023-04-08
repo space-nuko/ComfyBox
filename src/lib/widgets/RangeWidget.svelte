@@ -1,22 +1,35 @@
 <script lang="ts">
  import type { WidgetUIState, WidgetUIStateStore } from "$lib/stores/widgetState";
  import { Range } from "@gradio/form";
+ import { get } from "svelte/store";
  export let item: WidgetUIState | null = null;
  let itemValue: WidgetUIStateStore | null = null;
- $: if (item) { itemValue = item.value; }
+ let option: number | null = null;
+
+ $: if (item && !option) {
+     if (!itemValue)
+         itemValue = item.value;
+     option = get(item.value)
+ }
+
+ function onRelease(e: Event) {
+     if (itemValue && option) {
+         $itemValue = option
+     }
+ }
 </script>
 
 <div class="wrapper">
-    {#if item && itemValue}
+    {#if item && option}
         <Range
-            bind:value={$itemValue}
+            bind:value={option}
             minimum={item.widget.options.min}
             maximum={item.widget.options.max}
             step={item.widget.options.step}
             label={item.widget.name}
             show_label={true}
+            on:release={onRelease}
             on:change
-            on:release
         />
     {/if}
 </div>
