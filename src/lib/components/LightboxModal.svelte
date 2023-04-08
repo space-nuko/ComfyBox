@@ -53,6 +53,7 @@
 
  #modalImage {
      overflow: hidden;
+     user-drag: none;
  }
 
  .modalControls {

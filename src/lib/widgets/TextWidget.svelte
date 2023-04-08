@@ -1,13 +1,15 @@
 <script lang="ts">
- import type { WidgetUIState } from "$lib/stores/widgetState";
+ import type { WidgetUIState, WidgetUIStateStore } from "$lib/stores/widgetState";
  import { TextBox } from "@gradio/form";
  export let item: WidgetUIState | null = null;
+ let itemValue: WidgetUIStateStore | null = null;
+ $: if (item) { itemValue = item.value; }
 </script>
 
 <div class="wrapper">
-    {#if item}
+    {#if item && itemValue}
         <TextBox
-            bind:value={item.value}
+            bind:value={$itemValue}
             label={item.widget.name}
             lines={item.widget.options.multiline ? 5 : 1}
             max_lines={item.widget.options.multiline ? 5 : 1}

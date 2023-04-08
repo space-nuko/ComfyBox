@@ -1,13 +1,17 @@
 <script lang="ts">
- import type { WidgetDrawState, WidgetUIState } from "$lib/stores/widgetState";
+ import type { WidgetDrawState, WidgetUIState, WidgetUIStateStore } from "$lib/stores/widgetState";
  import { BlockTitle } from "@gradio/atoms";
  import { Dropdown } from "@gradio/form";
+ import { get } from "svelte/store";
  import Select from 'svelte-select';
  export let item: WidgetUIState | null = null;
+ let itemValue: WidgetUIStateStore | null = null;
+ let option: any;
 
- let option: any = null;
-
- $: if(item && !option) option = item.value;
+ $: if(item) {
+     option = get(item.value);
+     itemValue = item.value
+ };
 </script>
 
 <div class="wrapper">
@@ -16,7 +20,7 @@
             <BlockTitle show_label={true}>{item.widget.name}</BlockTitle>
             <Select
                 bind:value={option}
-                bind:justValue={item.value}
+                bind:justValue={$itemValue}
                 bind:items={item.widget.options.values}
                 disabled={item.widget.options.values.length === 0}
                 clearable={false}

@@ -4,10 +4,15 @@ import type { Readable, Writable } from 'svelte/store';
 import type ComfyGraphNode from '$lib/nodes/ComfyGraphNode';
 import type ComfyWidget from '$lib/widgets/ComfyWidget';
 
+import { subStore } from "immer-loves-svelte"
+
+/** store for one widget's state */
+export type WidgetUIStateStore = Writable<any>
+
 export type WidgetUIState = {
     node: LGraphNode,
     widget: IWidget,
-    value: any,
+    value: WidgetUIStateStore,
     isVirtual: boolean
 }
 
@@ -41,7 +46,7 @@ function nodeAdded(node: LGraphNode) {
         for (const widget of node.widgets) {
             if (!state[node.id])
                 state[node.id] = []
-            state[node.id].push({ node, widget, value: widget.value, isVirtual: false })
+            state[node.id].push({ node, widget, value: writable(widget.value), isVirtual: false })
         }
     }
 
@@ -50,9 +55,11 @@ function nodeAdded(node: LGraphNode) {
         for (const widget of comfyNode.virtualWidgets) {
             if (!state[comfyNode.id])
                 state[comfyNode.id] = []
-            state[comfyNode.id].push({ node, widget, value: widget.value, isVirtual: true })
+            state[comfyNode.id].push({ node, widget, value: writable(widget.value), isVirtual: true })
         }
     }
+
+    console.log("NODEADDED", state)
 
     store.set(state);
 }
@@ -69,7 +76,7 @@ function widgetStateChanged(widget: ComfyWidget<any, any>) {
     if (entries) {
         let widgetState = entries.find(e => e.widget === widget);
         if (widgetState) {
-            widgetState.value = widget.value;
+            widgetState.value.set(widget.value);
             store.set(state);
         }
         else {
@@ -88,7 +95,7 @@ function configureFinished(graph: LGraph) {
         if (node.widgets_values) {
             for (const [i, value] of node.widgets_values.entries()) {
                 if (i < state[node.id].length && !state[node.id][i].isVirtual) { // Virtual widgets always come after real widgets
-                    state[node.id][i].value = value;
+                    state[node.id][i].value.set(value);
                 }
                 else {
                     console.error("Mismatch in widgets_values!", state[node.id].map(i => i.value), node.widgets_values)

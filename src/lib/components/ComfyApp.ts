@@ -16,6 +16,7 @@ import type { WidgetStateStore, WidgetUIState } from "$lib/stores/widgetState";
 import * as widgets from "$lib/widgets/index"
 import type ComfyWidget from "$lib/widgets/ComfyWidget";
 import queueState from "$lib/stores/queueState";
+import GraphSync from "$lib/GraphSync";
 
 LiteGraph.catch_exceptions = false;
 
@@ -70,6 +71,7 @@ export default class ComfyApp {
     dropZone: HTMLElement | null = null;
     nodeOutputs: Record<string, any> = {};
     eventBus: TypedEmitter<ComfyAppEvents> = new EventEmitter() as TypedEmitter<ComfyAppEvents>;
+    graphSync: GraphSync;
 
     dragOverNode: LGraphNode | null = null;
     shiftDown: boolean = false;
@@ -88,6 +90,7 @@ export default class ComfyApp {
         this.lGraph = new LGraph();
         this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl, this.lGraph);
         this.canvasCtx = this.canvasEl.getContext("2d");
+        this.graphSync = new GraphSync(this);
 
         this.addGraphLifecycleHooks();
 
@@ -458,14 +461,12 @@ export default class ComfyApp {
      * Converts the current graph workflow for sending to the API
      * @returns The workflow and node links
      */
-    async graphToPrompt(frontendState: WidgetStateStore = {}) {
+    async graphToPrompt() {
         const workflow = this.lGraph.serialize();
 
         const output = {};
         // Process nodes in order of execution
         for (const node of this.lGraph.computeExecutionOrder<ComfyGraphNodeExecutable>(false, null)) {
-            const fromFrontend: WidgetUIState[] | null = frontendState[node.id];
-
             const n = workflow.nodes.find((n) => n.id === node.id);
 
             if (node.isVirtualNode || !node.comfyClass) {
@@ -491,9 +492,6 @@ export default class ComfyApp {
                     const widget = widgets[i];
                     if (!widget.options || widget.options.serialize !== false) {
                         let value = widget.serializeValue ? await widget.serializeValue(n, i) : widget.value;
-                        if (fromFrontend && !fromFrontend[i].isVirtual) {
-                            value = fromFrontend[i].value;
-                        }
                         inputs[widget.name] = value
                     }
                 }
@@ -540,7 +538,7 @@ export default class ComfyApp {
         return { workflow, output };
     }
 
-    async queuePrompt(num: number, batchCount: number = 1, frontendState: WidgetStateStore = {}) {
+    async queuePrompt(num: number, batchCount: number = 1) {
         this.queueItems.push({ num, batchCount });
 
         // Only have one action process the items so each one gets a unique seed correctly
@@ -555,7 +553,7 @@ export default class ComfyApp {
                 console.log(`Queue get! ${num} ${batchCount}`);
 
                 for (let i = 0; i < batchCount; i++) {
-                    const p = await this.graphToPrompt(frontendState);
+                    const p = await this.graphToPrompt();
 
                     try {
                         await this.api.queuePrompt(num, p);

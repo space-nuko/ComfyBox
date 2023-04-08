@@ -21,6 +21,7 @@ importers:
       eslint-config-prettier: ^8.8.0
       eslint-plugin-svelte3: ^4.0.0
       events: ^3.3.0
+      immer-loves-svelte: ^2.2.4
       pollen-css: ^4.6.2
       prettier: ^2.8.7
       prettier-plugin-svelte: ^2.10.0
@@ -52,6 +53,7 @@ importers:
       '@litegraph-ts/core': link:litegraph/packages/core
       '@litegraph-ts/nodes-basic': link:litegraph/packages/nodes-basic
       events: 3.3.0
+      immer-loves-svelte: 2.2.4
       pollen-css: 4.6.2
       radix-icons-svelte: 1.2.1
       svelte-preprocess: 5.0.3_3gubijbxbisgisegeglxqngyuq
@@ -1003,6 +1005,19 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
+  /immer-loves-svelte/2.2.4:
+    resolution: {integrity: sha512-CQ/PS8nymZg/4Jhu2X6qsrUdtjPyPz25S8j9xnsT/J+idPFVvhtRH/+yZKDXleu0Na4ZtfPQoVpWz43HD1XFAQ==}
+    engines: {node: '>=10'}
+    dependencies:
+      immer: 9.0.21
+      svelte: 3.58.0
+      underscore: 1.13.6
+    dev: false
+
+  /immer/9.0.21:
+    resolution: {integrity: sha512-bc4NBHqOqSfRW7POMkHd51LvClaeMXpm8dx0e8oE2GORbq5aRK7Bxl4FyzVLdGtLmvLKL7BTDBG5ACQm4HWjTA==}
+    dev: false
+
   /immutable/4.3.0:
     resolution: {integrity: sha512-0AOCmOip+xgJwEVTQj1EfiDDOkPmuyllDuTuEX+DDXUgapLAsBIfkg3sxCYyCEA8mQqZrrxPUGjcOQ2JS3WLkg==}
 
@@ -1857,6 +1872,10 @@ packages:
     resolution: {integrity: sha512-xv8mOEDnigb/tN9PSMTwSEqAnUvkoXMQlicOb0IUVDBSQCgBSaAAROUZYy2IcUy5qU6XajK5jjjO7TMWqBTKZA==}
     engines: {node: '>=12.20'}
     hasBin: true
+
+  /underscore/1.13.6:
+    resolution: {integrity: sha512-+A5Sja4HP1M08MaXya7p5LvjuM7K6q/2EaC0+iovj/wOcMsTzMvDFbasi/oSapiwOlt252IqsKqPjCl7huKS0A==}
+    dev: false
 
   /undici/5.20.0:
     resolution: {integrity: sha512-J3j60dYzuo6Eevbawwp1sdg16k5Tf768bxYK4TUJRH7cBM4kFCbf3mOnM/0E3vQYXvpxITbbWmBafaDbxLDz3g==}

@@ -1,11 +1,17 @@
 <script lang="ts">
  import { onMount } from "svelte";
  import { ImageViewer } from "$lib/ImageViewer";
- import type { WidgetUIState } from "$lib/stores/widgetState";
+ import type { WidgetUIState, WidgetUIStateStore } from "$lib/stores/widgetState";
  import { Block } from "@gradio/atoms";
  import { Gallery } from "@gradio/gallery";
  import type { Styles } from "@gradio/utils";
+
  export let item: WidgetUIState | null = null;
+ let itemValue: WidgetUIStateStore | null = null; // stores must be declared at top level
+
+ $: if(item) {
+     itemValue = item.value;
+ }
 
  let style: Styles = {
      // grid_cols: [2],
@@ -28,10 +34,10 @@
 
 </script>
 <div class="wrapper comfy-gallery-widget" bind:this={element}>
-    {#if item}
+    {#if item && itemValue}
         <Block variant="solid" padding={false}>
             <Gallery
-                bind:value={item.value}
+                bind:value={$itemValue}
                 label={item.widget.name}
                 show_label={true}
                 {style}

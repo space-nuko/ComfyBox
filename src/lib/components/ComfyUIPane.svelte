@@ -5,7 +5,7 @@
  import ComfyApp  from "./ComfyApp";
  import type { SerializedPanes } from "./ComfyApp"
  import ComfyPane from "./ComfyPane.svelte";
- import widgetState, { type WidgetUIState } from "$lib/stores/widgetState";
+ import widgetState from "$lib/stores/widgetState";
 	import type { DragItem } from "./ComfyUIPane";
 
  export let app: ComfyApp;

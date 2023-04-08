@@ -33,9 +33,8 @@
  }
 
  function queuePrompt() {
-     const state = get(widgetState);
-     console.log("Queuing!", state);
-     app.queuePrompt(0, 1, state);
+     console.log("Queuing!");
+     app.queuePrompt(0, 1);
  }
 
  $: if (app) app.lCanvas.allow_dragnodes = !nodesLocked;
@@ -69,27 +68,9 @@
 
  function serializeAppState(): SerializedAppState {
      const graph = app.lGraph;
-     const frontendState = get(widgetState);
 
      const serializedGraph = graph.serialize()
      const serializedPaneOrder = uiPane.serialize()
-
-     // Override the saved graph widget state with the properties set in the
-     // frontend panels.
-     for (let i = 0; i < serializedGraph.nodes.length; i++) {
-         let serializedNode = serializedGraph.nodes[i];
-         let frontendWidgetStates = frontendState[serializedNode.id];
-         if (frontendWidgetStates && serializedNode.widgets_values) {
-             for (let j = 0; j < serializedNode.widgets_values.length; j++) {
-                 let frontendWidgetState = frontendWidgetStates[j];
-
-                 // Virtual widgets always come after real widgets in the current design
-                 if (frontendWidgetState && !frontendWidgetState.isVirtual) {
-                     serializedNode.widgets_values[j] = frontendWidgetState.value;
-                 }
-             }
-         }
-     }
 
      return {
          createdBy: "ComfyBox",

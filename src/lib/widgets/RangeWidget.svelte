@@ -1,13 +1,15 @@
 <script lang="ts">
- import type { WidgetUIState } from "$lib/stores/widgetState";
+ import type { WidgetUIState, WidgetUIStateStore } from "$lib/stores/widgetState";
  import { Range } from "@gradio/form";
  export let item: WidgetUIState | null = null;
+ let itemValue: WidgetUIStateStore | null = null;
+ $: if (item) { itemValue = item.value; }
 </script>
 
 <div class="wrapper">
-    {#if item}
+    {#if item && itemValue}
         <Range
-            bind:value={item.value}
+            bind:value={$itemValue}
             minimum={item.widget.options.min}
             maximum={item.widget.options.max}
             step={item.widget.options.step}
