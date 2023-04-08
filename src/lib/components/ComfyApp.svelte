@@ -79,7 +79,7 @@
      for (let i = 0; i < serializedGraph.nodes.length; i++) {
          let serializedNode = serializedGraph.nodes[i];
          let frontendWidgetStates = frontendState[serializedNode.id];
-         if (frontendWidgetStates) {
+         if (frontendWidgetStates && serializedNode.widgets_values) {
              for (let j = 0; j < serializedNode.widgets_values.length; j++) {
                  let frontendWidgetState = frontendWidgetStates[j];
 

@@ -46,7 +46,7 @@
 
  onDestroy(unsubscribe);
 
- $: if ($queueState.runningNodeId) {
+ $: if ($queueState) {
      for (let dragItem of dragItems) {
          dragItem.isNodeExecuting = $queueState.runningNodeId === dragItem.node.id;
      }

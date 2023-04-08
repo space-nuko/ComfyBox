@@ -51,6 +51,10 @@
      flex-direction: column;
  }
 
+ #modalImage {
+     overflow: hidden;
+ }
+
  .modalControls {
      display: flex;
      gap: 1em;
