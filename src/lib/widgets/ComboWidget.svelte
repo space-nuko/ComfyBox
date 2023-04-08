@@ -21,7 +21,7 @@
 </script>
 
 <div class="wrapper">
-    {#if item && $itemValue}
+    {#if item && option}
         <label>
             <BlockTitle show_label={true}>{item.widget.name}</BlockTitle>
             <Select
