@@ -6,7 +6,7 @@ import FullReload from 'vite-plugin-full-reload';
 export default defineConfig({
     clearScreen: false,
     plugins: [
-        tsconfigPaths({ loose: true }),
+        // tsconfigPaths({ loose: true }),
         sveltekit(),
         FullReload(["src/**/*.{js,ts,svelte}"])
     ],

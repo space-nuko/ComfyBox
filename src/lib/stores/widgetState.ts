@@ -4,8 +4,6 @@ import type { Readable, Writable } from 'svelte/store';
 import type ComfyGraphNode from '$lib/nodes/ComfyGraphNode';
 import type ComfyWidget from '$lib/widgets/ComfyWidget';
 
-import { subStore } from "immer-loves-svelte"
-
 /** store for one widget's state */
 export type WidgetUIStateStore = Writable<any>
 

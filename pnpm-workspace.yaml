@@ -3,3 +3,4 @@ packages:
   - 'gradio/client/js'
   - 'litegraph/packages/core'
   - 'litegraph/packages/nodes-basic'
+  - 'litegraph/packages/tsconfig'

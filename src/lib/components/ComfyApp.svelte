@@ -7,6 +7,8 @@
  import ComfyApp, { type SerializedAppState } from "./ComfyApp";
  import { Checkbox } from "@gradio/form"
  import widgetState from "$lib/stores/widgetState";
+ import nodeState from "$lib/stores/nodeState";
+ import uiState from "$lib/stores/uiState";
  import { ImageViewer } from "$lib/ImageViewer";
  import { download } from "$lib/utils"
 
@@ -23,8 +25,6 @@
  let queue: ComfyQueue = undefined;
  let mainElem: HTMLDivElement;
  let containerElem: HTMLDivElement;
- let nodesLocked: boolean = false;
- let graphLocked: boolean = false;
  let resizeTimeout: typeof Timer = -1;
 
  function refreshView(event?: Event) {
@@ -37,8 +37,8 @@
      app.queuePrompt(0, 1);
  }
 
- $: if (app) app.lCanvas.allow_dragnodes = !nodesLocked;
- $: if (app) app.lCanvas.allow_interaction = !graphLocked;
+ $: if (app) app.lCanvas.allow_dragnodes = !$uiState.nodesLocked;
+ $: if (app) app.lCanvas.allow_interaction = !$uiState.graphLocked;
 
  let graphSize = null;
 
@@ -101,6 +101,12 @@
 
  onMount(async () => {
      app = new ComfyApp();
+
+// TODO dedup
+     app.eventBus.on("nodeAdded", nodeState.nodeAdded);
+     app.eventBus.on("nodeRemoved", nodeState.nodeRemoved);
+     app.eventBus.on("configured", nodeState.configureFinished);
+     app.eventBus.on("cleared", nodeState.clear);
 
      app.eventBus.on("nodeAdded", widgetState.nodeAdded);
      app.eventBus.on("nodeRemoved", widgetState.nodeRemoved);
@@ -167,8 +173,9 @@
         <Button variant="secondary" on:click={doSave}>
             Save
         </Button>
-        <Checkbox label="Lock Nodes" bind:value={nodesLocked}/>
-        <Checkbox label="Disable Interaction" bind:value={graphLocked}/>
+        <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
+        <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/>
+        <Checkbox label="Enable UI Editing" bind:value={$uiState.unlocked}/>
     </div>
     <LightboxModal />
 </div>

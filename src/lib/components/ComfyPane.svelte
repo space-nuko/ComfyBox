@@ -8,6 +8,8 @@
  import TextWidget from "$lib/widgets/TextWidget.svelte";
  import widgetState, { type WidgetDrawState, type WidgetUIState } from "$lib/stores/widgetState";
  import queueState from "$lib/stores/queueState";
+ import nodeState from "$lib/stores/nodeState";
+ import uiState from "$lib/stores/uiState";
 
  import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME } from 'svelte-dnd-action';
 
@@ -21,6 +23,7 @@
 
  export let dragItems: DragItem[] = [];
  let dragDisabled = true;
+ let unlockUI = false;
  const flipDurationMs = 200;
 
  const handleConsider = evt => {
@@ -76,6 +79,11 @@
 
      return null;
  }
+
+ function updateNodeName(node: LGraphNode, value: string) {
+ console.log("CHA")
+    nodeState.nodeStateChanged(node);
+ }
 </script>
 
 
@@ -89,11 +97,22 @@
         {@const id = node.id}
         <div class="animation-wrapper" class:is-executing={dragItem.isNodeExecuting} animate:flip={{duration:flipDurationMs}}>
             <Block>
+                {#if $uiState.unlocked}
                 <div class="handle" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}>
                     <Move/>
                 </div>
+                {/if}
                 <label for={String(id)}>
-                    <BlockTitle>{node.title}</BlockTitle>
+                    <BlockTitle>
+                    {#if $uiState.unlocked}
+                        <input bind:value={dragItem.node.title} type="text" minlength="1" on:input="{(v) => { updateNodeName(node, v) }}"/>
+                    {:else}
+                        {node.title}
+                    {/if}
+                    {#if node.title !== node.type}
+                        <span class="node-type">({node.type})</span>
+                    {/if}
+                    </BlockTitle>
                 </label>
                 {#each $widgetState[id] as item}
                     <svelte:component this={getComponentForWidgetState(item)} {item} />
@@ -145,4 +164,9 @@
      opacity: 0.5;
      margin: 0;
  }
+
+ .node-type {
+      font-size: smaller;
+      color: var(--neutral-400);
+  }
 </style>

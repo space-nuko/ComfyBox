@@ -27,7 +27,7 @@
     "svelte-check": "^3.2.0",
     "svelte-dnd-action": "^0.9.22",
     "typescript": "^5.0.3",
-    "vite": "^4.2.1",
+    "vite": "^4.3.1",
     "vite-tsconfig-paths": "^4.0.8",
     "vitest": "^0.25.8"
   },
@@ -42,6 +42,7 @@
     "@gradio/theme": "workspace:*",
     "@gradio/upload": "workspace:*",
     "@gradio/utils": "workspace:*",
+    "@litegraph-ts/tsconfig": "workspace:*",
     "@litegraph-ts/core": "workspace:*",
     "@litegraph-ts/nodes-basic": "workspace:*",
     "events": "^3.3.0",

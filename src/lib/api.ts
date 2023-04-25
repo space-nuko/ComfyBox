@@ -179,7 +179,7 @@ export default class ComfyAPI extends EventTarget {
             prompt: output,
             extra_data: { extra_pnginfo: { workflow } },
             front: false,
-            number: null
+            number: number
         };
 
         if (number === -1) {

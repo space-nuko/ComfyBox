@@ -1,10 +1,16 @@
 import type { LGraph } from "@litegraph-ts/core";
 import widgetState, { type WidgetStateStore, type WidgetUIState, type WidgetUIStateStore } from "./stores/widgetState";
+import nodeState, { type NodeStateStore, type NodeUIState, type NodeUIStateStore } from "./stores/nodeState";
 import type ComfyApp from "./components/ComfyApp";
 import type { Unsubscriber } from "svelte/store";
 
 type WidgetSubStore = {
     store: WidgetUIStateStore,
+    unsubscribe: Unsubscriber
+}
+
+type NodeSubStore = {
+    store: NodeUIStateStore,
     unsubscribe: Unsubscriber
 }
 
@@ -32,10 +38,12 @@ export default class GraphSync {
 
     constructor(app: ComfyApp) {
         this.graph = app.lGraph;
-        this._unsubscribe = widgetState.subscribe(this.onAllWidgetStateChanged.bind(this));
+        this._unsubscribeWidget = widgetState.subscribe(this.onAllWidgetStateChanged.bind(this));
+        this._unsubscribeNode = nodeState.subscribe(this.onAllNodeStateChanged.bind(this));
         this._finalizer = new FinalizationRegistry((id: number) => {
             console.log(`${this} has been garbage collected`);
-            this._unsubscribe();
+            this._unsubscribeWidget();
+            this._unsubscribeNode();
         });
     }
 
@@ -58,6 +66,16 @@ export default class GraphSync {
         }
     }
 
+    private onAllNodeStateChanged(state: NodeStateStore) {
+        // TODO assumes only a single graph's widget state.
+
+        for (let nodeId in state) {
+            state[nodeId].node.name = state[nodeId].name;
+        }
+
+        this.graph.setDirtyCanvas(true, true);
+    }
+
     private addStores(state: WidgetStateStore, nodeId: string) {
         if (this.stores[nodeId]) {
             console.warn("Stores already exist!", nodeId, this.stores[nodeId])
@@ -67,7 +85,7 @@ export default class GraphSync {
 
         for (const wuis of state[nodeId]) {
             const unsub = wuis.value.subscribe((v) => this.onWidgetStateChanged(wuis, v))
-            this.stores[nodeId].push({ store: wuis.vlue, unsubscribe: unsub });
+            this.stores[nodeId].push({ store: wuis.value, unsubscribe: unsub });
         }
 
         console.log("NEWSTORES", this.stores[nodeId])
