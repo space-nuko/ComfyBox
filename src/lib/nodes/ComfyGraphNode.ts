@@ -10,5 +10,6 @@ export default class ComfyGraphNode extends LGraphNode {
      */
     virtualWidgets: ComfyWidget[] = [];
 
+    onExecuting?(): void;
     onExecuted?(output: any): void;
 }

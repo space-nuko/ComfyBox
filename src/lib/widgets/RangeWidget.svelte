@@ -6,10 +6,13 @@
  let itemValue: WidgetUIStateStore | null = null;
  let option: number | null = null;
 
- $: if (item && !option) {
-     if (!itemValue)
-         itemValue = item.value;
-     option = get(item.value)
+ $: if (item) {
+     itemValue = item.value;
+     updateOption(); // don't react on option
+ }
+
+ function updateOption() {
+     option = get(itemValue);
  }
 
  function onRelease(e: Event) {

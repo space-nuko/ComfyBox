@@ -206,6 +206,8 @@ export default class ComfyApp {
     private registerNodeTypeOverrides() {
         ComfyApp.node_type_overrides["SaveImage"] = nodes.ComfySaveImageNode;
         ComfyApp.node_type_overrides["PreviewImage"] = nodes.ComfyPreviewImageNode;
+        ComfyApp.node_type_overrides["KSampler"] = nodes.ComfyKSamplerNode;
+        ComfyApp.node_type_overrides["KSamplerAdvanced"] = nodes.ComfyKSamplerAdvancedNode;
     }
 
     private registerWidgetTypeOverrides() {
@@ -386,7 +388,11 @@ export default class ComfyApp {
         });
 
         this.api.addEventListener("executing", ({ detail }: CustomEvent) => {
-            queueState.executingUpdated(detail);
+            queueState.executingUpdated(detail.node);
+            const node = this.lGraph.getNodeById(detail.node) as ComfyGraphNode;
+            if (node?.onExecuting) {
+                node.onExecuting();
+            }
             this.lGraph.setDirtyCanvas(true, false);
         });
 

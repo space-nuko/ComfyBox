@@ -26,7 +26,7 @@ export default abstract class ComfyWidget<T = any, V = any> implements IWidget<T
 
     setValue(value: V) {
         this.value = value;
-        widgetState.widgetStateChanged(this);
+        widgetState.widgetStateChanged(this.node.id, this);
     }
 
     draw?(ctx: CanvasRenderingContext2D, node: LGraphNode, width: number, posY: number, height: number): void;

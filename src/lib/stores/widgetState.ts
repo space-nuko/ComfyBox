@@ -34,7 +34,8 @@ type WidgetStateOps = {
     nodeAdded: (node: LGraphNode) => void,
     nodeRemoved: (node: LGraphNode) => void,
     configureFinished: (graph: LGraph) => void,
-    widgetStateChanged: (widget: ComfyWidget<any, any>) => void,
+    widgetStateChanged: (nodeId: number, widget: IWidget<any, any>) => void,
+    findWidgetByName: (nodeId: number, name: string) => WidgetUIState | null,
     clear: () => void,
 }
 
@@ -78,9 +79,9 @@ function nodeRemoved(node: LGraphNode) {
     store.set(state)
 }
 
-function widgetStateChanged(widget: ComfyWidget<any, any>) {
+function widgetStateChanged(nodeId: number, widget: IWidget<any, any>) {
     const state = get(store)
-    const entries = state[widget.node.id]
+    const entries = state[nodeId]
     if (entries) {
         let widgetState = entries.find(e => e.widget === widget);
         if (widgetState) {
@@ -116,6 +117,15 @@ function configureFinished(graph: LGraph) {
     store.set(state)
 }
 
+function findWidgetByName(nodeId: number, name: string): WidgetUIState | null {
+    let state = get(store);
+
+    if (!(nodeId in state))
+        return null;
+
+    return state[nodeId].find((v) => v.widget.name === name);
+}
+
 const widgetStateStore: WritableWidgetStateStore =
 {
     ...store,
@@ -123,6 +133,7 @@ const widgetStateStore: WritableWidgetStateStore =
     nodeRemoved,
     widgetStateChanged,
     configureFinished,
+    findWidgetByName,
     clear
 }
 export default widgetStateStore;
