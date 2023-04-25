@@ -206,8 +206,6 @@ export default class ComfyApp {
     private registerNodeTypeOverrides() {
         ComfyApp.node_type_overrides["SaveImage"] = nodes.ComfySaveImageNode;
         ComfyApp.node_type_overrides["PreviewImage"] = nodes.ComfyPreviewImageNode;
-        ComfyApp.node_type_overrides["KSampler"] = nodes.ComfyKSamplerNode;
-        ComfyApp.node_type_overrides["KSamplerAdvanced"] = nodes.ComfyKSamplerAdvancedNode;
     }
 
     private registerWidgetTypeOverrides() {
@@ -389,10 +387,6 @@ export default class ComfyApp {
 
         this.api.addEventListener("executing", ({ detail }: CustomEvent) => {
             queueState.executingUpdated(detail.node);
-            const node = this.lGraph.getNodeById(detail.node) as ComfyGraphNode;
-            if (node?.onExecuting) {
-                node.onExecuting();
-            }
             this.lGraph.setDirtyCanvas(true, false);
         });
 
@@ -496,7 +490,10 @@ export default class ComfyApp {
             if (widgets) {
                 for (let i = 0; i < widgets.length; i++) {
                     const widget = widgets[i];
-                    if (!widget.options || widget.options.serialize !== false) {
+                    let isVirtual = false;
+                    if ("isVirtual" in widget)
+                        isVirtual = (widget as ComfyWidget<any, any>).isVirtual;
+                    if ((!widget.options || widget.options.serialize !== false) && !isVirtual) {
                         let value = widget.serializeValue ? await widget.serializeValue(n, i) : widget.value;
                         inputs[widget.name] = value
                     }
@@ -575,9 +572,9 @@ export default class ComfyApp {
                             for (const widget of node.widgets) {
                                 // Allow widgets to run callbacks after a prompt has been queued
                                 // e.g. random seed after every gen
-                                // if (widget.afterQueued) {
-                                // 	widget.afterQueued();
-                                // }
+                                if ("afterQueued" in widget) {
+                                    (widget as ComfyWidget<any, any>).afterQueued();
+                                }
                             }
                         }
                     }

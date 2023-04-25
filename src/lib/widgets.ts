@@ -1,5 +1,6 @@
 import type { IWidget, LGraphNode } from "@litegraph-js/core";
 import type ComfyApp from "$lib/components/ComfyApp";
+import ComfyValueControlWidget from "./widgets/ComfyValueControlWidget";
 
 export interface WidgetData {
     widget: IWidget,
@@ -47,6 +48,15 @@ const INT: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any)
         ),
     };
 };
+
+function seedWidget(node, inputName, inputData, app) {
+	const seed = INT(node, inputName, inputData, app);
+	const seedControl = new ComfyValueControlWidget("control_after_generate", "randomize", node, seed.widget);
+    node.addCustomWidget(seedControl);
+
+	// seed.widget.linkedWidgets = [seedControl];
+	return seed;
+}
 
 const STRING: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any, app: ComfyApp): WidgetData => {
     const defaultVal = inputData[1].default || "";
@@ -127,8 +137,8 @@ const IMAGEUPLOAD: WidgetFactory = (node: LGraphNode, inputName: string, inputDa
 export type WidgetRepository = Record<string, WidgetFactory>
 
 export const ComfyWidgets: WidgetRepository = {
-    "INT:seed": INT,
-    "INT:noise_seed": INT,
+    "INT:seed": seedWidget,
+    "INT:noise_seed": seedWidget,
     FLOAT,
     INT,
     STRING,

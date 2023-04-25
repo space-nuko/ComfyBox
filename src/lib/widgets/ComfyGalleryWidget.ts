@@ -9,4 +9,5 @@ export interface ComfyGalleryWidgetOptions extends WidgetPanelOptions {
 
 export default class ComfyGalleryWidget extends ComfyWidget<ComfyGalleryWidgetOptions, ComfyGalleryEntry[]> {
     override type = "comfy/gallery";
+    override isVirtual = true;
 }

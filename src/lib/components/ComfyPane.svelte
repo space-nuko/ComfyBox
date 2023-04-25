@@ -60,20 +60,18 @@
      let ctor: any = null;
 
      // custom widgets with TypeScript sources
-     if (item.isVirtual) {
-         let override = ComfyApp.widget_type_overrides[item.widget.type]
-         if (override) {
-             return override;
-         }
+     let override = ComfyApp.widget_type_overrides[item.widget.type]
+     if (override) {
+         return override;
      }
 
      // litegraph.ts built-in widgets
      switch (item.widget.type) {
-             case "combo":
+         case "combo":
              return ComboWidget;
-             case "number":
+         case "number":
              return RangeWidget;
-             case "text":
+         case "text":
              return TextWidget;
      }
 
@@ -81,8 +79,7 @@
  }
 
  function updateNodeName(node: LGraphNode, value: string) {
- console.log("CHA")
-    nodeState.nodeStateChanged(node);
+     nodeState.nodeStateChanged(node);
  }
 </script>
 
@@ -98,20 +95,20 @@
         <div class="animation-wrapper" class:is-executing={dragItem.isNodeExecuting} animate:flip={{duration:flipDurationMs}}>
             <Block>
                 {#if $uiState.unlocked}
-                <div class="handle" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}>
-                    <Move/>
-                </div>
+                    <div class="handle" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}>
+                        <Move/>
+                    </div>
                 {/if}
                 <label for={String(id)}>
                     <BlockTitle>
-                    {#if $uiState.unlocked}
-                        <input bind:value={dragItem.node.title} type="text" minlength="1" on:input="{(v) => { updateNodeName(node, v) }}"/>
-                    {:else}
-                        {node.title}
-                    {/if}
-                    {#if node.title !== node.type}
-                        <span class="node-type">({node.type})</span>
-                    {/if}
+                        {#if $uiState.unlocked}
+                            <input bind:value={dragItem.node.title} type="text" minlength="1" on:input="{(v) => { updateNodeName(node, v) }}"/>
+                        {:else}
+                            {node.title}
+                        {/if}
+                        {#if node.title !== node.type}
+                            <span class="node-type">({node.type})</span>
+                        {/if}
                     </BlockTitle>
                 </label>
                 {#each $widgetState[id] as item}
@@ -166,7 +163,7 @@
  }
 
  .node-type {
-      font-size: smaller;
-      color: var(--neutral-400);
-  }
+     font-size: smaller;
+     color: var(--neutral-400);
+ }
 </style>

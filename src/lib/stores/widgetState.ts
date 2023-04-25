@@ -52,19 +52,13 @@ function nodeAdded(node: LGraphNode) {
     let state = get(store)
 
     if (node.widgets) {
-        for (const widget of node.widgets) {
+        for (const [index, widget] of node.widgets.entries()) {
             if (!state[node.id])
                 state[node.id] = []
-            state[node.id].push({ node, widget, value: writable(widget.value), isVirtual: false })
-        }
-    }
-
-    if ("virtualWidgets" in node) {
-        const comfyNode = node as ComfyGraphNode;
-        for (const widget of comfyNode.virtualWidgets) {
-            if (!state[comfyNode.id])
-                state[comfyNode.id] = []
-            state[comfyNode.id].push({ node, widget, value: writable(widget.value), isVirtual: true })
+            let isVirtual = false;
+            if ("isVirtual" in widget)
+                isVirtual = (widget as ComfyWidget<any, any>).isVirtual;
+            state[node.id].push({ index, node, widget, value: writable(widget.value), isVirtual: isVirtual })
         }
     }
 
@@ -103,11 +97,11 @@ function configureFinished(graph: LGraph) {
     for (const node of graph.computeExecutionOrder(false, null)) {
         if (node.widgets_values) {
             for (const [i, value] of node.widgets_values.entries()) {
-                if (i < state[node.id].length && !state[node.id][i].isVirtual) { // Virtual widgets always come after real widgets
+                if (i < state[node.id].length && !state[node.id][i].isVirtual) {
                     state[node.id][i].value.set(value);
                 }
                 else {
-                    console.error("Mismatch in widgets_values!", state[node.id].map(i => i.value), node.widgets_values)
+                    console.error("Mismatch in widgets_values!", node.id, node.type, state[node.id].map(i => get(i.value)), node.widgets_values)
                     break;
                 }
             }

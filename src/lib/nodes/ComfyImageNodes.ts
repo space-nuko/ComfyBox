@@ -20,7 +20,7 @@ class ComfyImageNode extends ComfyGraphNode {
     constructor(title?: any) {
         super(title)
         this._galleryWidget = new ComfyGalleryWidget("Images", [], this);
-        this.virtualWidgets.push(this._galleryWidget)
+        this.addCustomWidget(this._galleryWidget);
     }
 
     override onExecuted(output: ComfyImageExecOutput) {

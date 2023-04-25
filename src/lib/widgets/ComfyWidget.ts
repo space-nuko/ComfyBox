@@ -13,6 +13,7 @@ export default abstract class ComfyWidget<T = any, V = any> implements IWidget<T
         this.node = node;
     }
 
+    isVirtual?: boolean;
     options?: T;
     type?: WidgetTypes | string | any;
     y?: number;
@@ -34,6 +35,8 @@ export default abstract class ComfyWidget<T = any, V = any> implements IWidget<T
     mouse?(event: MouseEvent, pos: Vector2, node: LGraphNode): boolean;
 
     computeSize?(width: number): [number, number];
+
+    afterQueued?(): void;
 
     serializeValue?(serialized: SerializedLGraphNode<LGraphNode>, slot: number): Promise<any>;
 }
