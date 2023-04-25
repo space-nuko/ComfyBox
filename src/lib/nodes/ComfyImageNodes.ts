@@ -32,7 +32,7 @@ class ComfyImageNode extends ComfyGraphNode {
             let entry: ComfyGalleryEntry = [url + params, null]
             return entry
         });
-        this._galleryWidget.setValue(galleryItems)
+        this._galleryWidget.addImages(galleryItems);
     }
 }
 
