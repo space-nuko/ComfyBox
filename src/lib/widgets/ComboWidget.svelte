@@ -21,7 +21,7 @@
 </script>
 
 <div class="wrapper">
-    {#if item && option}
+    {#if item !== null && option !== undefined}
         <label>
             <BlockTitle show_label={true}>{item.widget.name}</BlockTitle>
             <Select

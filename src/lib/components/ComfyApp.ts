@@ -11,7 +11,7 @@ import type TypedEmitter from "typed-emitter";
 import * as basic from "@litegraph-ts/nodes-basic"
 import * as nodes from "$lib/nodes/index"
 import ComfyGraphCanvas from "$lib/ComfyGraphCanvas";
-import type ComfyGraphNode from "$lib/ComfyGraphNode";
+import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import type { WidgetStateStore, WidgetUIState } from "$lib/stores/widgetState";
 import * as widgets from "$lib/widgets/index"
 import type ComfyWidget from "$lib/widgets/ComfyWidget";
@@ -423,7 +423,7 @@ export default class ComfyApp {
         this.clean();
 
         if (!graphData) {
-            graphData = structuredClone(defaultGraph) as SerializedLGraph;
+            graphData = structuredClone(defaultGraph.workflow)
         }
 
         // Patch T2IAdapterLoader to ControlNetLoader since they are the same node now

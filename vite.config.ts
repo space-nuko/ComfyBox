@@ -8,10 +8,10 @@ export default defineConfig({
     plugins: [
         // tsconfigPaths({ loose: true }),
         sveltekit(),
-        FullReload(["src/**/*.{js,ts,svelte}"])
+        // FullReload(["src/**/*.{js,ts,svelte}"])
     ],
     build: {
-        sourcemap: true,
+      sourcemap: true,
     },
     server: {
         port: 3000,

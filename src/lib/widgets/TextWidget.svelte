@@ -7,7 +7,7 @@
 </script>
 
 <div class="wrapper">
-    {#if item && itemValue}
+    {#if item !== null && itemValue !== null}
         <TextBox
             bind:value={$itemValue}
             label={item.widget.name}

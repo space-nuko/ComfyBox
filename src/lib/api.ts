@@ -3,7 +3,7 @@ type PromptRequestBody = {
     prompt: any,
     extra_data: any,
     front: boolean,
-    number: number | null
+    number: number | undefined
 }
 
 export type QueueItemType = "queue" | "history";

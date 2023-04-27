@@ -101,8 +101,7 @@ function configureFinished(graph: LGraph) {
                     state[node.id][i].value.set(value);
                 }
                 else {
-                    console.error("Mismatch in widgets_values!", node.id, node.type, state[node.id].map(i => get(i.value)), node.widgets_values)
-                    break;
+                    console.log("Skip virtual widget", node.id, node.type, state[node.id][i].widget)
                 }
             }
         }

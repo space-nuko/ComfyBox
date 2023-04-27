@@ -181,8 +181,6 @@
 </div>
 
 <style lang="scss">
- @import '../../scss/shared.scss';
-
  #container {
      height: calc(100vh - 60px);
      max-width: 100vw;
