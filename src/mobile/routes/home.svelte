@@ -16,7 +16,18 @@
  import queueState from "$lib/stores/queueState";
  import { Page, Navbar, Link, BlockTitle, Block, List, ListItem } from "framework7-svelte"
 
- let app: ComfyApp = undefined;
+ let app: ComfyApp | null = null;
+
+ function onBackKeyDown(e) {
+     if(f7.view.current.router.currentRoute.path == '/'){
+         // exitApp();
+         e.preventDefault();
+     } else {
+         f7.dialog.close()
+         f7.view.main.router.back()
+         return false;
+     }
+ }
 
  let serializedPaneOrder = {};
 
@@ -43,7 +54,9 @@
  }
 
  onMount(async () => {
-     app = new ComfyApp();
+     if (app)
+         return
+     app = ComfyApp.instance;
 
      // TODO dedup
      app.eventBus.on("nodeAdded", nodeState.nodeAdded);
@@ -64,6 +77,7 @@
 
      await app.setup();
      (window as any).app = app;
+
  });
 
 </script>
@@ -77,14 +91,15 @@
     </Block>
 
     <List strong inset dividersIos class="components-list searchbar-found">
-        <ListItem link="/accordion/" title="Accordion">
+        <ListItem link="/subworkflows/" title="Workflows">
             <i class="icon icon-f7" slot="media" />
         </ListItem>
-        <ListItem link="/action-sheet/" title="Action Sheet">
-            <i class="icon icon-f7" slot="media" />
-        </ListItem>
-        <ListItem link="/graph/" title="Show Node Graph" routeProps={{ app: app }}>
+        <ListItem link="/graph/" title="Show Node Graph">
             <i class="icon icon-f7" slot="media" />
         </ListItem>
     </List>
+
+    <div class="canvas-wrapper pane-wrapper" style="display: none">
+        <canvas id="graph-canvas" />
+    </div>
 </Page>

@@ -10,21 +10,4 @@ const app = new AppMobile({
   target: document.getElementById('app'),
 })
 
-function onBackKeyDown(e: Event) {
-    console.log(f7.view.current.router.currentRoute.name)
-		e.preventDefault();
-	// Handle the back button
-	if(f7.view.current.router.currentRoute.name == 'index'){
-		// exitApp();
-		e.preventDefault();
-	} else {
-        f7.dialog.close()
-        f7.view.main.router.back()
-		return false;
-	}
-}
-
-document.addEventListener("backbutton", onBackKeyDown, false);
-document.addEventListener("popstate", onBackKeyDown, false);
-
 export default app;

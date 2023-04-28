@@ -18,11 +18,14 @@
  import { f7, f7ready } from 'framework7-svelte';
 
  import "framework7/css/bundle"
+ import "./scss/global.scss";
 
  import HomePage from './mobile/routes/home.svelte';
  import AboutPage from './mobile/routes/about.svelte';
  import LoginPage from './mobile/routes/login.svelte';
  import GraphPage from './mobile/routes/graph.svelte';
+ import ListSubWorkflowsPage from './mobile/routes/list-subworkflows.svelte';
+ import SubWorkflowPage from './mobile/routes/subworkflow.svelte';
 
  function onBackKeyDown(e) {
      if(f7.view.current.router.currentRoute.path == '/'){
@@ -63,6 +66,14 @@
              path: '/graph/',
              component: GraphPage,
          },
+         {
+             path: '/subworkflows/',
+             component: ListSubWorkflowsPage,
+         },
+         {
+             path: '/subworkflows/:subworkflowID/',
+             component: SubWorkflowPage,
+         },
      ],
      popup: {
          closeOnEscape: true,
@@ -79,6 +90,7 @@
  }
 </script>
 
+{#if app}
 <App theme="auto" name="ComfyBox" {...f7params}>
     <View
         url="/"
@@ -88,8 +100,5 @@
         browserHistory=true,
         browserHistoryRoot="/mobile/"
     />
-
-    <div class="canvas-wrapper pane-wrapper" style="display: none">
-        <canvas id="graph-canvas" />
-    </div>
 </App>
+{/if}

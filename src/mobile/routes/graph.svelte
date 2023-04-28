@@ -1,11 +1,11 @@
 <script lang="ts">
  import { Page, Navbar, Block, Tab, BlockHeader, Segmented, Button, Icon } from 'framework7-svelte';
- import { LGraphCanvas } from "@litegraph-ts/core";
+ import { LiteGraph, LGraphCanvas } from "@litegraph-ts/core";
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
  import ComfyGraphCanvas from "$lib/ComfyGraphCanvas";
  import { onMount } from 'svelte';
 
- export let app: ComfyApp = undefined;
+ const app: ComfyApp = ComfyApp.instance;
  let lCanvas: LGraphCanvas | null = null;
  let canvasEl: HTMLCanvasElement | null = null;
 
@@ -21,6 +21,9 @@
      if (!lCanvas) {
          lCanvas = new ComfyGraphCanvas(app, canvasEl);
          lCanvas.allow_interaction = false;
+         LiteGraph.dialog_close_on_mouse_leave = false;
+         LiteGraph.search_hide_on_mouse_leave = false;
+         LiteGraph.pointerevents_method = "pointer";
      }
      resizeCanvas();
  }

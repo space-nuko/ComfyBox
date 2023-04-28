@@ -3,9 +3,6 @@
  import { get } from "svelte/store"
  import { Block, BlockTitle } from "@gradio/atoms";
  import { Move } from 'radix-icons-svelte';
- import ComboWidget from "$lib/widgets/ComboWidget.svelte";
- import RangeWidget from "$lib/widgets/RangeWidget.svelte";
- import TextWidget from "$lib/widgets/TextWidget.svelte";
  import widgetState, { type WidgetDrawState, type WidgetUIState } from "$lib/stores/widgetState";
  import queueState from "$lib/stores/queueState";
  import nodeState from "$lib/stores/nodeState";
@@ -20,6 +17,7 @@
  import ComfyApp from "./ComfyApp";
  import type { LGraphNode } from "@litegraph-ts/core";
  import type { DragItem } from "./ComfyUIPane";
+ import { getComponentForWidgetState } from "$lib/utils"
 
  export let dragItems: DragItem[] = [];
  let dragDisabled = true;
@@ -60,28 +58,6 @@
          dragItem.isNodeExecuting = $queueState.runningNodeId === dragItem.node.id;
      }
      dragItems = dragItems;
- }
-
- function getComponentForWidgetState(item: WidgetUIState): any {
-     let ctor: any = null;
-
-     // custom widgets with TypeScript sources
-     let override = ComfyApp.widget_type_overrides[item.widget.type]
-     if (override) {
-         return override;
-     }
-
-     // litegraph.ts built-in widgets
-     switch (item.widget.type) {
-         case "combo":
-             return ComboWidget;
-         case "number":
-             return RangeWidget;
-         case "text":
-             return TextWidget;
-     }
-
-     return null;
  }
 
  function updateNodeName(node: LGraphNode, value: string) {
