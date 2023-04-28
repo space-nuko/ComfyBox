@@ -18,17 +18,6 @@
 
  let app: ComfyApp | null = null;
 
- function onBackKeyDown(e) {
-     if(f7.view.current.router.currentRoute.path == '/'){
-         // exitApp();
-         e.preventDefault();
-     } else {
-         f7.dialog.close()
-         f7.view.main.router.back()
-         return false;
-     }
- }
-
  let serializedPaneOrder = {};
 
  function serializeAppState(): SerializedAppState {
@@ -56,7 +45,7 @@
  onMount(async () => {
      if (app)
          return
-     app = ComfyApp.instance;
+     app = $uiState.app = new ComfyApp();
 
      // TODO dedup
      app.eventBus.on("nodeAdded", nodeState.nodeAdded);

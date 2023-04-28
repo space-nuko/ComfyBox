@@ -21,9 +21,8 @@
  export let subworkflowID: number = -1;
  let app: ComfyApp = undefined;
 
- $: if (ComfyApp.instance)
-     app = ComfyApp.instance;
-
+ $: if (!app)
+     app = $uiState.app
 
  function queuePrompt() {
      app.queuePrompt(0, 1);

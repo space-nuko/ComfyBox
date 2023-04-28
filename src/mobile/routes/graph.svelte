@@ -4,10 +4,14 @@
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
  import ComfyGraphCanvas from "$lib/ComfyGraphCanvas";
  import { onMount } from 'svelte';
+ import uiState from "$lib/stores/uiState"
 
- const app: ComfyApp = ComfyApp.instance;
+ let app: ComfyApp | null = null;
  let lCanvas: LGraphCanvas | null = null;
  let canvasEl: HTMLCanvasElement | null = null;
+
+ $: if (!app)
+     app = $uiState.app
 
  function resizeCanvas() {
      canvasEl.width = canvasEl.parentElement.offsetWidth;

@@ -77,14 +77,6 @@ export default class ComfyApp {
     shiftDown: boolean = false;
     selectedGroupMoving: boolean = false;
 
-    private static _instance: ComfyApp;
-
-    static get instance(): ComfyApp {
-        if (!ComfyApp._instance)
-            ComfyApp._instance = new ComfyApp()
-        return ComfyApp._instance
-    }
-
     private queueItems: QueueItem[] = [];
     private processingQueue: boolean = false;
 
