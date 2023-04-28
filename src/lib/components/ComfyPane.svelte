@@ -17,14 +17,16 @@
  // notice - fade in works fine but don't add svelte's fade-out (known issue)
  import {cubicIn} from 'svelte/easing';
  import { flip } from 'svelte/animate';
-	import ComfyApp from "./ComfyApp";
-	import type { LGraphNode } from "@litegraph-ts/core";
-	import type { DragItem } from "./ComfyUIPane";
+ import ComfyApp from "./ComfyApp";
+ import type { LGraphNode } from "@litegraph-ts/core";
+ import type { DragItem } from "./ComfyUIPane";
 
  export let dragItems: DragItem[] = [];
  let dragDisabled = true;
  let unlockUI = false;
  const flipDurationMs = 200;
+
+ $: dragDisabled = !$uiState.unlocked;
 
  const handleConsider = evt => {
      dragItems = evt.detail.items;
@@ -37,9 +39,13 @@
  };
 
  const startDrag = () => {
+     if (!$uiState.unlocked)
+         return
      dragDisabled = false;
  };
  const stopDrag = () => {
+     if (!$uiState.unlocked)
+         return
      dragDisabled = true;
  };
 
@@ -94,29 +100,27 @@
         {@const id = node.id}
         <div class="animation-wrapper" class:is-executing={dragItem.isNodeExecuting} animate:flip={{duration:flipDurationMs}}>
             <Block>
-                {#if $uiState.unlocked}
-                    <div class="handle" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}>
-                        <Move/>
-                    </div>
-                {/if}
-                <label for={String(id)}>
-                    <BlockTitle>
-                        {#if $uiState.unlocked}
-                            <input bind:value={dragItem.node.title} type="text" minlength="1" on:input="{(v) => { updateNodeName(node, v) }}"/>
-                        {:else}
-                            {node.title}
+                    <label for={String(id)} class={$uiState.unlocked ? "edit-title-label" : ""}>
+                        <BlockTitle>
+                            {#if $uiState.unlocked}
+                                <input class="edit-title" bind:value={dragItem.node.title} type="text" minlength="1" on:input="{(v) => { updateNodeName(node, v) }}"/>
+                            {:else}
+                                {node.title}
+                            {/if}
+                            {#if node.title !== node.type}
+                                <span class="node-type">({node.type})</span>
+                            {/if}
+                        </BlockTitle>
+                    </label>
+                    {#each $widgetState[id] as item}
+                        <svelte:component this={getComponentForWidgetState(item)} {item} />
+                        {#if dragItem[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
+                            <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
                         {/if}
-                        {#if node.title !== node.type}
-                            <span class="node-type">({node.type})</span>
-                        {/if}
-                    </BlockTitle>
-                </label>
-                {#each $widgetState[id] as item}
-                    <svelte:component this={getComponentForWidgetState(item)} {item} />
-                    {#if dragItem[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
-                        <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
+                    {/each}
+                    {#if $uiState.unlocked}
+                        <div class="handle" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
                     {/if}
-                {/each}
             </Block>
         </div>
     {/each}
@@ -138,18 +142,16 @@
 
  .handle {
      cursor: grab;
+     z-index: 99999;
      position: absolute;
-     top: 0;
      right: 0;
-     width: 32px;
-     height: 32px;
-     padding: 0.5em;
-     margin-right: 0.5em;
-     margin-top: 0.25em;
+     top: 0;
+     width: 100%;
+     height: 100%;
  }
 
  .handle:hover {
-     background-color: lightblue;
+     background-color: #add8e680;
  }
 
  .drag-item-shadow {
@@ -165,5 +167,36 @@
  .node-type {
      font-size: smaller;
      color: var(--neutral-400);
+ }
+
+ .edit-title-label {
+     position: relative;
+     z-index: 100000;
+ }
+
+ .edit-title {
+     z-index: 100000;
+     display: block;
+     position: relative;
+     outline: none !important;
+     box-shadow: var(--input-shadow);
+     border: var(--input-border-width) solid var(--input-border-color);
+     border-radius: var(--input-radius);
+     background: var(--input-background-fill);
+     padding: var(--input-padding);
+     width: 100%;
+     color: var(--body-text-color);
+     font-weight: var(--input-text-weight);
+     font-size: var(--input-text-size);
+     line-height: var(--line-sm);
+ }
+
+ .edit-title:focus {
+     box-shadow: var(--input-shadow-focus);
+     border-color: var(--input-border-color-focus);
+ }
+
+ .edit-title::placeholder {
+     color: var(--input-placeholder-color);
  }
 </style>

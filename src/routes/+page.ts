@@ -1,10 +1,5 @@
 import type { PageLoad } from "./$types"
 
-import Framework7 from 'framework7/lite-bundle';
-import Framework7Svelte from 'framework7-svelte';
-
-Framework7.use(Framework7Svelte)
-
 // `PageServerData` will contain everything from the layouts and also the
 // `data` from the `+page.server.ts` file.
 type OutputProps = {}

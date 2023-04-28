@@ -1,22 +1,12 @@
 <script lang="ts">
  import ComfyApp from "$lib/components/ComfyApp.svelte"
  import "@litegraph-ts/core/css/litegraph.css";
- import "framework7/css/bundle";
  import "../scss/global.scss";
 
  import { onMount } from 'svelte';
- import { f7, f7ready, App } from 'framework7-svelte';
- onMount(() => {
-     f7ready(() => {
-         // Framework7 initialized
-         f7.theme = "ios";
-     })
- })
 </script>
 
-<App>
-    <ComfyApp/>
-</App>
+<ComfyApp/>
 
 <style>
 :root {
