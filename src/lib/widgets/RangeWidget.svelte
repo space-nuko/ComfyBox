@@ -23,7 +23,7 @@
 </script>
 
 <div class="wrapper gr-range">
-    {#if item && option}
+    {#if item !== null && option !== null}
         <Range
             bind:value={option}
             minimum={item.widget.options.min}
