@@ -15,8 +15,6 @@
     "build:css": "pollen -c gradio/js/theme/src/pollen.config.cjs && mv src/pollen.css node_modules/@gradio/theme/src"
   },
   "devDependencies": {
-    "@sveltejs/adapter-auto": "^2.0.0",
-    "@sveltejs/kit": "^1.15.2",
     "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-svelte3": "^4.0.0",
@@ -45,7 +43,11 @@
     "@litegraph-ts/core": "workspace:*",
     "@litegraph-ts/nodes-basic": "workspace:*",
     "@litegraph-ts/tsconfig": "workspace:*",
+    "@sveltejs/vite-plugin-svelte": "^2.1.1",
+    "@tsconfig/svelte": "^4.0.1",
     "events": "^3.3.0",
+    "framework7": "^8.0.3",
+    "framework7-svelte": "^8.0.3",
     "pollen-css": "^4.6.2",
     "radix-icons-svelte": "^1.2.1",
     "svelte-preprocess": "^5.0.3",

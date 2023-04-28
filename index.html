@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <!-- <link rel="icon" href="%sveltekit.assets%/favicon.png" /> -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="theme-color" content="#2196f3">
+    </head>
+    <script>
+     if(!window.location.search.substring(1) == "desktop=true") {
+         if (navigator.userAgent.match(/iPhone/i)
+             || navigator.userAgent.match(/iPad/i)
+             || navigator.userAgent.match(/Android/i)
+             || navigator.userAgent.match(/Blackberry/i)
+             || navigator.userAgent.match(/WebOs/i)) {
+             window.location.href = "/mobile/"
+         }
+     }
+    </script>
+    <body>
+        <div id="app"/>
+        <script type="module" src='/src/main-desktop.ts'></script>
+    </body>
+</html>

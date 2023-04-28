@@ -13,11 +13,11 @@
  import { download } from "$lib/utils"
 
  import { LGraph, LGraphNode } from "@litegraph-ts/core";
-	import LightboxModal from "./LightboxModal.svelte";
-	import { Block } from "@gradio/atoms";
-	import ComfyQueue from "./ComfyQueue.svelte";
-	import type { ComfyAPIStatus } from "$lib/api";
-	import queueState from "$lib/stores/queueState";
+ import LightboxModal from "./LightboxModal.svelte";
+ import { Block } from "@gradio/atoms";
+ import ComfyQueue from "./ComfyQueue.svelte";
+ import type { ComfyAPIStatus } from "$lib/api";
+ import queueState from "$lib/stores/queueState";
 
  let app: ComfyApp = undefined;
  let imageViewer: ImageViewer;
@@ -102,7 +102,7 @@
  onMount(async () => {
      app = new ComfyApp();
 
-// TODO dedup
+     // TODO dedup
      app.eventBus.on("nodeAdded", nodeState.nodeAdded);
      app.eventBus.on("nodeRemoved", nodeState.nodeRemoved);
      app.eventBus.on("configured", nodeState.configureFinished);
