@@ -33,7 +33,7 @@
  }
 
 </script>
-<div class="wrapper comfy-gallery-widget" bind:this={element}>
+<div class="wrapper comfy-gallery-widget gr-gallery" bind:this={element}>
     {#if item && itemValue}
         <Block variant="solid" padding={false}>
             <Gallery

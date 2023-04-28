@@ -22,7 +22,7 @@
  }
 </script>
 
-<div class="wrapper">
+<div class="wrapper gr-range">
     {#if item && option}
         <Range
             bind:value={option}

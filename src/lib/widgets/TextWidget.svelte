@@ -6,7 +6,7 @@
  $: if (item) { itemValue = item.value; }
 </script>
 
-<div class="wrapper">
+<div class="wrapper gr-textbox">
     {#if item !== null && itemValue !== null}
         <TextBox
             bind:value={$itemValue}

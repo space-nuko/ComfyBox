@@ -20,7 +20,7 @@
  }
 </script>
 
-<div class="wrapper">
+<div class="wrapper gr-combo">
     {#if item !== null && option !== undefined}
         <label>
             <BlockTitle show_label={true}>{item.widget.name}</BlockTitle>
