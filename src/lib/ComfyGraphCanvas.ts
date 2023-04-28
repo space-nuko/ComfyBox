@@ -9,7 +9,6 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     constructor(
         app: ComfyApp,
         canvas: HTMLCanvasElement | string,
-        graph?: LGraph,
         options: {
             skip_render?: boolean;
             skip_events?: boolean;
@@ -17,7 +16,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
             viewport?: Vector4;
         } = {}
     ) {
-        super(canvas, graph, options);
+        super(canvas, app.lGraph, options);
         this.app = app;
     }
 

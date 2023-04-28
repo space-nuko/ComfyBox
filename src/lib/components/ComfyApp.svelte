@@ -120,10 +120,10 @@
      });
 
      await app.setup();
-     refreshView();
-
      (window as any).app = app;
      (window as any).appPane = uiPane;
+
+     refreshView();
 
      imageViewer = new ImageViewer(app.rootEl);
 

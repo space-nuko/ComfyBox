@@ -62,7 +62,7 @@ function nodeAdded(node: LGraphNode) {
         }
     }
 
-    console.log("NODEADDED", state)
+    console.debug("NODEADDED", state)
 
     store.set(state);
 }

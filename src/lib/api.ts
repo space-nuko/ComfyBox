@@ -49,8 +49,6 @@ export default class ComfyAPI extends EventTarget {
     private getBackendUrl(): string {
         const hostname = this.hostname || location.hostname;
         const port = this.port || location.port;
-        console.log(hostname)
-        console.log(port)
         return `${window.location.protocol}//${hostname}:${port}`
     }
 

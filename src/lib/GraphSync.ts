@@ -88,11 +88,11 @@ export default class GraphSync {
             this.stores[nodeId].push({ store: wuis.value, unsubscribe: unsub });
         }
 
-        console.log("NEWSTORES", this.stores[nodeId])
+        console.debug("NEWSTORES", this.stores[nodeId])
     }
 
     private removeStores(nodeId: string) {
-        console.log("DELSTORES", this.stores[nodeId])
+        console.debug("DELSTORES", this.stores[nodeId])
         for (const ss of this.stores[nodeId]) {
             ss.unsubscribe();
         }

@@ -7,7 +7,7 @@ export type QueueItem = {
 }
 
 type QueueStateOps = {
-    statusUpdated: (status: ComfyAPIQueueStatus) => void,
+    statusUpdated: (status: ComfyAPIQueueStatus | null) => void,
     executingUpdated: (runningNodeId: string | null) => void,
     progressUpdated: (progress: Progress | null) => void
 }
@@ -21,9 +21,10 @@ type WritableQueueStateStore = Writable<QueueState> & QueueStateOps;
 
 const store: Writable<QueueState> = writable({ queueRemaining: null, runningNodeId: null, progress: null })
 
-function statusUpdated(status: ComfyAPIQueueStatus) {
+function statusUpdated(status: ComfyAPIQueueStatus | null) {
     store.update((s) => {
-        s.queueRemaining = status.exec_info.queue_remaining;
+        if (status !== null)
+            s.queueRemaining = status.exec_info.queue_remaining;
         return s
     })
 }

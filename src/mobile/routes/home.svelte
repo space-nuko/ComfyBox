@@ -1,0 +1,90 @@
+<script lang="ts">
+ import { onMount } from "svelte";
+ import { get } from "svelte/store";
+ import { Pane, Splitpanes } from 'svelte-splitpanes';
+ import { Button } from "@gradio/button";
+ import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
+ import { Checkbox } from "@gradio/form"
+ import widgetState from "$lib/stores/widgetState";
+ import nodeState from "$lib/stores/nodeState";
+ import uiState from "$lib/stores/uiState";
+ import { ImageViewer } from "$lib/ImageViewer";
+ import { download } from "$lib/utils"
+
+ import { LGraph, LGraphNode } from "@litegraph-ts/core";
+ import type { ComfyAPIStatus } from "$lib/api";
+ import queueState from "$lib/stores/queueState";
+ import { Page, Navbar, Link, BlockTitle, Block, List, ListItem } from "framework7-svelte"
+
+ let app: ComfyApp = undefined;
+
+ let serializedPaneOrder = {};
+
+ function serializeAppState(): SerializedAppState {
+     const graph = app.lGraph;
+
+     const serializedGraph = graph.serialize()
+
+     return {
+         createdBy: "ComfyBox",
+         version: 1,
+         workflow: serializedGraph,
+         panes: serializedPaneOrder
+     }
+ }
+
+ function doAutosave(graph: LGraph): void {
+     const savedWorkflow = serializeAppState();
+     localStorage.setItem("workflow", JSON.stringify(savedWorkflow))
+ }
+
+ function doRestore(workflow: SerializedAppState) {
+     serializedPaneOrder = workflow.panes;
+ }
+
+ onMount(async () => {
+     app = new ComfyApp();
+
+     // TODO dedup
+     app.eventBus.on("nodeAdded", nodeState.nodeAdded);
+     app.eventBus.on("nodeRemoved", nodeState.nodeRemoved);
+     app.eventBus.on("configured", nodeState.configureFinished);
+     app.eventBus.on("cleared", nodeState.clear);
+
+     app.eventBus.on("nodeAdded", widgetState.nodeAdded);
+     app.eventBus.on("nodeRemoved", widgetState.nodeRemoved);
+     app.eventBus.on("configured", widgetState.configureFinished);
+     app.eventBus.on("cleared", widgetState.clear);
+     app.eventBus.on("autosave", doAutosave);
+     app.eventBus.on("restored", doRestore);
+
+     app.api.addEventListener("status", (ev: CustomEvent) => {
+         queueState.statusUpdated(ev.detail as ComfyAPIStatus);
+     });
+
+     await app.setup();
+     (window as any).app = app;
+ });
+
+</script>
+
+<Page name="home">
+    <Navbar title="Home Page" />
+
+    <BlockTitle>Yo</BlockTitle>
+    <Block>
+        <div>{app} Nodes</div>
+    </Block>
+
+    <List strong inset dividersIos class="components-list searchbar-found">
+        <ListItem link="/accordion/" title="Accordion">
+            <i class="icon icon-f7" slot="media" />
+        </ListItem>
+        <ListItem link="/action-sheet/" title="Action Sheet">
+            <i class="icon icon-f7" slot="media" />
+        </ListItem>
+        <ListItem link="/graph/" title="Show Node Graph" routeProps={{ app: app }}>
+            <i class="icon icon-f7" slot="media" />
+        </ListItem>
+    </List>
+</Page>

@@ -88,7 +88,7 @@ export default class ComfyApp {
         this.rootEl = document.getElementById("main") as HTMLDivElement;
         this.canvasEl = document.getElementById("graph-canvas") as HTMLCanvasElement;
         this.lGraph = new LGraph();
-        this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl, this.lGraph);
+        this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl);
         this.canvasCtx = this.canvasEl.getContext("2d");
         this.graphSync = new GraphSync(this);
 
@@ -151,37 +151,37 @@ export default class ComfyApp {
     }
 
     private graphOnConfigure() {
-        console.log("Configured");
+        console.debug("Configured");
         this.eventBus.emit("configured", this.lGraph);
     }
 
     private graphOnBeforeChange(graph: LGraph, info: any) {
-        console.log("BeforeChange", info);
+        console.debug("BeforeChange", info);
         this.eventBus.emit("beforeChange", graph, info);
     }
 
     private graphOnAfterChange(graph: LGraph, info: any) {
-        console.log("AfterChange", info);
+        console.debug("AfterChange", info);
         this.eventBus.emit("afterChange", graph, info);
     }
 
     private graphOnNodeAdded(node: LGraphNode) {
-        console.log("Added", node);
+        console.debug("Added", node);
         this.eventBus.emit("nodeAdded", node);
     }
 
     private graphOnNodeRemoved(node: LGraphNode) {
-        console.log("Removed", node);
+        console.debug("Removed", node);
         this.eventBus.emit("nodeRemoved", node);
     }
 
     private graphOnNodeConnectionChange(kind: LConnectionKind, node: LGraphNode, slot: INodeSlot, targetNode: LGraphNode, targetSlot: INodeSlot) {
-        console.log("ConnectionChange", node);
+        console.debug("ConnectionChange", node);
         this.eventBus.emit("nodeConnectionChanged", kind, node, slot, targetNode, targetSlot);
     }
 
     private canvasOnClear() {
-        console.log("CanvasClear");
+        console.debug("CanvasClear");
         this.eventBus.emit("cleared");
     }
 
@@ -306,11 +306,13 @@ export default class ComfyApp {
     }
 
     private showDropZone() {
-        this.dropZone.style.display = "block";
+        if (this.dropZone)
+            this.dropZone.style.display = "block";
     }
 
     private hideDropZone() {
-        this.dropZone.style.display = "none";
+        if (this.dropZone)
+            this.dropZone.style.display = "none";
     }
 
     private allowDrag(event: DragEvent) {
@@ -334,10 +336,15 @@ export default class ComfyApp {
     private addDropHandler() {
         this.dropZone = document.getElementById("dropzone");
 
-        window.addEventListener('dragenter', this.allowDrag.bind(this));
-        this.dropZone.addEventListener('dragover', this.allowDrag.bind(this));
-        this.dropZone.addEventListener('dragleave', this.hideDropZone.bind(this));
-        this.dropZone.addEventListener('drop', this.handleDrop.bind(this));
+        if (this.dropZone) {
+            window.addEventListener('dragenter', this.allowDrag.bind(this));
+            this.dropZone.addEventListener('dragover', this.allowDrag.bind(this));
+            this.dropZone.addEventListener('dragleave', this.hideDropZone.bind(this));
+            this.dropZone.addEventListener('drop', this.handleDrop.bind(this));
+        }
+        else {
+            console.warn("No dropzone detected (probably on mobile).")
+        }
     }
 
     /**
