@@ -48,11 +48,23 @@
      // Ensure dragging is stopped on drag finish
  };
 
- const startDrag = () => {
-     return
+ const startDrag = (evt: MouseEvent) => {
+     const dragItemId: string = evt.target.dataset["dragItemId"];
+     const item = $layoutState.allItems[dragItemId].dragItem
+     if (evt.ctrlKey) {
+         const index = $layoutState.currentSelection.indexOf(item.id)
+         if (index === -1)
+             $layoutState.currentSelection.push(item.id);
+         else
+             $layoutState.currentSelection.splice(index, 1);
+         $layoutState.currentSelection = $layoutState.currentSelection;
+     }
+     else {
+         $layoutState.currentSelection = [item.id]
+     }
  };
- const stopDrag = () => {
-     return
+
+ const stopDrag = (evt: MouseEvent) => {
  };
 
  $: if ($queueState && widget) {
@@ -65,6 +77,7 @@
 {#if container && children}
     {@const id = container.id}
     <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')}"
+         class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(container.id)}
          class:root-container={isRoot}
          class:container-edit-outline={$uiState.uiEditMode === "containers" && zIndex > 1}>
         <Block>
@@ -82,12 +95,14 @@
             <div class="v-pane"
                  class:empty={children.length === 0}
                  class:edit={$uiState.uiEditMode === "containers" && zIndex > 1}
+                 class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId === container.attrs.associatedNode}
                  use:dndzone="{{
                               items: children,
                               flipDurationMs,
+                              centreDraggedOnCursor: true,
                               morphDisabled: true,
                               dropFromOthersDisabled: zIndex === 0,
-                              dragDisabled: zIndex === 0
+                              dragDisabled: zIndex === 0 || $layoutState.currentSelection.length > 2 || $uiState.uiEditMode === "disabled"
                               }}"
                  on:consider="{handleConsider}"
                  on:finalize="{handleFinalize}"
@@ -105,16 +120,19 @@
                 {/each}
             </div>
             {#if $uiState.uiEditMode === "containers" && zIndex > 1}
-                <div class="handle handle-container" style="z-index: {zIndex+100}" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+                <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
             {/if}
         </Block>
     </div>
 {:else if widget}
-    <div class:widget-edit-outline={$uiState.uiEditMode === "widgets" && zIndex > 1}>
+    <div class="widget" class:widget-edit-outline={$uiState.uiEditMode === "widgets" && zIndex > 1}
+        class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(widget.id)}
+        class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.attrs.associatedNode}
+        >
         <svelte:component this={getComponentForWidgetState(widgetState)} item={widgetState} />
     </div>
     {#if $uiState.uiEditMode ==="widgets" && zIndex > 1}
-        <div class="handle handle-widget" style="z-index: {zIndex+100}" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+        <div class="handle handle-widget" style="z-index: {zIndex+100}" data-drag-item-id={widget.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
     {/if}
 {/if}
 
@@ -134,7 +152,7 @@
          border-color: var(--color-grey-400);
          border-radius: var(--block-radius);
          background: var(--color-grey-300);
-         min-height: 200px;
+         min-height: 100px;
          border-style: dashed;
      }
  }
@@ -179,8 +197,16 @@
      }
  }
 
- .is-executing :global(.block) {
-     border: 5px dashed var(--color-green-600) !important;
+ .container, .widget {
+     &.selected {
+         background: var(--color-yellow-200);
+     }
+ }
+
+ .is-executing {
+     border: 3px dashed var(--color-green-600) !important;
+     margin: 0.2em;
+     padding: 0.2em;
  }
 
  .animation-wrapper {

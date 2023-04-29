@@ -8,6 +8,7 @@
  import { Checkbox } from "@gradio/form"
  import nodeState from "$lib/stores/nodeState";
  import uiState from "$lib/stores/uiState";
+ import layoutState from "$lib/stores/layoutState";
  import { ImageViewer } from "$lib/ImageViewer";
  import { download } from "$lib/utils"
 
@@ -38,6 +39,9 @@
 
  $: if (app) app.lCanvas.allow_dragnodes = !$uiState.nodesLocked;
  $: if (app) app.lCanvas.allow_interaction = !$uiState.graphLocked;
+
+ $: if ($uiState.uiEditMode)
+     $layoutState.currentSelection = []
 
  let graphSize = null;
 
