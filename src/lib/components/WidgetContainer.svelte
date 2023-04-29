@@ -22,6 +22,7 @@
  let widget: WidgetLayout | null = null;
  let widgetState: WidgetUIState | null = null;
  let children: IDragItem[] | null = null;
+ let showHandles: boolean = false;
  const flipDurationMs = 100;
 
  $: if (dragItem) {
@@ -38,6 +39,10 @@
      }
  }
 
+ $: showHandles = $uiState.uiEditMode === "widgets" // TODO
+               && zIndex > 1
+               && !$layoutState.isMenuOpen
+
  function handleConsider(evt: any) {
      children = layoutState.updateChildren(dragItem, evt.detail.items)
      // console.log(dragItems);
@@ -49,6 +54,9 @@
  };
 
  const startDrag = (evt: MouseEvent) => {
+     if (evt.button === 2)
+         return;
+
      const dragItemId: string = evt.target.dataset["dragItemId"];
      const item = $layoutState.allItems[dragItemId].dragItem
      if (evt.ctrlKey) {
@@ -79,12 +87,12 @@
     <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')}"
          class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(container.id)}
          class:root-container={isRoot}
-         class:container-edit-outline={$uiState.uiEditMode === "containers" && zIndex > 1}>
+         class:container-edit-outline={$uiState.uiEditMode === "widgets" && zIndex > 1}>
         <Block>
             {#if container.attrs.showTitle}
-                <label for={String(id)} class={$uiState.uiEditMode === "containers" ? "edit-title-label" : ""}>
+                <label for={String(id)} class={$uiState.uiEditMode === "widgets" ? "edit-title-label" : ""}>
                     <BlockTitle>
-                        {#if $uiState.uiEditMode === "containers"}
+                        {#if $uiState.uiEditMode === "widgets"}
                             <input class="edit-title" bind:value={container.attrs.title} type="text" minlength="1" />
                         {:else}
                             {container.attrs.title}
@@ -94,7 +102,7 @@
             {/if}
             <div class="v-pane"
                  class:empty={children.length === 0}
-                 class:edit={$uiState.uiEditMode === "containers" && zIndex > 1}
+                 class:edit={$uiState.uiEditMode === "widgets" && zIndex > 1}
                  class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId === container.attrs.associatedNode}
                  use:dndzone="{{
                               items: children,
@@ -119,7 +127,7 @@
                     </div>
                 {/each}
             </div>
-            {#if $uiState.uiEditMode === "containers" && zIndex > 1}
+            {#if showHandles}
                 <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
             {/if}
         </Block>
@@ -131,7 +139,7 @@
         >
         <svelte:component this={getComponentForWidgetState(widgetState)} item={widgetState} />
     </div>
-    {#if $uiState.uiEditMode ==="widgets" && zIndex > 1}
+    {#if showHandles}
         <div class="handle handle-widget" style="z-index: {zIndex+100}" data-drag-item-id={widget.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
     {/if}
 {/if}
@@ -197,10 +205,12 @@
      }
  }
 
- .container, .widget {
-     &.selected {
-         background: var(--color-yellow-200);
-     }
+ .widget.selected {
+     background: var(--color-yellow-200);
+ }
+
+ .container.selected > :global(.block) {
+     background: var(--color-yellow-300);
  }
 
  .is-executing {
@@ -286,7 +296,7 @@
      border-width: 2px;
      border-style: dashed !important;
      margin: 0.2em;
-     padding: 1.2em;
+     padding: 0.2em;
  }
 
  .widget-edit-outline {

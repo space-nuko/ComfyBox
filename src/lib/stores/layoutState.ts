@@ -16,7 +16,8 @@ export type LayoutState = {
     root: IDragItem | null,
     allItems: Record<DragItemID, DragItemEntry>,
     currentId: number,
-    currentSelection: IDragItem[]
+    currentSelection: DragItemID[],
+    isMenuOpen: boolean
 }
 
 export type Attributes = {
@@ -62,7 +63,8 @@ const store: Writable<LayoutState> = writable({
     root: null,
     allItems: [],
     currentId: 0,
-    currentSelection: []
+    currentSelection: [],
+    isMenuOpen: false
 })
 
 function findDefaultContainerForInsertion(): ContainerLayout | null {

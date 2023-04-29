@@ -177,7 +177,6 @@
         <select id="enable-ui-editing" name="enable-ui-editing" bind:value={$uiState.uiEditMode}>
             <option value="disabled">Disabled</option>
             <option value="widgets">Widgets</option>
-            <option value="containers">Containers</option>
         </select>
     </div>
     <LightboxModal />
