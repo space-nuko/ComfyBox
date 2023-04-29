@@ -14,7 +14,7 @@ const store: WritableUIStateStore = writable(
     {
         graphLocked: true,
         nodesLocked: false,
-        unlocked: true,
+        unlocked: false,
     })
 
 const uiStateStore: WritableUIStateStore =

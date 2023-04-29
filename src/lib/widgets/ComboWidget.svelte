@@ -45,6 +45,6 @@
  }
 
  :global(.svelte-select-list) {
-     z-index: var(--layer-5) !important;
+     z-index: var(--layer-top) !important;
  }
 </style>

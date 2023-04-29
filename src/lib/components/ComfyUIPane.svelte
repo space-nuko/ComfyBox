@@ -10,9 +10,6 @@
 
  export let app: ComfyApp;
  let dragConfigured: boolean = false;
- export let dragItems: DragItem[][] = []
-
- export let totalId = 0;
  //
  //  function addUIForNewNode(node: LGraphNode, paneIndex?: number) {
  //      if (!paneIndex)
@@ -32,48 +29,32 @@
  }
 
  export function restore(panels: SerializedPanes) {
-     const a: ContainerLayout = {
-         type: "container",
-         id: "0",
-         attrs: {
-             title: "root!",
-             direction: "horizontal"
-         }
+     const id = 0;
+     $layoutState.root = layoutState.addContainer(null, { direction: "horizontal", showTitle: false });
+     const left = layoutState.addContainer($layoutState.root.id, { direction: "vertical", showTitle: false });
+     const right = layoutState.addContainer($layoutState.root.id, { direction: "vertical", showTitle: false });
+
+     for (const node of app.lGraph.computeExecutionOrder(false, null)) {
+         layoutState.nodeAdded(node)
      }
-     $layoutState.root = a;
-     $layoutState.children[0] = [
-         {
-             type: "widget",
-             id: "1",
-             nodeId: 7,
-             widgetName: "text",
-             attrs: {
-
-             }
-         },
-         {
-             type: "widget",
-             id: "2",
-             nodeId: 6,
-             widgetName: "text",
-             attrs: {
-
-             }
-         },
-     ]
-     $layoutState.children[1] = []
-     $layoutState.children[2] = []
+     console.warn($layoutState)
  }
 </script>
 
 <div id="comfy-ui-panes" >
-    <WidgetContainer bind:dragItem={$layoutState.root} />
+    <WidgetContainer bind:dragItem={$layoutState.root} classes={["root-container"]} />
 </div>
 
-<style>
+<style lang="scss">
  #comfy-ui-panes {
      width: 100%;
      height: 100%;
      overflow: scroll;
+
  }
+
+ #comfy-ui-panes > :global(.root-container > .block) {
+     padding: 0px;
+ }
+
 </style>

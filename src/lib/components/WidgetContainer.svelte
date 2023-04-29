@@ -1,8 +1,5 @@
 <script lang="ts">
- import { onDestroy } from "svelte";
- import { get } from "svelte/store"
  import { Block, BlockTitle } from "@gradio/atoms";
- import { Move } from 'radix-icons-svelte';
  import queueState from "$lib/stores/queueState";
  import nodeState, { type WidgetUIState } from "$lib/stores/nodeState";
  import uiState from "$lib/stores/uiState";
@@ -13,14 +10,15 @@
  // notice - fade in works fine but don't add svelte's fade-out (known issue)
  import {cubicIn} from 'svelte/easing';
  import { flip } from 'svelte/animate';
- import ComfyApp from "./ComfyApp";
- import type { LGraphNode } from "@litegraph-ts/core";
  import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
  import { getComponentForWidgetState } from "$lib/utils"
 
- export let dragItem: DragItem | null = null;
+ export let dragItem: IDragItem | null = null;
+ export let zIndex: number = 100;
+ export let classes: string[] = [];
  let container: ContainerLayout | null = null;
- let widget: WidgetUIState | null = null;
+ let widget: WidgetLayout | null = null;
+ let widgetState: WidgetUIState | null = null;
  let children: IDragItem[] | null = null;
  let dragDisabled = true;
  const flipDurationMs = 200;
@@ -28,12 +26,12 @@
  $: if (dragItem) {
      if (dragItem.type === "container") {
          container = dragItem as ContainerLayout;
-         children = $layoutState.children[dragItem.id];
+         children = $layoutState.allItems[dragItem.id].children;
          widget = null;
      }
      else if (dragItem.type === "widget") {
-         const widgetLayout = dragItem as WidgetLayout;
-         widget = nodeState.findWidgetByName(widgetLayout.nodeId, widgetLayout.widgetName)
+         widget = dragItem as WidgetLayout;
+         widgetState = nodeState.findWidgetByName(widget.nodeId, widget.widgetName)
          children = null;
          container = null;
      }
@@ -41,14 +39,13 @@
 
  $: dragDisabled = !$uiState.unlocked;
 
- const handleConsider = evt => {
-     $layoutState.children[dragItem.id] = evt.detail.items;
-     children = $layoutState.children[dragItem.id];
+ function handleConsider(evt: any) {
+     children = layoutState.updateChildren(dragItem, evt.detail.items)
      // console.log(dragItems);
  };
- const handleFinalize = evt => {
-     $layoutState.children[dragItem.id] = evt.detail.items;
-     children = $layoutState.children[dragItem.id];
+
+ function handleFinalize(evt: any) {
+     children = layoutState.updateChildren(dragItem, evt.detail.items)
      // Ensure dragging is stopped on drag finish
      // dragDisabled = true;
  };
@@ -64,66 +61,106 @@
      // dragDisabled = true;
  };
 
- const unsubscribe = nodeState.subscribe(state => {
-     if (container) {
-         $layoutState.children[container.id] = $layoutState.children[container.id].filter(item => item.node.id in state);
-         children = $layoutState.children[container.id];
-     }
- });
-
- onDestroy(unsubscribe);
-
  $: if ($queueState && widget) {
      widget.isNodeExecuting = $queueState.runningNodeId === widget.nodeId;
-     children = $layoutState.children[widget.nodeId];
- }
-
- function updateNodeName(node: LGraphNode, value: string) {
-     nodeState.nodeStateChanged(node);
+     children = $layoutState.allItems[widget.id].children;
  }
 </script>
 
 
-{#if container}
-    {@const node = container.node}
+{#if container && children}
     {@const id = container.id}
-    <Block>
-        <label for={String(id)} class={$uiState.unlocked ? "edit-title-label" : ""}>
-            <BlockTitle>
-                {#if $uiState.unlocked}
-                    <input class="edit-title" bind:value={container.attrs.title} type="text" minlength="1" on:input="{(v) => { updateNodeName(node, v) }}"/>
-                {:else}
-                    {container.attrs.title}
-                {/if}
-            </BlockTitle>
-        </label>
-        <div class="v-pane"
-             use:dndzone="{{ items: children, dragDisabled, flipDurationMs }}"
-             on:consider="{handleConsider}"
-             on:finalize="{handleFinalize}"
-        >
-			{#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
-                <div class="animation-wrapper" class:is-executing={item.isNodeExecuting} animate:flip={{duration:flipDurationMs}}>
-                    <svelte:self dragItem={item}/>
-                    {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
-                        <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
-                    {/if}
-                </div>
-            {/each}
-        </div>
-    </Block>
+    <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')}">
+        <Block>
+            {#if container.attrs.showTitle}
+                <label for={String(id)} class={$uiState.unlocked ? "edit-title-label" : ""}>
+                    <BlockTitle>
+                        {#if $uiState.unlocked}
+                            <input class="edit-title" bind:value={container.attrs.title} type="text" minlength="1" />
+                        {:else}
+                            {container.attrs.title}
+                        {/if}
+                    </BlockTitle>
+                </label>
+            {/if}
+            <div class="v-pane"
+                 class:empty={children.length === 0}
+                 use:dndzone="{{ items: children, dragDisabled, flipDurationMs }}"
+                 on:consider="{handleConsider}"
+                 on:finalize="{handleFinalize}"
+            >
+                {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
+                    <div class="animation-wrapper" class:is-executing={item.isNodeExecuting} animate:flip={{duration:flipDurationMs}}>
+                        <svelte:self dragItem={item} zIndex={zIndex+1} />
+                        {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
+                            <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
+                        {/if}
+                    </div>
+                {/each}
+            </div>
+            {#if $uiState.unlocked}
+                <div class="handle handle-container" style="z-index: {zIndex}" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+            {/if}
+        </Block>
+    </div>
 {:else if widget}
-    <svelte:component this={getComponentForWidgetState(widget)} item={widget} />
+    <svelte:component this={getComponentForWidgetState(widgetState)} item={widgetState} />
     {#if $uiState.unlocked}
-        <div class="handle" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+        <div class="handle handle-widget" style="z-index: {zIndex}" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
     {/if}
 {/if}
 
-<style>
+<style lang="scss">
  .v-pane {
      height: 100%;
      width: 100%;
-     overflow-y: auto ;
+     overflow: visible;
+     display: flex;
+
+     &.empty {
+         border-width: 3px;
+         border-color: var(--color-grey-400);
+         border-radius: var(--block-radius);
+         background: var(--color-grey-300);
+         min-height: 50px;
+         border-style: dashed;
+     }
+ }
+
+ .container {
+     display: flex;
+
+     :global(.block) {
+         height: fit-content;
+     }
+
+     &.horizontal {
+         flex-wrap: wrap;
+         gap: var(--layout-gap);
+         width: var(--size-full);
+
+         .v-pane {
+             flex-direction: row;
+         }
+
+         > :global(*), > :global(.form > *) {
+             flex: 1 1 0%;
+             flex-wrap: wrap;
+             min-width: min(160px, 100%);
+         }
+     }
+
+     &.vertical {
+         position: relative;
+
+         .v-pane {
+             flex-direction: column;
+         }
+
+         > :global(*), > :global(.form > *), .v-pane {
+             width: var(--size-full);
+         }
+     }
  }
 
  .is-executing :global(.block) {
@@ -132,8 +169,7 @@
 
  .animation-wrapper {
      position: relative;
-     width: 100%;
-     height: 100%;
+     flex-grow: 1;
  }
 
  .handle {
@@ -146,8 +182,12 @@
      height: 100%;
  }
 
- .handle:hover {
+ .handle-widget:hover {
      background-color: #add8e680;
+ }
+
+ .handle-container:hover {
+     background-color: #d8ade680;
  }
 
  .drag-item-shadow {
