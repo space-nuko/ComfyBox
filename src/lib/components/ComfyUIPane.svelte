@@ -5,7 +5,7 @@
  import ComfyApp  from "./ComfyApp";
  import type { SerializedPanes } from "./ComfyApp"
  import ComfyPane from "./ComfyPane.svelte";
- import widgetState from "$lib/stores/widgetState";
+ import nodeState from "$lib/stores/nodeState";
 	import type { DragItem } from "./ComfyUIPane";
 
  export let app: ComfyApp;
@@ -17,12 +17,12 @@
  function findLeastPopulatedPaneIndex(): number {
      let minWidgetCount = 2 ** 64;
      let minIndex = 0;
-     let state = get(widgetState);
+     let state = get(nodeState);
      for (let i = 0; i < dragItems.length; i++) {
          let widgetCount = 0;
          for (let j = 0; j < dragItems[i].length; j++) {
              const nodeID = dragItems[i][j].node.id;
-             widgetCount += state[nodeID].length;
+             widgetCount += state[nodeID].widgetStates.length;
          }
          if (widgetCount < minWidgetCount) {
              minWidgetCount = widgetCount

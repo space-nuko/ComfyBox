@@ -6,7 +6,6 @@
  import ComfyUIPane from "./ComfyUIPane.svelte";
  import ComfyApp, { type SerializedAppState } from "./ComfyApp";
  import { Checkbox } from "@gradio/form"
- import widgetState from "$lib/stores/widgetState";
  import nodeState from "$lib/stores/nodeState";
  import uiState from "$lib/stores/uiState";
  import { ImageViewer } from "$lib/ImageViewer";
@@ -102,16 +101,11 @@
  onMount(async () => {
      app = new ComfyApp();
 
-     // TODO dedup
      app.eventBus.on("nodeAdded", nodeState.nodeAdded);
      app.eventBus.on("nodeRemoved", nodeState.nodeRemoved);
      app.eventBus.on("configured", nodeState.configureFinished);
      app.eventBus.on("cleared", nodeState.clear);
 
-     app.eventBus.on("nodeAdded", widgetState.nodeAdded);
-     app.eventBus.on("nodeRemoved", widgetState.nodeRemoved);
-     app.eventBus.on("configured", widgetState.configureFinished);
-     app.eventBus.on("cleared", widgetState.clear);
      app.eventBus.on("autosave", doAutosave);
      app.eventBus.on("restored", doRestore);
 

@@ -1,6 +1,6 @@
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import type { IWidget, LGraphNode, SerializedLGraphNode, Vector2, WidgetCallback, WidgetTypes } from "@litegraph-ts/core";
-import widgetState from "$lib/stores/widgetState";
+import nodeState from "$lib/stores/nodeState";
 
 export default abstract class ComfyWidget<T = any, V = any> implements IWidget<T, V> {
     name: string;
@@ -27,7 +27,7 @@ export default abstract class ComfyWidget<T = any, V = any> implements IWidget<T
 
     setValue(value: V) {
         this.value = value;
-        widgetState.widgetStateChanged(this.node.id, this);
+        nodeState.widgetStateChanged(this.node.id, this);
     }
 
     draw?(ctx: CanvasRenderingContext2D, node: LGraphNode, width: number, posY: number, height: number): void;

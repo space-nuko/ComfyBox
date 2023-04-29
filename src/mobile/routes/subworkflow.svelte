@@ -5,7 +5,6 @@
  import { Button } from "@gradio/button";
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
  import { Checkbox } from "@gradio/form"
- import widgetState from "$lib/stores/widgetState";
  import nodeState from "$lib/stores/nodeState";
  import uiState from "$lib/stores/uiState";
  import { ImageViewer } from "$lib/ImageViewer";
@@ -29,7 +28,7 @@
 <Page name="subworkflow">
     <Navbar title="Workflow {subworkflowID}" backLink="Back" />
 
-    {#each Object.entries($widgetState) as [id, ws]}
+    {#each Object.entries($nodeState) as [id, ws]}
         {@const node = app.lGraph.getNodeById(id)}
         <div class:is-executing={$queueState.runningNodeId === node.id}>
             <Block>
@@ -38,7 +37,7 @@
                         {node.title}
                     </BlockTitle>
                 </label>
-                {#each $widgetState[id] as item}
+                {#each $nodeState[id].widgetStates as item}
                     <svelte:component this={getComponentForWidgetState(item)} {item} />
                 {/each}
             </Block>

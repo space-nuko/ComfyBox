@@ -3,7 +3,6 @@
  import { get } from "svelte/store"
  import { Block, BlockTitle } from "@gradio/atoms";
  import { Move } from 'radix-icons-svelte';
- import widgetState, { type WidgetDrawState, type WidgetUIState } from "$lib/stores/widgetState";
  import queueState from "$lib/stores/queueState";
  import nodeState from "$lib/stores/nodeState";
  import uiState from "$lib/stores/uiState";
@@ -47,7 +46,7 @@
      dragDisabled = true;
  };
 
- const unsubscribe = widgetState.subscribe(state => {
+ const unsubscribe = nodeState.subscribe(state => {
      dragItems = dragItems.filter(item => item.node.id in state);
  });
 
@@ -88,7 +87,7 @@
                             {/if}
                         </BlockTitle>
                     </label>
-                    {#each $widgetState[id] as item}
+                    {#each $nodeState[id].widgetStates as item}
                         <svelte:component this={getComponentForWidgetState(item)} {item} />
                         {#if dragItem[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
                             <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>

@@ -1,5 +1,5 @@
 <script lang="ts">
- import type { WidgetDrawState, WidgetUIState, WidgetUIStateStore } from "$lib/stores/widgetState";
+ import type { WidgetDrawState, WidgetUIState, WidgetUIStateStore } from "$lib/stores/nodeState";
  import { BlockTitle } from "@gradio/atoms";
  import { Dropdown } from "@gradio/form";
  import { get } from "svelte/store";

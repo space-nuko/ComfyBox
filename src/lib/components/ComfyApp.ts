@@ -12,7 +12,6 @@ import * as basic from "@litegraph-ts/nodes-basic"
 import * as nodes from "$lib/nodes/index"
 import ComfyGraphCanvas from "$lib/ComfyGraphCanvas";
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
-import type { WidgetStateStore, WidgetUIState } from "$lib/stores/widgetState";
 import * as widgets from "$lib/widgets/index"
 import type ComfyWidget from "$lib/widgets/ComfyWidget";
 import queueState from "$lib/stores/queueState";

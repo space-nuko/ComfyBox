@@ -2,7 +2,7 @@ import ComfyApp from "./components/ComfyApp";
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import RangeWidget from "$lib/widgets/RangeWidget.svelte";
 import TextWidget from "$lib/widgets/TextWidget.svelte";
- import widgetState, { type WidgetDrawState, type WidgetUIState } from "$lib/stores/widgetState";
+import { type WidgetUIState } from "$lib/stores/nodeState";
 
 export function download(filename: string, text: string, type: string = "text/plain") {
     const blob = new Blob([text], { type: type });

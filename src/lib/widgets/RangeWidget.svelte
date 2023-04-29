@@ -1,5 +1,5 @@
 <script lang="ts">
- import type { WidgetUIState, WidgetUIStateStore } from "$lib/stores/widgetState";
+ import type { WidgetUIState, WidgetUIStateStore } from "$lib/stores/nodeState";
  import { Range } from "@gradio/form";
  import { get } from "svelte/store";
  export let item: WidgetUIState | null = null;

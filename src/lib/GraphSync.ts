@@ -1,6 +1,5 @@
 import type { LGraph } from "@litegraph-ts/core";
-import widgetState, { type WidgetStateStore, type WidgetUIState, type WidgetUIStateStore } from "./stores/widgetState";
-import nodeState, { type NodeStateStore, type NodeUIState, type NodeUIStateStore } from "./stores/nodeState";
+import nodeState, { type WidgetUIState, type WidgetUIStateStore,  type NodeStateStore, type NodeUIState, type NodeUIStateStore } from "./stores/nodeState";
 import type ComfyApp from "./components/ComfyApp";
 import type { Unsubscriber } from "svelte/store";
 
@@ -38,24 +37,20 @@ export default class GraphSync {
 
     constructor(app: ComfyApp) {
         this.graph = app.lGraph;
-        this._unsubscribeWidget = widgetState.subscribe(this.onAllWidgetStateChanged.bind(this));
-        this._unsubscribeNode = nodeState.subscribe(this.onAllNodeStateChanged.bind(this));
+        this._unsubscribe = nodeState.subscribe(this.onAllNodeStateChanged.bind(this));
         this._finalizer = new FinalizationRegistry((id: number) => {
             console.log(`${this} has been garbage collected`);
-            this._unsubscribeWidget();
-            this._unsubscribeNode();
+            this._unsubscribe();
         });
     }
 
-    /*
-     * Fired when the entire widget graph changes.
-     */
-    private onAllWidgetStateChanged(state: WidgetStateStore) {
+    private onAllNodeStateChanged(state: NodeStateStore) {
         // TODO assumes only a single graph's widget state.
 
         for (let nodeId in state) {
+            state[nodeId].node.title = state[nodeId].name;
             if (!this.stores[nodeId]) {
-                this.addStores(state, nodeId);
+                this.addStores(state[nodeId].widgetStates, nodeId);
             }
         }
 
@@ -64,26 +59,18 @@ export default class GraphSync {
                 this.removeStores(nodeId);
             }
         }
-    }
-
-    private onAllNodeStateChanged(state: NodeStateStore) {
-        // TODO assumes only a single graph's widget state.
-
-        for (let nodeId in state) {
-            state[nodeId].node.name = state[nodeId].name;
-        }
 
         this.graph.setDirtyCanvas(true, true);
     }
 
-    private addStores(state: WidgetStateStore, nodeId: string) {
+    private addStores(widgetStates: WidgetUIState[], nodeId: string) {
         if (this.stores[nodeId]) {
             console.warn("Stores already exist!", nodeId, this.stores[nodeId])
         }
 
         this.stores[nodeId] = []
 
-        for (const wuis of state[nodeId]) {
+        for (const wuis of widgetStates) {
             const unsub = wuis.value.subscribe((v) => this.onWidgetStateChanged(wuis, v))
             this.stores[nodeId].push({ store: wuis.value, unsubscribe: unsub });
         }
