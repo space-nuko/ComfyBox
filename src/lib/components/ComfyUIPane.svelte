@@ -33,18 +33,11 @@
   * Serialize UI panel order so it can be restored when workflow is loaded
   */
  export function serialize(): any {
+     // TODO
  }
 
  export function restore(panels: SerializedPanes) {
-     const id = 0;
-     $layoutState.root = layoutState.addContainer(null, { direction: "horizontal", showTitle: false });
-     const left = layoutState.addContainer($layoutState.root.id, { direction: "vertical", showTitle: false });
-     const right = layoutState.addContainer($layoutState.root.id, { direction: "vertical", showTitle: false });
-
-     for (const node of app.lGraph.computeExecutionOrder(false, null)) {
-         layoutState.nodeAdded(node)
-     }
-     console.warn($layoutState)
+     // TODO
  }
 
  function groupWidgets() {

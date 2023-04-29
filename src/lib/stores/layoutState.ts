@@ -1,7 +1,7 @@
 import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
 import type ComfyApp from "$lib/components/ComfyApp"
-import type { LGraphNode, IWidget } from "@litegraph-ts/core"
+import type { LGraphNode, IWidget, LGraph } from "@litegraph-ts/core"
 import nodeState from "$lib/state/nodeState";
 import type { NodeStateStore } from './nodeState';
  import { dndzone, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
@@ -17,8 +17,61 @@ export type LayoutState = {
     allItems: Record<DragItemID, DragItemEntry>,
     currentId: number,
     currentSelection: DragItemID[],
+    isConfiguring: boolean,
     isMenuOpen: boolean
 }
+
+export type AttributesSpec = {
+    name: string,
+    type: string,
+    editable: boolean
+}
+
+export type AttributesCategorySpec = {
+    categoryName: string,
+    specs: AttributesSpec[]
+}
+
+export type AttributesSpecList = AttributesCategorySpec[]
+
+const ALL_ATTRIBUTES: AttributesSpecList = [
+    {
+        categoryName: "appearance",
+        specs: [
+            {
+                name: "title",
+                type: "string",
+                editable: true,
+            },
+            {
+                name: "showTitle",
+                type: "boolean",
+                editable: true,
+            },
+            {
+                name: "direction",
+                type: "string",
+                editable: true,
+            },
+            {
+                name: "classes",
+                type: "string",
+                editable: true,
+            },
+        ]
+    },
+    {
+        categoryName: "behavior",
+        specs: [
+            {
+                name: "associatedNode",
+                type: "number",
+                editable: false,
+            },
+        ]
+    }
+];
+export { ALL_ATTRIBUTES };
 
 export type Attributes = {
     direction: string,
@@ -54,6 +107,7 @@ type LayoutStateOps = {
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode) => void,
     nodeRemoved: (node: LGraphNode) => void,
+    configureFinished: (graph: LGraph) => void,
     groupItems: (dragItems: IDragItem[]) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
     getCurrentSelection: () => IDragItem[],
@@ -64,11 +118,12 @@ type LayoutStateOps = {
 export type WritableLayoutStateStore = Writable<LayoutState> & LayoutStateOps;
 const store: Writable<LayoutState> = writable({
     root: null,
-    allItems: [],
+    allItems: {},
     currentId: 0,
     currentSelection: [],
     isMenuOpen: false
 })
+addContainer(null, { direction: "horizontal", showTitle: false });
 
 function findDefaultContainerForInsertion(): ContainerLayout | null {
     const state = get(store);
@@ -160,6 +215,10 @@ function updateChildren(parent: IDragItem, newChildren?: IDragItem[]): IDragItem
 }
 
 function nodeAdded(node: LGraphNode) {
+    const state = get(store)
+    if (state.isConfiguring)
+        return;
+
     const parent = findDefaultContainerForInsertion();
     // Add default node panel containing all widgets
     if (node.widgets && node.widgets.length > 0) {
@@ -187,11 +246,14 @@ function removeEntry(state: LayoutState, id: DragItemID) {
 function nodeRemoved(node: LGraphNode) {
     const state = get(store)
 
+    console.debug("[layoutState] nodeRemoved", node)
+
     // Remove widgets bound to the node
     let del = Object.entries(state.allItems).filter(pair =>
         pair[1].dragItem.type === "widget"
         && pair[1].dragItem.attrs.associatedNode === node.id)
-    for (const id in del) {
+    for (const item of del) {
+        const [id, dragItem] = item;
         console.debug("[layoutState] Remove widget", id, state.allItems[id])
         removeEntry(state, id)
     }
@@ -209,11 +271,29 @@ function nodeRemoved(node: LGraphNode) {
     }
 
     // Remove empty containers bound to the node
-    for (const id in delContainers) {
+    for (const id of delContainers) {
         console.debug("[layoutState] Remove container", id, state.allItems[id])
         removeEntry(state, id)
     }
 
+    store.set(state)
+}
+
+function configureFinished(graph: LGraph) {
+    const state = get(store)
+    const id = 0;
+
+    state.isConfiguring = false;
+
+    state.root = addContainer(null, { direction: "horizontal", showTitle: false });
+    const left = addContainer(state.root.id, { direction: "vertical", showTitle: false });
+    const right = addContainer(state.root.id, { direction: "vertical", showTitle: false });
+
+    for (const node of graph.computeExecutionOrder(false, null)) {
+        nodeAdded(node)
+    }
+
+    console.debug("[layoutState] configureFinished", state)
     store.set(state)
 }
 
@@ -311,6 +391,15 @@ function ungroup(container: ContainerLayout) {
 }
 
 function clear() {
+    store.set({
+        root: null,
+        allItems: {},
+        currentId: 0,
+        currentSelection: [],
+        isMenuOpen: false,
+        isConfiguring: true,
+    })
+    addContainer(null, { direction: "horizontal", showTitle: false });
 }
 
 function resetLayout() {
@@ -326,6 +415,7 @@ const layoutStateStore: WritableLayoutStateStore =
     updateChildren,
     nodeAdded,
     nodeRemoved,
+    configureFinished,
     getCurrentSelection,
     groupItems,
     ungroup,
