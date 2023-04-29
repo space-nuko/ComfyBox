@@ -132,7 +132,6 @@ export default class ComfyApp {
         this.addPasteHandler();
         this.addKeyboardHandler();
 
-
         // await this.#invokeExtensionsAsync("setup");
 
         // Ensure the canvas fills the window

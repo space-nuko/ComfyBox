@@ -33,7 +33,7 @@
         {@const node = app.lGraph.getNodeById(id)}
         <div class:is-executing={$queueState.runningNodeId === node.id}>
             <Block>
-                <label for={String(id)} class={$uiState.unlocked ? "edit-title-label" : ""}>
+                <label for={String(id)}>
                     <BlockTitle>
                         {node.title}
                     </BlockTitle>
@@ -41,9 +41,6 @@
                 {#each $widgetState[id] as item}
                     <svelte:component this={getComponentForWidgetState(item)} {item} />
                 {/each}
-                {#if $uiState.unlocked}
-                    <div class="handle" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
-                {/if}
             </Block>
         </div>
     {/each}
