@@ -26,7 +26,14 @@
  const flipDurationMs = 100;
 
  $: if (dragItem) {
-     if (dragItem.type === "container") {
+     if (!$layoutState.allItems[dragItem.id]) {
+         dragItem = null;
+         widget = null;
+         widgetState = null;
+         children = null;
+         container = null;
+     }
+     else if (dragItem.type === "container") {
          container = dragItem as ContainerLayout;
          children = $layoutState.allItems[dragItem.id].children;
          widget = null;
@@ -54,11 +61,16 @@
  };
 
  const startDrag = (evt: MouseEvent) => {
-     if (evt.button === 2)
-         return;
-
      const dragItemId: string = evt.target.dataset["dragItemId"];
+
+     if (evt.button !== 0) {
+         if ($layoutState.currentSelection.length <= 1 && !$layoutState.isMenuOpen)
+             $layoutState.currentSelection = [dragItemId]
+         return;
+     }
+
      const item = $layoutState.allItems[dragItemId].dragItem
+
      if (evt.ctrlKey) {
          const index = $layoutState.currentSelection.indexOf(item.id)
          if (index === -1)
@@ -103,7 +115,6 @@
             <div class="v-pane"
                  class:empty={children.length === 0}
                  class:edit={$uiState.uiEditMode === "widgets" && zIndex > 1}
-                 class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId === container.attrs.associatedNode}
                  use:dndzone="{{
                               items: children,
                               flipDurationMs,
@@ -137,6 +148,10 @@
         class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(widget.id)}
         class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.attrs.associatedNode}
         >
+        {#if widget.attrs.associatedNode}
+            {@const node = $nodeState[widget.attrs.associatedNode].node}
+            <span class="node-type">({node.type})</span>
+        {/if}
         <svelte:component this={getComponentForWidgetState(widgetState)} item={widgetState} />
     </div>
     {#if showHandles}
@@ -261,12 +276,12 @@
  }
 
  .edit-title-label {
+     z-index: 10000;
      position: relative;
-     z-index: var(--layer-1);
  }
 
  .edit-title {
-     z-index: var(--layer-1);
+     z-index: 10000;
      display: block;
      position: relative;
      outline: none !important;

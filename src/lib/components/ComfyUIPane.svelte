@@ -47,6 +47,34 @@
      console.warn($layoutState)
  }
 
+ function groupWidgets() {
+     const items = layoutState.getCurrentSelection()
+     $layoutState.currentSelection = []
+     layoutState.groupItems(items)
+ }
+
+ let canUngroup = false;
+ let isDeleteGroup = false;
+ $: canUngroup = $layoutState.currentSelection.length === 1
+            && layoutState.getCurrentSelection()[0].type === "container"
+ $: if (canUngroup) {
+     const dragItem = layoutState.getCurrentSelection()[0];
+     const entry = $layoutState.allItems[dragItem.id];
+     isDeleteGroup = entry.children.length === 0
+ }
+ else {
+     isDeleteGroup = false
+ }
+
+ function ungroup() {
+     const item = layoutState.getCurrentSelection()[0]
+     if (item.type !== "container")
+         return;
+
+     $layoutState.currentSelection = []
+     layoutState.ungroup(item as ContainerLayout)
+ }
+
  let menuPos = { x: 0, y: 0 };
  let showMenu = false;
 
@@ -78,20 +106,13 @@
 {#if showMenu}
     <Menu {...menuPos} on:click={closeMenu} on:clickoutside={closeMenu}>
         <MenuOption
-            on:click={console.log}
-                     text="Do nothing" />
+            isDisabled={$layoutState.currentSelection.length === 0}
+            on:click={groupWidgets}
+            text="Group" />
         <MenuOption
-            on:click={console.log}
-                     text="Do nothing, but twice" />
-        <MenuDivider />
-        <MenuOption
-            isDisabled={true}
-                       on:click={console.log}
-                       text="Whoops, disabled!" />
-        <MenuOption on:click={console.log}>
-            <Icon />
-            <span>Look! An icon!</span>
-        </MenuOption>
+            isDisabled={!canUngroup}
+            on:click={ungroup}
+            text={isDeleteGroup ? "Delete Group" : "Ungroup"} />
     </Menu>
 {/if}
 

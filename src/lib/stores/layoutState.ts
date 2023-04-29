@@ -48,12 +48,15 @@ export interface WidgetLayout extends IDragItem {
 type DragItemID = string;
 
 type LayoutStateOps = {
-    addContainer: (parentId: DragItemID, attrs: Partial<Attributes>) => ContainerLayout,
+    addContainer: (parentId: DragItemID, attrs: Partial<Attributes>, index: number) => ContainerLayout,
+    addWidget: (parentId: DragItemID, node: LGraphNode, widget: IWidget<any, any>, attrs: Partial<Attributes>, index: number) => WidgetLayout,
     findDefaultContainerForInsertion: () => ContainerLayout | null,
-    addWidget: (parentId: DragItemID, node: LGraphNode, widget: IWidget<any, any>, attrs: Partial<Attributes>) => WidgetLayout,
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode) => void,
     nodeRemoved: (node: LGraphNode) => void,
+    groupItems: (dragItems: IDragItem[]) => ContainerLayout,
+    ungroup: (container: ContainerLayout) => void,
+    getCurrentSelection: () => IDragItem[],
     clear: () => void,
     resetLayout: () => void,
 }
@@ -87,7 +90,7 @@ function findDefaultContainerForInsertion(): ContainerLayout | null {
     return null
 }
 
-function addContainer(parentId: DragItemID | null, attrs: Partial<Attributes> = {}): ContainerLayout {
+function addContainer(parentId: DragItemID | null, attrs: Partial<Attributes> = {}, index: number = -1): ContainerLayout {
     const state = get(store);
     const dragItem: ContainerLayout = {
         type: "container",
@@ -106,13 +109,16 @@ function addContainer(parentId: DragItemID | null, attrs: Partial<Attributes> = 
     state.allItems[dragItem.id] = entry;
     if (parent) {
         parent.children ||= []
-        parent.children.push(dragItem)
+        if (index)
+            parent.children.splice(index, 0, dragItem)
+        else
+            parent.children.push(dragItem)
     }
     store.set(state)
     return dragItem;
 }
 
-function addWidget(parentId: DragItemID, node: LGraphNode, widget: IWidget<any, any>, attrs: Partial<Attributes> = {}): WidgetLayout {
+function addWidget(parentId: DragItemID, node: LGraphNode, widget: IWidget<any, any>, attrs: Partial<Attributes> = {}, index: number = -1): WidgetLayout {
     const state = get(store);
     const dragItem: WidgetLayout = {
         type: "widget",
@@ -132,21 +138,25 @@ function addWidget(parentId: DragItemID, node: LGraphNode, widget: IWidget<any, 
     const entry: DragItemEntry = { dragItem, children: [], parent: parent.dragItem };
     state.allItems[dragItem.id] = entry;
     parent.children ||= []
-    parent.children.push(dragItem)
+    if (index !== -1)
+        parent.children.splice(index, 0, dragItem)
+    else
+        parent.children.push(dragItem)
     store.set(state)
     return dragItem;
 }
 
-function updateChildren(parent: IDragItem, children: IDragItem[]): IDragItem[] {
+function updateChildren(parent: IDragItem, newChildren?: IDragItem[]): IDragItem[] {
     const state = get(store);
-    state.allItems[parent.id].children = children;
-    for (const child of children) {
+    if (newChildren)
+        state.allItems[parent.id].children = newChildren;
+    for (const child of state.allItems[parent.id].children) {
         if (child.id === SHADOW_PLACEHOLDER_ITEM_ID)
             continue;
         state.allItems[child.id].parent = parent;
     }
     store.set(state)
-    return children
+    return state.allItems[parent.id].children
 }
 
 function nodeAdded(node: LGraphNode) {
@@ -207,6 +217,99 @@ function nodeRemoved(node: LGraphNode) {
     store.set(state)
 }
 
+function moveItem(target: IDragItem, to: ContainerLayout, index: number = -1) {
+    const state = get(store)
+    const entry = state.allItems[target.id]
+    if (entry.parent && entry.parent.id === to.id)
+        return;
+
+    if (entry.parent) {
+        const parentEntry = state.allItems[entry.parent.id];
+        const index = parentEntry.children.indexOf(target)
+        if (index !== -1) {
+            parentEntry.children.splice(index, 1)
+        }
+        else {
+            console.error(parentEntry)
+            console.error(target)
+            throw "Child not found in parent!"
+        }
+    }
+
+    const toEntry = state.allItems[to.id];
+    if (index !== -1)
+        toEntry.children.splice(index, 0, target)
+    else
+        toEntry.children.push(target)
+    state.allItems[target.id].parent = toEntry.dragItem;
+
+    console.debug("[layoutState] Move child", target, toEntry, index)
+
+    store.set(state)
+}
+
+function getCurrentSelection(): IDragItem[] {
+    const state = get(store)
+    return state.currentSelection.map(id => state.allItems[id].dragItem)
+}
+
+function groupItems(dragItems: IDragItem[]): ContainerLayout {
+    if (dragItems.length === 0)
+        return;
+
+    const state = get(store)
+    const parent = state.allItems[dragItems[0].id].parent || findDefaultContainerForInsertion();
+
+    if (parent === null || parent.type !== "container")
+        return;
+
+    let index = undefined;
+    if (parent) {
+        const indexFound = state.allItems[parent.id].children.indexOf(dragItems[0])
+        if (indexFound !== -1)
+            index = indexFound
+    }
+
+    const container = addContainer(parent.id, { title: "Group" }, index)
+
+    for (const item of dragItems) {
+        moveItem(item, container)
+    }
+
+    store.set(state)
+    return container
+}
+
+function ungroup(container: ContainerLayout) {
+    const state = get(store)
+
+    const parent = state.allItems[container.id].parent;
+    if (!parent || parent.type !== "container") {
+        console.warn("No parent to ungroup into!", container)
+        return;
+    }
+
+    let index = undefined;
+    const parentChildren = state.allItems[parent.id].children;
+    const indexFound = parentChildren.indexOf(container)
+    if (indexFound !== -1)
+        index = indexFound
+
+    const containerEntry = state.allItems[container.id]
+    console.debug("[layoutState] About to ungroup", containerEntry, parent, parentChildren, index)
+
+    const children = [...containerEntry.children]
+    for (const item of children) {
+        moveItem(item, parent as ContainerLayout, index)
+    }
+
+    removeEntry(state, container.id)
+
+    console.debug("[layoutState] Ungrouped", containerEntry, parent, parentChildren, index)
+
+    store.set(state)
+}
+
 function clear() {
 }
 
@@ -214,7 +317,7 @@ function resetLayout() {
     // TODO
 }
 
-const uiStateStore: WritableLayoutStateStore =
+const layoutStateStore: WritableLayoutStateStore =
 {
     ...store,
     addContainer,
@@ -223,7 +326,10 @@ const uiStateStore: WritableLayoutStateStore =
     updateChildren,
     nodeAdded,
     nodeRemoved,
+    getCurrentSelection,
+    groupItems,
+    ungroup,
     clear,
     resetLayout
 }
-export default uiStateStore;
+export default layoutStateStore;
