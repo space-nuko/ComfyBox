@@ -10,7 +10,12 @@ export type UIState = {
 }
 
 export type WritableUIStateStore = Writable<UIState>;
-const store: WritableUIStateStore = writable({ unlocked: false, graphLocked: true, nodesLocked:false })
+const store: WritableUIStateStore = writable(
+    {
+        graphLocked: true,
+        nodesLocked: false,
+        unlocked: true,
+    })
 
 const uiStateStore: WritableUIStateStore =
 {

@@ -4,101 +4,76 @@
  import type { IWidget } from "@litegraph-ts/core";
  import ComfyApp  from "./ComfyApp";
  import type { SerializedPanes } from "./ComfyApp"
- import ComfyPane from "./ComfyPane.svelte";
+ import WidgetContainer from "./WidgetContainer.svelte";
  import nodeState from "$lib/stores/nodeState";
-	import type { DragItem } from "./ComfyUIPane";
+ import layoutState, { type ContainerLayout, type DragItem } from "$lib/stores/layoutState";
 
  export let app: ComfyApp;
  let dragConfigured: boolean = false;
  export let dragItems: DragItem[][] = []
 
  export let totalId = 0;
-
- function findLeastPopulatedPaneIndex(): number {
-     let minWidgetCount = 2 ** 64;
-     let minIndex = 0;
-     let state = get(nodeState);
-     for (let i = 0; i < dragItems.length; i++) {
-         let widgetCount = 0;
-         for (let j = 0; j < dragItems[i].length; j++) {
-             const nodeID = dragItems[i][j].node.id;
-             widgetCount += state[nodeID].widgetStates.length;
-         }
-         if (widgetCount < minWidgetCount) {
-             minWidgetCount = widgetCount
-             minIndex = i;
-         }
-     }
-     return minIndex
- }
-
- function addUIForNewNode(node: LGraphNode, paneIndex?: number) {
-     if (!paneIndex)
-         paneIndex = findLeastPopulatedPaneIndex();
-     dragItems[paneIndex].push({ id: totalId++, node: node });
- }
-
- $: if(app && !dragConfigured) {
-     dragConfigured = true;
-     app.eventBus.on("nodeAdded", addUIForNewNode);
- }
+ //
+ //  function addUIForNewNode(node: LGraphNode, paneIndex?: number) {
+ //      if (!paneIndex)
+ //          paneIndex = findLeastPopulatedPaneIndex();
+ //      dragItems[paneIndex].push({ id: totalId++, node: node });
+ //  }
+ //
+ //  $: if(app && !dragConfigured) {
+ //      dragConfigured = true;
+ //      app.eventBus.on("nodeAdded", addUIForNewNode);
+ //  }
 
  /*
   * Serialize UI panel order so it can be restored when workflow is loaded
   */
  export function serialize(): any {
-     let panels = []
-     for (let i = 0; i < dragItems.length; i++) {
-         panels[i] = [];
-         for (let j = 0; j < dragItems[i].length; j++) {
-             panels[i].push({ nodeId: dragItems[i][j].node.id });
-         }
-     }
-     return {
-         panels
-     }
  }
 
  export function restore(panels: SerializedPanes) {
-     let nodeIdToDragItem: Record<number, DragItem> = {};
-     for (let i = 0; i < dragItems.length; i++) {
-         for (const dragItem of dragItems[i]) {
-             nodeIdToDragItem[dragItem.node.id] = dragItem
+     const a: ContainerLayout = {
+         type: "container",
+         id: "0",
+         attrs: {
+             title: "root!",
+             direction: "horizontal"
          }
      }
+     $layoutState.root = a;
+     $layoutState.children[0] = [
+         {
+             type: "widget",
+             id: "1",
+             nodeId: 7,
+             widgetName: "text",
+             attrs: {
 
-     for (let i = 0; i < panels.panels.length; i++) {
-         dragItems[i].length = 0;
-         for (const panel of panels.panels[i]) {
-             const dragItem = nodeIdToDragItem[panel.nodeId];
-             if (dragItem) {
-                 delete nodeIdToDragItem[panel.nodeId];
-                 dragItems[i].push(dragItem)
              }
-         }
-     }
+         },
+         {
+             type: "widget",
+             id: "2",
+             nodeId: 6,
+             widgetName: "text",
+             attrs: {
 
-     // Put everything left over into other columns
-     if (Object.keys(nodeIdToDragItem).length > 0) {
-         console.warn("Extra panels without ordering found", nodeIdToDragItem, panels)
-         for (const nodeId in nodeIdToDragItem) {
-             const dragItem = nodeIdToDragItem[nodeId];
-             const paneIndex = findLeastPopulatedPaneIndex();
-             dragItems[paneIndex].push(dragItem);
-         }
-     }
+             }
+         },
+     ]
+     $layoutState.children[1] = []
+     $layoutState.children[2] = []
  }
 </script>
 
 <div id="comfy-ui-panes" >
-    <ComfyPane bind:dragItems={dragItems[0]} />
-    <ComfyPane bind:dragItems={dragItems[1]} />
-    <ComfyPane bind:dragItems={dragItems[2]} />
+    <WidgetContainer bind:dragItem={$layoutState.root} />
 </div>
 
 <style>
  #comfy-ui-panes {
      width: 100%;
      height: 100%;
+     overflow: scroll;
  }
 </style>
