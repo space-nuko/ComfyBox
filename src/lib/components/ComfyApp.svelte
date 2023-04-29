@@ -169,7 +169,12 @@
         </Button>
         <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
         <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/>
-        <Checkbox label="Enable UI Editing" bind:value={$uiState.unlocked}/>
+        <label for="enable-ui-editing">Enable UI Editing</label>
+        <select id="enable-ui-editing" name="enable-ui-editing" bind:value={$uiState.uiEditMode}>
+            <option value="disabled">Disabled</option>
+            <option value="widgets">Widgets</option>
+            <option value="containers">Containers</option>
+        </select>
     </div>
     <LightboxModal />
 </div>

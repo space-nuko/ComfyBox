@@ -14,14 +14,15 @@
  import { getComponentForWidgetState } from "$lib/utils"
 
  export let dragItem: IDragItem | null = null;
- export let zIndex: number = 100;
+ export let zIndex: number = 0;
  export let classes: string[] = [];
+ export let isRoot: boolean = false;
+ let dragDisabled: boolean = false;
  let container: ContainerLayout | null = null;
  let widget: WidgetLayout | null = null;
  let widgetState: WidgetUIState | null = null;
  let children: IDragItem[] | null = null;
- let dragDisabled = true;
- const flipDurationMs = 200;
+ const flipDurationMs = 100;
 
  $: if (dragItem) {
      if (dragItem.type === "container") {
@@ -37,8 +38,6 @@
      }
  }
 
- $: dragDisabled = !$uiState.unlocked;
-
  function handleConsider(evt: any) {
      children = layoutState.updateChildren(dragItem, evt.detail.items)
      // console.log(dragItems);
@@ -47,18 +46,13 @@
  function handleFinalize(evt: any) {
      children = layoutState.updateChildren(dragItem, evt.detail.items)
      // Ensure dragging is stopped on drag finish
-     // dragDisabled = true;
  };
 
  const startDrag = () => {
-     if (!$uiState.unlocked)
-         return
-     // dragDisabled = false;
+     return
  };
  const stopDrag = () => {
-     if (!$uiState.unlocked)
-         return
-     // dragDisabled = true;
+     return
  };
 
  $: if ($queueState && widget) {
@@ -70,12 +64,14 @@
 
 {#if container && children}
     {@const id = container.id}
-    <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')}">
+    <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')}"
+         class:root-container={isRoot}
+         class:container-edit-outline={$uiState.uiEditMode === "containers" && zIndex > 1}>
         <Block>
             {#if container.attrs.showTitle}
-                <label for={String(id)} class={$uiState.unlocked ? "edit-title-label" : ""}>
+                <label for={String(id)} class={$uiState.uiEditMode === "containers" ? "edit-title-label" : ""}>
                     <BlockTitle>
-                        {#if $uiState.unlocked}
+                        {#if $uiState.uiEditMode === "containers"}
                             <input class="edit-title" bind:value={container.attrs.title} type="text" minlength="1" />
                         {:else}
                             {container.attrs.title}
@@ -85,12 +81,22 @@
             {/if}
             <div class="v-pane"
                  class:empty={children.length === 0}
-                 use:dndzone="{{ items: children, dragDisabled, flipDurationMs }}"
+                 class:edit={$uiState.uiEditMode === "containers" && zIndex > 1}
+                 use:dndzone="{{
+                              items: children,
+                              flipDurationMs,
+                              morphDisabled: true,
+                              dropFromOthersDisabled: zIndex === 0,
+                              dragDisabled: zIndex === 0
+                              }}"
                  on:consider="{handleConsider}"
                  on:finalize="{handleFinalize}"
             >
                 {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
-                    <div class="animation-wrapper" class:is-executing={item.isNodeExecuting} animate:flip={{duration:flipDurationMs}}>
+                    <div class="animation-wrapper"
+                         class:edit={$uiState.unlocked}
+                         class:is-executing={item.isNodeExecuting}
+                         animate:flip={{duration:flipDurationMs}}>
                         <svelte:self dragItem={item} zIndex={zIndex+1} />
                         {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
                             <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
@@ -98,15 +104,17 @@
                     </div>
                 {/each}
             </div>
-            {#if $uiState.unlocked}
-                <div class="handle handle-container" style="z-index: {zIndex}" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+            {#if $uiState.uiEditMode === "containers" && zIndex > 1}
+                <div class="handle handle-container" style="z-index: {zIndex+100}" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
             {/if}
         </Block>
     </div>
 {:else if widget}
-    <svelte:component this={getComponentForWidgetState(widgetState)} item={widgetState} />
-    {#if $uiState.unlocked}
-        <div class="handle handle-widget" style="z-index: {zIndex}" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+    <div class:widget-edit-outline={$uiState.uiEditMode === "widgets" && zIndex > 1}>
+        <svelte:component this={getComponentForWidgetState(widgetState)} item={widgetState} />
+    </div>
+    {#if $uiState.uiEditMode ==="widgets" && zIndex > 1}
+        <div class="handle handle-widget" style="z-index: {zIndex+100}" on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
     {/if}
 {/if}
 
@@ -117,12 +125,16 @@
      overflow: visible;
      display: flex;
 
+     .edit {
+         min-width: 200px;
+     }
+
      &.empty {
          border-width: 3px;
          border-color: var(--color-grey-400);
          border-radius: var(--block-radius);
          background: var(--color-grey-300);
-         min-height: 50px;
+         min-height: 200px;
          border-style: dashed;
      }
  }
@@ -132,6 +144,10 @@
 
      :global(.block) {
          height: fit-content;
+     }
+
+     &.container-edit-outline {
+         /* width: 20rem; */
      }
 
      &.horizontal {
@@ -169,7 +185,10 @@
 
  .animation-wrapper {
      position: relative;
-     flex-grow: 1;
+
+     &:not(.edit) {
+         flex-grow: 1;
+     }
  }
 
  .handle {
@@ -234,5 +253,23 @@
 
  .edit-title::placeholder {
      color: var(--input-placeholder-color);
+ }
+
+ .container-edit-outline > :global(.block) {
+     border-color: var(--color-pink-500);
+     border-width: 2px;
+     border-style: dashed !important;
+     margin: 0.2em;
+     padding: 1.2em;
+ }
+
+ .widget-edit-outline {
+     border: 2px dashed var(--color-blue-400);
+     margin: 0.2em;
+     padding: 0.2em;
+ }
+
+ .root-container > :global(.block) {
+     padding: 0px;
  }
 </style>

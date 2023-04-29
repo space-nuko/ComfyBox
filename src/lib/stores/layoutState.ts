@@ -4,6 +4,7 @@ import type ComfyApp from "$lib/components/ComfyApp"
 import type { LGraphNode, IWidget } from "@litegraph-ts/core"
 import nodeState from "$lib/state/nodeState";
 import type { NodeStateStore } from './nodeState';
+ import { dndzone, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 
 type DragItemEntry = {
     dragItem: IDragItem,
@@ -136,6 +137,8 @@ function updateChildren(parent: IDragItem, children: IDragItem[]): IDragItem[] {
     const state = get(store);
     state.allItems[parent.id].children = children;
     for (const child of children) {
+        if (child.id === SHADOW_PLACEHOLDER_ITEM_ID)
+            continue;
         state.allItems[child.id].parent = parent;
     }
     store.set(state)

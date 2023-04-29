@@ -53,8 +53,4 @@
 
  }
 
- #comfy-ui-panes > :global(.root-container > .block) {
-     padding: 0px;
- }
-
 </style>
