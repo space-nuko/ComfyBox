@@ -20,6 +20,8 @@
  import "framework7/css/bundle"
  import "./scss/global.scss";
 
+ import GenToolbar from './mobile/GenToolbar.svelte'
+
  import HomePage from './mobile/routes/home.svelte';
  import AboutPage from './mobile/routes/about.svelte';
  import LoginPage from './mobile/routes/login.svelte';
@@ -99,6 +101,8 @@
         masterDetailBreakpoint={768},
         browserHistory=true,
         browserHistoryRoot="/mobile/"
-    />
+    >
+        <GenToolbar/>
+    </View>
 </App>
 {/if}
