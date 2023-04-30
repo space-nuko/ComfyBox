@@ -221,12 +221,12 @@ function nodeAdded(node: LGraphNode) {
 
     const parent = findDefaultContainerForInsertion();
     // Add default node panel containing all widgets
-    if (node.widgets && node.widgets.length > 0) {
-        const container = addContainer(parent.id, { title: node.title, direction: "vertical", associatedNode: node.id });
-        for (const widget of node.widgets) {
-            addWidget(container.id, node, widget, { associatedNode: node.id });
-        }
-    }
+    // if (node.widgets && node.widgets.length > 0) {
+    //     const container = addContainer(parent.id, { title: node.title, direction: "vertical", associatedNode: node.id });
+    //     for (const widget of node.widgets) {
+    //         addWidget(container.id, node, widget, { associatedNode: node.id });
+    //     }
+    // }
 }
 
 function removeEntry(state: LayoutState, id: DragItemID) {

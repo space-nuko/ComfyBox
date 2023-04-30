@@ -18,9 +18,6 @@ export default class ComfyReroute extends ComfyGraphNode {
         }
     }
 
-    // This node is purely frontend and does not impact the resulting prompt so should not be serialized
-    override isVirtualNode: boolean = true;
-
     override titleMode: TitleMode = TitleMode.NO_TITLE;
     override collapsable: boolean = false;
 

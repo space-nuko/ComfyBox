@@ -5,6 +5,7 @@ import TextWidget from "$lib/widgets/TextWidget.svelte";
 import { type WidgetUIState } from "$lib/stores/nodeState";
 import { get } from "svelte/store"
 import layoutState from "$lib/stores/layoutState"
+import type { SvelteComponentDev } from "svelte/internal";
 
 export function download(filename: string, text: string, type: string = "text/plain") {
     const blob = new Blob([text], { type: type });
@@ -20,13 +21,11 @@ export function download(filename: string, text: string, type: string = "text/pl
     }, 0);
 }
 
-export function getComponentForWidgetState(item: WidgetUIState): any {
-    let ctor: any = null;
-
+export function getComponentForWidgetState(item: WidgetUIState): typeof SvelteComponentDev {
     // custom widgets with TypeScript sources
     let override = ComfyApp.widget_type_overrides[item.widget.type]
     if (override) {
-        return override;
+        return override
     }
 
     // litegraph.ts built-in widgets

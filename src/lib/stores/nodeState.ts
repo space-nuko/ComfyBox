@@ -63,14 +63,14 @@ function nodeAdded(node: LGraphNode) {
 
     const widgets = [];
 
-    if (node.widgets) {
-        for (const [index, widget] of node.widgets.entries()) {
-            let isVirtual = false;
-            if ("isVirtual" in widget)
-                isVirtual = (widget as ComfyWidget<any, any>).isVirtual;
-            widgets.push({ index, widget, value: writable(widget.value), isVirtual: isVirtual })
-        }
-    }
+    // if (node.widgets) {
+    //     for (const [index, widget] of node.widgets.entries()) {
+    //         let isVirtual = false;
+    //         if ("isVirtual" in widget)
+    //             isVirtual = (widget as ComfyWidget<any, any>).isVirtual;
+    //         widgets.push({ index, widget, value: writable(widget.value), isVirtual: isVirtual })
+    //     }
+    // }
 
     state[node.id] = { node: node, name: node.title, widgetStates: widgets }
     store.set(state);
@@ -97,17 +97,17 @@ function configureFinished(graph: LGraph) {
     for (const node of graph.computeExecutionOrder(false, null)) {
         state[node.id].name = node.title;
 
-        const widgetStates = state[node.id].widgetStates;
-        if (node.widgets_values) {
-            for (const [i, value] of node.widgets_values.entries()) {
-                if (i < widgetStates.length && !widgetStates[i].isVirtual) {
-                    widgetStates[i].value.set(value);
-                }
-                else {
-                    console.log("Skip virtual widget", node.id, node.type, widgetStates[i].widget)
-                }
-            }
-        }
+        // const widgetStates = state[node.id].widgetStates;
+        // if (node.widgets_values) {
+        //     for (const [i, value] of node.widgets_values.entries()) {
+        //         if (i < widgetStates.length && !widgetStates[i].isVirtual) {
+        //             widgetStates[i].value.set(value);
+        //         }
+        //         else {
+        //             console.log("Skip virtual widget", node.id, node.type, widgetStates[i].widget)
+        //         }
+        //     }
+        // }
     }
 
     store.set(state)
