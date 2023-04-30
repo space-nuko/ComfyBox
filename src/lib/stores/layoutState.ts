@@ -265,6 +265,7 @@ function nodeRemoved(node: LGraphNode) {
     let delContainers = []
 
     // Remove widget from all children lists
+  // TODO just use parent.children
     for (const entry of Object.values(state.allItems)) {
         if (entry.children?.length === 0 && isAssociatedContainer(entry.dragItem))
             delContainers.push(entry.dragItem.id)

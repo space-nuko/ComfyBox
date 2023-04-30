@@ -41,6 +41,7 @@
 <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')}"
      class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(container.id)}
      class:root-container={zIndex === 0}
+     class:is-executing={container.isNodeExecuting}
      class:container-edit-outline={$uiState.uiEditMode === "widgets" && zIndex > 1}>
     <Block>
         {#if container.attrs.showTitle}
@@ -70,7 +71,6 @@
             >
             {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
                 <div class="animation-wrapper"
-                     class:is-executing={item.isNodeExecuting}
                      animate:flip={{duration:flipDurationMs}}>
                     <WidgetContainer dragItem={item} zIndex={zIndex+1} />
                     {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}

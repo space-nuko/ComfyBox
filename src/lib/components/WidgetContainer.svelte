@@ -15,22 +15,20 @@
  let widgetState: WidgetUIState | null = null;
  let showHandles: boolean = false;
 
- $: if (dragItem) {
-     if (!$layoutState.allItems[dragItem.id]) {
-         dragItem = null;
-         widget = null;
-         widgetState = null;
-         container = null;
-     }
-     else if (dragItem.type === "container") {
-         container = dragItem as ContainerLayout;
-         widget = null;
-     }
-     else if (dragItem.type === "widget") {
-         widget = dragItem as WidgetLayout;
-         widgetState = nodeState.findWidgetByName(widget.nodeId, widget.widgetName)
-         container = null;
-     }
+ $: if (!dragItem || !$layoutState.allItems[dragItem.id]) {
+     dragItem = null;
+     container = null;
+     widget = null;
+     widgetState = null;
+ }
+ else if (dragItem.type === "container") {
+     container = dragItem as ContainerLayout;
+     widget = null;
+ }
+ else if (dragItem.type === "widget") {
+     widget = dragItem as WidgetLayout;
+     widgetState = nodeState.findWidgetByName(widget.nodeId, widget.widgetName)
+     container = null;
  }
 
  $: showHandles = $uiState.uiEditMode === "widgets" // TODO
@@ -38,8 +36,8 @@
                && !$layoutState.isMenuOpen
 
 
- $: if ($queueState && widget) {
-     widget.isNodeExecuting = $queueState.runningNodeId === widget.nodeId;
+ $: if ($queueState && dragItem) {
+     dragItem.isNodeExecuting = $queueState.runningNodeId === dragItem.nodeId;
  }
 </script>
 
@@ -51,10 +49,6 @@
         class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(widget.id)}
         class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.attrs.associatedNode}
         >
-        {#if widget.attrs.associatedNode}
-            {@const node = $nodeState[widget.attrs.associatedNode].node}
-            <span class="node-type">({node.type})</span>
-        {/if}
         <svelte:component this={getComponentForWidgetState(widgetState)} item={widgetState} />
     </div>
     {#if showHandles}
