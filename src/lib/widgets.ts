@@ -24,9 +24,6 @@ function addComfyInput(node: LGraphNode, inputName: string, extraInfo: Partial<I
     for (const [k, v] of Object.entries(extraInfo))
         input[k] = v
     input.serialize = true;
-    input.shape = BuiltInSlotShape.CARD_SHAPE;
-    input.color_off = "lightblue"
-    input.color_on = "lightblue"
     return input;
 }
 

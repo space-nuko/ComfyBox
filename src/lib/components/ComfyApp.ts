@@ -127,6 +127,11 @@ export default class ComfyApp {
         this.addPasteHandler();
         this.addKeyboardHandler();
 
+        // Distinguish frontend/backend connections
+        const BACKEND_TYPES = ["CLIP", "CLIP_VISION", "CLIP_VISION_OUTPUT", "CONDITIONING", "CONTROL_NET", "IMAGE", "LATENT", "MASK", "MODEL", "STYLE_MODEL", "VAE"]
+        for (const type of BACKEND_TYPES)
+            LGraphCanvas.link_type_colors[type] = "orange" // yellow
+
         // await this.#invokeExtensionsAsync("setup");
 
         // Ensure the canvas fills the window
@@ -236,6 +241,9 @@ export default class ComfyApp {
                     this.type = nodeId; // XXX: workaround dependency in LGraphNode.addInput()
                     (this as any).comfyClass = nodeId;
                     (this as any).isBackendNode = true;
+                    const color = LGraphCanvas.node_colors["yellow"];
+                    this.color = color.color
+                    this.bgColor = color.bgColor
                     var inputs = nodeData["input"]["required"];
                     if (nodeData["input"]["optional"] != undefined) {
                         inputs = Object.assign({}, nodeData["input"]["required"], nodeData["input"]["optional"])
@@ -267,7 +275,7 @@ export default class ComfyApp {
                     for (const o in nodeData["output"]) {
                         const output = nodeData["output"][o];
                         const outputName = nodeData["output_name"][o] || output;
-                        this.addOutput(outputName, output);
+                        this.addOutput(outputName, output, { color_off: "orange", color_on: "orange" });
                     }
 
                     const s = this.computeSize();
@@ -477,8 +485,14 @@ export default class ComfyApp {
                     const inp = node.inputs[i];
                     const inputLink = node.getInputLink(i)
                     const inputNode = node.getInputNode(i)
-                    if (!inputLink || !inputNode)
+                    if (!inputLink || !inputNode) {
+                        if ("config" in inp) {
+                            const defaultValue = (inp as IComfyInputSlot).config?.defaultValue
+                            if (defaultValue !== null && defaultValue !== undefined)
+                                inputs[inp.name] = defaultValue
+                        }
                         continue;
+                    }
 
                     let serialize = true;
                     if ("config" in inp)
