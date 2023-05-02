@@ -27,7 +27,6 @@
  }
  else if (dragItem.type === "widget") {
      widget = dragItem as WidgetLayout;
-     widgetState = nodeState.findWidgetByName(widget.nodeId, widget.widgetName)
      container = null;
  }
 
@@ -47,9 +46,9 @@
 {:else if widget}
     <div class="widget" class:widget-edit-outline={$uiState.uiEditMode === "widgets" && zIndex > 1}
         class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(widget.id)}
-        class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.attrs.associatedNode}
+        class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.node.id}
         >
-        <svelte:component this={getComponentForWidgetState(widgetState)} item={widgetState} />
+        <svelte:component this={widget.node.svelteComponentType} node={widget.node} />
     </div>
     {#if showHandles}
         <div class="handle handle-widget" style="z-index: {zIndex+100}" data-drag-item-id={widget.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>

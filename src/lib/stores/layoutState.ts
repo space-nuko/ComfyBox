@@ -5,6 +5,7 @@ import type { LGraphNode, IWidget, LGraph } from "@litegraph-ts/core"
 import nodeState from "$lib/state/nodeState";
 import type { NodeStateStore } from './nodeState';
  import { dndzone, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
+import type { ComfyWidgetNode } from '$lib/nodes';
 
 type DragItemEntry = {
     dragItem: IDragItem,
@@ -59,16 +60,6 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 editable: true,
             },
         ]
-    },
-    {
-        categoryName: "behavior",
-        specs: [
-            {
-                name: "associatedNode",
-                type: "number",
-                editable: false,
-            },
-        ]
     }
 ];
 export { ALL_ATTRIBUTES };
@@ -77,8 +68,7 @@ export type Attributes = {
     direction: string,
     title: string,
     showTitle: boolean,
-    classes: string,
-    associatedNode: number | null
+    classes: string
 }
 
 export interface IDragItem {
@@ -94,8 +84,7 @@ export interface ContainerLayout extends IDragItem {
 
 export interface WidgetLayout extends IDragItem {
     type: "widget",
-    nodeId: number,
-    widgetName: string
+    node: ComfyWidgetNode
 }
 
 type DragItemID = string;
@@ -121,7 +110,8 @@ const store: Writable<LayoutState> = writable({
     allItems: {},
     currentId: 0,
     currentSelection: [],
-    isMenuOpen: false
+    isMenuOpen: false,
+    isConfiguring: true
 })
 addContainer(null, { direction: "horizontal", showTitle: false });
 
@@ -155,7 +145,6 @@ function addContainer(parentId: DragItemID | null, attrs: Partial<Attributes> = 
             showTitle: true,
             direction: "vertical",
             classes: "",
-            associatedNode: null,
             ...attrs
         }
     }
@@ -173,31 +162,25 @@ function addContainer(parentId: DragItemID | null, attrs: Partial<Attributes> = 
     return dragItem;
 }
 
-function addWidget(parentId: DragItemID, node: LGraphNode, widget: IWidget<any, any>, attrs: Partial<Attributes> = {}, index: number = -1): WidgetLayout {
+function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes> = {}, index: number = -1): WidgetLayout {
     const state = get(store);
+    const widgetName = "Widget"
     const dragItem: WidgetLayout = {
         type: "widget",
         id: `${state.currentId++}`,
-        nodeId: node.id,
-        widgetName: widget.name, // TODO name and displayName
+        node: node,
         attrs: {
-            title: widget.name,
+            title: widgetName,
             showTitle: true,
             direction: "horizontal",
             classes: "",
-            associatedNode: null,
             ...attrs
         }
     }
-    const parent = state.allItems[parentId]
-    const entry: DragItemEntry = { dragItem, children: [], parent: parent.dragItem };
+    const parentEntry = state.allItems[parent.id]
+    const entry: DragItemEntry = { dragItem, children: [], parent: parentEntry.dragItem };
     state.allItems[dragItem.id] = entry;
-    parent.children ||= []
-    if (index !== -1)
-        parent.children.splice(index, 0, dragItem)
-    else
-        parent.children.push(dragItem)
-    store.set(state)
+    moveItem(dragItem, parent)
     return dragItem;
 }
 
@@ -220,7 +203,17 @@ function nodeAdded(node: LGraphNode) {
         return;
 
     const parent = findDefaultContainerForInsertion();
-    // Add default node panel containing all widgets
+
+    // Two cases where we want to add nodes:
+    // 1. User adds a new UI node, so we should instantiate its widget in the frontend.
+    // 2. User adds a node with inputs that can be filled by frontend widgets.
+    // Depending on config, this means we should instantiate default UI nodes connected to those inputs.
+
+    if ("svelteComponentType" in node) {
+        addWidget(parent, node as ComfyWidgetNode);
+    }
+
+    // Add default node panel with all widgets autoinstantiated
     // if (node.widgets && node.widgets.length > 0) {
     //     const container = addContainer(parent.id, { title: node.title, direction: "vertical", associatedNode: node.id });
     //     for (const widget of node.widgets) {
@@ -248,32 +241,12 @@ function nodeRemoved(node: LGraphNode) {
 
     console.debug("[layoutState] nodeRemoved", node)
 
-    // Remove widgets bound to the node
     let del = Object.entries(state.allItems).filter(pair =>
         pair[1].dragItem.type === "widget"
-        && pair[1].dragItem.attrs.associatedNode === node.id)
-    for (const item of del) {
-        const [id, dragItem] = item;
-        console.debug("[layoutState] Remove widget", id, state.allItems[id])
-        removeEntry(state, id)
-    }
+        && (pair[1].dragItem as WidgetLayout).node.id === node.id)
 
-    const isAssociatedContainer = (dragItem: IDragItem) =>
-        dragItem.type === "container"
-        && dragItem.attrs.associatedNode === node.id;
-
-    let delContainers = []
-
-    // Remove widget from all children lists
-  // TODO just use parent.children
-    for (const entry of Object.values(state.allItems)) {
-        if (entry.children?.length === 0 && isAssociatedContainer(entry.dragItem))
-            delContainers.push(entry.dragItem.id)
-    }
-
-    // Remove empty containers bound to the node
-    for (const id of delContainers) {
-        console.debug("[layoutState] Remove container", id, state.allItems[id])
+    for (const pair of del) {
+        const [id, dragItem] = pair;
         removeEntry(state, id)
     }
 
@@ -290,7 +263,7 @@ function configureFinished(graph: LGraph) {
     const left = addContainer(state.root.id, { direction: "vertical", showTitle: false });
     const right = addContainer(state.root.id, { direction: "vertical", showTitle: false });
 
-    for (const node of graph.computeExecutionOrder(false, null)) {
+    for (const node of graph._nodes_in_order) {
         nodeAdded(node)
     }
 

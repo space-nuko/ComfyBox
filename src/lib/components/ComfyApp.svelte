@@ -110,10 +110,10 @@
      app.eventBus.on("configured", nodeState.configureFinished);
      app.eventBus.on("cleared", nodeState.clear);
 
-     // app.eventBus.on("nodeAdded", layoutState.nodeAdded);
-     // app.eventBus.on("nodeRemoved", layoutState.nodeRemoved);
-     // app.eventBus.on("configured", layoutState.configureFinished);
-     // app.eventBus.on("cleared", layoutState.clear);
+     app.eventBus.on("nodeAdded", layoutState.nodeAdded);
+     app.eventBus.on("nodeRemoved", layoutState.nodeRemoved);
+     app.eventBus.on("configured", layoutState.configureFinished);
+     app.eventBus.on("cleared", layoutState.clear);
 
      app.eventBus.on("autosave", doAutosave);
      app.eventBus.on("restored", doRestore);

@@ -1,5 +1,6 @@
 import type { INodeInputSlot } from "@litegraph-ts/core";
 
+// TODO generalize
 export type ComfyInputConfig = {
     min?: number,
     max?: number,

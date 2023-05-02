@@ -1,18 +1,27 @@
 <script lang="ts">
- import type { WidgetUIState, WidgetUIStateStore } from "$lib/stores/nodeState";
+ import type { WidgetUIStateStore } from "$lib/stores/nodeState";
  import { TextBox } from "@gradio/form";
- export let item: WidgetUIState | null = null;
+ import type { ComfyComboNode } from "$lib/nodes/index";
+ import { type WidgetLayout } from "$lib/stores/layoutState";
+ import { get, type Writable } from "svelte/store";
+ export let widget: WidgetLayout | null = null;
+ let node: ComfyComboNode | null = null;
+ let nodeValue: Writable<string> | null = null;
  let itemValue: WidgetUIStateStore | null = null;
- $: if (item) { itemValue = item.value; }
+
+ $: if(widget) {
+     node = widget.node as ComfyComboNode
+     nodeValue = node.value;
+ };
 </script>
 
 <div class="wrapper gr-textbox">
-    {#if item !== null && itemValue !== null}
+    {#if node !== null && nodeValue !== null}
         <TextBox
             bind:value={$itemValue}
-            label={item.widget.name}
-            lines={item.widget.options.multiline ? 5 : 1}
-            max_lines={item.widget.options.multiline ? 5 : 1}
+            label={widget.attrs.title}
+            lines={node.properties.multiline ? 5 : 1}
+            max_lines={node.properties.multiline ? 5 : 1}
             show_label={true}
             on:change
             on:submit
