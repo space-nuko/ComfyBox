@@ -1,7 +1,6 @@
 <script lang="ts">
  import { onMount } from "svelte";
  import { ImageViewer } from "$lib/ImageViewer";
- import type { WidgetUIState, WidgetUIStateStore } from "$lib/stores/nodeState";
  import { Block } from "@gradio/atoms";
  import { Gallery } from "@gradio/gallery";
  import type { Styles } from "@gradio/utils";

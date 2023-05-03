@@ -2,7 +2,6 @@ import ComfyApp from "./components/ComfyApp";
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import RangeWidget from "$lib/widgets/RangeWidget.svelte";
 import TextWidget from "$lib/widgets/TextWidget.svelte";
-import { type WidgetUIState } from "$lib/stores/nodeState";
 import { get } from "svelte/store"
 import layoutState from "$lib/stores/layoutState"
 import type { SvelteComponentDev } from "svelte/internal";
@@ -19,26 +18,6 @@ export function download(filename: string, text: string, type: string = "text/pl
         a.remove();
         window.URL.revokeObjectURL(url);
     }, 0);
-}
-
-export function getComponentForWidgetState(item: WidgetUIState): typeof SvelteComponentDev {
-    // custom widgets with TypeScript sources
-    let override = ComfyApp.widget_type_overrides[item.widget.type]
-    if (override) {
-        return override
-    }
-
-    // litegraph.ts built-in widgets
-    switch (item.widget.type) {
-        case "combo":
-            return ComboWidget;
-        case "number":
-            return RangeWidget;
-        case "text":
-            return TextWidget;
-    }
-
-    return null;
 }
 
 export function startDrag(evt: MouseEvent) {

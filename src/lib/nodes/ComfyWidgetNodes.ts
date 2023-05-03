@@ -17,7 +17,7 @@ export interface ComfyWidgetProperties extends Record<string, any> {
  * widget is changed, the value of the first output in the node is updated
  * in the litegraph instance.
  */
-export abstract class ComfyWidgetNode<T> extends ComfyGraphNode {
+export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     abstract properties: ComfyWidgetProperties;
 
     value: Writable<T>
@@ -134,7 +134,7 @@ export class ComfySliderNode extends ComfyWidgetNode<number> {
         this.setProperty("min", Math.max(this.properties.min, input.config.min))
         this.setProperty("max", Math.max(this.properties.max, input.config.max))
         this.setProperty("step", Math.max(this.properties.step, input.config.step))
-        this.setProperty("value", Math.max(Math.min(this.properties.value, this.properties.max), this.properties.min))
+        this.setValue(Math.max(Math.min(this.properties.value, this.properties.max), this.properties.min))
     }
 }
 
@@ -151,7 +151,7 @@ export interface ComfyComboProperties extends ComfyWidgetProperties {
 
 export class ComfyComboNode extends ComfyWidgetNode<string> {
     override properties: ComfyComboProperties = {
-        options: ["*"]
+        options: ["A", "B", "C", "D"]
     }
 
     static slotLayout: SlotLayout = {
@@ -164,7 +164,7 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
     override inputWidgetTypes = ["combo", "enum"]
 
     constructor(name?: string) {
-        super(name, "*")
+        super(name, "A")
     }
 
     onConnectOutput(
@@ -194,9 +194,9 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
     override clampOneConfig(input: IComfyInputSlot) {
         if (!(this.properties.value in input.config.values)) {
             if (input.config.values.length === 0)
-                this.setProperty("value", "")
+                this.setValue("")
             else
-                this.setProperty("value", input.config.values[0])
+                this.setValue(input.config.values[0])
         }
     }
 }

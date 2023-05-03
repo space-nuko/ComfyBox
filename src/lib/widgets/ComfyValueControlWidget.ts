@@ -2,7 +2,6 @@ import type { IEnumWidget, IEnumWidgetOptions, INumberWidget, LGraphNode, Widget
 import ComfyWidget from "./ComfyWidget";
 import type { ComfyImageResult } from "$lib/nodes/ComfySaveImageNode";
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
-import nodeState from "$lib/stores/nodeState"
 
 export interface ComfyValueControlWidgetOptions extends IEnumWidgetOptions {
 }
@@ -50,6 +49,6 @@ export default class ComfyValueControlWidget extends ComfyWidget<ComfyValueContr
 		if (this.targetWidget.value > max)
 			this.targetWidget.value = max;
 
-        nodeState.widgetStateChanged(this.node.id, this.targetWidget);
+        // nodeState.widgetStateChanged(this.node.id, this.targetWidget);
     }
 }

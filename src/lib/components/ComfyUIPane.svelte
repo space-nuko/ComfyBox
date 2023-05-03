@@ -6,7 +6,6 @@
  import ComfyApp  from "./ComfyApp";
  import type { SerializedPanes } from "./ComfyApp"
  import WidgetContainer from "./WidgetContainer.svelte";
- import nodeState from "$lib/stores/nodeState";
  import layoutState, { type ContainerLayout, type DragItem } from "$lib/stores/layoutState";
  import uiState from "$lib/stores/uiState";
 

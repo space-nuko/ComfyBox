@@ -2,8 +2,6 @@ import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
 import type ComfyApp from "$lib/components/ComfyApp"
 import type { LGraphNode, IWidget, LGraph } from "@litegraph-ts/core"
-import nodeState from "$lib/state/nodeState";
-import type { NodeStateStore } from './nodeState';
  import { dndzone, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 import type { ComfyWidgetNode } from '$lib/nodes';
 
@@ -90,8 +88,8 @@ export interface WidgetLayout extends IDragItem {
 type DragItemID = string;
 
 type LayoutStateOps = {
-    addContainer: (parentId: DragItemID, attrs: Partial<Attributes>, index: number) => ContainerLayout,
-    addWidget: (parentId: DragItemID, node: LGraphNode, widget: IWidget<any, any>, attrs: Partial<Attributes>, index: number) => WidgetLayout,
+    addContainer: (parent: ContainerLayout | null, attrs: Partial<Attributes>, index: number) => ContainerLayout,
+    addWidget: (parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes>, index: number) => WidgetLayout,
     findDefaultContainerForInsertion: () => ContainerLayout | null,
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode) => void,
@@ -100,7 +98,7 @@ type LayoutStateOps = {
     groupItems: (dragItems: IDragItem[]) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
     getCurrentSelection: () => IDragItem[],
-    clear: () => void,
+    clear: (state?: Partial<LayoutState>) => void,
     resetLayout: () => void,
 }
 
@@ -135,7 +133,7 @@ function findDefaultContainerForInsertion(): ContainerLayout | null {
     return null
 }
 
-function addContainer(parentId: DragItemID | null, attrs: Partial<Attributes> = {}, index: number = -1): ContainerLayout {
+function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes> = {}, index: number = -1): ContainerLayout {
     const state = get(store);
     const dragItem: ContainerLayout = {
         type: "container",
@@ -148,15 +146,10 @@ function addContainer(parentId: DragItemID | null, attrs: Partial<Attributes> = 
             ...attrs
         }
     }
-    const parent = parentId ? state.allItems[parentId] : null;
-    const entry: DragItemEntry = { dragItem, children: [], parent: parent?.dragItem };
+    const entry: DragItemEntry = { dragItem, children: [], parent: null };
     state.allItems[dragItem.id] = entry;
     if (parent) {
-        parent.children ||= []
-        if (index)
-            parent.children.splice(index, 0, dragItem)
-        else
-            parent.children.push(dragItem)
+        moveItem(dragItem, parent)
     }
     store.set(state)
     return dragItem;
@@ -178,7 +171,7 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
         }
     }
     const parentEntry = state.allItems[parent.id]
-    const entry: DragItemEntry = { dragItem, children: [], parent: parentEntry.dragItem };
+    const entry: DragItemEntry = { dragItem, children: [], parent: null };
     state.allItems[dragItem.id] = entry;
     moveItem(dragItem, parent)
     return dragItem;
@@ -209,6 +202,7 @@ function nodeAdded(node: LGraphNode) {
     // 2. User adds a node with inputs that can be filled by frontend widgets.
     // Depending on config, this means we should instantiate default UI nodes connected to those inputs.
 
+    console.debug(node)
     if ("svelteComponentType" in node) {
         addWidget(parent, node as ComfyWidgetNode);
     }
@@ -254,21 +248,25 @@ function nodeRemoved(node: LGraphNode) {
 }
 
 function configureFinished(graph: LGraph) {
-    const state = get(store)
     const id = 0;
 
-    state.isConfiguring = false;
+    clear({isConfiguring: false})
 
-    state.root = addContainer(null, { direction: "horizontal", showTitle: false });
-    const left = addContainer(state.root.id, { direction: "vertical", showTitle: false });
-    const right = addContainer(state.root.id, { direction: "vertical", showTitle: false });
+    const root = addContainer(null, { direction: "horizontal", showTitle: false });
+    const left = addContainer(root, { direction: "vertical", showTitle: false });
+    const right = addContainer(root, { direction: "vertical", showTitle: false });
 
-    for (const node of graph._nodes_in_order) {
+    const state = get(store)
+    state.root = root;
+    store.set(state)
+
+    console.debug("[layoutState] configure begin", state, graph)
+
+    for (const node of graph._nodes) {
         nodeAdded(node)
     }
 
     console.debug("[layoutState] configureFinished", state)
-    store.set(state)
 }
 
 function moveItem(target: IDragItem, to: ContainerLayout, index: number = -1) {
@@ -324,7 +322,7 @@ function groupItems(dragItems: IDragItem[]): ContainerLayout {
             index = indexFound
     }
 
-    const container = addContainer(parent.id, { title: "Group" }, index)
+    const container = addContainer(parent as ContainerLayout, { title: "Group" }, index)
 
     for (const item of dragItems) {
         moveItem(item, container)
@@ -364,7 +362,7 @@ function ungroup(container: ContainerLayout) {
     store.set(state)
 }
 
-function clear() {
+function clear(state: Partial<LayoutState> = {}) {
     store.set({
         root: null,
         allItems: {},
@@ -372,8 +370,8 @@ function clear() {
         currentSelection: [],
         isMenuOpen: false,
         isConfiguring: true,
+        ...state
     })
-    addContainer(null, { direction: "horizontal", showTitle: false });
 }
 
 function resetLayout() {

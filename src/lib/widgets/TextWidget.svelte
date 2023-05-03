@@ -1,5 +1,4 @@
 <script lang="ts">
- import type { WidgetUIStateStore } from "$lib/stores/nodeState";
  import { TextBox } from "@gradio/form";
  import type { ComfyComboNode } from "$lib/nodes/index";
  import { type WidgetLayout } from "$lib/stores/layoutState";
@@ -18,7 +17,7 @@
 <div class="wrapper gr-textbox">
     {#if node !== null && nodeValue !== null}
         <TextBox
-            bind:value={$itemValue}
+            bind:value={$nodeValue}
             label={widget.attrs.title}
             lines={node.properties.multiline ? 5 : 1}
             max_lines={node.properties.multiline ? 5 : 1}

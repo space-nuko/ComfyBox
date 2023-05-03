@@ -1,7 +1,5 @@
 <script lang="ts">
- import type { WidgetDrawState, WidgetUIState, WidgetUIStateStore } from "$lib/stores/nodeState";
  import { BlockTitle } from "@gradio/atoms";
- import { Dropdown } from "@gradio/form";
  import Select from 'svelte-select';
  import type { ComfyComboNode } from "$lib/nodes/index";
  import { type WidgetLayout } from "$lib/stores/layoutState";
@@ -9,32 +7,35 @@
  export let widget: WidgetLayout | null = null;
  let node: ComfyComboNode | null = null;
  let nodeValue: Writable<string> | null = null;
- let itemValue: WidgetUIStateStore | null = null;
- let option: any;
+ let option: any
 
- $: if(widget) {
-     node = widget.node as ComfyComboNode
-     nodeValue = node.value;
-     updateOption(); // don't react on option
- };
+ $: widget && setNodeValue(widget);
 
- function updateOption() {
-     option = get(nodeValue);
+ function setNodeValue(widget: WidgetLayout) {
+     if(widget && !node) {
+         node = widget.node as ComfyComboNode
+         nodeValue = node.value;
+         setOption($nodeValue) // don't react on option
+     }
  }
 
- $: if (option && itemValue) {
-     $itemValue = option.value
+ function setOption(value: any) {
+     option = value;
+ }
+
+ $: if (nodeValue && option) {
+     $nodeValue = option.value;
  }
 </script>
 
 <div class="wrapper gr-combo">
-    {#if node !== null && option !== undefined}
+    {#if node !== null && nodeValue !== null}
         <label>
             <BlockTitle show_label={true}>{widget.attrs.title}</BlockTitle>
             <Select
                 bind:value={option}
-                bind:items={node.properties.values}
-                disabled={node.properties.values.length === 0}
+                bind:items={node.properties.options}
+                disabled={node.properties.options.length === 0}
                 clearable={false}
                 on:change
                 on:select

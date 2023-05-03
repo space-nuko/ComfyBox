@@ -1,10 +1,9 @@
 <script lang="ts">
  import queueState from "$lib/stores/queueState";
- import nodeState, { type WidgetUIState } from "$lib/stores/nodeState";
  import uiState from "$lib/stores/uiState";
 
  import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
- import { startDrag, stopDrag, getComponentForWidgetState } from "$lib/utils"
+ import { startDrag, stopDrag } from "$lib/utils"
  import BlockContainer from "./BlockContainer.svelte"
 
  export let dragItem: IDragItem | null = null;
@@ -12,14 +11,12 @@
  export let classes: string[] = [];
  let container: ContainerLayout | null = null;
  let widget: WidgetLayout | null = null;
- let widgetState: WidgetUIState | null = null;
  let showHandles: boolean = false;
 
  $: if (!dragItem || !$layoutState.allItems[dragItem.id]) {
      dragItem = null;
      container = null;
      widget = null;
-     widgetState = null;
  }
  else if (dragItem.type === "container") {
      container = dragItem as ContainerLayout;
@@ -48,7 +45,7 @@
         class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(widget.id)}
         class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.node.id}
         >
-        <svelte:component this={widget.node.svelteComponentType} node={widget.node} />
+        <svelte:component this={widget.node.svelteComponentType} {widget} />
     </div>
     {#if showHandles}
         <div class="handle handle-widget" style="z-index: {zIndex+100}" data-drag-item-id={widget.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>

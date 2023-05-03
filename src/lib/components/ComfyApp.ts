@@ -433,7 +433,7 @@ export default class ComfyApp {
         this.clean();
 
         if (!graphData) {
-            // graphData = structuredClone(defaultGraph.workflow)
+            graphData = structuredClone(defaultGraph.workflow)
         }
 
         // Patch T2IAdapterLoader to ControlNetLoader since they are the same node now

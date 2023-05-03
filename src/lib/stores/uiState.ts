@@ -14,7 +14,8 @@ export type UIState = {
 export type WritableUIStateStore = Writable<UIState>;
 const store: WritableUIStateStore = writable(
     {
-        graphLocked: true,
+        app: null,
+        graphLocked: false,
         nodesLocked: false,
         uiEditMode: "disabled",
     })

@@ -5,7 +5,6 @@
  import { Button } from "@gradio/button";
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
  import { Checkbox } from "@gradio/form"
- import nodeState from "$lib/stores/nodeState";
  import uiState from "$lib/stores/uiState";
  import { ImageViewer } from "$lib/ImageViewer";
  import { download } from "$lib/utils"
@@ -45,11 +44,6 @@
      if (app)
          return
      app = $uiState.app = new ComfyApp();
-
-     app.eventBus.on("nodeAdded", nodeState.nodeAdded);
-     app.eventBus.on("nodeRemoved", nodeState.nodeRemoved);
-     app.eventBus.on("configured", nodeState.configureFinished);
-     app.eventBus.on("cleared", nodeState.clear);
 
      app.eventBus.on("autosave", doAutosave);
      app.eventBus.on("restored", doRestore);
