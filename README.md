@@ -20,7 +20,6 @@ This frontend isn't compatible with regular ComfyUI's workflow format since extr
 ## Requirements
 
 - `pnpm`
-- [Turborepo](https://turbo.build/repo/docs/installing)
 - An installation of vanilla [ComfyUI](https://github.com/comfyanonymous/ComfyUI) for the backend
 
 ## Installation
@@ -32,6 +31,7 @@ git clone https://github.com/space-nuko/ComfyBox --recursive
 ```
 
 2. `pnpm install`
-3. `pnpm dev`
-4. Start ComfyUI as usual with `python main.py --enable-cors-header`
-5. Visit `http://localhost:3000` in your browser
+4. `pnpm build:css`
+5. `pnpm dev`
+6. Start ComfyUI as usual with `python main.py --enable-cors-header`
+7. Visit `http://localhost:3000` in your browser

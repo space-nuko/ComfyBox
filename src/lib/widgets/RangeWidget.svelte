@@ -20,7 +20,9 @@
      }
  };
 
- $: if ($propsChanged && nodeValue !== null) {
+ // I don't know why but this is necessary to watch for changes to node
+ // properties from ComfyWidgetNode.
+ $: if (nodeValue !== null && (!$propsChanged || $propsChanged)) {
      setOption($nodeValue)
      setNodeValue(widget)
      node.properties = node.properties

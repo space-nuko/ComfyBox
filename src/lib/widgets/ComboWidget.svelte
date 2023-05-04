@@ -12,7 +12,7 @@
 
  $: widget && setNodeValue(widget);
 
- $: if ($propsChanged && nodeValue !== null) {
+ $: if (nodeValue !== null && (!$propsChanged || $propsChanged)) {
      setOption($nodeValue)
      setNodeValue(widget)
      node.properties = node.properties

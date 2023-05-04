@@ -6,12 +6,25 @@
  export let widget: WidgetLayout | null = null;
  let node: ComfyComboNode | null = null;
  let nodeValue: Writable<string> | null = null;
+ let propsChanged: Writable<boolean> | null = null;
  let itemValue: WidgetUIStateStore | null = null;
 
- $: if(widget) {
-     node = widget.node as ComfyComboNode
-     nodeValue = node.value;
+ $: widget && setNodeValue(widget);
+
+ function setNodeValue(widget: WidgetLayout) {
+     if (widget) {
+         node = widget.node as ComfySliderNode
+         nodeValue = node.value;
+         propsChanged = node.propsChanged;
+     }
  };
+
+ // I don't know why but this is necessary to watch for changes to node
+ // properties from ComfyWidgetNode.
+ $: if (nodeValue !== null && (!$propsChanged || $propsChanged)) {
+     setNodeValue(widget)
+     node.properties = node.properties
+ }
 </script>
 
 <div class="wrapper gr-textbox">

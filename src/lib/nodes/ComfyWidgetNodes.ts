@@ -1,4 +1,4 @@
-import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot } from "@litegraph-ts/core";
+import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot, type SerializedLGraphNode } from "@litegraph-ts/core";
 import ComfyGraphNode from "./ComfyGraphNode";
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import RangeWidget from "$lib/widgets/RangeWidget.svelte";
@@ -127,13 +127,19 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
             }
         }
 
-        if (changed) {
-            // Force trigger reactivity to update component based on new props
-            this.propsChanged.set(true)
-        }
+        // Force reactivity change so the frontend can be updated with the new props
+        this.propsChanged.set(!get(this.propsChanged))
     }
 
-    clampOneConfig(input: IComfyInputSlot) {}
+    clampOneConfig(input: IComfyInputSlot) { }
+
+    override onSerialize(o: SerializedLGraphNode) {
+        (o as any).comfyValue = get(this.value)
+    }
+
+    override onConfigure(o: SerializedLGraphNode) {
+        this.value.set((o as any).comfyValue)
+    }
 }
 
 export interface ComfySliderProperties extends ComfyWidgetProperties {
