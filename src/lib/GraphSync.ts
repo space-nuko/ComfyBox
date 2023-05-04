@@ -2,6 +2,7 @@ import type { LGraph, LGraphNode } from "@litegraph-ts/core";
 import type ComfyApp from "./components/ComfyApp";
 import type { Unsubscriber, Writable } from "svelte/store";
 import type { ComfyWidgetNode } from "./nodes";
+import type ComfyGraph from "./ComfyGraph";
 
 type WidgetSubStore = {
     store: WidgetUIStateStore,
@@ -28,13 +29,11 @@ export default class GraphSync {
     // nodeId -> widgetSubStore
     private stores: Record<string, WidgetSubStore> = {}
 
-    constructor(app: ComfyApp) {
-        this.graph = app.lGraph;
-        app.eventBus.on("nodeAdded", this.onNodeAdded.bind(this));
-        app.eventBus.on("nodeRemoved", this.onNodeRemoved.bind(this));
+    constructor(graph: ComfyGraph) {
+        this.graph = graph;
     }
 
-    private onNodeAdded(node: LGraphNode) {
+    onNodeAdded(node: LGraphNode) {
         // TODO assumes only a single graph's widget state.
 
         if ("svelteComponentType" in node) {
@@ -44,7 +43,7 @@ export default class GraphSync {
         this.graph.setDirtyCanvas(true, true);
     }
 
-    private onNodeRemoved(node: LGraphNode) {
+    onNodeRemoved(node: LGraphNode) {
         if ("svelteComponentType" in node) {
             this.removeStore(node as ComfyWidgetNode);
         }

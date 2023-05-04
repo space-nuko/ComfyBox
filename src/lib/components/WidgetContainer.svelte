@@ -32,7 +32,7 @@
                && !$layoutState.isMenuOpen
 
 
- $: if ($queueState && widget) {
+ $: if ($queueState && widget && widget.node) {
      dragItem.isNodeExecuting = $queueState.runningNodeId === widget.node.id;
  }
 </script>
@@ -40,7 +40,7 @@
 
 {#if container}
     <BlockContainer {container} {classes} {zIndex} {showHandles} />
-{:else if widget}
+{:else if widget && widget.node}
     <div class="widget" class:widget-edit-outline={$uiState.uiEditMode === "widgets" && zIndex > 1}
         class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(widget.id)}
         class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.node.id}

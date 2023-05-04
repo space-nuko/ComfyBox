@@ -13,13 +13,13 @@ import * as nodes from "$lib/nodes/index"
 import ComfyGraphCanvas, { type SerializedGraphCanvasState } from "$lib/ComfyGraphCanvas";
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import * as widgets from "$lib/widgets/index"
-import type ComfyWidget from "$lib/widgets/ComfyWidget";
 import queueState from "$lib/stores/queueState";
-import GraphSync from "$lib/GraphSync";
 import type { SvelteComponentDev } from "svelte/internal";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import type { SerializedLayoutState } from "$lib/stores/layoutState";
 import layoutState from "$lib/stores/layoutState";
+import { toast } from '@zerodevx/svelte-toast'
+import ComfyGraph from "$lib/ComfyGraph";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -40,17 +40,6 @@ export type SerializedAppState = {
     canvas: SerializedGraphCanvasState
 }
 
-type ComfyAppEvents = {
-    configured: (graph: LGraph) => void
-    nodeAdded: (node: LGraphNode) => void
-    nodeRemoved: (node: LGraphNode) => void
-    nodeConnectionChanged: (kind: LConnectionKind, node: LGraphNode, slot: INodeSlot, targetNode: LGraphNode, targetSlot: INodeSlot) => void
-    cleared: () => void
-    beforeChange: (graph: LGraph, param: any) => void
-    afterChange: (graph: LGraph, param: any) => void
-    restored: (workflow: SerializedAppState) => void
-}
-
 export type Progress = {
     value: number,
     max: number
@@ -61,12 +50,10 @@ export default class ComfyApp {
     rootEl: HTMLDivElement | null = null;
     canvasEl: HTMLCanvasElement | null = null;
     canvasCtx: CanvasRenderingContext2D | null = null;
-    lGraph: LGraph | null = null;
+    lGraph: ComfyGraph | null = null;
     lCanvas: ComfyGraphCanvas | null = null;
     dropZone: HTMLElement | null = null;
     nodeOutputs: Record<string, any> = {};
-    eventBus: TypedEmitter<ComfyAppEvents> = new EventEmitter() as TypedEmitter<ComfyAppEvents>;
-    graphSync: GraphSync;
 
     dragOverNode: LGraphNode | null = null;
     shiftDown: boolean = false;
@@ -82,12 +69,9 @@ export default class ComfyApp {
     async setup(): Promise<void> {
         this.rootEl = document.getElementById("main") as HTMLDivElement;
         this.canvasEl = document.getElementById("graph-canvas") as HTMLCanvasElement;
-        this.lGraph = new LGraph();
+        this.lGraph = new ComfyGraph();
         this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl);
         this.canvasCtx = this.canvasEl.getContext("2d");
-        this.graphSync = new GraphSync(this);
-
-        this.addGraphLifecycleHooks();
 
         LiteGraph.release_link_on_empty_shows_menu = true;
         LiteGraph.alt_drag_do_clone_nodes = true;
@@ -118,7 +102,7 @@ export default class ComfyApp {
         }
 
         // Save current workflow automatically
-        setInterval(this.saveStateToLocalStorage.bind(this), 1000);
+        // setInterval(this.saveStateToLocalStorage.bind(this), 1000);
 
         this.addApiUpdateHandlers();
         this.addDropHandler();
@@ -147,56 +131,10 @@ export default class ComfyApp {
         this.lCanvas.draw(true, true);
     }
 
-    private graphOnConfigure() {
-        console.debug("Configured");
-        this.eventBus.emit("configured", this.lGraph);
-    }
-
-    private graphOnBeforeChange(graph: LGraph, info: any) {
-        console.debug("BeforeChange", info);
-        this.eventBus.emit("beforeChange", graph, info);
-    }
-
-    private graphOnAfterChange(graph: LGraph, info: any) {
-        console.debug("AfterChange", info);
-        this.eventBus.emit("afterChange", graph, info);
-    }
-
-    private graphOnNodeAdded(node: LGraphNode) {
-        console.debug("Added", node);
-        this.eventBus.emit("nodeAdded", node);
-    }
-
-    private graphOnNodeRemoved(node: LGraphNode) {
-        console.debug("Removed", node);
-        this.eventBus.emit("nodeRemoved", node);
-    }
-
-    private graphOnNodeConnectionChange(kind: LConnectionKind, node: LGraphNode, slot: INodeSlot, targetNode: LGraphNode, targetSlot: INodeSlot) {
-        console.debug("ConnectionChange", node);
-        this.eventBus.emit("nodeConnectionChanged", kind, node, slot, targetNode, targetSlot);
-    }
-
-    private canvasOnClear() {
-        console.debug("CanvasClear");
-        this.eventBus.emit("cleared");
-    }
-
     saveStateToLocalStorage() {
         const savedWorkflow = this.serialize();
         const json = JSON.stringify(savedWorkflow);
         localStorage.setItem("workflow", json)
-    }
-
-    private addGraphLifecycleHooks() {
-        this.lGraph.onConfigure = this.graphOnConfigure.bind(this);
-        this.lGraph.onBeforeChange = this.graphOnBeforeChange.bind(this);
-        this.lGraph.onAfterChange = this.graphOnAfterChange.bind(this);
-        this.lGraph.onNodeAdded = this.graphOnNodeAdded.bind(this);
-        this.lGraph.onNodeRemoved = this.graphOnNodeRemoved.bind(this);
-        this.lGraph.onNodeConnectionChange = this.graphOnNodeConnectionChange.bind(this);
-
-        this.lCanvas.onClear = this.canvasOnClear.bind(this);
     }
 
     static node_type_overrides: Record<string, typeof ComfyGraphNode> = {}
@@ -642,7 +580,13 @@ export default class ComfyApp {
                         await this.api.queuePrompt(num, p);
                     } catch (error) {
                         // this.ui.dialog.show(error.response || error.toString());
-                        console.error(error.response || error.toString())
+                        const mes = error.response || error.toString()
+                        toast.push(`Error queuing prompt:\n${mes}`, {
+                            theme: {
+                                '--toastBackground': 'var(--color-red-500)',
+                            }
+                        })
+                        console.error("Error queuing prompt", mes, num, p)
                         break;
                     }
 

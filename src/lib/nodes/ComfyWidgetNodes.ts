@@ -29,8 +29,6 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
 
     /** Svelte class for the frontend logic */
     abstract svelteComponentType: typeof SvelteComponentDev
-    /** Compatible litegraph widget types that can be connected to this node */
-    abstract inputWidgetTypes: string[]
 
     /** If false, user manually set min/max/step, and should not be autoinherited from connected input */
     autoConfig: boolean = true;
@@ -159,7 +157,6 @@ export class ComfySliderNode extends ComfyWidgetNode<number> {
     }
 
     override svelteComponentType = RangeWidget
-    override inputWidgetTypes = ["number", "slider"]
 
     static slotLayout: SlotLayout = {
         outputs: [
@@ -203,7 +200,6 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
     }
 
     override svelteComponentType = ComboWidget
-    override inputWidgetTypes = ["combo", "enum"]
 
     constructor(name?: string) {
         super(name, "A")
@@ -269,7 +265,6 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
     }
 
     override svelteComponentType = TextWidget
-    override inputWidgetTypes = ["text"]
 
     constructor(name?: string) {
         super(name, "")

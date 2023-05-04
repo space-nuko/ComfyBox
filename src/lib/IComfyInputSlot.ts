@@ -1,4 +1,5 @@
 import type { INodeInputSlot } from "@litegraph-ts/core";
+import type { ComfyWidgetNode } from "./nodes";
 
 // TODO generalize
 export type ComfyInputConfig = {
@@ -12,6 +13,7 @@ export type ComfyInputConfig = {
 }
 
 export default interface IComfyInputSlot extends INodeInputSlot {
-    serialize: boolean
-    config: ComfyInputConfig // stores range min/max/step, etc.
+    serialize: boolean,
+    defaultWidgetNode?: new (name?: string) => ComfyWidgetNode,
+    config: ComfyInputConfig, // stores range min/max/step, etc.
 }

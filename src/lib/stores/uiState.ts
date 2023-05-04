@@ -8,6 +8,7 @@ export type UIState = {
     app: ComfyApp,
     nodesLocked: boolean,
     graphLocked: boolean,
+    autoAddUI: boolean,
     uiEditMode: UIEditMode
 }
 
@@ -17,6 +18,7 @@ const store: WritableUIStateStore = writable(
         app: null,
         graphLocked: false,
         nodesLocked: false,
+        autoAddUI: true,
         uiEditMode: "disabled",
     })
 

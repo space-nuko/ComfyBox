@@ -14,6 +14,7 @@ type DragItemEntry = {
 export type LayoutState = {
     root: IDragItem | null,
     allItems: Record<DragItemID, DragItemEntry>,
+    allItemsByNode: Record<number, DragItemEntry>,
     currentId: number,
     currentSelection: DragItemID[],
     isConfiguring: boolean,
@@ -94,7 +95,7 @@ type LayoutStateOps = {
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode) => void,
     nodeRemoved: (node: LGraphNode) => void,
-    groupItems: (dragItems: IDragItem[]) => ContainerLayout,
+    groupItems: (dragItems: IDragItem[], title: string) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
     getCurrentSelection: () => IDragItem[],
     findLayoutForNode: (nodeId: number) => IDragItem | null;
@@ -108,6 +109,7 @@ export type WritableLayoutStateStore = Writable<LayoutState> & LayoutStateOps;
 const store: Writable<LayoutState> = writable({
     root: null,
     allItems: {},
+    allItemsByNode: {},
     currentId: 0,
     currentSelection: [],
     isMenuOpen: false,
@@ -175,6 +177,7 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
     const parentEntry = state.allItems[parent.id]
     const entry: DragItemEntry = { dragItem, children: [], parent: null };
     state.allItems[dragItem.id] = entry;
+    state.allItemsByNode[node.id] = entry;
     console.debug("[layoutState] addWidget", state)
     moveItem(dragItem, parent)
     return dragItem;
@@ -229,6 +232,10 @@ function removeEntry(state: LayoutState, id: DragItemID) {
     if (parent) {
         const parentEntry = state.allItems[parent.id];
         parentEntry.children = parentEntry.children.filter(item => item.id !== id)
+    }
+    if (entry.dragItem.type === "widget") {
+        const widget = entry.dragItem as WidgetLayout;
+        delete state.allItemsByNode[widget.node.id]
     }
     delete state.allItems[id]
 }
@@ -286,7 +293,7 @@ function getCurrentSelection(): IDragItem[] {
     return state.currentSelection.map(id => state.allItems[id].dragItem)
 }
 
-function groupItems(dragItems: IDragItem[]): ContainerLayout {
+function groupItems(dragItems: IDragItem[], title: string = "Group"): ContainerLayout {
     if (dragItems.length === 0)
         return;
 
@@ -303,7 +310,7 @@ function groupItems(dragItems: IDragItem[]): ContainerLayout {
             index = indexFound
     }
 
-    const container = addContainer(parent as ContainerLayout, { title: "Group" }, index)
+    const container = addContainer(parent as ContainerLayout, { title }, index)
 
     for (const item of dragItems) {
         moveItem(item, container)
@@ -420,21 +427,28 @@ function serialize(): SerializedLayoutState {
 
 function deserialize(data: SerializedLayoutState, graph: LGraph) {
     const allItems: Record<DragItemID, DragItemEntry> = {}
+    const allItemsByNode: Record<number, DragItemEntry> = {}
     for (const pair of Object.entries(data.allItems)) {
         const [id, entry] = pair;
+
         const dragItem: IDragItem = {
             type: entry.dragItem.type,
             id: entry.dragItem.id,
             attrs: entry.dragItem.attrs
         };
-        if (dragItem.type === "widget") {
-            const widget = dragItem as WidgetLayout;
-            widget.node = graph.getNodeById(entry.dragItem.nodeId) as ComfyWidgetNode
-        }
-        allItems[id] = {
+
+        const dragEntry: DragItemEntry = {
             dragItem,
             children: [],
             parent: null
+        }
+
+        allItems[id] = dragEntry
+
+        if (dragItem.type === "widget") {
+            const widget = dragItem as WidgetLayout;
+            widget.node = graph.getNodeById(entry.dragItem.nodeId) as ComfyWidgetNode
+            allItemsByNode[entry.dragItem.nodeId] = dragEntry
         }
     }
 
@@ -457,6 +471,7 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
     const state: LayoutState = {
         root,
         allItems,
+        allItemsByNode,
         currentId: data.currentId,
         currentSelection: [],
         isMenuOpen: false,

@@ -107,9 +107,6 @@
          })
      }
 
-     app.eventBus.on("nodeAdded", layoutState.nodeAdded);
-     app.eventBus.on("nodeRemoved", layoutState.nodeRemoved);
-
      app.api.addEventListener("status", (ev: CustomEvent) => {
          queueState.statusUpdated(ev.detail as ComfyAPIStatus);
      });
@@ -176,6 +173,7 @@
         </Button>
         <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
         <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/>
+        <Checkbox label="Auto-Add UI" bind:value={$uiState.autoAddUI}/>
         <label for="enable-ui-editing">Enable UI Editing</label>
         <select id="enable-ui-editing" name="enable-ui-editing" bind:value={$uiState.uiEditMode}>
             <option value="disabled">Disabled</option>
