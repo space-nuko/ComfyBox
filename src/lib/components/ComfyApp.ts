@@ -91,7 +91,6 @@ export default class ComfyApp {
 
         LiteGraph.release_link_on_empty_shows_menu = true;
         LiteGraph.alt_drag_do_clone_nodes = true;
-        LiteGraph.ignore_all_widget_events = true;
 
         this.lGraph.start();
 

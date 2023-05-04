@@ -6,6 +6,10 @@ import { get } from "svelte/store"
 import layoutState from "$lib/stores/layoutState"
 import type { SvelteComponentDev } from "svelte/internal";
 
+export function clamp(n: number, min: number, max: number): number {
+    return Math.min(Math.max(n, min), max)
+}
+
 export function download(filename: string, text: string, type: string = "text/plain") {
     const blob = new Blob([text], { type: type });
     const url = URL.createObjectURL(blob);

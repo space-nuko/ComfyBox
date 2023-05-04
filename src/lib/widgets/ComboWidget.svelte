@@ -7,14 +7,22 @@
  export let widget: WidgetLayout | null = null;
  let node: ComfyComboNode | null = null;
  let nodeValue: Writable<string> | null = null;
+ let propsChanged: Writable<boolean> | null = null;
  let option: any
 
  $: widget && setNodeValue(widget);
 
+ $: if ($propsChanged && nodeValue !== null) {
+     setOption($nodeValue)
+     setNodeValue(widget)
+     node.properties = node.properties
+ }
+
  function setNodeValue(widget: WidgetLayout) {
-     if(widget && !node) {
+     if(widget) {
          node = widget.node as ComfyComboNode
          nodeValue = node.value;
+         propsChanged = node.propsChanged;
          setOption($nodeValue) // don't react on option
      }
  }
@@ -23,7 +31,7 @@
      option = value;
  }
 
- $: if (nodeValue && option) {
+ $: if (nodeValue && option && option.value) {
      $nodeValue = option.value;
  }
 </script>
@@ -34,8 +42,8 @@
             <BlockTitle show_label={true}>{widget.attrs.title}</BlockTitle>
             <Select
                 bind:value={option}
-                bind:items={node.properties.options}
-                disabled={node.properties.options.length === 0}
+                bind:items={node.properties.values}
+                disabled={node.properties.values.length === 0}
                 clearable={false}
                 on:change
                 on:select

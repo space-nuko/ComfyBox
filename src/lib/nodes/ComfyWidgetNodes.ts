@@ -1,4 +1,4 @@
-import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget } from "@litegraph-ts/core";
+import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot } from "@litegraph-ts/core";
 import ComfyGraphNode from "./ComfyGraphNode";
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import RangeWidget from "$lib/widgets/RangeWidget.svelte";
@@ -7,9 +7,12 @@ import type { SvelteComponentDev } from "svelte/internal";
 import { ComfyWidgets } from "$lib/widgets";
 import { Watch } from "@litegraph-ts/nodes-basic";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
-import { writable, type Unsubscriber, type Writable } from "svelte/store";
+import { writable, type Unsubscriber, type Writable, get } from "svelte/store";
+import { clamp } from "$lib/utils"
+import layoutState from "$lib/stores/layoutState";
 
 export interface ComfyWidgetProperties extends Record<string, any> {
+    defaultValue: any
 }
 
 /*
@@ -21,6 +24,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     abstract properties: ComfyWidgetProperties;
 
     value: Writable<T>
+    propsChanged: Writable<boolean> = writable(true) // dummy to indicate if props changed
     unsubscribe: Unsubscriber;
 
     /** Svelte class for the frontend logic */
@@ -38,7 +42,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
 
     override size: Vector2 = [60, 40];
 
-    constructor(name?: string, value: T) {
+    constructor(name: string, value: T) {
         const color = LGraphCanvas.node_colors["blue"]
         super(name)
         this.value = writable(value)
@@ -49,10 +53,12 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
             "Value",
             ""
         );
+        this.displayWidget.disabled = true; // prevent editing
         this.unsubscribe = this.value.subscribe(this.onValueUpdated.bind(this))
     }
 
     private onValueUpdated(value: any) {
+        console.debug("[Widget] valueUpdated", this, value)
         this.displayWidget.value = Watch.toString(value)
     }
 
@@ -82,20 +88,48 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
                 for (const key in comfyInput.config)
                     this.setProperty(key, comfyInput.config[key])
             }
+            if ("defaultValue" in this.properties)
+                this.setValue(this.properties.defaultValue)
+
+            const widget = layoutState.findLayoutForNode(this.id)
+            if (widget) {
+                widget.attrs.title = input.name;
+            }
+
             console.debug("Property copy", input, this.properties)
         }
 
         return true;
     }
 
+    onConnectionsChange(
+        type: LConnectionKind,
+        slotIndex: number,
+        isConnected: boolean,
+        link: LLink,
+        ioSlot: (INodeOutputSlot | INodeInputSlot)
+    ): void {
+        this.clampConfig();
+    }
+
     clampConfig() {
+        let changed = false;
         for (const link of this.getOutputLinks(0)) {
-            const node = this.graph._nodes_by_id[link.target_id]
-            if (node) {
-                const input = node.inputs[link.target_slot]
-                if (input && "config" in input)
-                    this.clampOneConfig(input as IComfyInputSlot)
+            if (link) { // can be undefined if the link is removed
+                const node = this.graph._nodes_by_id[link.target_id]
+                if (node) {
+                    const input = node.inputs[link.target_slot]
+                    if (input && "config" in input) {
+                        this.clampOneConfig(input as IComfyInputSlot)
+                        changed = true;
+                    }
+                }
             }
+        }
+
+        if (changed) {
+            // Force trigger reactivity to update component based on new props
+            this.propsChanged.set(true)
         }
     }
 
@@ -111,6 +145,7 @@ export interface ComfySliderProperties extends ComfyWidgetProperties {
 
 export class ComfySliderNode extends ComfyWidgetNode<number> {
     override properties: ComfySliderProperties = {
+        defaultValue: 0,
         min: 0,
         max: 10,
         step: 1,
@@ -131,10 +166,10 @@ export class ComfySliderNode extends ComfyWidgetNode<number> {
     }
 
     override clampOneConfig(input: IComfyInputSlot) {
-        this.setProperty("min", Math.max(this.properties.min, input.config.min))
-        this.setProperty("max", Math.max(this.properties.max, input.config.max))
-        this.setProperty("step", Math.max(this.properties.step, input.config.step))
-        this.setValue(Math.max(Math.min(this.properties.value, this.properties.max), this.properties.min))
+        // this.setProperty("min", clamp(this.properties.min, input.config.min, input.config.max))
+        // this.setProperty("max", clamp(this.properties.max, input.config.max, input.config.min))
+        // this.setProperty("step", Math.min(this.properties.step, input.config.step))
+        this.setValue(clamp(this.properties.defaultValue, this.properties.min, this.properties.max))
     }
 }
 
@@ -146,12 +181,13 @@ LiteGraph.registerNodeType({
 })
 
 export interface ComfyComboProperties extends ComfyWidgetProperties {
-    options: string[]
+    values: string[]
 }
 
 export class ComfyComboNode extends ComfyWidgetNode<string> {
     override properties: ComfyComboProperties = {
-        options: ["A", "B", "C", "D"]
+        defaultValue: "A",
+        values: ["A", "B", "C", "D"]
     }
 
     static slotLayout: SlotLayout = {
@@ -178,21 +214,23 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
             return false;
 
         const thisProps = this.properties;
-        const otherProps = inputNode.properties;
+        if (!("config" in input))
+            return true;
+
+        const comfyInput = input as IComfyInputSlot;
+        const otherProps = comfyInput.config;
 
         // Ensure combo options match
-        if (!(otherProps.options instanceof Array))
+        if (!(otherProps.values instanceof Array))
             return false;
-        if (otherProps.options.length !== thisProps.options.length)
-            return false;
-        if (otherProps.find((v, i) => thisProps[i] !== v))
+        if (thisProps.values.find((v, i) => otherProps.values.indexOf(v) === -1))
             return false;
 
         return true;
     }
 
     override clampOneConfig(input: IComfyInputSlot) {
-        if (!(this.properties.value in input.config.values)) {
+        if (input.config.values.indexOf(this.properties.value) === -1) {
             if (input.config.values.length === 0)
                 this.setValue("")
             else
@@ -214,6 +252,7 @@ export interface ComfyTextProperties extends ComfyWidgetProperties {
 
 export class ComfyTextNode extends ComfyWidgetNode<string> {
     override properties: ComfyTextProperties = {
+        defaultValue: "",
         multiline: false
     }
 

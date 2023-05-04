@@ -98,6 +98,7 @@ type LayoutStateOps = {
     groupItems: (dragItems: IDragItem[]) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
     getCurrentSelection: () => IDragItem[],
+    findLayoutForNode: (nodeId: number) => IDragItem | null;
     clear: (state?: Partial<LayoutState>) => void,
     resetLayout: () => void,
 }
@@ -362,6 +363,16 @@ function ungroup(container: ContainerLayout) {
     store.set(state)
 }
 
+function findLayoutForNode(nodeId: number): WidgetLayout | null {
+    const state = get(store)
+    const found = Object.entries(state.allItems).find(pair =>
+        pair[1].dragItem.type === "widget"
+        && (pair[1].dragItem as WidgetLayout).node.id === nodeId)
+    if (found)
+        return found[1].dragItem as WidgetLayout
+    return null;
+}
+
 function clear(state: Partial<LayoutState> = {}) {
     store.set({
         root: null,
@@ -390,6 +401,7 @@ const layoutStateStore: WritableLayoutStateStore =
     configureFinished,
     getCurrentSelection,
     groupItems,
+    findLayoutForNode,
     ungroup,
     clear,
     resetLayout

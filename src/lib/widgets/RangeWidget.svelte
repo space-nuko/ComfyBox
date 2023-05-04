@@ -6,16 +6,28 @@
  export let widget: WidgetLayout | null = null;
  let node: ComfySliderNode | null = null;
  let nodeValue: Writable<number> | null = null;
+ let propsChanged: Writable<boolean> | null = null;
  let option: number | null = null;
 
- $: if(widget) {
-     node = widget.node
-     nodeValue = node.value;
-     updateOption(); // don't react on option
+ $: widget && setNodeValue(widget);
+
+ function setNodeValue(widget: WidgetLayout) {
+     if (widget) {
+         node = widget.node as ComfySliderNode
+         nodeValue = node.value;
+         propsChanged = node.propsChanged;
+         setOption($nodeValue); // don't react on option
+     }
  };
 
- function updateOption() {
-     option = get(nodeValue);
+ $: if ($propsChanged && nodeValue !== null) {
+     setOption($nodeValue)
+     setNodeValue(widget)
+     node.properties = node.properties
+ }
+
+ function setOption(value: any) {
+     option = value;
  }
 
  function onRelease(e: Event) {
