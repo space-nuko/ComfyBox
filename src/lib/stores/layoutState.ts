@@ -100,7 +100,8 @@ type LayoutStateOps = {
     getCurrentSelection: () => IDragItem[],
     findLayoutForNode: (nodeId: number) => IDragItem | null;
     clear: (state?: Partial<LayoutState>) => void,
-    serialize(): SerializedLayoutState,
+    serialize: () => SerializedLayoutState,
+    deserialize: (data: SerializedLayoutState, graph: LGraph) => void,
     resetLayout: () => void,
 }
 
@@ -434,9 +435,52 @@ function serialize(): SerializedLayoutState {
     }
 }
 
-// function deserialize(data: any): LayoutState {
+function deserialize(data: SerializedLayoutState, graph: LGraph) {
+    clear();
 
-// }
+    const allItems: Record<DragItemID, DragItemEntry> = {}
+    for (const pair of Object.entries(data.allItems)) {
+        const [id, entry] = pair;
+        const dragItem: IDragItem = {
+            type: entry.dragItem.type,
+            id: entry.dragItem.id,
+            attrs: entry.dragItem.attrs
+        };
+        if (dragItem.type === "widget") {
+            const widget = dragItem as WidgetLayout;
+            widget.node = graph.getNodeById(entry.dragItem.nodeId) as ComfyWidgetNode
+        }
+        allItems[id] = {
+            dragItem,
+            children: [],
+            parent: null
+        }
+    }
+
+    // reconnect parent/child tree
+    for (const pair of Object.entries(data.allItems)) {
+        const [id, entry] = pair;
+
+        for (const childId of entry.children) {
+            allItems[id].children.push(allItems[childId].dragItem)
+        }
+        if (entry.parent) {
+            allItems[id].parent = allItems[entry.parent].dragItem;
+        }
+    }
+
+    let root = null;
+    if (data.root)
+        root = allItems[data.root]
+
+    const state = get(store)
+    store.set({
+        ...state,
+        root,
+        allItems,
+        currentId: data.currentId,
+    })
+}
 
 const layoutStateStore: WritableLayoutStateStore =
 {
@@ -455,6 +499,6 @@ const layoutStateStore: WritableLayoutStateStore =
     clear,
     resetLayout,
     serialize,
-    // deserialize
+    deserialize
 }
 export default layoutStateStore;

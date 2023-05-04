@@ -18,21 +18,8 @@
 
  let serializedPaneOrder = {};
 
- function serializeAppState(): SerializedAppState {
-     const graph = app.lGraph;
-
-     const serializedGraph = graph.serialize()
-
-     return {
-         createdBy: "ComfyBox",
-         version: 1,
-         workflow: serializedGraph,
-         panes: serializedPaneOrder
-     }
- }
-
  function doAutosave(graph: LGraph): void {
-     const savedWorkflow = serializeAppState();
+     const savedWorkflow = app.serialize();
      localStorage.setItem("workflow", JSON.stringify(savedWorkflow))
  }
 

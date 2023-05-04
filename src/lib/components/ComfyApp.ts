@@ -18,6 +18,8 @@ import queueState from "$lib/stores/queueState";
 import GraphSync from "$lib/GraphSync";
 import type { SvelteComponentDev } from "svelte/internal";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
+import type { SerializedLayoutState } from "$lib/stores/layoutState";
+import layoutState from "$lib/stores/layoutState";
 
 LiteGraph.catch_exceptions = false;
 
@@ -28,15 +30,11 @@ if (typeof window !== "undefined") {
 
 type QueueItem = { num: number, batchCount: number }
 
-export type SerializedPanes = {
-    panels: { nodeId: number }[][]
-}
-
 export type SerializedAppState = {
     createdBy: "ComfyBox",
     version: number,
-    panes: SerializedPanes,
-    workflow: SerializedLGraph
+    workflow: SerializedLGraph,
+    layout: SerializedLayoutState
 }
 
 type ComfyAppEvents = {
@@ -305,6 +303,20 @@ export default class ComfyApp {
         }
 
         // await this.#invokeExtensionsAsync("registerCustomNodes");
+    }
+
+    serialize(): SerializedAppState {
+        const graph = this.lGraph;
+
+        const serializedGraph = graph.serialize()
+        const serializedLayout = layoutState.serialize()
+
+        return {
+            createdBy: "ComfyBox",
+            version: 1,
+            workflow: serializedGraph,
+            layout: serializedLayout
+        }
     }
 
     private showDropZone() {

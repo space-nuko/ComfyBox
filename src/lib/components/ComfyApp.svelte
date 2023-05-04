@@ -10,12 +10,11 @@
  import layoutState from "$lib/stores/layoutState";
  import { ImageViewer } from "$lib/ImageViewer";
  import { download } from "$lib/utils"
-
- import { LGraph, LGraphNode } from "@litegraph-ts/core";
- import LightboxModal from "./LightboxModal.svelte";
- import { Block } from "@gradio/atoms";
- import ComfyQueue from "./ComfyQueue.svelte";
  import type { ComfyAPIStatus } from "$lib/api";
+
+ import { LGraph } from "@litegraph-ts/core";
+ import LightboxModal from "./LightboxModal.svelte";
+ import ComfyQueue from "./ComfyQueue.svelte";
  import queueState from "$lib/stores/queueState";
 
  let app: ComfyApp = undefined;
@@ -66,29 +65,13 @@
      }
  }
 
- let graphResizeTimer: typeof Timer = -1;
-
- function serializeAppState(): SerializedAppState {
-     const graph = app.lGraph;
-
-     const serializedGraph = graph.serialize()
-     const serializedPaneOrder = uiPane.serialize()
-
-     return {
-         createdBy: "ComfyBox",
-         version: 1,
-         workflow: serializedGraph,
-         panes: serializedPaneOrder
-     }
- }
-
  function doAutosave(graph: LGraph): void {
-     const savedWorkflow = serializeAppState();
+     const savedWorkflow = app.serialize();
      localStorage.setItem("workflow", JSON.stringify(savedWorkflow))
  }
 
- function doRestore(workflow: SerializedAppState) {
-     uiPane.restore(workflow.panes);
+ function doRestore(data: SerializedAppState) {
+     layoutState.deserialize(data.layout, app.lGraph);
  }
 
  function doSave(): void {
@@ -98,7 +81,7 @@
      const date = new Date();
      const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
 
-     download(`workflow-${formattedDate}.json`, JSON.stringify(serializeAppState()), "application/json")
+     download(`workflow-${formattedDate}.json`, JSON.stringify(app.serialize()), "application/json")
  }
 
  onMount(async () => {
