@@ -43,6 +43,19 @@ export type SerializedAppState = {
     canvas: SerializedGraphCanvasState
 }
 
+/** [link origin, link index] | value */
+export type SerializedPromptInput = [string, number] | any
+
+export type SerializedPromptInputs = {
+    inputs: Record<string, SerializedPromptInput>,
+    class_type: string
+}
+
+export type SerializedPrompt = {
+    workflow: SerializedLGraph,
+    output: Record<string, SerializedPromptInputs>
+}
+
 export type Progress = {
     value: number,
     max: number
@@ -402,7 +415,7 @@ export default class ComfyApp {
      * Converts the current graph workflow for sending to the API
      * @returns The workflow and node links
      */
-    async graphToPrompt() {
+    async graphToPrompt(): Promise<SerializedPrompt> {
         // Run frontend-only logic
         this.lGraph.runStep(1)
 
@@ -410,13 +423,15 @@ export default class ComfyApp {
 
         const output = {};
         // Process nodes in order of execution
-        for (const node of this.lGraph.computeExecutionOrder<ComfyGraphNode>(false, null)) {
-            const n = workflow.nodes.find((n) => n.id === node.id);
+        for (const node_ of this.lGraph.computeExecutionOrder<ComfyGraphNode>(false, null)) {
+            const n = workflow.nodes.find((n) => n.id === node_.id);
 
-            if (!node.isBackendNode) {
-                console.debug("Not serializing node: ", node.type)
+            if (!node_.isBackendNode) {
+                console.debug("Not serializing node: ", node_.type)
                 continue;
             }
+
+            const node = node_ as ComfyBackendNode;
 
             if (node.mode === NodeMode.NEVER) {
                 // Don't serialize muted nodes
@@ -444,10 +459,8 @@ export default class ComfyApp {
                     if ("config" in inp)
                         serialize = (inp as IComfyInputSlot).serialize
 
-                    let isBackendNode = false;
+                    let isBackendNode = node.isBackendNode;
                     let isInputBackendNode = false;
-                    if ("isBackendNode" in node)
-                        isBackendNode = (node as ComfyGraphNode).isBackendNode;
                     if ("isBackendNode" in inputNode)
                         isInputBackendNode = (inputNode as ComfyGraphNode).isBackendNode;
 
@@ -544,7 +557,7 @@ export default class ComfyApp {
                     for (const n of p.workflow.nodes) {
                         const node = this.lGraph.getNodeById(n.id);
                         if ("afterQueued" in node) {
-                            (node as ComfyGraphNode).afterQueued();
+                            (node as ComfyGraphNode).afterQueued(p);
                         }
                     }
 

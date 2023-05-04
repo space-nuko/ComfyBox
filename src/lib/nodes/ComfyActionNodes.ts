@@ -1,6 +1,46 @@
 import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, BuiltInSlotType, type ITextWidget } from "@litegraph-ts/core";
 import ComfyGraphNode from "./ComfyGraphNode";
 import { Watch } from "@litegraph-ts/nodes-basic";
+import type { SerializedPrompt } from "$lib/components/ComfyApp";
+
+export interface ComfyAfterQueuedAction extends Record<any, any> {
+    prompt: SerializedPrompt
+}
+
+export class ComfyAfterQueuedAction extends ComfyGraphNode {
+    override properties: ComfyCopyActionProperties = {
+        prompt: null
+    }
+
+    static slotLayout: SlotLayout = {
+        outputs: [
+            { name: "afterQueued", type: BuiltInSlotType.EVENT },
+            { name: "prompt", type: "*" }
+        ],
+    }
+
+    override onPropertyChanged(property: string, value: any, prevValue?: any) {
+        if (property === "value") {
+            this.setOutputData(0, this.properties.prompt)
+        }
+    }
+
+    override onExecute() {
+        this.setOutputData(0, this.properties.prompt)
+    }
+
+    override afterQueued(p: SerializedPrompt) {
+        this.setProperty("value", p)
+        this.triggerSlot(0, "bang")
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyAfterQueuedAction,
+    title: "Comfy.AfterQueuedAction",
+    desc: "Triggers a 'bang' event when a prompt is queued.",
+    type: "actions/after_queued"
+})
 
 export interface ComfyCopyActionProperties extends Record<any, any> {
     value: any
