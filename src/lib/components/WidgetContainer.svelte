@@ -32,8 +32,8 @@
                && !$layoutState.isMenuOpen
 
 
- $: if ($queueState && dragItem) {
-     dragItem.isNodeExecuting = $queueState.runningNodeId === dragItem.nodeId;
+ $: if ($queueState && widget) {
+     dragItem.isNodeExecuting = $queueState.runningNodeId === widget.node.id;
  }
 </script>
 

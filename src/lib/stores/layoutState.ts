@@ -2,7 +2,7 @@ import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
 import type ComfyApp from "$lib/components/ComfyApp"
 import type { LGraphNode, IWidget, LGraph } from "@litegraph-ts/core"
- import { dndzone, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
+import { dndzone, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 import type { ComfyWidgetNode } from '$lib/nodes';
 
 type DragItemEntry = {
@@ -100,6 +100,7 @@ type LayoutStateOps = {
     getCurrentSelection: () => IDragItem[],
     findLayoutForNode: (nodeId: number) => IDragItem | null;
     clear: (state?: Partial<LayoutState>) => void,
+    serialize(): SerializedLayoutState,
     resetLayout: () => void,
 }
 
@@ -125,7 +126,7 @@ function findDefaultContainerForInsertion(): ContainerLayout | null {
     if (state.root.type === "container") {
         const container = state.root as ContainerLayout;
         const children: IDragItem[] = state.allItems[container.id]?.children || []
-        const found = children.find((di) =>  di.type === "container" )
+        const found = children.find((di) => di.type === "container")
         if (found && found.type === "container")
             return found as ContainerLayout;
         return container;
@@ -251,7 +252,7 @@ function nodeRemoved(node: LGraphNode) {
 function configureFinished(graph: LGraph) {
     const id = 0;
 
-    clear({isConfiguring: false})
+    clear({ isConfiguring: false })
 
     const root = addContainer(null, { direction: "horizontal", showTitle: false });
     const left = addContainer(root, { direction: "vertical", showTitle: false });
@@ -389,6 +390,54 @@ function resetLayout() {
     // TODO
 }
 
+export type SerializedLayoutState = {
+    root: DragItemID | null,
+    allItems: Record<DragItemID, SerializedDragEntry>,
+    currentId: number,
+}
+
+export type SerializedDragEntry = {
+    dragItem: SerializedDragItem,
+    children: DragItemID[],
+    parent: DragItemID | null
+}
+
+export type SerializedDragItem = {
+    type: string,
+    id: DragItemID,
+    nodeId: number | null,
+    attrs: Attributes
+}
+
+function serialize(): SerializedLayoutState {
+    const state = get(store)
+
+    const allItems: Record<DragItemID, SerializedDragEntry> = {}
+    for (const pair of Object.entries(state.allItems)) {
+        const [id, entry] = pair;
+        allItems[id] = {
+            dragItem: {
+                type: entry.dragItem.type,
+                id: entry.dragItem.id,
+                nodeId: (entry.dragItem as any).node?.id,
+                attrs: entry.dragItem.attrs
+            },
+            children: entry.children.map((di) => di.id),
+            parent: entry.parent?.id
+        }
+    }
+
+    return {
+        root: state.root?.id,
+        allItems,
+        currentId: state.currentId,
+    }
+}
+
+// function deserialize(data: any): LayoutState {
+
+// }
+
 const layoutStateStore: WritableLayoutStateStore =
 {
     ...store,
@@ -404,6 +453,8 @@ const layoutStateStore: WritableLayoutStateStore =
     findLayoutForNode,
     ungroup,
     clear,
-    resetLayout
+    resetLayout,
+    serialize,
+    // deserialize
 }
 export default layoutStateStore;
