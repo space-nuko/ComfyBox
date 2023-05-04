@@ -6,7 +6,7 @@
  import ComfyApp  from "./ComfyApp";
  import type { SerializedPanes } from "./ComfyApp"
  import WidgetContainer from "./WidgetContainer.svelte";
- import layoutState, { type ContainerLayout, type DragItem } from "$lib/stores/layoutState";
+ import layoutState, { type ContainerLayout, type DragItem, type IDragItem } from "$lib/stores/layoutState";
  import uiState from "$lib/stores/uiState";
 
  import Menu from './menu/Menu.svelte';
@@ -15,18 +15,8 @@
  import Icon from './menu/Icon.svelte'
 
  export let app: ComfyApp;
+ let root: IDragItem | null;
  let dragConfigured: boolean = false;
- //
- //  function addUIForNewNode(node: LGraphNode, paneIndex?: number) {
- //      if (!paneIndex)
- //          paneIndex = findLeastPopulatedPaneIndex();
- //      dragItems[paneIndex].push({ id: totalId++, node: node });
- //  }
- //
- //  $: if(app && !dragConfigured) {
- //      dragConfigured = true;
- //      app.eventBus.on("nodeAdded", addUIForNewNode);
- //  }
 
  /*
   * Serialize UI panel order so it can be restored when workflow is loaded
@@ -72,6 +62,12 @@
 
  $: $layoutState.isMenuOpen = showMenu;
 
+ $: if ($layoutState.root) {
+     root = $layoutState.root
+ } else {
+     root = null;
+ }
+
  async function onRightClick(e) {
      if ($uiState.uiEditMode === "disabled")
          return;
@@ -92,7 +88,7 @@
 </script>
 
 <div id="comfy-ui-panes" on:contextmenu={onRightClick}>
-    <WidgetContainer bind:dragItem={$layoutState.root} classes={["root-container"]} />
+    <WidgetContainer bind:dragItem={root} classes={["root-container"]} />
 </div>
 
 {#if showMenu}

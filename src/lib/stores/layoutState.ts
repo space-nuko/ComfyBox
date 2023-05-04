@@ -94,15 +94,14 @@ type LayoutStateOps = {
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode) => void,
     nodeRemoved: (node: LGraphNode) => void,
-    configureFinished: (graph: LGraph) => void,
     groupItems: (dragItems: IDragItem[]) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
     getCurrentSelection: () => IDragItem[],
     findLayoutForNode: (nodeId: number) => IDragItem | null;
-    clear: (state?: Partial<LayoutState>) => void,
     serialize: () => SerializedLayoutState,
     deserialize: (data: SerializedLayoutState, graph: LGraph) => void,
-    resetLayout: () => void,
+    initDefaultLayout: () => void,
+    onStartConfigure: () => void
 }
 
 export type WritableLayoutStateStore = Writable<LayoutState> & LayoutStateOps;
@@ -114,7 +113,6 @@ const store: Writable<LayoutState> = writable({
     isMenuOpen: false,
     isConfiguring: true
 })
-addContainer(null, { direction: "horizontal", showTitle: false });
 
 function findDefaultContainerForInsertion(): ContainerLayout | null {
     const state = get(store);
@@ -154,6 +152,7 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
     if (parent) {
         moveItem(dragItem, parent)
     }
+    console.debug("[layoutState] addContainer", state)
     store.set(state)
     return dragItem;
 }
@@ -176,6 +175,7 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
     const parentEntry = state.allItems[parent.id]
     const entry: DragItemEntry = { dragItem, children: [], parent: null };
     state.allItems[dragItem.id] = entry;
+    console.debug("[layoutState] addWidget", state)
     moveItem(dragItem, parent)
     return dragItem;
 }
@@ -248,28 +248,6 @@ function nodeRemoved(node: LGraphNode) {
     }
 
     store.set(state)
-}
-
-function configureFinished(graph: LGraph) {
-    const id = 0;
-
-    clear({ isConfiguring: false })
-
-    const root = addContainer(null, { direction: "horizontal", showTitle: false });
-    const left = addContainer(root, { direction: "vertical", showTitle: false });
-    const right = addContainer(root, { direction: "vertical", showTitle: false });
-
-    const state = get(store)
-    state.root = root;
-    store.set(state)
-
-    console.debug("[layoutState] configure begin", state, graph)
-
-    for (const node of graph._nodes) {
-        nodeAdded(node)
-    }
-
-    console.debug("[layoutState] configureFinished", state)
 }
 
 function moveItem(target: IDragItem, to: ContainerLayout, index: number = -1) {
@@ -375,20 +353,25 @@ function findLayoutForNode(nodeId: number): WidgetLayout | null {
     return null;
 }
 
-function clear(state: Partial<LayoutState> = {}) {
+function initDefaultLayout() {
     store.set({
         root: null,
         allItems: {},
         currentId: 0,
         currentSelection: [],
         isMenuOpen: false,
-        isConfiguring: true,
-        ...state
+        isConfiguring: false
     })
-}
 
-function resetLayout() {
-    // TODO
+    const root = addContainer(null, { direction: "horizontal", showTitle: false });
+    const left = addContainer(root, { direction: "vertical", showTitle: false });
+    const right = addContainer(root, { direction: "vertical", showTitle: false });
+
+    const state = get(store)
+    state.root = root;
+    store.set(state)
+
+    console.debug("[layoutState] initDefault", state)
 }
 
 export type SerializedLayoutState = {
@@ -436,8 +419,6 @@ function serialize(): SerializedLayoutState {
 }
 
 function deserialize(data: SerializedLayoutState, graph: LGraph) {
-    clear();
-
     const allItems: Record<DragItemID, DragItemEntry> = {}
     for (const pair of Object.entries(data.allItems)) {
         const [id, entry] = pair;
@@ -469,16 +450,28 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
         }
     }
 
-    let root = null;
+    let root: IDragItem = null;
     if (data.root)
-        root = allItems[data.root]
+        root = allItems[data.root].dragItem
 
-    const state = get(store)
-    store.set({
-        ...state,
+    const state: LayoutState = {
         root,
         allItems,
         currentId: data.currentId,
+        currentSelection: [],
+        isMenuOpen: false,
+        isConfiguring: false
+    }
+
+    console.debug("[layoutState] deserialize", data, state)
+
+    store.set(state)
+}
+
+function onStartConfigure() {
+    store.update(s => {
+        s.isConfiguring = true;
+        return s
     })
 }
 
@@ -491,13 +484,12 @@ const layoutStateStore: WritableLayoutStateStore =
     updateChildren,
     nodeAdded,
     nodeRemoved,
-    configureFinished,
     getCurrentSelection,
     groupItems,
     findLayoutForNode,
     ungroup,
-    clear,
-    resetLayout,
+    initDefaultLayout,
+    onStartConfigure,
     serialize,
     deserialize
 }

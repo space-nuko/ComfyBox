@@ -1,4 +1,4 @@
-import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode } from "@litegraph-ts/core";
+import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2 } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
 import ComfyAPI from "$lib/api"
 import { ComfyWidgets } from "$lib/widgets"
@@ -10,7 +10,7 @@ import type TypedEmitter from "typed-emitter";
 // Import nodes
 import "@litegraph-ts/nodes-basic"
 import * as nodes from "$lib/nodes/index"
-import ComfyGraphCanvas from "$lib/ComfyGraphCanvas";
+import ComfyGraphCanvas, { type SerializedGraphCanvasState } from "$lib/ComfyGraphCanvas";
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import * as widgets from "$lib/widgets/index"
 import type ComfyWidget from "$lib/widgets/ComfyWidget";
@@ -20,6 +20,8 @@ import type { SvelteComponentDev } from "svelte/internal";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import type { SerializedLayoutState } from "$lib/stores/layoutState";
 import layoutState from "$lib/stores/layoutState";
+
+export const COMFYBOX_SERIAL_VERSION = 1;
 
 LiteGraph.catch_exceptions = false;
 
@@ -34,7 +36,8 @@ export type SerializedAppState = {
     createdBy: "ComfyBox",
     version: number,
     workflow: SerializedLGraph,
-    layout: SerializedLayoutState
+    layout: SerializedLayoutState,
+    canvas: SerializedGraphCanvasState
 }
 
 type ComfyAppEvents = {
@@ -45,7 +48,6 @@ type ComfyAppEvents = {
     cleared: () => void
     beforeChange: (graph: LGraph, param: any) => void
     afterChange: (graph: LGraph, param: any) => void
-    autosave: (graph: LGraph) => void
     restored: (workflow: SerializedAppState) => void
 }
 
@@ -60,7 +62,7 @@ export default class ComfyApp {
     canvasEl: HTMLCanvasElement | null = null;
     canvasCtx: CanvasRenderingContext2D | null = null;
     lGraph: LGraph | null = null;
-    lCanvas: LGraphCanvas | null = null;
+    lCanvas: ComfyGraphCanvas | null = null;
     dropZone: HTMLElement | null = null;
     nodeOutputs: Record<string, any> = {};
     eventBus: TypedEmitter<ComfyAppEvents> = new EventEmitter() as TypedEmitter<ComfyAppEvents>;
@@ -102,9 +104,8 @@ export default class ComfyApp {
         try {
             const json = localStorage.getItem("workflow");
             if (json) {
-                const workflow = JSON.parse(json) as SerializedAppState;
-                this.loadGraphData(workflow["workflow"]);
-                this.eventBus.emit("restored", workflow);
+                const state = JSON.parse(json) as SerializedAppState;
+                this.deserialize(state)
                 restored = true;
             }
         } catch (err) {
@@ -113,11 +114,11 @@ export default class ComfyApp {
 
         // We failed to restore a workflow so load the default
         if (!restored) {
-            this.loadGraphData();
+            this.initDefaultGraph();
         }
 
         // Save current workflow automatically
-        setInterval(this.requestAutosave.bind(this), 15000);
+        setInterval(this.saveStateToLocalStorage.bind(this), 1000);
 
         this.addApiUpdateHandlers();
         this.addDropHandler();
@@ -181,8 +182,10 @@ export default class ComfyApp {
         this.eventBus.emit("cleared");
     }
 
-    private requestAutosave() {
-        this.eventBus.emit("autosave", this.lGraph);
+    saveStateToLocalStorage() {
+        const savedWorkflow = this.serialize();
+        const json = JSON.stringify(savedWorkflow);
+        localStorage.setItem("workflow", json)
     }
 
     private addGraphLifecycleHooks() {
@@ -305,20 +308,6 @@ export default class ComfyApp {
         // await this.#invokeExtensionsAsync("registerCustomNodes");
     }
 
-    serialize(): SerializedAppState {
-        const graph = this.lGraph;
-
-        const serializedGraph = graph.serialize()
-        const serializedLayout = layoutState.serialize()
-
-        return {
-            createdBy: "ComfyBox",
-            version: 1,
-            workflow: serializedGraph,
-            layout: serializedLayout
-        }
-    }
-
     private showDropZone() {
         if (this.dropZone)
             this.dropZone.style.display = "block";
@@ -365,24 +354,24 @@ export default class ComfyApp {
      * Adds a handler on paste that extracts and loads workflows from pasted JSON data
      */
     private addPasteHandler() {
-        document.addEventListener("paste", (e) => {
-            let data = (e.clipboardData || (window as any).clipboardData).getData("text/plain");
-            let workflow;
-            try {
-                data = data.slice(data.indexOf("{"));
-                workflow = JSON.parse(data);
-            } catch (err) {
-                try {
-                    data = data.slice(data.indexOf("workflow\n"));
-                    data = data.slice(data.indexOf("{"));
-                    workflow = JSON.parse(data);
-                } catch (error) { }
-            }
+        // document.addEventListener("paste", (e) => {
+        //     let data = (e.clipboardData || (window as any).clipboardData).getData("text/plain");
+        //     let workflow;
+        //     try {
+        //         data = data.slice(data.indexOf("{"));
+        //         workflow = JSON.parse(data);
+        //     } catch (err) {
+        //         try {
+        //             data = data.slice(data.indexOf("workflow\n"));
+        //             data = data.slice(data.indexOf("{"));
+        //             workflow = JSON.parse(data);
+        //         } catch (error) { }
+        //     }
 
-            if (workflow && workflow.version && workflow.nodes && workflow.extra) {
-                this.loadGraphData(workflow);
-            }
-        });
+        //     if (workflow && workflow.version && workflow.nodes && workflow.extra) {
+        //         this.loadGraphData(workflow);
+        //     }
+        // });
     }
 
     /**
@@ -436,16 +425,54 @@ export default class ComfyApp {
         });
     }
 
+    serialize(): SerializedAppState {
+        const graph = this.lGraph;
+
+        const serializedGraph = graph.serialize()
+        const serializedLayout = layoutState.serialize()
+        const serializedCanvas = this.lCanvas.serialize();
+
+        return {
+            createdBy: "ComfyBox",
+            version: COMFYBOX_SERIAL_VERSION,
+            workflow: serializedGraph,
+            layout: serializedLayout,
+            canvas: serializedCanvas
+        }
+    }
+
+    deserialize(data: SerializedAppState) {
+        if (data.version !== COMFYBOX_SERIAL_VERSION) {
+            throw `Invalid ComfyBox saved data format: ${data.version}`
+        }
+
+        // Ensure loadGraphData does not trigger any state changes in layoutState
+        // (isConfiguring is set to true here)
+        // lGraph.configure will add new nodes, triggering onNodeAdded, but we
+        // want to restore the layoutState ourselves
+        layoutState.onStartConfigure();
+
+        this.loadGraphData(data.workflow)
+
+        // Now restore the layout
+        // Subsequent added nodes will add the UI data to layoutState
+        layoutState.deserialize(data.layout, this.lGraph)
+
+        // Restore canvas offset/zoom
+        this.lCanvas.deserialize(data.canvas)
+    }
+
+    initDefaultGraph() {
+        const state = structuredClone(defaultGraph)
+        this.deserialize(state)
+    }
+
     /**
      * Populates the graph with the specified workflow data
      * @param {*} graphData A serialized graph object
      */
-    loadGraphData(graphData?: SerializedLGraph) {
+    loadGraphData(graphData: SerializedLGraph) {
         this.clean();
-
-        if (!graphData) {
-            graphData = structuredClone(defaultGraph.workflow)
-        }
 
         // Patch T2IAdapterLoader to ControlNetLoader since they are the same node now
         for (let n of graphData.nodes) {
@@ -461,6 +488,25 @@ export default class ComfyApp {
             node.size = size;
             // this.#invokeExtensions("loadedGraphNode", node);
         }
+    }
+
+    reset() {
+        this.clean();
+
+        const blankGraph: SerializedLGraph = {
+            last_node_id: 0,
+            last_link_id: 0,
+            nodes: [],
+            links: [],
+            groups: [],
+            config: {},
+            extra: {},
+            version: 0
+        }
+
+        layoutState.onStartConfigure();
+        this.lGraph.configure(blankGraph)
+        layoutState.initDefaultLayout();
     }
 
     /**

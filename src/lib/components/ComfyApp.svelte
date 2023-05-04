@@ -9,8 +9,8 @@
  import uiState from "$lib/stores/uiState";
  import layoutState from "$lib/stores/layoutState";
  import { ImageViewer } from "$lib/ImageViewer";
- import { download } from "$lib/utils"
  import type { ComfyAPIStatus } from "$lib/api";
+ import { SvelteToast, toast } from '@zerodevx/svelte-toast'
 
  import { LGraph } from "@litegraph-ts/core";
  import LightboxModal from "./LightboxModal.svelte";
@@ -19,11 +19,20 @@
 
  let app: ComfyApp = undefined;
  let imageViewer: ImageViewer;
- let uiPane: ComfyUIPane = undefined;
  let queue: ComfyQueue = undefined;
  let mainElem: HTMLDivElement;
+ let uiPane: ComfyUIPane = undefined;
  let containerElem: HTMLDivElement;
- let resizeTimeout: typeof Timer = -1;
+ let resizeTimeout: NodeJS.Timeout | null;
+
+ let debugLayout: boolean = true;
+
+ const toastOptions = {
+     intro: { duration: 200 },
+     theme: {
+         '--toastBarHeight': 0
+     }
+ }
 
  function refreshView(event?: Event) {
      clearTimeout(resizeTimeout);
@@ -65,35 +74,41 @@
      }
  }
 
- function doAutosave(graph: LGraph): void {
-     const savedWorkflow = app.serialize();
-     localStorage.setItem("workflow", JSON.stringify(savedWorkflow))
- }
-
- function doRestore(data: SerializedAppState) {
-     layoutState.deserialize(data.layout, app.lGraph);
- }
-
  function doSave(): void {
      if (!app?.lGraph)
          return;
 
-     const date = new Date();
-     const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
+     app.saveStateToLocalStorage();
+     toast.push("Saved to local storage.")
+     //
+     //      const date = new Date();
+     //      const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
+     //
+     //      download(`workflow-${formattedDate}.json`, JSON.stringify(app.serialize()), "application/json")
+ }
 
-     download(`workflow-${formattedDate}.json`, JSON.stringify(app.serialize()), "application/json")
+ function doReset(): void {
+     var confirmed = confirm("Are you sure you want to clear the current workflow?");
+     if (confirmed) {
+         app.reset();
+     }
+ }
+
+ function doRecenter(): void {
+     app.lCanvas.recenter();
  }
 
  onMount(async () => {
      app = new ComfyApp();
 
+     if (debugLayout) {
+         layoutState.subscribe(s => {
+             console.warn("UPDATESTATE", s)
+         })
+     }
+
      app.eventBus.on("nodeAdded", layoutState.nodeAdded);
      app.eventBus.on("nodeRemoved", layoutState.nodeRemoved);
-     app.eventBus.on("configured", layoutState.configureFinished);
-     app.eventBus.on("cleared", layoutState.clear);
-
-     app.eventBus.on("autosave", doAutosave);
-     app.eventBus.on("restored", doRestore);
 
      app.api.addEventListener("status", (ev: CustomEvent) => {
          queueState.statusUpdated(ev.detail as ComfyAPIStatus);
@@ -117,7 +132,7 @@
  })
 </script>
 
-<div id="main" bind:this={mainElem}>
+<div id="main">
     <div id="dropzone" class="dropzone"></div>
     <div id="container" bind:this={containerElem}>
         <Splitpanes theme="comfy" on:resize={refreshView}>
@@ -153,6 +168,12 @@
         <Button variant="secondary" on:click={doSave}>
             Save
         </Button>
+        <Button variant="secondary" on:click={doReset}>
+            Reset
+        </Button>
+        <Button variant="secondary" on:click={doRecenter}>
+            Recenter
+        </Button>
         <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
         <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/>
         <label for="enable-ui-editing">Enable UI Editing</label>
@@ -163,6 +184,8 @@
     </div>
     <LightboxModal />
 </div>
+
+<SvelteToast options={toastOptions} />
 
 <style lang="scss">
  #container {

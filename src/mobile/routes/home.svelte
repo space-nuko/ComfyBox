@@ -16,24 +16,11 @@
 
  let app: ComfyApp | null = null;
 
- let serializedPaneOrder = {};
-
- function doAutosave(graph: LGraph): void {
-     const savedWorkflow = app.serialize();
-     localStorage.setItem("workflow", JSON.stringify(savedWorkflow))
- }
-
- function doRestore(workflow: SerializedAppState) {
-     serializedPaneOrder = workflow.panes;
- }
-
  onMount(async () => {
      if (app)
          return
      app = $uiState.app = new ComfyApp();
 
-     app.eventBus.on("autosave", doAutosave);
-     app.eventBus.on("restored", doRestore);
 
      app.api.addEventListener("status", (ev: CustomEvent) => {
          queueState.statusUpdated(ev.detail as ComfyAPIStatus);
