@@ -254,7 +254,7 @@
      border-width: 2px;
      border-style: dashed !important;
      margin: 0.2em;
-     padding: 0.2em;
+     padding: 1.4em;
  }
 
  .widget-edit-outline {

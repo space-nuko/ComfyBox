@@ -67,7 +67,10 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     override onExecute() {
         // Assumption: we will have one output in the inherited class with the
         // correct type
-        this.setOutputData(0, this.properties.value)
+        this.setOutputData(0, get(this.value))
+
+        const outputLinks = this.getOutputLinks(0)
+        console.debug("[Widget] onExecute", this, outputLinks)
 
         // TODO send event to linked nodes
     }
@@ -95,6 +98,8 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
             }
 
             console.debug("Property copy", input, this.properties)
+
+            this.setValue(get(this.value))
         }
 
         return true;

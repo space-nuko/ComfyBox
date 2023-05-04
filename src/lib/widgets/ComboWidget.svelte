@@ -10,6 +10,8 @@
  let propsChanged: Writable<boolean> | null = null;
  let option: any
 
+ export let debug: boolean = false;
+
  $: widget && setNodeValue(widget);
 
  $: if (nodeValue !== null && (!$propsChanged || $propsChanged)) {
@@ -35,6 +37,15 @@
  $: if (nodeValue && option && option.value) {
      $nodeValue = option.value;
  }
+
+ function getLinkValue() {
+     if (!node)
+         return "???";
+     const links = node.getOutputLinks(0)
+     if (links.length === 0)
+         return "???";
+     return links[0].data
+ }
 </script>
 
 <div class="wrapper gr-combo">
@@ -51,6 +62,11 @@
                 on:filter
                 on:blur
             />
+            {#if debug}
+                <div>Value: {option?.value}</div>
+                <div>NodeValue: {$nodeValue}</div>
+                <div>LinkValue: {getLinkValue()}</div>
+            {/if}
         </label>
     {/if}
 </div>
