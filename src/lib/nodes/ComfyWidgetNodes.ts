@@ -1,15 +1,18 @@
-import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot, type SerializedLGraphNode } from "@litegraph-ts/core";
+import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot, type SerializedLGraphNode, BuiltInSlotType } from "@litegraph-ts/core";
 import ComfyGraphNode from "./ComfyGraphNode";
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import RangeWidget from "$lib/widgets/RangeWidget.svelte";
 import TextWidget from "$lib/widgets/TextWidget.svelte";
+import GalleryWidget from "$lib/widgets/GalleryWidget.svelte";
+import ButtonWidget from "$lib/widgets/ButtonWidget.svelte";
 import type { SvelteComponentDev } from "svelte/internal";
-import { ComfyWidgets } from "$lib/widgets";
 import { Watch } from "@litegraph-ts/nodes-basic";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import { writable, type Unsubscriber, type Writable, get } from "svelte/store";
 import { clamp } from "$lib/utils"
 import layoutState from "$lib/stores/layoutState";
+import type { FileData as GradioFileData } from "@gradio/upload";
+import queueState from "$lib/stores/queueState";
 
 export interface ComfyWidgetProperties extends Record<string, any> {
     defaultValue: any
@@ -36,6 +39,10 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     override isBackendNode = false;
     override serialize_widgets = true;
 
+    outputIndex: number = 0;
+    inputIndex: number = 0;
+    changedIndex: number = 1;
+
     displayWidget: ITextWidget;
 
     override size: Vector2 = [60, 40];
@@ -55,24 +62,47 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         this.unsubscribe = this.value.subscribe(this.onValueUpdated.bind(this))
     }
 
+    formatValue(value: any): string {
+        return Watch.toString(value)
+    }
+
     private onValueUpdated(value: any) {
         console.debug("[Widget] valueUpdated", this, value)
-        this.displayWidget.value = Watch.toString(value)
+        this.displayWidget.value = this.formatValue(value)
+
+        if (this.outputs.length >= this.outputIndex) {
+            this.setOutputData(this.outputIndex, get(this.value))
+        }
+        if (this.outputs.length >= this.changedIndex) {
+            const changedOutput = this.outputs[this.changedIndex]
+            if (changedOutput.type === BuiltInSlotType.EVENT)
+                this.triggerSlot(this.changedIndex, "changed")
+        }
     }
 
     setValue(value: any) {
         this.value.set(value)
     }
 
+    abstract validateValue(value: any): boolean;
+
+    /*
+     * Logic to run if this widget can be treated as output (slider, combo, text)
+     */
     override onExecute() {
-        // Assumption: we will have one output in the inherited class with the
-        // correct type
-        this.setOutputData(0, get(this.value))
+        if (this.inputs.length >= this.inputIndex) {
+            const data = this.getInputData(this.inputIndex)
+            if (data && this.validateValue(data)) { // TODO can "null" be a legitimate value here?
+                this.setValue(data)
+            }
+        }
+        if (this.outputs.length >= this.outputIndex) {
+            this.setOutputData(this.outputIndex, get(this.value))
+        }
+    }
 
-        const outputLinks = this.getOutputLinks(0)
-        console.debug("[Widget] onExecute", this, outputLinks)
-
-        // TODO send event to linked nodes
+    /** Called when a backend node sends a ComfyUI output over a link */
+    receiveOutput() {
     }
 
     onConnectOutput(
@@ -93,7 +123,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
                 this.setValue(this.properties.defaultValue)
 
             const widget = layoutState.findLayoutForNode(this.id)
-            if (widget) {
+            if (widget && input.name !== "") {
                 widget.attrs.title = input.name;
             }
 
@@ -164,13 +194,23 @@ export class ComfySliderNode extends ComfyWidgetNode<number> {
     override svelteComponentType = RangeWidget
 
     static slotLayout: SlotLayout = {
-        outputs: [
+        inputs: [
             { name: "value", type: "number" }
+        ],
+        outputs: [
+            { name: "value", type: "number" },
+            { name: "changed", type: BuiltInSlotType.EVENT }
         ]
     }
 
     constructor(name?: string) {
         super(name, 0)
+    }
+
+    override validateValue(value: any): boolean {
+        return typeof value === "number"
+            && value >= this.properties.min
+            && value <= this.properties.max
     }
 
     override clampOneConfig(input: IComfyInputSlot) {
@@ -199,8 +239,12 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
     }
 
     static slotLayout: SlotLayout = {
-        outputs: [
+        inputs: [
             { name: "value", type: "string" }
+        ],
+        outputs: [
+            { name: "value", type: "string" },
+            { name: "changed", type: BuiltInSlotType.EVENT }
         ]
     }
 
@@ -236,6 +280,12 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
         return true;
     }
 
+    override validateValue(value: any): boolean {
+        if (typeof value !== "string")
+            return false;
+        return this.properties.values.indexOf(value) !== -1;
+    }
+
     override clampOneConfig(input: IComfyInputSlot) {
         if (input.config.values.indexOf(this.properties.value) === -1) {
             if (input.config.values.length === 0)
@@ -264,8 +314,12 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
     }
 
     static slotLayout: SlotLayout = {
-        outputs: [
+        inputs: [
             { name: "value", type: "string" }
+        ],
+        outputs: [
+            { name: "value", type: "string" },
+            { name: "changed", type: BuiltInSlotType.EVENT }
         ]
     }
 
@@ -274,6 +328,10 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
     constructor(name?: string) {
         super(name, "")
     }
+
+    override validateValue(value: any): boolean {
+        return typeof value === "string"
+    }
 }
 
 LiteGraph.registerNodeType({
@@ -281,4 +339,122 @@ LiteGraph.registerNodeType({
     title: "UI.Text",
     desc: "Textbox outputting a string value",
     type: "ui/text"
+})
+
+/** Raw output as received from ComfyUI's backend */
+export type GalleryOutput = {
+    images: GalleryOutputEntry[]
+}
+
+/** Raw output entry as received from ComfyUI's backend */
+export type GalleryOutputEntry = {
+    filename: string,
+    subfolder: string,
+    type: string
+}
+
+export interface ComfyGalleryProperties extends ComfyWidgetProperties {
+}
+
+export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
+    override properties: ComfyGalleryProperties = {
+        defaultValue: []
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "images", type: "OUTPUT" }
+        ]
+    }
+
+    override svelteComponentType = GalleryWidget
+
+    constructor(name?: string) {
+        super(name, [])
+    }
+
+    override afterQueued() {
+        let queue = get(queueState)
+        if (!(typeof queue.queueRemaining === "number" && queue.queueRemaining > 1)) {
+            this.setValue([])
+        }
+    }
+
+    override formatValue(value: GradioFileData[]): string {
+        return `Images: ${value.length}`
+    }
+
+    override validateValue(value: any): boolean {
+        return Array.isArray(value) && value.every(e => "images" in e)
+    }
+
+    receiveOutput() {
+        const link = this.getInputLink(0)
+        if (link.data && "images" in link.data) {
+            const data = link.data as GalleryOutput
+            console.debug("[ComfyGalleryNode] Received output!", data)
+
+            const galleryItems: GradioFileData[] = data.images.map(r => {
+                // TODO configure backend URL
+                const url = "http://localhost:8188/view?"
+                const params = new URLSearchParams(r)
+                return {
+                    name: null,
+                    data: url + params
+                }
+            });
+
+            const currentValue = get(this.value)
+            this.setValue(currentValue.concat(galleryItems))
+        }
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyGalleryNode,
+    title: "UI.Gallery",
+    desc: "Gallery that shows most recent outputs",
+    type: "ui/gallery"
+})
+
+export interface ComfyButtonProperties extends ComfyWidgetProperties {
+    message: string
+}
+
+export class ComfyButtonNode extends ComfyWidgetNode<boolean> {
+    override properties: ComfyButtonProperties = {
+        defaultValue: false,
+        message: "bang"
+    }
+
+    static slotLayout: SlotLayout = {
+        outputs: [
+            { name: "event", type: BuiltInSlotType.EVENT },
+            { name: "isClicked", type: "boolean" },
+        ]
+    }
+
+    override outputIndex = 1;
+    override svelteComponentType = ButtonWidget;
+
+    override validateValue(value: any): boolean {
+        return typeof value === "boolean"
+    }
+
+    onClick() {
+        this.setValue(true)
+        this.triggerSlot(0, this.properties.message);
+        this.setValue(false)
+    }
+
+    constructor(name?: string) {
+        super(name, false)
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyButtonNode,
+    title: "UI.Button",
+    desc: "Button that triggers an event when clicked",
+    type: "ui/button"
 })

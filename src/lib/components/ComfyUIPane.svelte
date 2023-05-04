@@ -29,10 +29,10 @@
      // TODO
  }
 
- function groupWidgets() {
+ function groupWidgets(horizontal: boolean) {
      const items = layoutState.getCurrentSelection()
      $layoutState.currentSelection = []
-     layoutState.groupItems(items)
+     layoutState.groupItems(items, { direction: horizontal ? "horizontal" : "vertical" })
  }
 
  let canUngroup = false;
@@ -95,8 +95,12 @@
     <Menu {...menuPos} on:click={closeMenu} on:clickoutside={closeMenu}>
         <MenuOption
             isDisabled={$layoutState.currentSelection.length === 0}
-            on:click={groupWidgets}
+            on:click={() => groupWidgets(false)}
             text="Group" />
+        <MenuOption
+            isDisabled={$layoutState.currentSelection.length === 0}
+            on:click={() => groupWidgets(true)}
+            text="Group Horizontally" />
         <MenuOption
             isDisabled={!canUngroup}
             on:click={ungroup}

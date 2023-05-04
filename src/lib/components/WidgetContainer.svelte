@@ -56,6 +56,9 @@
  .widget.selected {
      background: var(--color-yellow-200);
  }
+ .container.selected {
+     background: var(--color-yellow-400);
+ }
 
  .is-executing {
      border: 3px dashed var(--color-green-600) !important;

@@ -143,7 +143,7 @@
          gap: var(--layout-gap);
          width: var(--size-full);
 
-         .v-pane {
+         > :global(.block > .v-pane) {
              flex-direction: row;
          }
 
@@ -157,7 +157,7 @@
      &.vertical {
          position: relative;
 
-         .v-pane {
+         > :global(.block > .v-pane) {
              flex-direction: column;
          }
 

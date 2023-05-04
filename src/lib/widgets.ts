@@ -1,12 +1,11 @@
 import type { IWidget, LGraphNode } from "@litegraph-js/core";
-import type ComfyApp from "$lib/components/ComfyApp";
 import ComfyValueControlWidget from "./widgets/ComfyValueControlWidget";
 import type { ComfyInputConfig } from "./IComfyInputSlot";
 import type IComfyInputSlot from "./IComfyInputSlot";
 import { BuiltInSlotShape } from "@litegraph-ts/core";
 import { ComfyComboNode, ComfySliderNode, ComfyTextNode } from "./nodes";
 
-type WidgetFactory = (node: LGraphNode, inputName: string, inputData: any, app: ComfyApp) => IComfyInputSlot;
+type WidgetFactory = (node: LGraphNode, inputName: string, inputData: any) => IComfyInputSlot;
 
 function getNumberDefaults(inputData: any, defaultStep: number): ComfyInputConfig {
     let defaultValue = inputData[1]["default"];
@@ -38,7 +37,7 @@ const INT: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any)
     return addComfyInput(node, inputName, { type: "number", config, defaultWidgetNode: ComfySliderNode })
 };
 
-const STRING: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any, app: ComfyApp): IComfyInputSlot => {
+const STRING: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any): IComfyInputSlot => {
     const defaultValue = inputData[1].default || "";
     const multiline = !!inputData[1].multiline;
 
@@ -54,13 +53,13 @@ const COMBO: WidgetFactory = (node: LGraphNode, inputName: string, inputData: an
     return addComfyInput(node, inputName, { type: "string", config: { values: type, defaultValue }, defaultWidgetNode: ComfyComboNode })
 }
 
-const IMAGEUPLOAD: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any, app): IComfyInputSlot => {
+const IMAGEUPLOAD: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any): IComfyInputSlot => {
     return addComfyInput(node, inputName, { type: "number", config: {} })
 }
 
 export type WidgetRepository = Record<string, WidgetFactory>
 
-export const ComfyWidgets: WidgetRepository = {
+const ComfyWidgets: WidgetRepository = {
     "INT:seed": INT,
     "INT:noise_seed": INT,
     FLOAT,
@@ -69,3 +68,5 @@ export const ComfyWidgets: WidgetRepository = {
     COMBO,
     IMAGEUPLOAD,
 }
+
+export default ComfyWidgets

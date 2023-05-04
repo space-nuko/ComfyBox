@@ -17,13 +17,14 @@
  import ComfyQueue from "./ComfyQueue.svelte";
  import queueState from "$lib/stores/queueState";
 
- let app: ComfyApp = undefined;
+ export let app: ComfyApp = undefined;
  let imageViewer: ImageViewer;
  let queue: ComfyQueue = undefined;
  let mainElem: HTMLDivElement;
  let uiPane: ComfyUIPane = undefined;
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
+ let hasShownUIHelpToast: boolean = false;
 
  let debugLayout: boolean = true;
 
@@ -44,8 +45,8 @@
      app.queuePrompt(0, 1);
  }
 
- $: if (app) app.lCanvas.allow_dragnodes = !$uiState.nodesLocked;
- $: if (app) app.lCanvas.allow_interaction = !$uiState.graphLocked;
+ $: if (app?.lCanvas) app.lCanvas.allow_dragnodes = !$uiState.nodesLocked;
+ $: if (app?.lCanvas) app.lCanvas.allow_interaction = !$uiState.graphLocked;
 
  $: if ($uiState.uiEditMode)
      $layoutState.currentSelection = []
@@ -98,27 +99,26 @@
      app.lCanvas.recenter();
  }
 
- onMount(async () => {
-     app = new ComfyApp();
+ $: if ($uiState.uiEditMode !== "disabled" && !hasShownUIHelpToast) {
+     hasShownUIHelpToast = true;
+     toast.push("Right-click to open context menu.")
+ }
 
-     if (debugLayout) {
-         layoutState.subscribe(s => {
-             console.warn("UPDATESTATE", s)
-         })
-     }
+ if (debugLayout) {
+     layoutState.subscribe(s => {
+         console.warn("UPDATESTATE", s)
+     })
+ }
 
-     app.api.addEventListener("status", (ev: CustomEvent) => {
-         queueState.statusUpdated(ev.detail as ComfyAPIStatus);
-     });
+ app.api.addEventListener("status", (ev: CustomEvent) => {
+     queueState.statusUpdated(ev.detail as ComfyAPIStatus);
+ });
 
-     await app.setup();
-     (window as any).app = app;
-     (window as any).appPane = uiPane;
-
-     refreshView();
-
+ $: if (app.rootEl && !imageViewer) {
      imageViewer = new ImageViewer(app.rootEl);
+ }
 
+ $: if (containerElem) {
      let wrappers = containerElem.querySelectorAll<HTMLDivElement>(".pane-wrapper")
      for (const wrapper of wrappers) {
          const paneNode = wrapper.parentNode as HTMLElement; // get the node inside the <Pane/>
@@ -126,6 +126,14 @@
              app.resizeCanvas()
          }
      }
+ }
+
+ onMount(async () => {
+     await app.setup();
+     (window as any).app = app;
+     (window as any).appPane = uiPane;
+
+     refreshView();
  })
 </script>
 

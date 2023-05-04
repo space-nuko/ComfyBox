@@ -64,7 +64,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
 export { ALL_ATTRIBUTES };
 
 export type Attributes = {
-    direction: string,
+    direction: "horizontal" | "vertical",
     title: string,
     showTitle: boolean,
     classes: string
@@ -95,7 +95,7 @@ type LayoutStateOps = {
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode) => void,
     nodeRemoved: (node: LGraphNode) => void,
-    groupItems: (dragItems: IDragItem[], title: string) => ContainerLayout,
+    groupItems: (dragItems: IDragItem[], attrs?: Partial<Attributes>) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
     getCurrentSelection: () => IDragItem[],
     findLayoutForNode: (nodeId: number) => IDragItem | null;
@@ -265,7 +265,7 @@ function moveItem(target: IDragItem, to: ContainerLayout, index: number = -1) {
 
     if (entry.parent) {
         const parentEntry = state.allItems[entry.parent.id];
-        const index = parentEntry.children.indexOf(target)
+        const index = parentEntry.children.findIndex(c => c.id === target.id)
         if (index !== -1) {
             parentEntry.children.splice(index, 1)
         }
@@ -293,7 +293,7 @@ function getCurrentSelection(): IDragItem[] {
     return state.currentSelection.map(id => state.allItems[id].dragItem)
 }
 
-function groupItems(dragItems: IDragItem[], title: string = "Group"): ContainerLayout {
+function groupItems(dragItems: IDragItem[], attrs: Partial<Attributes> = {}): ContainerLayout {
     if (dragItems.length === 0)
         return;
 
@@ -305,16 +305,18 @@ function groupItems(dragItems: IDragItem[], title: string = "Group"): ContainerL
 
     let index = undefined;
     if (parent) {
-        const indexFound = state.allItems[parent.id].children.indexOf(dragItems[0])
+        const indexFound = state.allItems[parent.id].children.findIndex(c => c.id === dragItems[0].id)
         if (indexFound !== -1)
             index = indexFound
     }
 
-    const container = addContainer(parent as ContainerLayout, { title }, index)
+    const container = addContainer(parent as ContainerLayout, attrs, index)
 
     for (const item of dragItems) {
         moveItem(item, container)
     }
+
+    console.debug("[layoutState] Grouped", container, parent, state.allItems[container.id].children, index)
 
     store.set(state)
     return container
@@ -331,7 +333,7 @@ function ungroup(container: ContainerLayout) {
 
     let index = undefined;
     const parentChildren = state.allItems[parent.id].children;
-    const indexFound = parentChildren.indexOf(container)
+    const indexFound = parentChildren.findIndex(c => c.id === container.id)
     if (indexFound !== -1)
         index = indexFound
 

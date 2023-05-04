@@ -7,6 +7,7 @@ import uiState from "./stores/uiState";
 import { get } from "svelte/store";
 import type ComfyGraphNode from "./nodes/ComfyGraphNode";
 import type IComfyInputSlot from "./IComfyInputSlot";
+import type { ComfyBackendNode } from "./nodes/ComfyBackendNode";
 
 type ComfyGraphEvents = {
     configured: (graph: LGraph) => void
@@ -16,6 +17,7 @@ type ComfyGraphEvents = {
     cleared: () => void
     beforeChange: (graph: LGraph, param: any) => void
     afterChange: (graph: LGraph, param: any) => void
+    afterExecute: () => void
 }
 
 export default class ComfyGraph extends LGraph {
@@ -42,6 +44,10 @@ export default class ComfyGraph extends LGraph {
         this.eventBus.emit("afterChange", graph, info);
     }
 
+    override onAfterExecute() {
+        this.eventBus.emit("afterExecute");
+    }
+
     override onNodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
         layoutState.nodeAdded(node)
         this.graphSync.onNodeAdded(node);
@@ -51,7 +57,7 @@ export default class ComfyGraph extends LGraph {
             && !options.addedByDeserialize      // ...and we're not trying to deserialize an existing workflow
             && get(uiState).autoAddUI) {
             console.debug("[ComfyGraph] AutoAdd UI")
-            const comfyNode = node as ComfyGraphNode;
+            const comfyNode = node as ComfyBackendNode;
             const widgetNodesAdded = []
             for (let index = 0; index < comfyNode.inputs.length; index++) {
                 const input = comfyNode.inputs[index];
@@ -70,7 +76,7 @@ export default class ComfyGraph extends LGraph {
             }
             const dragItems = widgetNodesAdded.map(wn => get(layoutState).allItemsByNode[wn.id]?.dragItem).filter(di => di)
             console.debug("[ComfyGraph] Group new widgets", dragItems)
-            layoutState.groupItems(dragItems, comfyNode.comfyClass)
+            layoutState.groupItems(dragItems, { title: comfyNode.comfyClass })
         }
 
         console.debug("Added", node);
