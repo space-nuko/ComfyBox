@@ -54,9 +54,3 @@ jobs:
         run: |
           pnpm build:css
           pnpm build
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ComfyBox-dist
-          path: dist/
-          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
