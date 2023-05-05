@@ -3,6 +3,7 @@
  import { get } from "svelte/store";
  import { Pane, Splitpanes } from 'svelte-splitpanes';
  import { Button } from "@gradio/button";
+ import { BlockTitle } from "@gradio/atoms";
  import ComfyUIPane from "./ComfyUIPane.svelte";
  import ComfyApp, { type SerializedAppState } from "./ComfyApp";
  import { Checkbox } from "@gradio/form"
@@ -222,7 +223,9 @@
         <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
         <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/>
         <Checkbox label="Auto-Add UI" bind:value={$uiState.autoAddUI}/>
-        <label for="enable-ui-editing">Enable UI Editing</label>
+        <label class="label" for="enable-ui-editing">
+            <BlockTitle>Enable UI Editing</BlockTitle>
+        </label>
         <select id="enable-ui-editing" name="enable-ui-editing" bind:value={$uiState.uiEditMode}>
             <option value="disabled">Disabled</option>
             <option value="widgets">Widgets</option>
@@ -325,5 +328,9 @@
      align-items: center;
      display: flex;
      position: relative;
+ }
+
+ label.label > :global(span) {
+     top: 20%;
  }
 </style>

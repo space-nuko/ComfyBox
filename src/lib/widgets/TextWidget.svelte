@@ -27,7 +27,7 @@
  }
 </script>
 
-<div class="wrapper gr-textbox">
+<div class="wrapper gradio-textbox">
     {#if node !== null && nodeValue !== null}
         <TextBox
             bind:value={$nodeValue}

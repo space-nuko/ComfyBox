@@ -42,7 +42,7 @@
 
 {#if container && children}
     {#key $attrsChanged}
-        <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')}"
+        <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')} z-index{zIndex}"
              class:hide-block={container.attrs.blockVariant === "hidden"}
              class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(container.id)}
              class:root-container={zIndex === 0}
@@ -69,7 +69,7 @@
                     on:finalize="{handleFinalize}"
                     >
                     {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
-                        {@const hidden = item?.node?.properties?.hidden}
+                        {@const hidden = item?.attrs?.hidden}
                         <div class="animation-wrapper"
                              class:hidden={hidden}
                              animate:flip={{duration:flipDurationMs}}>
@@ -139,6 +139,18 @@
 
  .container {
      display: flex;
+
+     > :global(*) {
+         border-radius: 0;
+     }
+
+     > :global(.padded) {
+         padding: 10px 12px 0px 10px;
+
+         &:last-child {
+             padding-bottom: 12px;
+         }
+     }
 
      :global(.block) {
          height: fit-content;
@@ -214,7 +226,7 @@
 
  .animation-wrapper {
      position: relative;
-     flex-grow: 1;
+     flex-grow: 100;
  }
 
  .handle-widget:hover {

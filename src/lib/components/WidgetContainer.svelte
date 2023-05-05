@@ -68,11 +68,11 @@
                  class:edit={edit}
                 class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(widget.id)}
                 class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.node.id}
-                class:hidden={widget.node.properties.hidden}
+                class:hidden={widget.attrs.hidden}
                 >
                 <svelte:component this={widget.node.svelteComponentType} {widget} />
             </div>
-            {#if widget.node.properties.hidden && edit}
+            {#if widget.attrs.hidden && edit}
                 <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>
             {/if}
             {#if showHandles}

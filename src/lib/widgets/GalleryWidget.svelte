@@ -44,14 +44,14 @@
  }
 
 </script>
-<div class="wrapper comfy-gallery-widget gr-gallery" bind:this={element}>
+<div class="wrapper comfy-gallery-widget gradio-gallery" bind:this={element}>
     {#if widget && node && nodeValue}
         <Block variant="solid" padding={false}>
             <div class="padding">
                 <Gallery
                     bind:value={$nodeValue}
                     label={widget.attrs.title}
-                    show_label={true}
+                    show_label={widget.attrs.title !== ""}
                     {style}
                     root={""}
                     root_url={""}

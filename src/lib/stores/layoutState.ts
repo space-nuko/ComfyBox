@@ -28,6 +28,7 @@ export type AttributesSpec = {
     editable: boolean,
 
     values?: string[],
+    hidden?: boolean
 }
 
 export type AttributesCategorySpec = {
@@ -46,6 +47,12 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 type: "string",
                 location: "widget",
                 editable: true,
+            },
+            {
+                name: "hidden",
+                type: "boolean",
+                location: "widget",
+                editable: true
             },
             {
                 name: "direction",
@@ -72,12 +79,6 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
     {
         categoryName: "behavior",
         specs: [
-            {
-                name: "hidden",
-                type: "boolean",
-                location: "nodeProps",
-                editable: true
-            },
             {
                 name: "min",
                 type: "number",
@@ -106,7 +107,8 @@ export type Attributes = {
     title: string,
     showTitle: boolean,
     classes: string,
-    blockVariant?: "block" | "hidden"
+    blockVariant?: "block" | "hidden",
+    hidden?: boolean
 }
 
 export interface IDragItem {
@@ -353,7 +355,9 @@ function groupItems(dragItems: IDragItem[], attrs: Partial<Attributes> = {}): Co
             index = indexFound
     }
 
-    const container = addContainer(parent as ContainerLayout, attrs, index)
+    const title = dragItems.length <= 1 ? "" : "Group";
+
+    const container = addContainer(parent as ContainerLayout, { title, ...attrs }, index)
 
     for (const item of dragItems) {
         moveItem(item, container)

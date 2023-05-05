@@ -39,7 +39,7 @@
  }
 </script>
 
-<div class="wrapper gr-range">
+<div class="wrapper gradio-slider">
     {#if node !== null && option !== null}
         <Range
             bind:value={option}

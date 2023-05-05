@@ -3,12 +3,12 @@ import ComfyGraphNode from "./ComfyGraphNode";
 import { Watch } from "@litegraph-ts/nodes-basic";
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
 
-export interface ComfyAfterQueuedAction extends Record<any, any> {
+export interface ComfyAfterQueuedEventProperties extends Record<any, any> {
     prompt: SerializedPrompt
 }
 
-export class ComfyAfterQueuedAction extends ComfyGraphNode {
-    override properties: ComfyCopyActionProperties = {
+export class ComfyAfterQueuedEvent extends ComfyGraphNode {
+    override properties: ComfyAfterQueuedEventProperties = {
         prompt: null
     }
 
@@ -41,8 +41,8 @@ export class ComfyAfterQueuedAction extends ComfyGraphNode {
 }
 
 LiteGraph.registerNodeType({
-    class: ComfyAfterQueuedAction,
-    title: "Comfy.AfterQueuedAction",
+    class: ComfyAfterQueuedEvent,
+    title: "Comfy.AfterQueuedEvent",
     desc: "Triggers a 'bang' event when a prompt is queued.",
     type: "actions/after_queued"
 })

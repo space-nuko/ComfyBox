@@ -15,7 +15,6 @@ import type { FileData as GradioFileData } from "@gradio/upload";
 import queueState from "$lib/stores/queueState";
 
 export interface ComfyWidgetProperties extends Record<string, any> {
-    hidden?: boolean,
     defaultValue: any
 }
 
@@ -60,7 +59,6 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     constructor(name: string, value: T) {
         const color = LGraphCanvas.node_colors["blue"]
         super(name)
-        this.setProperty("hidden", false)
         this.value = writable(value)
         this.color ||= color.color
         this.bgColor ||= color.bgColor
@@ -215,7 +213,6 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     override onConfigure(o: SerializedLGraphNode) {
         this.value.set((o as any).comfyValue);
         this.shownOutputProperties = (o as any).shownOutputProperties;
-        this.setProperty("hidden", false)
     }
 }
 
