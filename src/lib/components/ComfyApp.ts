@@ -108,7 +108,7 @@ export default class ComfyApp {
             const json = localStorage.getItem("workflow");
             if (json) {
                 const state = JSON.parse(json) as SerializedAppState;
-                this.deserialize(state)
+                await this.deserialize(state)
                 restored = true;
             }
         } catch (err) {
@@ -117,7 +117,7 @@ export default class ComfyApp {
 
         // We failed to restore a workflow so load the default
         if (!restored) {
-            this.initDefaultGraph();
+            await this.initDefaultGraph();
         }
 
         // Save current workflow automatically
@@ -344,7 +344,7 @@ export default class ComfyApp {
         }
     }
 
-    deserialize(data: SerializedAppState) {
+    async deserialize(data: SerializedAppState) {
         if (data.version !== COMFYBOX_SERIAL_VERSION) {
             throw `Invalid ComfyBox saved data format: ${data.version}`
         }
@@ -363,11 +363,13 @@ export default class ComfyApp {
 
         // Restore canvas offset/zoom
         this.lCanvas.deserialize(data.canvas)
+
+        await this.refreshComboInNodes();
     }
 
-    initDefaultGraph() {
+    async initDefaultGraph() {
         const state = structuredClone(defaultGraph)
-        this.deserialize(state)
+        await this.deserialize(state)
     }
 
     /**
