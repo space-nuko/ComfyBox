@@ -11,7 +11,7 @@
  export let widget: WidgetLayout | null = null;
  let node: ComfyGalleryNode | null = null;
  let nodeValue: Writable<GradioFileData[]> | null = null;
- let propsChanged: Writable<boolean> | null = null;
+ let propsChanged: Writable<number> | null = null;
  let option: number | null = null;
 
  $: widget && setNodeValue(widget);

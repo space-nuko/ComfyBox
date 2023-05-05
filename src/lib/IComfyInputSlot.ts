@@ -14,6 +14,7 @@ export type ComfyInputConfig = {
 
 export default interface IComfyInputSlot extends INodeInputSlot {
     serialize: boolean,
-    defaultWidgetNode?: new (name?: string) => ComfyWidgetNode,
+    defaultWidgetNode: new (name?: string) => ComfyWidgetNode
+    widgetNodeType?: string,
     config: ComfyInputConfig, // stores range min/max/step, etc.
 }

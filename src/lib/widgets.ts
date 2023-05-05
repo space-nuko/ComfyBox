@@ -2,7 +2,7 @@ import type { IWidget, LGraphNode } from "@litegraph-js/core";
 import ComfyValueControlWidget from "./widgets/ComfyValueControlWidget";
 import type { ComfyInputConfig } from "./IComfyInputSlot";
 import type IComfyInputSlot from "./IComfyInputSlot";
-import { BuiltInSlotShape } from "@litegraph-ts/core";
+import { BuiltInSlotShape, LiteGraph } from "@litegraph-ts/core";
 import { ComfyComboNode, ComfySliderNode, ComfyTextNode } from "./nodes";
 
 type WidgetFactory = (node: LGraphNode, inputName: string, inputData: any) => IComfyInputSlot;
@@ -23,6 +23,14 @@ function addComfyInput(node: LGraphNode, inputName: string, extraInfo: Partial<I
     const input = node.addInput(inputName) as IComfyInputSlot
     for (const [k, v] of Object.entries(extraInfo))
         input[k] = v
+
+    if (input.defaultWidgetNode) {
+        const ty = Object.values(LiteGraph.registered_node_types)
+            .find(v => v.class === input.defaultWidgetNode)
+        if (ty)
+            input.widgetNodeType = ty.type
+    }
+
     input.serialize = true;
     return input;
 }

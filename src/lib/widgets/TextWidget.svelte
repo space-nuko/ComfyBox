@@ -6,7 +6,7 @@
  export let widget: WidgetLayout | null = null;
  let node: ComfyComboNode | null = null;
  let nodeValue: Writable<string> | null = null;
- let propsChanged: Writable<boolean> | null = null;
+ let propsChanged: Writable<number> | null = null;
  let itemValue: WidgetUIStateStore | null = null;
 
  $: widget && setNodeValue(widget);

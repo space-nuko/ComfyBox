@@ -6,7 +6,7 @@
  export let widget: WidgetLayout | null = null;
  let node: ComfySliderNode | null = null;
  let nodeValue: Writable<number> | null = null;
- let propsChanged: Writable<boolean> | null = null;
+ let propsChanged: Writable<number> | null = null;
  let option: number | null = null;
 
  $: widget && setNodeValue(widget);

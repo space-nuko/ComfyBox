@@ -23,6 +23,7 @@ import layoutState from "$lib/stores/layoutState";
 import { toast } from '@zerodevx/svelte-toast'
 import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
+import { get } from "svelte/store";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -616,18 +617,29 @@ export default class ComfyApp {
 
             const def = defs[node.type];
 
-            throw "refreshComboInNodes unimplemented!"
-            // for (const widgetNum in node.widgets) {
-            //     const widget = node.widgets[widgetNum]
+            for (let index = 0; index < node.inputs.length; index++) {
+                const input = node.inputs[index];
+                if ("config" in input) {
+                    const comfyInput = input as IComfyInputSlot;
 
-            //     if (widget.type == "combo" && def["input"]["required"][widget.name] !== undefined) {
-            //         widget.options.values = def["input"]["required"][widget.name][0];
+                    console.warn("RefreshCombo", comfyInput.defaultWidgetNode, comfyInput)
 
-            //         if (!widget.options.values.includes(widget.value)) {
-            //             widget.value = widget.options.values[0];
-            //         }
-            //     }
-            // }
+                    if (comfyInput.defaultWidgetNode == nodes.ComfyComboNode && def["input"]["required"][comfyInput.name] !== undefined) {
+                        comfyInput.config.values = def["input"]["required"][comfyInput.name][0];
+
+                        console.warn("RefreshCombo", comfyInput.config.values, def["input"]["required"][comfyInput.name])
+                        const inputNode = node.getInputNode(index)
+
+                        if (inputNode && "doAutoConfig" in inputNode) {
+                            const comfyInputNode = inputNode as nodes.ComfyWidgetNode;
+                            comfyInputNode.doAutoConfig(comfyInput)
+                            if (!comfyInput.config.values.includes(get(comfyInputNode.value))) {
+                                comfyInputNode.setValue(comfyInput.config.defaultValue || comfyInput.config.values[0])
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

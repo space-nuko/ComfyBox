@@ -27,7 +27,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     abstract properties: ComfyWidgetProperties;
 
     value: Writable<T>
-    propsChanged: Writable<boolean> = writable(true) // dummy to indicate if props changed
+    propsChanged: Writable<number> = writable(0) // dummy to indicate if props changed
     unsubscribe: Unsubscriber;
 
     /** Svelte class for the frontend logic */
@@ -119,6 +119,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
             if (this.inputs.length >= this.inputIndex) {
                 const data = this.getInputData(this.inputIndex)
                 if (data) { // TODO can "null" be a legitimate value here?
+                    console.log(data)
                     this.setValue(data)
                     const input = this.getInputLink(this.inputIndex)
                     input.data = null;
@@ -145,28 +146,31 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         inputNode: LGraphNode,
         inputIndex: number
     ): boolean {
-        if (this.autoConfig) {
-            // Copy properties from default config in input slot
-            if ("config" in input) {
-                const comfyInput = input as IComfyInputSlot;
-                for (const key in comfyInput.config)
-                    this.setProperty(key, comfyInput.config[key])
-
-                if ("defaultValue" in this.properties)
-                    this.setValue(this.properties.defaultValue)
-
-                const widget = layoutState.findLayoutForNode(this.id)
-                if (widget && input.name !== "") {
-                    widget.attrs.title = input.name;
-                }
-
-                console.debug("Property copy", input, this.properties)
-
-                this.setValue(get(this.value))
-            }
+        if (this.autoConfig && "config" in input) {
+            this.doAutoConfig(input as IComfyInputSlot)
         }
 
         return true;
+    }
+
+    doAutoConfig(input: IComfyInputSlot) {
+        // Copy properties from default config in input slot
+        const comfyInput = input as IComfyInputSlot;
+        for (const key in comfyInput.config)
+            this.setProperty(key, comfyInput.config[key])
+
+        if ("defaultValue" in this.properties)
+            this.setValue(this.properties.defaultValue)
+
+        const widget = layoutState.findLayoutForNode(this.id)
+        if (widget && input.name !== "") {
+            widget.attrs.title = input.name;
+        }
+
+        console.debug("Property copy", input, this.properties)
+
+        this.setValue(get(this.value))
+        this.propsChanged.set(get(this.propsChanged) + 1)
     }
 
     onConnectionsChange(
@@ -195,12 +199,13 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         }
 
         // Force reactivity change so the frontend can be updated with the new props
-        this.propsChanged.set(!get(this.propsChanged))
+        this.propsChanged.set(get(this.propsChanged) + 1)
     }
 
     clampOneConfig(input: IComfyInputSlot) { }
 
     override onSerialize(o: SerializedLGraphNode) {
+        super.onSerialize(o);
         (o as any).comfyValue = get(this.value);
         (o as any).shownOutputProperties = this.shownOutputProperties
     }

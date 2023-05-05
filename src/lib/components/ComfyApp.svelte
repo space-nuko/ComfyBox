@@ -135,6 +135,10 @@
 
      refreshView();
  })
+
+ async function doRefreshCombos() {
+     await app.refreshComboInNodes()
+ }
 </script>
 
 <div id="main">
@@ -178,6 +182,9 @@
         </Button>
         <Button variant="secondary" on:click={doRecenter}>
             Recenter
+        </Button>
+        <Button variant="secondary" on:click={doRefreshCombos}>
+            🔄
         </Button>
         <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
         <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/>

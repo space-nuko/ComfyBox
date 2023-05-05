@@ -91,3 +91,37 @@ LiteGraph.registerNodeType({
     desc: "Copies its input to its output when an event is received",
     type: "actions/copy"
 })
+
+export interface ComfySwapActionProperties extends Record<any, any> {
+}
+
+export class ComfySwapAction extends ComfyGraphNode {
+    override properties: ComfySwapActionProperties = {
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "A", type: "*" },
+            { name: "B", type: "*" },
+            { name: "swap", type: BuiltInSlotType.ACTION }
+        ],
+        outputs: [
+            { name: "B", type: "*" },
+            { name: "A", type: "*" }
+        ],
+    }
+
+    override onAction(action: any, param: any) {
+        const a = this.getInputData(0)
+        const b = this.getInputData(1)
+        this.setOutputData(0, a)
+        this.setOutputData(1, b)
+    };
+}
+
+LiteGraph.registerNodeType({
+    class: ComfySwapAction,
+    title: "Comfy.SwapAction",
+    desc: "Swaps two inputs when triggered",
+    type: "actions/swap"
+})

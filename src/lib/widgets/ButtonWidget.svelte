@@ -7,7 +7,7 @@
  export let widget: WidgetLayout | null = null;
  let node: ComfyButtonNode | null = null;
  let nodeValue: Writable<boolean> | null = null;
- let propsChanged: Writable<boolean> | null = null;
+ let propsChanged: Writable<number> | null = null;
 
  $: widget && setNodeValue(widget);
 
