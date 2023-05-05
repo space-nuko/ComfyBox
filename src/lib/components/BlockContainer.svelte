@@ -16,14 +16,17 @@
  export let zIndex: number = 0;
  export let classes: string[] = [];
  export let showHandles: boolean = false;
+ let attrsChanged: Writable<boolean> | null = null;
  let children: IDragItem[] | null = null;
  const flipDurationMs = 100;
 
  $: if (container) {
      children = $layoutState.allItems[container.id].children;
+     attrsChanged = container.attrsChanged
  }
  else {
      children = null;
+     attrsChanged = null
  }
 
  function handleConsider(evt: any) {
@@ -38,52 +41,48 @@
 </script>
 
 {#if container && children}
-<div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')}"
-     class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(container.id)}
-     class:root-container={zIndex === 0}
-     class:is-executing={container.isNodeExecuting}
-     class:container-edit-outline={$uiState.uiEditMode === "widgets" && zIndex > 1}>
-    <Block>
-        {#if container.attrs.showTitle}
-            <label for={String(container.id)} class={$uiState.uiEditMode === "widgets" ? "edit-title-label" : ""}>
-                <BlockTitle>
-                    {#if $uiState.uiEditMode === "widgets"}
-                        <input class="edit-title" bind:value={container.attrs.title} type="text" minlength="1" />
-                    {:else}
-                        {container.attrs.title}
-                    {/if}
-                </BlockTitle>
-            </label>
-        {/if}
-        <div class="v-pane"
-             class:empty={children.length === 0}
-             class:edit={$uiState.uiEditMode === "widgets" && zIndex > 1}
-            use:dndzone="{{
-                         items: children,
-                         flipDurationMs,
-                         centreDraggedOnCursor: true,
-                         morphDisabled: true,
-                         dropFromOthersDisabled: zIndex === 0,
-                         dragDisabled: zIndex === 0 || $layoutState.currentSelection.length > 2 || $uiState.uiEditMode === "disabled"
-                         }}"
-            on:consider="{handleConsider}"
-            on:finalize="{handleFinalize}"
-            >
-            {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
-                <div class="animation-wrapper"
-                     animate:flip={{duration:flipDurationMs}}>
-                    <WidgetContainer dragItem={item} zIndex={zIndex+1} />
-                    {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
-                        <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
-                    {/if}
+    {#key $attrsChanged}
+        <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')}"
+             class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(container.id)}
+             class:root-container={zIndex === 0}
+             class:is-executing={container.isNodeExecuting}
+             class:container-edit-outline={$uiState.uiEditMode === "widgets" && zIndex > 1}>
+            <Block>
+                {#if container.attrs.showTitle}
+                    <label for={String(container.id)} class={$uiState.uiEditMode === "widgets" ? "edit-title-label" : ""}>
+                        <BlockTitle>{container.attrs.title}</BlockTitle>
+                    </label>
+                {/if}
+                <div class="v-pane"
+                     class:empty={children.length === 0}
+                     class:edit={$uiState.uiEditMode === "widgets" && zIndex > 1}
+                    use:dndzone="{{
+                                 items: children,
+                                 flipDurationMs,
+                                 centreDraggedOnCursor: true,
+                                 morphDisabled: true,
+                                 dropFromOthersDisabled: zIndex === 0,
+                                 dragDisabled: zIndex === 0 || $layoutState.currentSelection.length > 2 || $uiState.uiEditMode === "disabled"
+                                 }}"
+                    on:consider="{handleConsider}"
+                    on:finalize="{handleFinalize}"
+                    >
+                    {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
+                        <div class="animation-wrapper"
+                             animate:flip={{duration:flipDurationMs}}>
+                            <WidgetContainer dragItem={item} zIndex={zIndex+1} />
+                            {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
+                                <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
+                            {/if}
+                        </div>
+                    {/each}
                 </div>
-            {/each}
+                {#if showHandles}
+                    <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+                {/if}
+            </Block>
         </div>
-        {#if showHandles}
-            <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
-        {/if}
-    </Block>
-</div>
+    {/key}
 {/if}
 
 <style lang="scss">

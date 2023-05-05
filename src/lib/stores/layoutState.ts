@@ -24,7 +24,8 @@ export type LayoutState = {
 export type AttributesSpec = {
     name: string,
     type: string,
-    editable: boolean
+    editable: boolean,
+    values?: string[]
 }
 
 export type AttributesCategorySpec = {
@@ -50,8 +51,9 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
             },
             {
                 name: "direction",
-                type: "string",
+                type: "enum",
                 editable: true,
+                values: ["horizontal", "vertical"]
             },
             {
                 name: "classes",
@@ -74,7 +76,8 @@ export interface IDragItem {
     type: string,
     id: DragItemID,
     isNodeExecuting?: boolean,
-    attrs: Attributes
+    attrs: Attributes,
+    attrsChanged: Writable<boolean>
 }
 
 export interface ContainerLayout extends IDragItem {
@@ -141,6 +144,7 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
     const dragItem: ContainerLayout = {
         type: "container",
         id: `${state.currentId++}`,
+        attrsChanged: writable(false),
         attrs: {
             title: "Container",
             showTitle: true,
@@ -166,6 +170,7 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
         type: "widget",
         id: `${state.currentId++}`,
         node: node,
+        attrsChanged: writable(false),
         attrs: {
             title: widgetName,
             showTitle: true,
@@ -436,7 +441,8 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
         const dragItem: IDragItem = {
             type: entry.dragItem.type,
             id: entry.dragItem.id,
-            attrs: entry.dragItem.attrs
+            attrs: entry.dragItem.attrs,
+            attrsChanged: writable(false)
         };
 
         const dragEntry: DragItemEntry = {

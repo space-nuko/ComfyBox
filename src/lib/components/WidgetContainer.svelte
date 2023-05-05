@@ -5,11 +5,13 @@
  import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
  import { startDrag, stopDrag } from "$lib/utils"
  import BlockContainer from "./BlockContainer.svelte"
+ import { type Writable } from "svelte/store"
 
  export let dragItem: IDragItem | null = null;
  export let zIndex: number = 0;
  export let classes: string[] = [];
  let container: ContainerLayout | null = null;
+ let attrsChanged: Writable<boolean> | null = null;
  let widget: WidgetLayout | null = null;
  let showHandles: boolean = false;
 
@@ -17,13 +19,16 @@
      dragItem = null;
      container = null;
      widget = null;
+     attrsChanged = null;
  }
  else if (dragItem.type === "container") {
      container = dragItem as ContainerLayout;
+     attrsChanged = container.attrsChanged;
      widget = null;
  }
  else if (dragItem.type === "widget") {
      widget = dragItem as WidgetLayout;
+     attrsChanged = widget.attrsChanged;
      container = null;
  }
 
@@ -35,21 +40,31 @@
  $: if ($queueState && widget && widget.node) {
      dragItem.isNodeExecuting = $queueState.runningNodeId === widget.node.id;
  }
+
+ function getWidgetClass() {
+     const title = widget.node.type.replace("/", "-").replace(".", "-")
+     return `widget--${title}`
+ }
 </script>
 
 
 {#if container}
-    <BlockContainer {container} {classes} {zIndex} {showHandles} />
+    {#key $attrsChanged}
+        <BlockContainer {container} {classes} {zIndex} {showHandles} />
+    {/key}
 {:else if widget && widget.node}
-    <div class="widget" class:widget-edit-outline={$uiState.uiEditMode === "widgets" && zIndex > 1}
-        class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(widget.id)}
-        class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.node.id}
-        >
-        <svelte:component this={widget.node.svelteComponentType} {widget} />
-    </div>
-    {#if showHandles}
-        <div class="handle handle-widget" style="z-index: {zIndex+100}" data-drag-item-id={widget.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
-    {/if}
+    {#key $attrsChanged}
+        <div class="widget {widget.attrs.classes} {getWidgetClass()}"
+             class:widget-edit-outline={$uiState.uiEditMode === "widgets" && zIndex > 1}
+            class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(widget.id)}
+            class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.node.id}
+            >
+            <svelte:component this={widget.node.svelteComponentType} {widget} />
+        </div>
+        {#if showHandles}
+            <div class="handle handle-widget" style="z-index: {zIndex+100}" data-drag-item-id={widget.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+        {/if}
+    {/key}
 {/if}
 
 <style lang="scss">

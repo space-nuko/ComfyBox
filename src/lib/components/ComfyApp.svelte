@@ -16,6 +16,7 @@
  import { LGraph } from "@litegraph-ts/core";
  import LightboxModal from "./LightboxModal.svelte";
  import ComfyQueue from "./ComfyQueue.svelte";
+ import ComfyProperties from "./ComfyProperties.svelte";
  import queueState from "$lib/stores/queueState";
 
  export let app: ComfyApp = undefined;
@@ -23,6 +24,7 @@
  let queue: ComfyQueue = undefined;
  let mainElem: HTMLDivElement;
  let uiPane: ComfyUIPane = undefined;
+ let props: ComfyProperties = undefined;
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
  let hasShownUIHelpToast: boolean = false;
@@ -64,15 +66,27 @@
      }
  }
 
- let sidebarSize = 20;
+ let propsSidebarSize = 15;
 
- function toggleSidebar() {
-     if (sidebarSize == 0) {
-         sidebarSize = 20;
+ function toggleProps() {
+     if (propsSidebarSize == 0) {
+         propsSidebarSize = 15;
          app.resizeCanvas();
      }
      else {
-         sidebarSize = 0;
+         propsSidebarSize = 0;
+     }
+ }
+
+ let queueSidebarSize = 15;
+
+ function toggleQueue() {
+     if (queueSidebarSize == 0) {
+         queueSidebarSize = 15;
+         app.resizeCanvas();
+     }
+     else {
+         queueSidebarSize = 0;
      }
  }
 
@@ -153,6 +167,11 @@
     <div id="dropzone" class="dropzone"></div>
     <div id="container" bind:this={containerElem}>
         <Splitpanes theme="comfy" on:resize={refreshView}>
+            <Pane bind:size={propsSidebarSize}>
+                <div class="sidebar-wrapper pane-wrapper">
+                    <ComfyProperties bind:this={props} />
+                </div>
+            </Pane>
             <Pane>
                 <Splitpanes theme="comfy" on:resize={refreshView} horizontal="{true}">
                     <Pane>
@@ -165,7 +184,7 @@
                     </Pane>
                 </Splitpanes>
             </Pane>
-            <Pane bind:size={sidebarSize}>
+            <Pane bind:size={queueSidebarSize}>
                 <div class="sidebar-wrapper pane-wrapper">
                     <ComfyQueue bind:this={queue} />
                 </div>
@@ -179,8 +198,11 @@
         <Button variant="secondary" on:click={toggleGraph}>
             Toggle Graph
         </Button>
-        <Button variant="secondary" on:click={toggleSidebar}>
-            Toggle Sidebar
+        <Button variant="secondary" on:click={toggleProps}>
+            Toggle Props
+        </Button>
+        <Button variant="secondary" on:click={toggleQueue}>
+            Toggle Queue
         </Button>
         <Button variant="secondary" on:click={doSave}>
             Save
