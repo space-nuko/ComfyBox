@@ -1,7 +1,6 @@
 import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
 import ComfyAPI from "$lib/api"
-import { ComfyWidgets } from "$lib/widgets"
 import defaultGraph from "$lib/defaultGraph"
 import { getPngMetadata, importA1111 } from "$lib/pnginfo";
 import EventEmitter from "events";
@@ -10,6 +9,7 @@ import type TypedEmitter from "typed-emitter";
 // Import nodes
 import "@litegraph-ts/nodes-basic"
 import "@litegraph-ts/nodes-events"
+import "@litegraph-ts/nodes-math"
 import * as nodes from "$lib/nodes/index"
 
 import ComfyGraphCanvas, { type SerializedGraphCanvasState } from "$lib/ComfyGraphCanvas";
@@ -482,17 +482,19 @@ export default class ComfyApp {
             for (let i = 0; i < node.inputs.length; i++) {
                 let parent: ComfyGraphNode = node.getInputNode(i) as ComfyGraphNode;
                 if (parent) {
+                    const seen = {}
                     let link = node.getInputLink(i);
                     while (parent && !parent.isBackendNode) {
                         link = parent.getInputLink(link.origin_slot);
-                        if (link) {
+                        if (link && !seen[link.id]) {
+                            seen[link.id] = true
                             parent = parent.getInputNode(link.origin_slot) as ComfyGraphNode;
                         } else {
                             parent = null;
                         }
                     }
 
-                    if (link) {
+                    if (link && parent && parent.isBackendNode) {
                         const input = node.inputs[i]
                         // TODO can null be a legitimate value in some cases?
                         // Nodes like CLIPLoader will never have a value in the frontend, hence "null".

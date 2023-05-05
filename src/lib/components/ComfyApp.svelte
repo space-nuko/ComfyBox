@@ -26,7 +26,7 @@
  let resizeTimeout: NodeJS.Timeout | null;
  let hasShownUIHelpToast: boolean = false;
 
- let debugLayout: boolean = true;
+ let debugLayout: boolean = false;
 
  const toastOptions = {
      intro: { duration: 200 },

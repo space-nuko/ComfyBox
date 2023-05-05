@@ -36,6 +36,15 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     /** If false, user manually set min/max/step, and should not be autoinherited from connected input */
     autoConfig: boolean = true;
 
+    copyFromInputLink: boolean = true;
+
+    /** Names of properties to add as inputs */
+    // shownInputProperties: string[] = []
+
+    /** Names of properties to add as outputs */
+    private shownOutputProperties: Record<string, { type: string, index: number }> = {}
+    outputProperties: { name: string, type: string }[] = []
+
     override isBackendNode = false;
     override serialize_widgets = true;
 
@@ -62,6 +71,18 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         this.unsubscribe = this.value.subscribe(this.onValueUpdated.bind(this))
     }
 
+    addPropertyAsOutput(propertyName: string, type: string) {
+        if (this.shownOutputProperties[propertyName])
+            return;
+
+        if (!(propertyName in this.properties)) {
+            throw `No property named ${propertyName} found!`
+        }
+
+        this.shownOutputProperties[propertyName] = { type, index: this.outputs.length }
+        this.addOutput(propertyName, type)
+    }
+
     formatValue(value: any): string {
         return Watch.toString(value)
     }
@@ -84,20 +105,32 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         this.value.set(value)
     }
 
-    abstract validateValue(value: any): boolean;
+    override onPropertyChanged(property: string, value: any, prevValue?: any) {
+        const data = this.shownOutputProperties[property]
+        if (data)
+            this.setOutputData(data.index, value)
+    }
 
     /*
      * Logic to run if this widget can be treated as output (slider, combo, text)
      */
     override onExecute() {
-        if (this.inputs.length >= this.inputIndex) {
-            const data = this.getInputData(this.inputIndex)
-            if (data && this.validateValue(data)) { // TODO can "null" be a legitimate value here?
-                this.setValue(data)
+        if (this.copyFromInputLink) {
+            if (this.inputs.length >= this.inputIndex) {
+                const data = this.getInputData(this.inputIndex)
+                if (data) { // TODO can "null" be a legitimate value here?
+                    this.setValue(data)
+                    const input = this.getInputLink(this.inputIndex)
+                    input.data = null;
+                }
             }
         }
         if (this.outputs.length >= this.outputIndex) {
             this.setOutputData(this.outputIndex, get(this.value))
+        }
+        for (const propName in this.shownOutputProperties) {
+            const data = this.shownOutputProperties[propName]
+            this.setOutputData(data.index, this.properties[propName])
         }
     }
 
@@ -118,18 +151,19 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
                 const comfyInput = input as IComfyInputSlot;
                 for (const key in comfyInput.config)
                     this.setProperty(key, comfyInput.config[key])
+
+                if ("defaultValue" in this.properties)
+                    this.setValue(this.properties.defaultValue)
+
+                const widget = layoutState.findLayoutForNode(this.id)
+                if (widget && input.name !== "") {
+                    widget.attrs.title = input.name;
+                }
+
+                console.debug("Property copy", input, this.properties)
+
+                this.setValue(get(this.value))
             }
-            if ("defaultValue" in this.properties)
-                this.setValue(this.properties.defaultValue)
-
-            const widget = layoutState.findLayoutForNode(this.id)
-            if (widget && input.name !== "") {
-                widget.attrs.title = input.name;
-            }
-
-            console.debug("Property copy", input, this.properties)
-
-            this.setValue(get(this.value))
         }
 
         return true;
@@ -167,11 +201,13 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     clampOneConfig(input: IComfyInputSlot) { }
 
     override onSerialize(o: SerializedLGraphNode) {
-        (o as any).comfyValue = get(this.value)
+        (o as any).comfyValue = get(this.value);
+        (o as any).shownOutputProperties = this.shownOutputProperties
     }
 
     override onConfigure(o: SerializedLGraphNode) {
-        this.value.set((o as any).comfyValue)
+        this.value.set((o as any).comfyValue);
+        this.shownOutputProperties = (o as any).shownOutputProperties;
     }
 }
 
@@ -199,25 +235,32 @@ export class ComfySliderNode extends ComfyWidgetNode<number> {
         ],
         outputs: [
             { name: "value", type: "number" },
-            { name: "changed", type: BuiltInSlotType.EVENT }
+            { name: "changed", type: BuiltInSlotType.EVENT },
         ]
     }
+
+    override outputProperties = [
+        { name: "min", type: "number" },
+        { name: "max", type: "number" },
+        { name: "step", type: "number" },
+        { name: "precision", type: "number" },
+    ]
 
     constructor(name?: string) {
         super(name, 0)
     }
 
-    override validateValue(value: any): boolean {
-        return typeof value === "number"
-            && value >= this.properties.min
-            && value <= this.properties.max
+    override setValue(value: any) {
+        if (typeof value !== "number")
+            return;
+        super.setValue(clamp(value, this.properties.min, this.properties.max))
     }
 
     override clampOneConfig(input: IComfyInputSlot) {
         // this.setProperty("min", clamp(this.properties.min, input.config.min, input.config.max))
         // this.setProperty("max", clamp(this.properties.max, input.config.max, input.config.min))
         // this.setProperty("step", Math.min(this.properties.step, input.config.step))
-        this.setValue(clamp(this.properties.defaultValue, this.properties.min, this.properties.max))
+        this.setValue(this.properties.defaultValue)
     }
 }
 
@@ -280,10 +323,10 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
         return true;
     }
 
-    override validateValue(value: any): boolean {
-        if (typeof value !== "string")
-            return false;
-        return this.properties.values.indexOf(value) !== -1;
+    override setValue(value: any) {
+        if (typeof value !== "string" || this.properties.values.indexOf(value) === -1)
+            return;
+        super.setValue(value)
     }
 
     override clampOneConfig(input: IComfyInputSlot) {
@@ -291,7 +334,7 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
             if (input.config.values.length === 0)
                 this.setValue("")
             else
-                this.setValue(input.config.values[0])
+                this.setValue(input.config.defaultValue || input.config.values[0])
         }
     }
 }
@@ -329,8 +372,8 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
         super(name, "")
     }
 
-    override validateValue(value: any): boolean {
-        return typeof value === "string"
+    override setValue(value: any) {
+        super.setValue(`${value}`)
     }
 }
 
@@ -368,6 +411,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     }
 
     override svelteComponentType = GalleryWidget
+    override copyFromInputLink = false;
 
     constructor(name?: string) {
         super(name, [])
@@ -380,12 +424,29 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
         }
     }
 
-    override formatValue(value: GradioFileData[]): string {
-        return `Images: ${value.length}`
+    override formatValue(value: GradioFileData[] | null): string {
+        return `Images: ${value?.length || 0}`
     }
 
-    override validateValue(value: any): boolean {
-        return Array.isArray(value) && value.every(e => "images" in e)
+    private convertItems(output: GalleryOutput): GradioFileData[] {
+        return output.images.map(r => {
+            // TODO configure backend URL
+            const url = "http://localhost:8188/view?"
+            const params = new URLSearchParams(r)
+            return {
+                name: null,
+                data: url + params
+            }
+        });
+    }
+
+    override setValue(value: any) {
+        if (Array.isArray(value)) {
+            super.setValue(value)
+        }
+        else {
+            super.setValue([])
+        }
     }
 
     receiveOutput() {
@@ -394,15 +455,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
             const data = link.data as GalleryOutput
             console.debug("[ComfyGalleryNode] Received output!", data)
 
-            const galleryItems: GradioFileData[] = data.images.map(r => {
-                // TODO configure backend URL
-                const url = "http://localhost:8188/view?"
-                const params = new URLSearchParams(r)
-                return {
-                    name: null,
-                    data: url + params
-                }
-            });
+            const galleryItems: GradioFileData[] = this.convertItems(link.data)
 
             const currentValue = get(this.value)
             this.setValue(currentValue.concat(galleryItems))
@@ -429,7 +482,7 @@ export class ComfyButtonNode extends ComfyWidgetNode<boolean> {
 
     static slotLayout: SlotLayout = {
         outputs: [
-            { name: "event", type: BuiltInSlotType.EVENT },
+            { name: "clicked", type: BuiltInSlotType.EVENT },
             { name: "isClicked", type: "boolean" },
         ]
     }
@@ -437,8 +490,8 @@ export class ComfyButtonNode extends ComfyWidgetNode<boolean> {
     override outputIndex = 1;
     override svelteComponentType = ButtonWidget;
 
-    override validateValue(value: any): boolean {
-        return typeof value === "boolean"
+    override setValue(value: any) {
+        super.setValue(Boolean(value))
     }
 
     onClick() {

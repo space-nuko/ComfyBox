@@ -8,6 +8,7 @@ import { get } from "svelte/store";
 import type ComfyGraphNode from "./nodes/ComfyGraphNode";
 import type IComfyInputSlot from "./IComfyInputSlot";
 import type { ComfyBackendNode } from "./nodes/ComfyBackendNode";
+import type { ComfyWidgetNode } from "./nodes";
 
 type ComfyGraphEvents = {
     configured: (graph: LGraph) => void
@@ -52,31 +53,56 @@ export default class ComfyGraph extends LGraph {
         layoutState.nodeAdded(node)
         this.graphSync.onNodeAdded(node);
 
-        if ("comfyClass" in node                // Is this a comfy node
-            && !("svelteComponentType" in node) // ...and not also a ComfyWidgetNode
-            && !options.addedByDeserialize      // ...and we're not trying to deserialize an existing workflow
-            && get(uiState).autoAddUI) {
-            console.debug("[ComfyGraph] AutoAdd UI")
-            const comfyNode = node as ComfyBackendNode;
-            const widgetNodesAdded = []
-            for (let index = 0; index < comfyNode.inputs.length; index++) {
-                const input = comfyNode.inputs[index];
-                if ("config" in input) {
-                    const comfyInput = input as IComfyInputSlot;
-                    if (comfyInput.defaultWidgetNode) {
-                        const widgetNode = LiteGraph.createNode(comfyInput.defaultWidgetNode)
-                        const inputPos = comfyNode.getConnectionPos(true, index);
-                        this.add(widgetNode)
-                        widgetNode.connect(0, comfyNode, index);
-                        widgetNode.collapse();
-                        widgetNode.pos = [inputPos[0] - 140, inputPos[1] + LiteGraph.NODE_SLOT_HEIGHT / 2];
-                        widgetNodesAdded.push(widgetNode)
+        if ("outputProperties" in node) {
+            const widgetNode = node as ComfyWidgetNode;
+            for (const propName of widgetNode.outputProperties) {
+                widgetNode.addPropertyAsOutput(propName.name, propName.type)
+            }
+        }
+
+        // Check if the class declared a default widget layout
+        if ("defaultWidgets" in node && !("svelteComponentType" in node)) {
+            const comfyNode = node as ComfyGraphNode;
+            const widgets = comfyNode.defaultWidgets;
+
+            if (widgets) {
+                if (widgets.inputs) {
+                    for (const pair of Object.entries(comfyNode.defaultWidgets.inputs)) {
+                        const [index, spec] = pair
+                        const input = comfyNode.inputs[index] as IComfyInputSlot;
+                        input.defaultWidgetNode = spec.defaultWidgetNode;
+                        if (spec.config)
+                            input.config = spec.config
                     }
                 }
             }
-            const dragItems = widgetNodesAdded.map(wn => get(layoutState).allItemsByNode[wn.id]?.dragItem).filter(di => di)
-            console.debug("[ComfyGraph] Group new widgets", dragItems)
-            layoutState.groupItems(dragItems, { title: comfyNode.comfyClass })
+        }
+
+        if (get(uiState).autoAddUI) {
+            if (!("svelteComponentType" in node) && !options.addedByDeserialize) {
+                console.debug("[ComfyGraph] AutoAdd UI")
+                const comfyNode = node as ComfyGraphNode;
+                const widgetNodesAdded = []
+                for (let index = 0; index < comfyNode.inputs.length; index++) {
+                    const input = comfyNode.inputs[index];
+                    if ("config" in input) {
+                        const comfyInput = input as IComfyInputSlot;
+                        if (comfyInput.defaultWidgetNode) {
+                            const widgetNode = LiteGraph.createNode(comfyInput.defaultWidgetNode)
+                            const inputPos = comfyNode.getConnectionPos(true, index);
+                            this.add(widgetNode)
+                            widgetNode.connect(0, comfyNode, index);
+                            widgetNode.collapse();
+                            widgetNode.pos = [inputPos[0] - 140, inputPos[1] + LiteGraph.NODE_SLOT_HEIGHT / 2];
+                            widgetNodesAdded.push(widgetNode)
+                        }
+                    }
+                }
+                const dragItems = widgetNodesAdded.map(wn => get(layoutState).allItemsByNode[wn.id]?.dragItem).filter(di => di)
+                console.debug("[ComfyGraph] Group new widgets", dragItems)
+
+                layoutState.groupItems(dragItems, { title: node.title })
+            }
         }
 
         console.debug("Added", node);
