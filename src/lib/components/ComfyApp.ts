@@ -24,10 +24,12 @@ import { toast } from '@zerodevx/svelte-toast'
 import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import { get } from "svelte/store";
+import uiState from "$lib/stores/uiState";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
 LiteGraph.catch_exceptions = false;
+LiteGraph.CANVAS_GRID_SIZE = 32;
 
 if (typeof window !== "undefined") {
     // Load default visibility
