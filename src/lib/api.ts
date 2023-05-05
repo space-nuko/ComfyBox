@@ -231,7 +231,7 @@ export default class ComfyAPI extends EventTarget {
             };
         } catch (error) {
             console.error(error);
-            return { Running: [], Pending: [] };
+            return { Running: [], Pending: [], error };
         }
     }
 
@@ -245,7 +245,7 @@ export default class ComfyAPI extends EventTarget {
             return { History: Object.values(await res.json()) };
         } catch (error) {
             console.error(error);
-            return { History: [] };
+            return { History: [], error };
         }
     }
 

@@ -5,8 +5,6 @@
  import { Button } from "@gradio/button";
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
  import { Checkbox } from "@gradio/form"
- import widgetState from "$lib/stores/widgetState";
- import nodeState from "$lib/stores/nodeState";
  import uiState from "$lib/stores/uiState";
  import { ImageViewer } from "$lib/ImageViewer";
  import { download } from "$lib/utils"
@@ -18,47 +16,11 @@
 
  let app: ComfyApp | null = null;
 
- let serializedPaneOrder = {};
-
- function serializeAppState(): SerializedAppState {
-     const graph = app.lGraph;
-
-     const serializedGraph = graph.serialize()
-
-     return {
-         createdBy: "ComfyBox",
-         version: 1,
-         workflow: serializedGraph,
-         panes: serializedPaneOrder
-     }
- }
-
- function doAutosave(graph: LGraph): void {
-     const savedWorkflow = serializeAppState();
-     localStorage.setItem("workflow", JSON.stringify(savedWorkflow))
- }
-
- function doRestore(workflow: SerializedAppState) {
-     serializedPaneOrder = workflow.panes;
- }
-
  onMount(async () => {
      if (app)
          return
      app = $uiState.app = new ComfyApp();
 
-     // TODO dedup
-     app.eventBus.on("nodeAdded", nodeState.nodeAdded);
-     app.eventBus.on("nodeRemoved", nodeState.nodeRemoved);
-     app.eventBus.on("configured", nodeState.configureFinished);
-     app.eventBus.on("cleared", nodeState.clear);
-
-     app.eventBus.on("nodeAdded", widgetState.nodeAdded);
-     app.eventBus.on("nodeRemoved", widgetState.nodeRemoved);
-     app.eventBus.on("configured", widgetState.configureFinished);
-     app.eventBus.on("cleared", widgetState.clear);
-     app.eventBus.on("autosave", doAutosave);
-     app.eventBus.on("restored", doRestore);
 
      app.api.addEventListener("status", (ev: CustomEvent) => {
          queueState.statusUpdated(ev.detail as ComfyAPIStatus);

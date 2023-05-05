@@ -2,7 +2,13 @@ import ComfyApp from "./components/ComfyApp";
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import RangeWidget from "$lib/widgets/RangeWidget.svelte";
 import TextWidget from "$lib/widgets/TextWidget.svelte";
- import widgetState, { type WidgetDrawState, type WidgetUIState } from "$lib/stores/widgetState";
+import { get } from "svelte/store"
+import layoutState from "$lib/stores/layoutState"
+import type { SvelteComponentDev } from "svelte/internal";
+
+export function clamp(n: number, min: number, max: number): number {
+    return Math.min(Math.max(n, min), max)
+}
 
 export function download(filename: string, text: string, type: string = "text/plain") {
     const blob = new Blob([text], { type: type });
@@ -18,24 +24,31 @@ export function download(filename: string, text: string, type: string = "text/pl
     }, 0);
 }
 
-export function getComponentForWidgetState(item: WidgetUIState): any {
-    let ctor: any = null;
+export function startDrag(evt: MouseEvent) {
+    const dragItemId: string = evt.target.dataset["dragItemId"];
+    const ls = get(layoutState)
 
-    // custom widgets with TypeScript sources
-    let override = ComfyApp.widget_type_overrides[item.widget.type]
-    if (override) {
-        return override;
+    if (evt.button !== 0) {
+        if (ls.currentSelection.length <= 1 && !ls.isMenuOpen)
+            ls.currentSelection = [dragItemId]
+        return;
     }
 
-    // litegraph.ts built-in widgets
-    switch (item.widget.type) {
-        case "combo":
-            return ComboWidget;
-        case "number":
-            return RangeWidget;
-        case "text":
-            return TextWidget;
-    }
+    const item = ls.allItems[dragItemId].dragItem
 
-    return null;
-}
+    if (evt.ctrlKey) {
+        const index = ls.currentSelection.indexOf(item.id)
+        if (index === -1)
+            ls.currentSelection.push(item.id);
+        else
+            ls.currentSelection.splice(index, 1);
+        ls.currentSelection = ls.currentSelection;
+    }
+    else {
+        ls.currentSelection = [item.id]
+    }
+    layoutState.set(ls)
+};
+
+export function stopDrag(evt: MouseEvent) {
+};

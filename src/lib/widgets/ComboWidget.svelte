@@ -1,50 +1,117 @@
 <script lang="ts">
- import type { WidgetDrawState, WidgetUIState, WidgetUIStateStore } from "$lib/stores/widgetState";
  import { BlockTitle } from "@gradio/atoms";
- import { Dropdown } from "@gradio/form";
- import { get } from "svelte/store";
  import Select from 'svelte-select';
- export let item: WidgetUIState | null = null;
- let itemValue: WidgetUIStateStore | null = null;
- let option: any;
+ import type { ComfyComboNode } from "$lib/nodes/index";
+ import { type WidgetLayout } from "$lib/stores/layoutState";
+ import { get, type Writable } from "svelte/store";
+ export let widget: WidgetLayout | null = null;
+ let node: ComfyComboNode | null = null;
+ let nodeValue: Writable<string> | null = null;
+ let propsChanged: Writable<number> | null = null;
+ let option: any
 
- $: if(item) {
-     if (!itemValue)
-         itemValue = item.value;
-     if (!option)
-         option = get(item.value);
- };
+ export let debug: boolean = false;
 
- $: if (option && itemValue) {
-     $itemValue = option.value
+ $: widget && setNodeValue(widget);
+
+ $: if (nodeValue !== null && (!$propsChanged || $propsChanged)) {
+     if (node.properties.values.indexOf(option.value) === -1) {
+         setOption($nodeValue)
+         $nodeValue = option
+     }
+     else {
+         $nodeValue = option
+         setOption($nodeValue)
+     }
+     setNodeValue(widget)
+     node.properties = node.properties
+ }
+
+ function setNodeValue(widget: WidgetLayout) {
+     if(widget) {
+         node = widget.node as ComfyComboNode
+         nodeValue = node.value;
+         propsChanged = node.propsChanged;
+         setOption($nodeValue) // don't react on option
+     }
+ }
+
+ function setOption(value: any) {
+     option = value;
+ }
+
+ $: if (nodeValue && option && option.value) {
+     $nodeValue = option.value;
+ }
+
+ function getLinkValue() {
+     if (!node)
+         return "???";
+     const links = node.getOutputLinks(0)
+     if (links.length === 0)
+         return "???";
+     return links[0].data
+ }
+
+ let lastPropsChanged: number = 0;
+ let werePropsChanged: boolean = false;
+
+ $: if ($propsChanged !== lastPropsChanged) {
+     werePropsChanged = true;
+     lastPropsChanged = $propsChanged;
+     setTimeout(() => (werePropsChanged = false), 2000);
  }
 </script>
 
-<div class="wrapper gr-combo">
-    {#if item !== null && option !== undefined}
-        <label>
-            <BlockTitle show_label={true}>{item.widget.name}</BlockTitle>
-            <Select
-                bind:value={option}
-                bind:items={item.widget.options.values}
-                disabled={item.widget.options.values.length === 0}
-                clearable={false}
-                on:change
-                on:select
-                on:filter
-                on:blur
-            />
-        </label>
-    {/if}
+<div class="wrapper gr-combo" class:updated={werePropsChanged}>
+    {#key $propsChanged}
+        {#if node !== null && nodeValue !== null}
+            <label>
+                <BlockTitle show_label={true}>{widget.attrs.title}</BlockTitle>
+                <Select
+                    bind:value={option}
+                    bind:items={node.properties.values}
+                    disabled={node.properties.values.length === 0}
+                    clearable={false}
+                    on:change
+                    on:select
+                    on:filter
+                    on:blur
+                />
+                {#if debug}
+                    <div>Value: {option?.value}</div>
+                    <div>Items: {node.properties.values}</div>
+                    <div>NodeValue: {$nodeValue}</div>
+                    <div>LinkValue: {getLinkValue()}</div>
+                {/if}
+            </label>
+        {/if}
+    {/key}
 </div>
 
-<style>
+<style lang="scss">
  .wrapper {
      padding: 2px;
      width: 100%;
  }
 
+ @keyframes -global-light-up {
+     from {
+         background-color: var(--color-yellow-400);
+     }
+     to {
+         background-color: none;
+     }
+ }
+
+ .updated {
+     animation: light-up 1s ease-out;
+     :global(.svelte-select) {
+         animation: light-up 1s ease-out;
+     }
+ }
+
  :global(.svelte-select-list) {
-     z-index: var(--layer-5) !important;
+     z-index: var(--layer-top) !important;
  }
 </style>

@@ -2,15 +2,25 @@ import { writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
 import type ComfyApp from "$lib/components/ComfyApp"
 
+export type UIEditMode = "disabled" | "widgets" | "containers" | "layout";
+
 export type UIState = {
     app: ComfyApp,
     nodesLocked: boolean,
     graphLocked: boolean,
-    unlocked: boolean,
+    autoAddUI: boolean,
+    uiEditMode: UIEditMode
 }
 
 export type WritableUIStateStore = Writable<UIState>;
-const store: WritableUIStateStore = writable({ unlocked: false, graphLocked: true, nodesLocked:false })
+const store: WritableUIStateStore = writable(
+    {
+        app: null,
+        graphLocked: false,
+        nodesLocked: false,
+        autoAddUI: true,
+        uiEditMode: "disabled",
+    })
 
 const uiStateStore: WritableUIStateStore =
 {

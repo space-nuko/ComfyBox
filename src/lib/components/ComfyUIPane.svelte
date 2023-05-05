@@ -1,104 +1,118 @@
 <script lang="ts">
+ import { tick } from 'svelte'
  import { get } from "svelte/store";
  import { LGraphNode, LGraph } from "@litegraph-ts/core";
  import type { IWidget } from "@litegraph-ts/core";
  import ComfyApp  from "./ComfyApp";
  import type { SerializedPanes } from "./ComfyApp"
- import ComfyPane from "./ComfyPane.svelte";
- import widgetState from "$lib/stores/widgetState";
-	import type { DragItem } from "./ComfyUIPane";
+ import WidgetContainer from "./WidgetContainer.svelte";
+ import layoutState, { type ContainerLayout, type DragItem, type IDragItem } from "$lib/stores/layoutState";
+ import uiState from "$lib/stores/uiState";
+
+ import Menu from './menu/Menu.svelte';
+ import MenuOption from './menu/MenuOption.svelte';
+ import MenuDivider from './menu/MenuDivider.svelte';
+ import Icon from './menu/Icon.svelte'
 
  export let app: ComfyApp;
+ let root: IDragItem | null;
  let dragConfigured: boolean = false;
- export let dragItems: DragItem[][] = []
-
- export let totalId = 0;
-
- function findLeastPopulatedPaneIndex(): number {
-     let minWidgetCount = 2 ** 64;
-     let minIndex = 0;
-     let state = get(widgetState);
-     for (let i = 0; i < dragItems.length; i++) {
-         let widgetCount = 0;
-         for (let j = 0; j < dragItems[i].length; j++) {
-             const nodeID = dragItems[i][j].node.id;
-             widgetCount += state[nodeID].length;
-         }
-         if (widgetCount < minWidgetCount) {
-             minWidgetCount = widgetCount
-             minIndex = i;
-         }
-     }
-     return minIndex
- }
-
- function addUIForNewNode(node: LGraphNode, paneIndex?: number) {
-     if (!paneIndex)
-         paneIndex = findLeastPopulatedPaneIndex();
-     dragItems[paneIndex].push({ id: totalId++, node: node });
- }
-
- $: if(app && !dragConfigured) {
-     dragConfigured = true;
-     app.eventBus.on("nodeAdded", addUIForNewNode);
- }
 
  /*
   * Serialize UI panel order so it can be restored when workflow is loaded
   */
  export function serialize(): any {
-     let panels = []
-     for (let i = 0; i < dragItems.length; i++) {
-         panels[i] = [];
-         for (let j = 0; j < dragItems[i].length; j++) {
-             panels[i].push({ nodeId: dragItems[i][j].node.id });
-         }
-     }
-     return {
-         panels
-     }
+     // TODO
  }
 
  export function restore(panels: SerializedPanes) {
-     let nodeIdToDragItem: Record<number, DragItem> = {};
-     for (let i = 0; i < dragItems.length; i++) {
-         for (const dragItem of dragItems[i]) {
-             nodeIdToDragItem[dragItem.node.id] = dragItem
-         }
+     // TODO
+ }
+
+ function groupWidgets(horizontal: boolean) {
+     const items = layoutState.getCurrentSelection()
+     $layoutState.currentSelection = []
+     layoutState.groupItems(items, { direction: horizontal ? "horizontal" : "vertical" })
+ }
+
+ let canUngroup = false;
+ let isDeleteGroup = false;
+ $: canUngroup = $layoutState.currentSelection.length === 1
+            && layoutState.getCurrentSelection()[0].type === "container"
+ $: if (canUngroup) {
+     const dragItem = layoutState.getCurrentSelection()[0];
+     const entry = $layoutState.allItems[dragItem.id];
+     isDeleteGroup = entry.children.length === 0
+ }
+ else {
+     isDeleteGroup = false
+ }
+
+ function ungroup() {
+     const item = layoutState.getCurrentSelection()[0]
+     if (item.type !== "container")
+         return;
+
+     $layoutState.currentSelection = []
+     layoutState.ungroup(item as ContainerLayout)
+ }
+
+ let menuPos = { x: 0, y: 0 };
+ let showMenu = false;
+
+ $: $layoutState.isMenuOpen = showMenu;
+
+ $: if ($layoutState.root) {
+     root = $layoutState.root
+ } else {
+     root = null;
+ }
+
+ async function onRightClick(e) {
+     if ($uiState.uiEditMode === "disabled")
+         return;
+
+     e.preventDefault();
+     if (showMenu) {
+         showMenu = false;
+         await new Promise(res => setTimeout(res, 100));
      }
 
-     for (let i = 0; i < panels.panels.length; i++) {
-         dragItems[i].length = 0;
-         for (const panel of panels.panels[i]) {
-             const dragItem = nodeIdToDragItem[panel.nodeId];
-             if (dragItem) {
-                 delete nodeIdToDragItem[panel.nodeId];
-                 dragItems[i].push(dragItem)
-             }
-         }
-     }
+     menuPos = { x: e.clientX, y: e.clientY };
+     showMenu = true;
+ }
 
-     // Put everything left over into other columns
-     if (Object.keys(nodeIdToDragItem).length > 0) {
-         console.warn("Extra panels without ordering found", nodeIdToDragItem, panels)
-         for (const nodeId in nodeIdToDragItem) {
-             const dragItem = nodeIdToDragItem[nodeId];
-             const paneIndex = findLeastPopulatedPaneIndex();
-             dragItems[paneIndex].push(dragItem);
-         }
-     }
+ function closeMenu() {
+     showMenu = false;
  }
 </script>
 
-<div id="comfy-ui-panes" >
-    <ComfyPane bind:dragItems={dragItems[0]} />
-    <ComfyPane bind:dragItems={dragItems[1]} />
-    <ComfyPane bind:dragItems={dragItems[2]} />
+<div id="comfy-ui-panes" on:contextmenu={onRightClick}>
+    <WidgetContainer bind:dragItem={root} classes={["root-container"]} />
 </div>
 
-<style>
+{#if showMenu}
+    <Menu {...menuPos} on:click={closeMenu} on:clickoutside={closeMenu}>
+        <MenuOption
+            isDisabled={$layoutState.currentSelection.length === 0}
+            on:click={() => groupWidgets(false)}
+            text="Group" />
+        <MenuOption
+            isDisabled={$layoutState.currentSelection.length === 0}
+            on:click={() => groupWidgets(true)}
+            text="Group Horizontally" />
+        <MenuOption
+            isDisabled={!canUngroup}
+            on:click={ungroup}
+            text={isDeleteGroup ? "Delete Group" : "Ungroup"} />
+    </Menu>
+{/if}
+
+<style lang="scss">
  #comfy-ui-panes {
      width: 100%;
      height: 100%;
+     overflow: auto;
  }
+
 </style>

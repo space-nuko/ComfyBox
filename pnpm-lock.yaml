@@ -37,6 +37,12 @@ importers:
       '@litegraph-ts/nodes-basic':
         specifier: workspace:*
         version: link:litegraph/packages/nodes-basic
+      '@litegraph-ts/nodes-events':
+        specifier: workspace:*
+        version: link:litegraph/packages/nodes-events
+      '@litegraph-ts/nodes-math':
+        specifier: workspace:*
+        version: link:litegraph/packages/nodes-math
       '@litegraph-ts/tsconfig':
         specifier: workspace:*
         version: link:litegraph/packages/tsconfig
@@ -63,7 +69,7 @@ importers:
         version: 1.2.1
       svelte-preprocess:
         specifier: ^5.0.3
-        version: 5.0.3(postcss@8.4.21)(sass@1.61.0)(svelte@3.58.0)(typescript@5.0.3)
+        version: 5.0.3(sass@1.61.0)(svelte@3.58.0)(typescript@5.0.3)
       svelte-select:
         specifier: ^5.5.3
         version: 5.5.3
@@ -72,7 +78,7 @@ importers:
         version: 0.7.13(svelte@3.58.0)
       tailwindcss:
         specifier: ^3.3.1
-        version: 3.3.1(postcss@8.4.21)
+        version: 3.3.1
       typed-emitter:
         specifier: github:andywer/typed-emitter
         version: github.com/andywer/typed-emitter/9a139b6fa0ec6b0db6141b5b756b784e4f7ef4e4
@@ -80,6 +86,9 @@ importers:
         specifier: ^1.0.5
         version: 1.0.5(vite@4.3.1)
     devDependencies:
+      '@zerodevx/svelte-toast':
+        specifier: ^0.9.3
+        version: 0.9.3(svelte@3.58.0)
       eslint:
         specifier: ^8.37.0
         version: 8.37.0
@@ -103,7 +112,7 @@ importers:
         version: 3.58.0
       svelte-check:
         specifier: ^3.2.0
-        version: 3.2.0(postcss@8.4.21)(sass@1.61.0)(svelte@3.58.0)
+        version: 3.2.0(sass@1.61.0)(svelte@3.58.0)
       svelte-dnd-action:
         specifier: ^0.9.22
         version: 0.9.22(svelte@3.58.0)
@@ -112,7 +121,7 @@ importers:
         version: 5.0.3
       vite:
         specifier: ^4.3.1
-        version: 4.3.1(@types/node@18.16.0)(sass@1.61.0)
+        version: 4.3.1(sass@1.61.0)
       vite-tsconfig-paths:
         specifier: ^4.0.8
         version: 4.0.8(typescript@5.0.3)(vite@4.3.1)
@@ -126,7 +135,7 @@ importers:
     devDependencies:
       vite:
         specifier: ^2.9.9
-        version: 2.9.9(sass@1.61.0)
+        version: 2.9.9
 
   gradio/js/accordion: {}
 
@@ -691,7 +700,7 @@ importers:
         version: 1.0.0-next.91(@sveltejs/kit@1.15.2)
       '@sveltejs/kit':
         specifier: ^1.0.0-next.318
-        version: 1.15.2(svelte@3.58.0)(vite@4.3.1)
+        version: 1.15.2(svelte@3.58.0)
       autoprefixer:
         specifier: ^10.4.2
         version: 10.4.2(postcss@8.4.21)
@@ -703,13 +712,13 @@ importers:
         version: 3.1.1
       svelte-check:
         specifier: ^2.2.6
-        version: 2.2.6(postcss-load-config@3.1.1)(postcss@8.4.21)(sass@1.61.0)(svelte@3.58.0)
+        version: 2.2.6(postcss-load-config@3.1.1)(postcss@8.4.21)(svelte@3.58.0)
       svelte-preprocess:
         specifier: ^4.10.1
-        version: 4.10.1(postcss-load-config@3.1.1)(postcss@8.4.21)(sass@1.61.0)(svelte@3.58.0)(typescript@4.5.4)
+        version: 4.10.1(postcss-load-config@3.1.1)(postcss@8.4.21)(svelte@3.58.0)(typescript@4.5.4)
       tailwindcss:
         specifier: ^3.0.12
-        version: 3.3.1(postcss@8.4.21)
+        version: 3.3.1
       tslib:
         specifier: ^2.3.1
         version: 2.3.1
@@ -743,7 +752,7 @@ importers:
         version: 5.0.3
       vite:
         specifier: ^4.2.1
-        version: 4.2.1(sass@1.61.0)
+        version: 4.2.1
       vite-plugin-checker:
         specifier: ^0.5.6
         version: 0.5.6(eslint@8.37.0)(typescript@5.0.3)(vite@4.2.1)
@@ -762,7 +771,39 @@ importers:
         version: 5.0.3
       vite:
         specifier: ^4.2.1
-        version: 4.2.1(sass@1.61.0)
+        version: 4.2.1
+
+  litegraph/packages/nodes-events:
+    dependencies:
+      '@litegraph-ts/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@litegraph-ts/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: ^5.0.3
+        version: 5.0.3
+      vite:
+        specifier: ^4.2.1
+        version: 4.3.1
+
+  litegraph/packages/nodes-math:
+    dependencies:
+      '@litegraph-ts/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@litegraph-ts/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: ^5.0.3
+        version: 5.0.3
+      vite:
+        specifier: ^4.2.1
+        version: 4.3.1
 
   litegraph/packages/tsconfig: {}
 
@@ -1990,11 +2031,11 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^1.0.0-next.587
     dependencies:
-      '@sveltejs/kit': 1.15.2(svelte@3.58.0)(vite@4.3.1)
+      '@sveltejs/kit': 1.15.2(svelte@3.58.0)
       import-meta-resolve: 2.2.2
     dev: true
 
-  /@sveltejs/kit@1.15.2(svelte@3.58.0)(vite@4.3.1):
+  /@sveltejs/kit@1.15.2(svelte@3.58.0):
     resolution: {integrity: sha512-rLNxZrjbrlPf8AWW8GAU4L/Vvu17e9v8EYl7pUip7x72lTft7RcxeP3z7tsrHpMSBBxC9o4XdKzFvz1vMZyXZw==}
     engines: {node: ^16.14 || >=18}
     hasBin: true
@@ -2003,7 +2044,7 @@ packages:
       svelte: ^3.54.0
       vite: ^4.0.0
     dependencies:
-      '@sveltejs/vite-plugin-svelte': 2.1.1(svelte@3.58.0)(vite@4.3.1)
+      '@sveltejs/vite-plugin-svelte': 2.1.1(svelte@3.58.0)
       '@types/cookie': 0.5.1
       cookie: 0.5.0
       devalue: 4.3.0
@@ -2017,7 +2058,24 @@ packages:
       svelte: 3.58.0
       tiny-glob: 0.2.9
       undici: 5.20.0
-      vite: 4.3.1(@types/node@18.16.0)(sass@1.61.0)
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /@sveltejs/vite-plugin-svelte@2.1.1(svelte@3.58.0):
+    resolution: {integrity: sha512-7YeBDt4us0FiIMNsVXxyaP4Hwyn2/v9x3oqStkHU3ZdIc5O22pGwUwH33wUqYo+7Itdmo8zxJ45Qvfm3H7UUjQ==}
+    engines: {node: ^14.18.0 || >= 16}
+    peerDependencies:
+      svelte: ^3.54.0
+      vite: ^4.0.0
+    dependencies:
+      debug: 4.3.4
+      deepmerge: 4.3.1
+      kleur: 4.1.5
+      magic-string: 0.30.0
+      svelte: 3.58.0
+      svelte-hmr: 0.15.1(svelte@3.58.0)
+      vitefu: 0.2.4
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -2035,10 +2093,11 @@ packages:
       magic-string: 0.30.0
       svelte: 3.58.0
       svelte-hmr: 0.15.1(svelte@3.58.0)
-      vite: 4.3.1(@types/node@18.16.0)(sass@1.61.0)
+      vite: 4.3.1(sass@1.61.0)
       vitefu: 0.2.4(vite@4.3.1)
     transitivePeerDependencies:
       - supports-color
+    dev: false
 
   /@ts-morph/common@0.18.1:
     resolution: {integrity: sha512-RVE+zSRICWRsfrkAw5qCAK+4ZH9kwEFv5h0+/YeHTLieWP7F4wWq4JsKFuNWG+fYh/KF+8rAtgdj5zb2mm+DVA==}
@@ -2178,6 +2237,7 @@ packages:
 
   /@types/node@18.16.0:
     resolution: {integrity: sha512-BsAaKhB+7X+H4GnSjGhJG9Qi8Tw+inU9nJDwmD5CgOmBLEI6ArdhikpLX7DjbjDRDTbqZzU2LSQNZg8WGPiSZQ==}
+    dev: true
 
   /@types/node@8.10.66:
     resolution: {integrity: sha512-tktOkFUA4kXx2hhhrB8bIFb5TbwzS4uOhKEmwiD+NoiL0qtP2OQ9mFldbgD4dV1djrlBYP6eBuQZiWjuHUpqFw==}
@@ -2279,6 +2339,14 @@ packages:
     dependencies:
       '@typescript-eslint/types': 5.59.1
       eslint-visitor-keys: 3.4.0
+    dev: true
+
+  /@zerodevx/svelte-toast@0.9.3(svelte@3.58.0):
+    resolution: {integrity: sha512-VPKWR4A9y01fyXRscu9HiTj7tV2hFrpRKZvGwMmaPXfHIXR1D9+NNsz0HXcQ7qZ0C5UaHS3n9uNtPtIcAXT7RQ==}
+    peerDependencies:
+      svelte: ^3.57.0
+    dependencies:
+      svelte: 3.58.0
     dev: true
 
   /acorn-jsx@5.3.2(acorn@8.8.2):
@@ -4292,7 +4360,7 @@ packages:
       exit: 0.1.2
       graceful-fs: 4.2.11
       import-local: 3.1.0
-      jest-config: 29.5.0(@types/node@18.16.0)
+      jest-config: 29.5.0
       jest-util: 29.5.0
       jest-validate: 29.5.0
       prompts: 2.4.2
@@ -4301,6 +4369,44 @@ packages:
       - '@types/node'
       - supports-color
       - ts-node
+    dev: true
+
+  /jest-config@29.5.0:
+    resolution: {integrity: sha512-kvDUKBnNJPNBmFFOhDbm59iu1Fii1Q6SxyhXfvylq3UTHbg6o7j/g8k2dZyXWLvfdKB1vAPxNZnMgtKJcmu3kA==}
+    engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
+    peerDependencies:
+      '@types/node': '*'
+      ts-node: '>=9.0.0'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      ts-node:
+        optional: true
+    dependencies:
+      '@babel/core': 7.21.4
+      '@jest/test-sequencer': 29.5.0
+      '@jest/types': 29.5.0
+      babel-jest: 29.5.0(@babel/core@7.21.4)
+      chalk: 4.1.2
+      ci-info: 3.8.0
+      deepmerge: 4.3.1
+      glob: 7.2.3
+      graceful-fs: 4.2.11
+      jest-circus: 29.5.0
+      jest-environment-node: 29.5.0
+      jest-get-type: 29.4.3
+      jest-regex-util: 29.4.3
+      jest-resolve: 29.5.0
+      jest-runner: 29.5.0
+      jest-util: 29.5.0
+      jest-validate: 29.5.0
+      micromatch: 4.0.5
+      parse-json: 5.2.0
+      pretty-format: 29.5.0
+      slash: 3.0.0
+      strip-json-comments: 3.1.1
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /jest-config@29.5.0(@types/node@18.16.0):
@@ -5882,7 +5988,7 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  /svelte-check@2.2.6(postcss-load-config@3.1.1)(postcss@8.4.21)(sass@1.61.0)(svelte@3.58.0):
+  /svelte-check@2.2.6(postcss-load-config@3.1.1)(postcss@8.4.21)(svelte@3.58.0):
     resolution: {integrity: sha512-oJux/afbmcZO+N+ADXB88h6XANLie8Y2rh2qBlhgfkpr2c3t/q/T0w2JWrHqagaDL8zeNwO8a8RVFBkrRox8gg==}
     hasBin: true
     peerDependencies:
@@ -5896,7 +6002,7 @@ packages:
       sade: 1.8.1
       source-map: 0.7.4
       svelte: 3.58.0
-      svelte-preprocess: 4.10.1(postcss-load-config@3.1.1)(postcss@8.4.21)(sass@1.61.0)(svelte@3.58.0)(typescript@5.0.3)
+      svelte-preprocess: 4.10.1(postcss-load-config@3.1.1)(postcss@8.4.21)(svelte@3.58.0)(typescript@5.0.3)
       typescript: 5.0.3
     transitivePeerDependencies:
       - '@babel/core'
@@ -5911,7 +6017,7 @@ packages:
       - sugarss
     dev: true
 
-  /svelte-check@3.2.0(postcss@8.4.21)(sass@1.61.0)(svelte@3.58.0):
+  /svelte-check@3.2.0(sass@1.61.0)(svelte@3.58.0):
     resolution: {integrity: sha512-6ZnscN8dHEN5Eq5LgIzjj07W9nc9myyBH+diXsUAuiY/3rt0l65/LCIQYlIuoFEjp2F1NhXqZiJwV9omPj9tMw==}
     hasBin: true
     peerDependencies:
@@ -5924,7 +6030,7 @@ packages:
       picocolors: 1.0.0
       sade: 1.8.1
       svelte: 3.58.0
-      svelte-preprocess: 5.0.3(postcss@8.4.21)(sass@1.61.0)(svelte@3.58.0)(typescript@5.0.3)
+      svelte-preprocess: 5.0.3(sass@1.61.0)(svelte@3.58.0)(typescript@5.0.3)
       typescript: 5.0.3
     transitivePeerDependencies:
       - '@babel/core'
@@ -5976,7 +6082,7 @@ packages:
       tiny-glob: 0.2.9
     dev: false
 
-  /svelte-preprocess@4.10.1(postcss-load-config@3.1.1)(postcss@8.4.21)(sass@1.61.0)(svelte@3.58.0)(typescript@4.5.4):
+  /svelte-preprocess@4.10.1(postcss-load-config@3.1.1)(postcss@8.4.21)(svelte@3.58.0)(typescript@4.5.4):
     resolution: {integrity: sha512-NSNloaylf+o9UeyUR2KvpdxrAyMdHl3U7rMnoP06/sG0iwJvlUM4TpMno13RaNqovh4AAoGsx1jeYcIyuGUXMw==}
     engines: {node: '>= 9.11.2'}
     requiresBuild: true
@@ -6023,14 +6129,13 @@ packages:
       magic-string: 0.25.9
       postcss: 8.4.21
       postcss-load-config: 3.1.1
-      sass: 1.61.0
       sorcery: 0.10.0
       strip-indent: 3.0.0
       svelte: 3.58.0
       typescript: 4.5.4
     dev: true
 
-  /svelte-preprocess@4.10.1(postcss-load-config@3.1.1)(postcss@8.4.21)(sass@1.61.0)(svelte@3.58.0)(typescript@5.0.3):
+  /svelte-preprocess@4.10.1(postcss-load-config@3.1.1)(postcss@8.4.21)(svelte@3.58.0)(typescript@5.0.3):
     resolution: {integrity: sha512-NSNloaylf+o9UeyUR2KvpdxrAyMdHl3U7rMnoP06/sG0iwJvlUM4TpMno13RaNqovh4AAoGsx1jeYcIyuGUXMw==}
     engines: {node: '>= 9.11.2'}
     requiresBuild: true
@@ -6077,14 +6182,13 @@ packages:
       magic-string: 0.25.9
       postcss: 8.4.21
       postcss-load-config: 3.1.1
-      sass: 1.61.0
       sorcery: 0.10.0
       strip-indent: 3.0.0
       svelte: 3.58.0
       typescript: 5.0.3
     dev: true
 
-  /svelte-preprocess@5.0.3(postcss@8.4.21)(sass@1.61.0)(svelte@3.58.0)(typescript@5.0.3):
+  /svelte-preprocess@5.0.3(sass@1.61.0)(svelte@3.58.0)(typescript@5.0.3):
     resolution: {integrity: sha512-GrHF1rusdJVbOZOwgPWtpqmaexkydznKzy5qIC2FabgpFyKN57bjMUUUqPRfbBXK5igiEWn1uO/DXsa2vJ5VHA==}
     engines: {node: '>= 14.10.0'}
     requiresBuild: true
@@ -6125,7 +6229,6 @@ packages:
       '@types/pug': 2.0.6
       detect-indent: 6.1.0
       magic-string: 0.27.0
-      postcss: 8.4.21
       sass: 1.61.0
       sorcery: 0.11.0
       strip-indent: 3.0.0
@@ -6190,12 +6293,10 @@ packages:
       get-port: 3.2.0
     dev: false
 
-  /tailwindcss@3.3.1(postcss@8.4.21):
+  /tailwindcss@3.3.1:
     resolution: {integrity: sha512-Vkiouc41d4CEq0ujXl6oiGFQ7bA3WEhUZdTgXAhtKxSy49OmKs8rEfQmupsfF0IGW8fv2iQkp1EVUuapCFrZ9g==}
     engines: {node: '>=12.13.0'}
     hasBin: true
-    peerDependencies:
-      postcss: ^8.0.9
     dependencies:
       arg: 5.0.2
       chokidar: 3.5.3
@@ -6924,7 +7025,7 @@ packages:
       strip-ansi: 6.0.1
       tiny-invariant: 1.3.1
       typescript: 5.0.3
-      vite: 4.2.1(sass@1.61.0)
+      vite: 4.2.1
       vscode-languageclient: 7.0.0
       vscode-languageserver: 7.0.0
       vscode-languageserver-textdocument: 1.0.8
@@ -6947,7 +7048,7 @@ packages:
       kolorist: 1.8.0
       magic-string: 0.29.0
       ts-morph: 17.0.1
-      vite: 4.2.1(sass@1.61.0)
+      vite: 4.2.1
     transitivePeerDependencies:
       - '@types/node'
       - rollup
@@ -6961,7 +7062,7 @@ packages:
     dependencies:
       picocolors: 1.0.0
       picomatch: 2.3.1
-      vite: 4.3.1(@types/node@18.16.0)(sass@1.61.0)
+      vite: 4.3.1(sass@1.61.0)
     dev: false
 
   /vite-tsconfig-paths@4.0.8(typescript@5.0.3)(vite@4.3.1):
@@ -6975,13 +7076,13 @@ packages:
       debug: 4.3.4
       globrex: 0.1.2
       tsconfck: 2.1.1(typescript@5.0.3)
-      vite: 4.3.1(@types/node@18.16.0)(sass@1.61.0)
+      vite: 4.3.1(sass@1.61.0)
     transitivePeerDependencies:
       - supports-color
       - typescript
     dev: true
 
-  /vite@2.9.9(sass@1.61.0):
+  /vite@2.9.9:
     resolution: {integrity: sha512-ffaam+NgHfbEmfw/Vuh6BHKKlI/XIAhxE5QSS7gFLIngxg171mg1P3a4LSRME0z2ZU1ScxoKzphkipcYwSD5Ew==}
     engines: {node: '>=12.2.0'}
     hasBin: true
@@ -7001,12 +7102,11 @@ packages:
       postcss: 8.4.21
       resolve: 1.22.2
       rollup: 2.79.1
-      sass: 1.61.0
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
 
-  /vite@4.2.1(sass@1.61.0):
+  /vite@4.2.1:
     resolution: {integrity: sha512-7MKhqdy0ISo4wnvwtqZkjke6XN4taqQ2TBaTccLIpOKv7Vp2h4Y+NpmWCnGDeSvvn45KxvWgGyb0MkHvY1vgbg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -7035,9 +7135,40 @@ packages:
       postcss: 8.4.21
       resolve: 1.22.2
       rollup: 3.21.0
-      sass: 1.61.0
     optionalDependencies:
       fsevents: 2.3.2
+
+  /vite@4.3.1:
+    resolution: {integrity: sha512-EPmfPLAI79Z/RofuMvkIS0Yr091T2ReUoXQqc5ppBX/sjFRhHKiPPF/R46cTdoci/XgeQpB23diiJxq5w30vdg==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': '>= 14'
+      less: '*'
+      sass: '*'
+      stylus: '*'
+      sugarss: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      less:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+    dependencies:
+      esbuild: 0.17.18
+      postcss: 8.4.21
+      rollup: 3.21.0
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: true
 
   /vite@4.3.1(@types/node@18.16.0)(sass@1.61.0):
     resolution: {integrity: sha512-EPmfPLAI79Z/RofuMvkIS0Yr091T2ReUoXQqc5ppBX/sjFRhHKiPPF/R46cTdoci/XgeQpB23diiJxq5w30vdg==}
@@ -7071,6 +7202,48 @@ packages:
       sass: 1.61.0
     optionalDependencies:
       fsevents: 2.3.2
+    dev: true
+
+  /vite@4.3.1(sass@1.61.0):
+    resolution: {integrity: sha512-EPmfPLAI79Z/RofuMvkIS0Yr091T2ReUoXQqc5ppBX/sjFRhHKiPPF/R46cTdoci/XgeQpB23diiJxq5w30vdg==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': '>= 14'
+      less: '*'
+      sass: '*'
+      stylus: '*'
+      sugarss: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      less:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+    dependencies:
+      esbuild: 0.17.18
+      postcss: 8.4.21
+      rollup: 3.21.0
+      sass: 1.61.0
+    optionalDependencies:
+      fsevents: 2.3.2
+
+  /vitefu@0.2.4:
+    resolution: {integrity: sha512-fanAXjSaf9xXtOOeno8wZXIhgia+CZury481LsDaV++lSvcU2R9Ch2bPh3PYFyoHW+w9LqAeYRISVQjUIew14g==}
+    peerDependencies:
+      vite: ^3.0.0 || ^4.0.0
+    peerDependenciesMeta:
+      vite:
+        optional: true
+    dev: true
 
   /vitefu@0.2.4(vite@4.3.1):
     resolution: {integrity: sha512-fanAXjSaf9xXtOOeno8wZXIhgia+CZury481LsDaV++lSvcU2R9Ch2bPh3PYFyoHW+w9LqAeYRISVQjUIew14g==}
@@ -7080,7 +7253,8 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.3.1(@types/node@18.16.0)(sass@1.61.0)
+      vite: 4.3.1(sass@1.61.0)
+    dev: false
 
   /vitest@0.25.8(sass@1.61.0):
     resolution: {integrity: sha512-X75TApG2wZTJn299E/TIYevr4E9/nBo1sUtZzn0Ci5oK8qnpZAZyhwg0qCeMSakGIWtc6oRwcQFyFfW14aOFWg==}

@@ -3,6 +3,11 @@ import type ComfyApp from "./components/ComfyApp";
 import queueState from "./stores/queueState";
 import { get } from "svelte/store";
 
+export type SerializedGraphCanvasState = {
+    offset: Vector2,
+    scale: number
+}
+
 export default class ComfyGraphCanvas extends LGraphCanvas {
     app: ComfyApp
 
@@ -18,6 +23,23 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     ) {
         super(canvas, app.lGraph, options);
         this.app = app;
+    }
+
+    serialize(): SerializedGraphCanvasState {
+        return {
+            offset: this.ds.offset,
+            scale: this.ds.scale
+        }
+    }
+
+    deserialize(data: SerializedGraphCanvasState) {
+        this.ds.offset = data.offset;
+        this.ds.scale = data.scale;
+    }
+
+    recenter() {
+        this.ds.reset();
+        this.setDirty(true, true)
     }
 
     override drawNodeShape(

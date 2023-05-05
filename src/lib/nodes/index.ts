@@ -1,2 +1,5 @@
 export { default as ComfyReroute } from "./ComfyReroute"
-export { ComfySaveImageNode, ComfyPreviewImageNode } from "./ComfyImageNodes"
+export { ComfyWidgetNode, ComfySliderNode, ComfyComboNode, ComfyTextNode } from "./ComfyWidgetNodes"
+export { ComfyCopyAction, ComfySwapAction } from "./ComfyActionNodes"
+export { default as ComfyValueControl } from "./ComfyValueControl"
+export { default as ComfySelector } from "./ComfySelector"

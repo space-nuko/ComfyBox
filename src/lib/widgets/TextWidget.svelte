@@ -1,18 +1,39 @@
 <script lang="ts">
- import type { WidgetUIState, WidgetUIStateStore } from "$lib/stores/widgetState";
  import { TextBox } from "@gradio/form";
- export let item: WidgetUIState | null = null;
+ import type { ComfyComboNode } from "$lib/nodes/index";
+ import { type WidgetLayout } from "$lib/stores/layoutState";
+ import { get, type Writable } from "svelte/store";
+ export let widget: WidgetLayout | null = null;
+ let node: ComfyComboNode | null = null;
+ let nodeValue: Writable<string> | null = null;
+ let propsChanged: Writable<number> | null = null;
  let itemValue: WidgetUIStateStore | null = null;
- $: if (item) { itemValue = item.value; }
+
+ $: widget && setNodeValue(widget);
+
+ function setNodeValue(widget: WidgetLayout) {
+     if (widget) {
+         node = widget.node as ComfySliderNode
+         nodeValue = node.value;
+         propsChanged = node.propsChanged;
+     }
+ };
+
+ // I don't know why but this is necessary to watch for changes to node
+ // properties from ComfyWidgetNode.
+ $: if (nodeValue !== null && (!$propsChanged || $propsChanged)) {
+     setNodeValue(widget)
+     node.properties = node.properties
+ }
 </script>
 
 <div class="wrapper gr-textbox">
-    {#if item !== null && itemValue !== null}
+    {#if node !== null && nodeValue !== null}
         <TextBox
-            bind:value={$itemValue}
-            label={item.widget.name}
-            lines={item.widget.options.multiline ? 5 : 1}
-            max_lines={item.widget.options.multiline ? 5 : 1}
+            bind:value={$nodeValue}
+            label={widget.attrs.title}
+            lines={node.properties.multiline ? 5 : 1}
+            max_lines={node.properties.multiline ? 5 : 1}
             show_label={true}
             on:change
             on:submit

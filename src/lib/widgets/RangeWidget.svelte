@@ -1,35 +1,52 @@
 <script lang="ts">
- import type { WidgetUIState, WidgetUIStateStore } from "$lib/stores/widgetState";
+ import type { ComfySliderNode } from "$lib/nodes/index";
+ import { type WidgetLayout } from "$lib/stores/layoutState";
  import { Range } from "@gradio/form";
- import { get } from "svelte/store";
- export let item: WidgetUIState | null = null;
- let itemValue: WidgetUIStateStore | null = null;
+ import { get, type Writable } from "svelte/store";
+ export let widget: WidgetLayout | null = null;
+ let node: ComfySliderNode | null = null;
+ let nodeValue: Writable<number> | null = null;
+ let propsChanged: Writable<number> | null = null;
  let option: number | null = null;
 
- $: if (item) {
-     itemValue = item.value;
-     updateOption(); // don't react on option
+ $: widget && setNodeValue(widget);
+
+ function setNodeValue(widget: WidgetLayout) {
+     if (widget) {
+         node = widget.node as ComfySliderNode
+         nodeValue = node.value;
+         propsChanged = node.propsChanged;
+         setOption($nodeValue); // don't react on option
+     }
+ };
+
+ // I don't know why but this is necessary to watch for changes to node
+ // properties from ComfyWidgetNode.
+ $: if (nodeValue !== null && (!$propsChanged || $propsChanged)) {
+     setOption($nodeValue)
+     setNodeValue(widget)
+     node.properties = node.properties
  }
 
- function updateOption() {
-     option = get(itemValue);
+ function setOption(value: any) {
+     option = value;
  }
 
  function onRelease(e: Event) {
-     if (itemValue && option) {
-         $itemValue = option
+     if (nodeValue && option) {
+         $nodeValue = option
      }
  }
 </script>
 
 <div class="wrapper gr-range">
-    {#if item !== null && option !== null}
+    {#if node !== null && option !== null}
         <Range
             bind:value={option}
-            minimum={item.widget.options.min}
-            maximum={item.widget.options.max}
-            step={item.widget.options.step}
-            label={item.widget.name}
+            minimum={node.properties.min}
+            maximum={node.properties.max}
+            step={node.properties.step}
+            label={widget.attrs.title}
             show_label={true}
             on:release={onRelease}
             on:change

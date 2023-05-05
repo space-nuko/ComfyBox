@@ -5,8 +5,6 @@
  import { Button } from "@gradio/button";
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
  import { Checkbox } from "@gradio/form"
- import widgetState from "$lib/stores/widgetState";
- import nodeState from "$lib/stores/nodeState";
  import uiState from "$lib/stores/uiState";
  import { ImageViewer } from "$lib/ImageViewer";
  import { download } from "$lib/utils"

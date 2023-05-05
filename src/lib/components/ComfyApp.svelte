@@ -6,26 +6,34 @@
  import ComfyUIPane from "./ComfyUIPane.svelte";
  import ComfyApp, { type SerializedAppState } from "./ComfyApp";
  import { Checkbox } from "@gradio/form"
- import widgetState from "$lib/stores/widgetState";
- import nodeState from "$lib/stores/nodeState";
  import uiState from "$lib/stores/uiState";
+ import layoutState from "$lib/stores/layoutState";
  import { ImageViewer } from "$lib/ImageViewer";
- import { download } from "$lib/utils"
-
- import { LGraph, LGraphNode } from "@litegraph-ts/core";
- import LightboxModal from "./LightboxModal.svelte";
- import { Block } from "@gradio/atoms";
- import ComfyQueue from "./ComfyQueue.svelte";
  import type { ComfyAPIStatus } from "$lib/api";
+ import { SvelteToast, toast } from '@zerodevx/svelte-toast'
+
+ import { LGraph } from "@litegraph-ts/core";
+ import LightboxModal from "./LightboxModal.svelte";
+ import ComfyQueue from "./ComfyQueue.svelte";
  import queueState from "$lib/stores/queueState";
 
- let app: ComfyApp = undefined;
+ export let app: ComfyApp = undefined;
  let imageViewer: ImageViewer;
- let uiPane: ComfyUIPane = undefined;
  let queue: ComfyQueue = undefined;
  let mainElem: HTMLDivElement;
+ let uiPane: ComfyUIPane = undefined;
  let containerElem: HTMLDivElement;
- let resizeTimeout: typeof Timer = -1;
+ let resizeTimeout: NodeJS.Timeout | null;
+ let hasShownUIHelpToast: boolean = false;
+
+ let debugLayout: boolean = false;
+
+ const toastOptions = {
+     intro: { duration: 200 },
+     theme: {
+         '--toastBarHeight': 0
+     }
+ }
 
  function refreshView(event?: Event) {
      clearTimeout(resizeTimeout);
@@ -37,8 +45,11 @@
      app.queuePrompt(0, 1);
  }
 
- $: if (app) app.lCanvas.allow_dragnodes = !$uiState.nodesLocked;
- $: if (app) app.lCanvas.allow_interaction = !$uiState.graphLocked;
+ $: if (app?.lCanvas) app.lCanvas.allow_dragnodes = !$uiState.nodesLocked;
+ $: if (app?.lCanvas) app.lCanvas.allow_interaction = !$uiState.graphLocked;
+
+ $: if ($uiState.uiEditMode)
+     $layoutState.currentSelection = []
 
  let graphSize = null;
 
@@ -64,69 +75,50 @@
      }
  }
 
- let graphResizeTimer: typeof Timer = -1;
-
- function serializeAppState(): SerializedAppState {
-     const graph = app.lGraph;
-
-     const serializedGraph = graph.serialize()
-     const serializedPaneOrder = uiPane.serialize()
-
-     return {
-         createdBy: "ComfyBox",
-         version: 1,
-         workflow: serializedGraph,
-         panes: serializedPaneOrder
-     }
- }
-
- function doAutosave(graph: LGraph): void {
-     const savedWorkflow = serializeAppState();
-     localStorage.setItem("workflow", JSON.stringify(savedWorkflow))
- }
-
- function doRestore(workflow: SerializedAppState) {
-     uiPane.restore(workflow.panes);
- }
-
  function doSave(): void {
      if (!app?.lGraph)
          return;
 
-     const date = new Date();
-     const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
-
-     download(`workflow-${formattedDate}.json`, JSON.stringify(serializeAppState()), "application/json")
+     app.saveStateToLocalStorage();
+     toast.push("Saved to local storage.")
+     //
+     //      const date = new Date();
+     //      const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
+     //
+     //      download(`workflow-${formattedDate}.json`, JSON.stringify(app.serialize()), "application/json")
  }
 
- onMount(async () => {
-     app = new ComfyApp();
+ function doReset(): void {
+     var confirmed = confirm("Are you sure you want to clear the current workflow?");
+     if (confirmed) {
+         app.reset();
+     }
+ }
 
-     // TODO dedup
-     app.eventBus.on("nodeAdded", nodeState.nodeAdded);
-     app.eventBus.on("nodeRemoved", nodeState.nodeRemoved);
-     app.eventBus.on("configured", nodeState.configureFinished);
-     app.eventBus.on("cleared", nodeState.clear);
+ function doRecenter(): void {
+     app.lCanvas.recenter();
+ }
 
-     app.eventBus.on("nodeAdded", widgetState.nodeAdded);
-     app.eventBus.on("nodeRemoved", widgetState.nodeRemoved);
-     app.eventBus.on("configured", widgetState.configureFinished);
-     app.eventBus.on("cleared", widgetState.clear);
-     app.eventBus.on("autosave", doAutosave);
-     app.eventBus.on("restored", doRestore);
+ $: if ($uiState.uiEditMode !== "disabled" && !hasShownUIHelpToast) {
+     hasShownUIHelpToast = true;
+     toast.push("Right-click to open context menu.")
+ }
 
-     app.api.addEventListener("status", (ev: CustomEvent) => {
-         queueState.statusUpdated(ev.detail as ComfyAPIStatus);
-     });
+ if (debugLayout) {
+     layoutState.subscribe(s => {
+         console.warn("UPDATESTATE", s)
+     })
+ }
 
-     await app.setup();
-     (window as any).app = app;
-     (window as any).appPane = uiPane;
+ app.api.addEventListener("status", (ev: CustomEvent) => {
+     queueState.statusUpdated(ev.detail as ComfyAPIStatus);
+ });
 
-     refreshView();
-
+ $: if (app.rootEl && !imageViewer) {
      imageViewer = new ImageViewer(app.rootEl);
+ }
 
+ $: if (containerElem) {
      let wrappers = containerElem.querySelectorAll<HTMLDivElement>(".pane-wrapper")
      for (const wrapper of wrappers) {
          const paneNode = wrapper.parentNode as HTMLElement; // get the node inside the <Pane/>
@@ -134,10 +126,22 @@
              app.resizeCanvas()
          }
      }
+ }
+
+ onMount(async () => {
+     await app.setup();
+     (window as any).app = app;
+     (window as any).appPane = uiPane;
+
+     refreshView();
  })
+
+ async function doRefreshCombos() {
+     await app.refreshComboInNodes()
+ }
 </script>
 
-<div id="main" bind:this={mainElem}>
+<div id="main">
     <div id="dropzone" class="dropzone"></div>
     <div id="container" bind:this={containerElem}>
         <Splitpanes theme="comfy" on:resize={refreshView}>
@@ -173,12 +177,28 @@
         <Button variant="secondary" on:click={doSave}>
             Save
         </Button>
+        <Button variant="secondary" on:click={doReset}>
+            Reset
+        </Button>
+        <Button variant="secondary" on:click={doRecenter}>
+            Recenter
+        </Button>
+        <Button variant="secondary" on:click={doRefreshCombos}>
+            🔄
+        </Button>
         <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
         <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/>
-        <Checkbox label="Enable UI Editing" bind:value={$uiState.unlocked}/>
+        <Checkbox label="Auto-Add UI" bind:value={$uiState.autoAddUI}/>
+        <label for="enable-ui-editing">Enable UI Editing</label>
+        <select id="enable-ui-editing" name="enable-ui-editing" bind:value={$uiState.uiEditMode}>
+            <option value="disabled">Disabled</option>
+            <option value="widgets">Widgets</option>
+        </select>
     </div>
     <LightboxModal />
 </div>
+
+<SvelteToast options={toastOptions} />
 
 <style lang="scss">
  #container {

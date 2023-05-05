@@ -1,22 +1,31 @@
-import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink } from "@litegraph-ts/core";
+import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
 import ComfyAPI from "$lib/api"
-import { ComfyWidgets } from "$lib/widgets"
 import defaultGraph from "$lib/defaultGraph"
 import { getPngMetadata, importA1111 } from "$lib/pnginfo";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
 
 // Import nodes
-import * as basic from "@litegraph-ts/nodes-basic"
+import "@litegraph-ts/nodes-basic"
+import "@litegraph-ts/nodes-events"
+import "@litegraph-ts/nodes-math"
 import * as nodes from "$lib/nodes/index"
-import ComfyGraphCanvas from "$lib/ComfyGraphCanvas";
+
+import ComfyGraphCanvas, { type SerializedGraphCanvasState } from "$lib/ComfyGraphCanvas";
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
-import type { WidgetStateStore, WidgetUIState } from "$lib/stores/widgetState";
 import * as widgets from "$lib/widgets/index"
-import type ComfyWidget from "$lib/widgets/ComfyWidget";
 import queueState from "$lib/stores/queueState";
-import GraphSync from "$lib/GraphSync";
+import type { SvelteComponentDev } from "svelte/internal";
+import type IComfyInputSlot from "$lib/IComfyInputSlot";
+import type { SerializedLayoutState } from "$lib/stores/layoutState";
+import layoutState from "$lib/stores/layoutState";
+import { toast } from '@zerodevx/svelte-toast'
+import ComfyGraph from "$lib/ComfyGraph";
+import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
+import { get } from "svelte/store";
+
+export const COMFYBOX_SERIAL_VERSION = 1;
 
 LiteGraph.catch_exceptions = false;
 
@@ -27,33 +36,25 @@ if (typeof window !== "undefined") {
 
 type QueueItem = { num: number, batchCount: number }
 
-export type SerializedPanes = {
-    panels: { nodeId: number }[][]
-}
-
 export type SerializedAppState = {
     createdBy: "ComfyBox",
     version: number,
-    panes: SerializedPanes,
-    workflow: SerializedLGraph
+    workflow: SerializedLGraph,
+    layout: SerializedLayoutState,
+    canvas: SerializedGraphCanvasState
 }
 
-type ComfyAppEvents = {
-    configured: (graph: LGraph) => void
-    nodeAdded: (node: LGraphNode) => void
-    nodeRemoved: (node: LGraphNode) => void
-    nodeConnectionChanged: (kind: LConnectionKind, node: LGraphNode, slot: INodeSlot, targetNode: LGraphNode, targetSlot: INodeSlot) => void
-    cleared: () => void
-    beforeChange: (graph: LGraph, param: any) => void
-    afterChange: (graph: LGraph, param: any) => void
-    autosave: (graph: LGraph) => void
-    restored: (workflow: SerializedAppState) => void
+/** [link origin, link index] | value */
+export type SerializedPromptInput = [string, number] | any
+
+export type SerializedPromptInputs = {
+    inputs: Record<string, SerializedPromptInput>,
+    class_type: string
 }
 
-interface ComfyGraphNodeExecutable extends LGraphNodeExecutable {
-    comfyClass: string
-    isVirtualNode?: boolean;
-    applyToGraph(workflow: SerializedLGraph<SerializedLGraphNode<LGraphNode>, SerializedLLink, SerializedLGraphGroup>): void;
+export type SerializedPrompt = {
+    workflow: SerializedLGraph,
+    output: Record<string, SerializedPromptInputs>
 }
 
 export type Progress = {
@@ -66,12 +67,10 @@ export default class ComfyApp {
     rootEl: HTMLDivElement | null = null;
     canvasEl: HTMLCanvasElement | null = null;
     canvasCtx: CanvasRenderingContext2D | null = null;
-    lGraph: LGraph | null = null;
-    lCanvas: LGraphCanvas | null = null;
+    lGraph: ComfyGraph | null = null;
+    lCanvas: ComfyGraphCanvas | null = null;
     dropZone: HTMLElement | null = null;
     nodeOutputs: Record<string, any> = {};
-    eventBus: TypedEmitter<ComfyAppEvents> = new EventEmitter() as TypedEmitter<ComfyAppEvents>;
-    graphSync: GraphSync;
 
     dragOverNode: LGraphNode | null = null;
     shiftDown: boolean = false;
@@ -79,30 +78,28 @@ export default class ComfyApp {
 
     private queueItems: QueueItem[] = [];
     private processingQueue: boolean = false;
+    private alreadySetup = false;
 
     constructor() {
         this.api = new ComfyAPI();
     }
 
     async setup(): Promise<void> {
+        if (this.alreadySetup) {
+            console.error("Already setup")
+            return;
+        }
+
         this.rootEl = document.getElementById("main") as HTMLDivElement;
         this.canvasEl = document.getElementById("graph-canvas") as HTMLCanvasElement;
-        this.lGraph = new LGraph();
+        this.lGraph = new ComfyGraph();
         this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl);
         this.canvasCtx = this.canvasEl.getContext("2d");
-        this.graphSync = new GraphSync(this);
-
-        this.addGraphLifecycleHooks();
 
         LiteGraph.release_link_on_empty_shows_menu = true;
         LiteGraph.alt_drag_do_clone_nodes = true;
-        LiteGraph.ignore_all_widget_events = true;
-
-        this.lGraph.start();
 
         // await this.#invokeExtensionsAsync("init");
-        this.registerNodeTypeOverrides();
-        this.registerWidgetTypeOverrides();
         await this.registerNodes();
 
         // Load previous workflow
@@ -110,9 +107,8 @@ export default class ComfyApp {
         try {
             const json = localStorage.getItem("workflow");
             if (json) {
-                const workflow = JSON.parse(json) as SerializedAppState;
-                this.loadGraphData(workflow["workflow"]);
-                this.eventBus.emit("restored", workflow);
+                const state = JSON.parse(json) as SerializedAppState;
+                this.deserialize(state)
                 restored = true;
             }
         } catch (err) {
@@ -121,23 +117,29 @@ export default class ComfyApp {
 
         // We failed to restore a workflow so load the default
         if (!restored) {
-            this.loadGraphData();
+            this.initDefaultGraph();
         }
 
         // Save current workflow automatically
-        setInterval(this.requestAutosave.bind(this), 15000);
+        // setInterval(this.saveStateToLocalStorage.bind(this), 1000);
 
         this.addApiUpdateHandlers();
         this.addDropHandler();
         this.addPasteHandler();
         this.addKeyboardHandler();
 
+        this.setupColorScheme()
 
         // await this.#invokeExtensionsAsync("setup");
 
         // Ensure the canvas fills the window
         this.resizeCanvas();
         window.addEventListener("resize", this.resizeCanvas.bind(this));
+
+        this.lGraph.start();
+        this.lGraph.eventBus.on("afterExecute", () => this.lCanvas.draw(true))
+
+        this.alreadySetup = true;
 
         return Promise.resolve();
     }
@@ -150,82 +152,20 @@ export default class ComfyApp {
         this.lCanvas.draw(true, true);
     }
 
-    private graphOnConfigure() {
-        console.debug("Configured");
-        this.eventBus.emit("configured", this.lGraph);
+    saveStateToLocalStorage() {
+        const savedWorkflow = this.serialize();
+        const json = JSON.stringify(savedWorkflow);
+        localStorage.setItem("workflow", json)
     }
 
-    private graphOnBeforeChange(graph: LGraph, info: any) {
-        console.debug("BeforeChange", info);
-        this.eventBus.emit("beforeChange", graph, info);
-    }
-
-    private graphOnAfterChange(graph: LGraph, info: any) {
-        console.debug("AfterChange", info);
-        this.eventBus.emit("afterChange", graph, info);
-    }
-
-    private graphOnNodeAdded(node: LGraphNode) {
-        console.debug("Added", node);
-        this.eventBus.emit("nodeAdded", node);
-    }
-
-    private graphOnNodeRemoved(node: LGraphNode) {
-        console.debug("Removed", node);
-        this.eventBus.emit("nodeRemoved", node);
-    }
-
-    private graphOnNodeConnectionChange(kind: LConnectionKind, node: LGraphNode, slot: INodeSlot, targetNode: LGraphNode, targetSlot: INodeSlot) {
-        console.debug("ConnectionChange", node);
-        this.eventBus.emit("nodeConnectionChanged", kind, node, slot, targetNode, targetSlot);
-    }
-
-    private canvasOnClear() {
-        console.debug("CanvasClear");
-        this.eventBus.emit("cleared");
-    }
-
-    private requestAutosave() {
-        this.eventBus.emit("autosave", this.lGraph);
-    }
-
-    private addGraphLifecycleHooks() {
-        this.lGraph.onConfigure = this.graphOnConfigure.bind(this);
-        this.lGraph.onBeforeChange = this.graphOnBeforeChange.bind(this);
-        this.lGraph.onAfterChange = this.graphOnAfterChange.bind(this);
-        this.lGraph.onNodeAdded = this.graphOnNodeAdded.bind(this);
-        this.lGraph.onNodeRemoved = this.graphOnNodeRemoved.bind(this);
-        this.lGraph.onNodeConnectionChange = this.graphOnNodeConnectionChange.bind(this);
-
-        this.lCanvas.onClear = this.canvasOnClear.bind(this);
-    }
-
-    static node_type_overrides: Record<string, typeof ComfyGraphNode> = {}
-    static widget_type_overrides: Record<string, Function> = {}
-
-    private registerNodeTypeOverrides() {
-        ComfyApp.node_type_overrides["SaveImage"] = nodes.ComfySaveImageNode;
-        ComfyApp.node_type_overrides["PreviewImage"] = nodes.ComfyPreviewImageNode;
-    }
-
-    private registerWidgetTypeOverrides() {
-        ComfyApp.widget_type_overrides["comfy/gallery"] = widgets.ComfyGalleryWidget_Svelte;
-    }
+    static node_type_overrides: Record<string, typeof ComfyBackendNode> = {}
+    static widget_type_overrides: Record<string, typeof SvelteComponentDev> = {}
 
     private async registerNodes() {
         const app = this;
 
         // Load node definitions from the backend
         const defs = await this.api.getNodeDefs();
-        // await this.#invokeExtensionsAsync("addCustomNodeDefs", defs);
-
-        // Generate list of known widgets
-        const widgets = ComfyWidgets;
-        // const widgets = Object.assign(
-        // 	{},
-        // 	ComfyWidgets,
-        // 	...(await this.#invokeExtensionsAsync("getCustomWidgets")).filter(Boolean)
-        // );
 
         // Register a node for each definition
         for (const nodeId in defs) {
@@ -234,56 +174,11 @@ export default class ComfyApp {
             const typeOverride = ComfyApp.node_type_overrides[nodeId]
             if (typeOverride)
                 console.debug("Attaching custom type to received node:", nodeId, typeOverride)
-            const baseClass: typeof LGraphNode = typeOverride || LGraphNode;
+            const baseClass: typeof ComfyBackendNode = typeOverride || ComfyBackendNode;
 
             const ctor = class extends baseClass {
                 constructor(title?: string) {
-                    super(title);
-                    this.type = nodeId; // XXX: workaround dependency in LGraphNode.addInput()
-                    (this as any).comfyClass = nodeId;
-                    var inputs = nodeData["input"]["required"];
-                    if (nodeData["input"]["optional"] != undefined) {
-                        inputs = Object.assign({}, nodeData["input"]["required"], nodeData["input"]["optional"])
-                    }
-                    const config = { minWidth: 1, minHeight: 1 };
-                    for (const inputName in inputs) {
-                        const inputData = inputs[inputName];
-                        const type = inputData[0];
-
-                        if (inputData[1]?.forceInput) {
-                            this.addInput(inputName, type);
-                        } else {
-                            if (Array.isArray(type)) {
-                                // Enums
-                                Object.assign(config, widgets.COMBO(this, inputName, inputData, app) || {});
-                            } else if (`${type}:${inputName}` in widgets) {
-                                // Support custom widgets by Type:Name
-                                Object.assign(config, widgets[`${type}:${inputName}`](this, inputName, inputData, app) || {});
-                            } else if (type in widgets) {
-                                // Standard type widgets
-                                Object.assign(config, widgets[type](this, inputName, inputData, app) || {});
-                            } else {
-                                // Node connection inputs
-                                this.addInput(inputName, type);
-                            }
-                        }
-                    }
-
-                    for (const o in nodeData["output"]) {
-                        const output = nodeData["output"][o];
-                        const outputName = nodeData["output_name"][o] || output;
-                        this.addOutput(outputName, output);
-                    }
-
-                    const s = this.computeSize();
-                    s[0] = Math.max(config.minWidth, s[0] * 1.5);
-                    s[1] = Math.max(config.minHeight, s[1]);
-                    this.size = s;
-                    this.serialize_widgets = true;
-
-                    // app.#invokeExtensionsAsync("nodeCreated", this);
-
-                    return this;
+                    super(title, nodeId, nodeData);
                 }
             }
 
@@ -294,15 +189,9 @@ export default class ComfyApp {
                 desc: `ComfyNode: ${nodeId}`
             }
 
-            // this.#addNodeContextMenuHandler(node);
-            // this.#addDrawBackgroundHandler(node, app);
-
-            // await this.#invokeExtensionsAsync("beforeRegisterNodeDef", node, nodeData);
             LiteGraph.registerNodeType(node);
             node.category = nodeData.category;
         }
-
-        // await this.#invokeExtensionsAsync("registerCustomNodes");
     }
 
     private showDropZone() {
@@ -351,24 +240,24 @@ export default class ComfyApp {
      * Adds a handler on paste that extracts and loads workflows from pasted JSON data
      */
     private addPasteHandler() {
-        document.addEventListener("paste", (e) => {
-            let data = (e.clipboardData || (window as any).clipboardData).getData("text/plain");
-            let workflow;
-            try {
-                data = data.slice(data.indexOf("{"));
-                workflow = JSON.parse(data);
-            } catch (err) {
-                try {
-                    data = data.slice(data.indexOf("workflow\n"));
-                    data = data.slice(data.indexOf("{"));
-                    workflow = JSON.parse(data);
-                } catch (error) { }
-            }
+        // document.addEventListener("paste", (e) => {
+        //     let data = (e.clipboardData || (window as any).clipboardData).getData("text/plain");
+        //     let workflow;
+        //     try {
+        //         data = data.slice(data.indexOf("{"));
+        //         workflow = JSON.parse(data);
+        //     } catch (err) {
+        //         try {
+        //             data = data.slice(data.indexOf("workflow\n"));
+        //             data = data.slice(data.indexOf("{"));
+        //             workflow = JSON.parse(data);
+        //         } catch (error) { }
+        //     }
 
-            if (workflow && workflow.version && workflow.nodes && workflow.extra) {
-                this.loadGraphData(workflow);
-            }
-        });
+        //     if (workflow && workflow.version && workflow.nodes && workflow.extra) {
+        //         this.loadGraphData(workflow);
+        //     }
+        // });
     }
 
     /**
@@ -422,16 +311,71 @@ export default class ComfyApp {
         });
     }
 
+    private setupColorScheme() {
+        const setColor = (type: any, color: string) => {
+            this.lCanvas.link_type_colors[type] = color
+            this.lCanvas.default_connection_color_byType[type] = color
+        }
+
+        // Distinguish frontend/backend connections
+        const BACKEND_TYPES = ["CLIP", "CLIP_VISION", "CLIP_VISION_OUTPUT", "CONDITIONING", "CONTROL_NET", "IMAGE", "LATENT", "MASK", "MODEL", "STYLE_MODEL", "VAE"]
+        for (const type of BACKEND_TYPES) {
+            setColor(type, "orange")
+        }
+
+        setColor("OUTPUT", "rebeccapurple")
+        setColor(BuiltInSlotType.EVENT, "lightseagreen")
+        setColor(BuiltInSlotType.ACTION, "lightseagreen")
+    }
+
+    serialize(): SerializedAppState {
+        const graph = this.lGraph;
+
+        const serializedGraph = graph.serialize()
+        const serializedLayout = layoutState.serialize()
+        const serializedCanvas = this.lCanvas.serialize();
+
+        return {
+            createdBy: "ComfyBox",
+            version: COMFYBOX_SERIAL_VERSION,
+            workflow: serializedGraph,
+            layout: serializedLayout,
+            canvas: serializedCanvas
+        }
+    }
+
+    deserialize(data: SerializedAppState) {
+        if (data.version !== COMFYBOX_SERIAL_VERSION) {
+            throw `Invalid ComfyBox saved data format: ${data.version}`
+        }
+
+        // Ensure loadGraphData does not trigger any state changes in layoutState
+        // (isConfiguring is set to true here)
+        // lGraph.configure will add new nodes, triggering onNodeAdded, but we
+        // want to restore the layoutState ourselves
+        layoutState.onStartConfigure();
+
+        this.loadGraphData(data.workflow)
+
+        // Now restore the layout
+        // Subsequent added nodes will add the UI data to layoutState
+        layoutState.deserialize(data.layout, this.lGraph)
+
+        // Restore canvas offset/zoom
+        this.lCanvas.deserialize(data.canvas)
+    }
+
+    initDefaultGraph() {
+        const state = structuredClone(defaultGraph)
+        this.deserialize(state)
+    }
+
     /**
      * Populates the graph with the specified workflow data
      * @param {*} graphData A serialized graph object
      */
-    loadGraphData(graphData?: SerializedLGraph) {
+    loadGraphData(graphData: SerializedLGraph) {
         this.clean();
-
-        if (!graphData) {
-            graphData = structuredClone(defaultGraph.workflow)
-        }
 
         // Patch T2IAdapterLoader to ControlNetLoader since they are the same node now
         for (let n of graphData.nodes) {
@@ -445,84 +389,118 @@ export default class ComfyApp {
             size[0] = Math.max(node.size[0], size[0]);
             size[1] = Math.max(node.size[1], size[1]);
             node.size = size;
-
-            if (node.widgets) {
-                // If you break something in the backend and want to patch workflows in the frontend
-                // This is the place to do this
-                for (let widget of node.widgets) {
-                    if (node.type == "KSampler" || node.type == "KSamplerAdvanced") {
-                        if (widget.name == "sampler_name") {
-                            if (widget.value.constructor === String && widget.value.startsWith("sample_")) {
-                                widget.value = widget.value.slice(7);
-                            }
-                        }
-                    }
-                }
-            }
-
             // this.#invokeExtensions("loadedGraphNode", node);
         }
+    }
+
+    reset() {
+        this.clean();
+
+        const blankGraph: SerializedLGraph = {
+            last_node_id: 0,
+            last_link_id: 0,
+            nodes: [],
+            links: [],
+            groups: [],
+            config: {},
+            extra: {},
+            version: 0
+        }
+
+        layoutState.onStartConfigure();
+        this.lGraph.configure(blankGraph)
+        layoutState.initDefaultLayout();
     }
 
     /**
      * Converts the current graph workflow for sending to the API
      * @returns The workflow and node links
      */
-    async graphToPrompt() {
+    async graphToPrompt(): Promise<SerializedPrompt> {
+        // Run frontend-only logic
+        this.lGraph.runStep(1)
+
         const workflow = this.lGraph.serialize();
 
         const output = {};
         // Process nodes in order of execution
-        for (const node of this.lGraph.computeExecutionOrder<ComfyGraphNodeExecutable>(false, null)) {
-            const n = workflow.nodes.find((n) => n.id === node.id);
+        for (const node_ of this.lGraph.computeExecutionOrder<ComfyGraphNode>(false, null)) {
+            const n = workflow.nodes.find((n) => n.id === node_.id);
 
-            if (node.isVirtualNode || !node.comfyClass) {
-                console.debug("Not serializing node: ", node.type)
-                // Don't serialize frontend only nodes but let them make changes
-                if (node.applyToGraph) {
-                    node.applyToGraph(workflow);
-                }
+            if (!node_.isBackendNode) {
+                console.debug("Not serializing node: ", node_.type)
                 continue;
             }
 
-            if (node.mode === 2) {
+            const node = node_ as ComfyBackendNode;
+
+            if (node.mode === NodeMode.NEVER) {
                 // Don't serialize muted nodes
                 continue;
             }
 
             const inputs = {};
-            const widgets = node.widgets;
 
-            // Store all widget values
-            if (widgets) {
-                for (let i = 0; i < widgets.length; i++) {
-                    const widget = widgets[i];
-                    let isVirtual = false;
-                    if ("isVirtual" in widget)
-                        isVirtual = (widget as ComfyWidget<any, any>).isVirtual;
-                    if ((!widget.options || widget.options.serialize !== false) && !isVirtual) {
-                        let value = widget.serializeValue ? await widget.serializeValue(n, i) : widget.value;
-                        inputs[widget.name] = value
+            // Store all link values
+            if (node.inputs) {
+                for (let i = 0; i < node.inputs.length; i++) {
+                    const inp = node.inputs[i];
+                    const inputLink = node.getInputLink(i)
+                    const inputNode = node.getInputNode(i)
+                    if (!inputLink || !inputNode) {
+                        if ("config" in inp) {
+                            const defaultValue = (inp as IComfyInputSlot).config?.defaultValue
+                            if (defaultValue !== null && defaultValue !== undefined)
+                                inputs[inp.name] = defaultValue
+                        }
+                        continue;
+                    }
+
+                    let serialize = true;
+                    if ("config" in inp)
+                        serialize = (inp as IComfyInputSlot).serialize
+
+                    let isBackendNode = node.isBackendNode;
+                    let isInputBackendNode = false;
+                    if ("isBackendNode" in inputNode)
+                        isInputBackendNode = (inputNode as ComfyGraphNode).isBackendNode;
+
+                    // The reasoning behind this check:
+                    // We only want to serialize inputs to nodes with backend equivalents.
+                    // And in ComfyBox, the nodes in litegraph *never* have widgets, instead they're all inputs.
+                    // All values are passed by separate frontend-only nodes,
+                    // either UI-bound or something like ConstantInteger.
+                    // So we know that any value passed into a backend node *must* come from
+                    // a frontend node.
+                    // The rest (links between backend nodes) will be serialized after this bit runs.
+                    if (serialize && isBackendNode && !isInputBackendNode) {
+                        inputs[inp.name] = inputLink.data
                     }
                 }
             }
 
-            // Store all node links
+            // Store all links between nodes
             for (let i = 0; i < node.inputs.length; i++) {
-                let parent: ComfyGraphNodeExecutable = node.getInputNode(i) as ComfyGraphNodeExecutable;
+                let parent: ComfyGraphNode = node.getInputNode(i) as ComfyGraphNode;
                 if (parent) {
+                    const seen = {}
                     let link = node.getInputLink(i);
-                    while (parent && parent.isVirtualNode) {
+                    while (parent && !parent.isBackendNode) {
                         link = parent.getInputLink(link.origin_slot);
-                        if (link) {
-                            parent = parent.getInputNode(link.origin_slot) as ComfyGraphNodeExecutable;
+                        if (link && !seen[link.id]) {
+                            seen[link.id] = true
+                            parent = parent.getInputNode(link.origin_slot) as ComfyGraphNode;
                         } else {
                             parent = null;
                         }
                     }
 
-                    if (link) {
-                        inputs[node.inputs[i].name] = [String(link.origin_id), link.origin_slot];
+                    if (link && parent && parent.isBackendNode) {
+                        const input = node.inputs[i]
+                        // TODO can null be a legitimate value in some cases?
+                        // Nodes like CLIPLoader will never have a value in the frontend, hence "null".
+                        if (!(input.name in inputs))
+                            inputs[input.name] = [String(link.origin_id), link.origin_slot];
                     }
                 }
             }
@@ -569,20 +547,20 @@ export default class ComfyApp {
                         await this.api.queuePrompt(num, p);
                     } catch (error) {
                         // this.ui.dialog.show(error.response || error.toString());
-                        console.error(error.response || error.toString())
+                        const mes = error.response || error.toString()
+                        toast.push(`Error queuing prompt:\n${mes}`, {
+                            theme: {
+                                '--toastBackground': 'var(--color-red-500)',
+                            }
+                        })
+                        console.error("Error queuing prompt", mes, num, p)
                         break;
                     }
 
                     for (const n of p.workflow.nodes) {
                         const node = this.lGraph.getNodeById(n.id);
-                        if (node.widgets) {
-                            for (const widget of node.widgets) {
-                                // Allow widgets to run callbacks after a prompt has been queued
-                                // e.g. random seed after every gen
-                                if ("afterQueued" in widget) {
-                                    (widget as ComfyWidget<any, any>).afterQueued();
-                                }
-                            }
+                        if ("afterQueued" in node) {
+                            (node as ComfyGraphNode).afterQueued(p);
                         }
                     }
 
@@ -639,14 +617,26 @@ export default class ComfyApp {
 
             const def = defs[node.type];
 
-            for (const widgetNum in node.widgets) {
-                const widget = node.widgets[widgetNum]
+            for (let index = 0; index < node.inputs.length; index++) {
+                const input = node.inputs[index];
+                if ("config" in input) {
+                    const comfyInput = input as IComfyInputSlot;
 
-                if (widget.type == "combo" && def["input"]["required"][widget.name] !== undefined) {
-                    widget.options.values = def["input"]["required"][widget.name][0];
+                    console.warn("RefreshCombo", comfyInput.defaultWidgetNode, comfyInput)
 
-                    if (!widget.options.values.includes(widget.value)) {
-                        widget.value = widget.options.values[0];
+                    if (comfyInput.defaultWidgetNode == nodes.ComfyComboNode && def["input"]["required"][comfyInput.name] !== undefined) {
+                        comfyInput.config.values = def["input"]["required"][comfyInput.name][0];
+
+                        console.warn("RefreshCombo", comfyInput.config.values, def["input"]["required"][comfyInput.name])
+                        const inputNode = node.getInputNode(index)
+
+                        if (inputNode && "doAutoConfig" in inputNode) {
+                            const comfyInputNode = inputNode as nodes.ComfyWidgetNode;
+                            comfyInputNode.doAutoConfig(comfyInput)
+                            if (!comfyInput.config.values.includes(get(comfyInputNode.value))) {
+                                comfyInputNode.setValue(comfyInput.config.defaultValue || comfyInput.config.values[0])
+                            }
+                        }
                     }
                 }
             }

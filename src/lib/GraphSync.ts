@@ -1,16 +1,11 @@
-import type { LGraph } from "@litegraph-ts/core";
-import widgetState, { type WidgetStateStore, type WidgetUIState, type WidgetUIStateStore } from "./stores/widgetState";
-import nodeState, { type NodeStateStore, type NodeUIState, type NodeUIStateStore } from "./stores/nodeState";
+import type { LGraph, LGraphNode } from "@litegraph-ts/core";
 import type ComfyApp from "./components/ComfyApp";
-import type { Unsubscriber } from "svelte/store";
+import type { Unsubscriber, Writable } from "svelte/store";
+import type { ComfyWidgetNode } from "./nodes";
+import type ComfyGraph from "./ComfyGraph";
 
 type WidgetSubStore = {
     store: WidgetUIStateStore,
-    unsubscribe: Unsubscriber
-}
-
-type NodeSubStore = {
-    store: NodeUIStateStore,
     unsubscribe: Unsubscriber
 }
 
@@ -30,80 +25,53 @@ type NodeSubStore = {
  */
 export default class GraphSync {
     graph: LGraph;
-    private _unsubscribe: Unsubscriber;
-    private _finalizer: FinalizationRegistry<number>;
 
-    // nodeId -> widgetSubStores[]
-    private stores: Record<string, WidgetSubStore[]> = {}
+    // nodeId -> widgetSubStore
+    private stores: Record<string, WidgetSubStore> = {}
 
-    constructor(app: ComfyApp) {
-        this.graph = app.lGraph;
-        this._unsubscribeWidget = widgetState.subscribe(this.onAllWidgetStateChanged.bind(this));
-        this._unsubscribeNode = nodeState.subscribe(this.onAllNodeStateChanged.bind(this));
-        this._finalizer = new FinalizationRegistry((id: number) => {
-            console.log(`${this} has been garbage collected`);
-            this._unsubscribeWidget();
-            this._unsubscribeNode();
-        });
+    constructor(graph: ComfyGraph) {
+        this.graph = graph;
     }
 
-    /*
-     * Fired when the entire widget graph changes.
-     */
-    private onAllWidgetStateChanged(state: WidgetStateStore) {
+    onNodeAdded(node: LGraphNode) {
         // TODO assumes only a single graph's widget state.
 
-        for (let nodeId in state) {
-            if (!this.stores[nodeId]) {
-                this.addStores(state, nodeId);
-            }
-        }
-
-        for (let nodeId in this.stores) {
-            if (!state[nodeId]) {
-                this.removeStores(nodeId);
-            }
-        }
-    }
-
-    private onAllNodeStateChanged(state: NodeStateStore) {
-        // TODO assumes only a single graph's widget state.
-
-        for (let nodeId in state) {
-            state[nodeId].node.name = state[nodeId].name;
+        if ("svelteComponentType" in node) {
+            this.addStore(node as ComfyWidgetNode);
         }
 
         this.graph.setDirtyCanvas(true, true);
     }
 
-    private addStores(state: WidgetStateStore, nodeId: string) {
-        if (this.stores[nodeId]) {
-            console.warn("Stores already exist!", nodeId, this.stores[nodeId])
+    onNodeRemoved(node: LGraphNode) {
+        if ("svelteComponentType" in node) {
+            this.removeStore(node as ComfyWidgetNode);
         }
 
-        this.stores[nodeId] = []
-
-        for (const wuis of state[nodeId]) {
-            const unsub = wuis.value.subscribe((v) => this.onWidgetStateChanged(wuis, v))
-            this.stores[nodeId].push({ store: wuis.value, unsubscribe: unsub });
-        }
-
-        console.debug("NEWSTORES", this.stores[nodeId])
+        this.graph.setDirtyCanvas(true, true);
     }
 
-    private removeStores(nodeId: string) {
-        console.debug("DELSTORES", this.stores[nodeId])
-        for (const ss of this.stores[nodeId]) {
-            ss.unsubscribe();
+    private addStore(node: ComfyWidgetNode) {
+        if (this.stores[node.id]) {
+            console.warn("[GraphSync] Stores already exist!", node.id, this.stores[node.id])
         }
-        delete this.stores[nodeId]
+
+        const unsub = node.value.subscribe((v) => this.onWidgetStateChanged(node, v))
+        this.stores[node.id] = ({ store: node.value, unsubscribe: unsub });
+
+        console.debug("[GraphSync] NEWSTORE", this.stores[node.id])
+    }
+
+    private removeStore(node: ComfyWidgetNode) {
+        console.debug("[GraphSync] DELSTORE", this.stores[node.id])
+        this.stores[node.id].unsubscribe()
+        delete this.stores[node.id]
     }
 
     /*
      * Fired when a single widget's value changes.
      */
-    private onWidgetStateChanged(wuis: WidgetUIState, value: any) {
-        wuis.widget.value = value;
+    private onWidgetStateChanged(node: ComfyWidgetNode, value: any) {
         this.graph.setDirtyCanvas(true, true);
     }
 }
