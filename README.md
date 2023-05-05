@@ -13,16 +13,27 @@ This frontend isn't compatible with regular ComfyUI's workflow format since extr
 ## Proposed Features
 - All the power of ComfyUI with more convenience on top
 - Autocreation of UI widgets from your workflow, quickly creating a personalized dashboard
-- Custom widget and node types
-- Look up queued and finished generations and their configs in realtime
+- Arrange the UI however you like and attach custom classes/styles to each widget
+- Custom widget types
+- See the status of queued and finished generations and their configs in realtime
 - Development with TypeScript
 
-## Requirements
+## Installation
+
+1. Download the latest release [here](https://nightly.link/space-nuko/ComfyBox/workflows/build-and-publish/master/ComfyBox-dist.zip) and extract it somewhere
+2. Start the ComfyUI server with `python main.py --enable-cors-header`
+3. In the folder you extracted to run `python -m http.server 8000` (or whatever web server you want)
+4. Alternately extract the `.zip` into the `dist/` folder of this repository, then open `run.bat`/`run.sh`
+5. Visit `http://localhost:8000` in your browser
+
+## Development
+
+### Requirements
 
 - `pnpm`
 - An installation of vanilla [ComfyUI](https://github.com/comfyanonymous/ComfyUI) for the backend
 
-## Installation
+### Installation
 
 1. Clone the repo with submodules:
 
