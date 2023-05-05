@@ -10,9 +10,79 @@
      const title = app.lGraph.getNodeById(nodeId)?.title || String(nodeId);
      return title + " (" + nodeId + ")"
  }
+
+ const entries = [
+     {
+         "outputs": {
+             44: {
+                 "images": [
+                     {
+                         "filename": "ComfyUI_00052_.png",
+                         "subfolder": "",
+                         "type": "output"
+                     }
+                 ]
+             }
+         }
+     },
+     {
+         "outputs": {
+             44: {
+                 "images": [
+                     {
+                         "filename": "ComfyUI_00052_.png",
+                         "subfolder": "",
+                         "type": "output"
+                     }
+                 ]
+             }
+         }
+     },
+     {
+         "outputs": {
+             44: {
+                 "images": [
+                     {
+                         "filename": "ComfyUI_00052_.png",
+                         "subfolder": "",
+                         "type": "output"
+                     }
+                 ]
+             }
+         }
+     }
+ ]
+
+ let _entries: any[] = []
+
+ $: if (entries) {
+     _entries = []
+     for (const entry of entries) {
+         for (const outputs of Object.values(entry.outputs)) {
+             const allImages = outputs.images.map(r => {
+                 // TODO configure backend URL
+                 const url = "http://localhost:8188/view?"
+                 const params = new URLSearchParams(r)
+                 return url + params
+             });
+
+             _entries.push({ allImages, name: "Output" })
+         }
+     }
+ }
 </script>
 
 <div class="queue">
+    <div class="queue-entries">
+        {#each _entries as entry}
+            <div class="queue-entry">
+                <img class="queue-entry-image" src={entry.allImages[0]} alt="thumbnail" />
+                <div class="queue-entry-details">
+                    {entry.name}
+                </div>
+            </div>
+        {/each}
+    </div>
     <div class="bottom">
         {#if $queueState.runningNodeId || $queueState.progress}
             <div class="node-name">
@@ -48,6 +118,20 @@
      display: flex;
      justify-content: center;
      align-items: center;
+ }
+
+ .queue-entry {
+     padding: 0.5rem 0.5rem 0 0.5rem;
+     display: flex;
+     flex-direction: row;
+ }
+
+ .queue-entry-image {
+     width: var(--size-20)
+ }
+
+ .queue-entry-details {
+     width: var(--size-20)
  }
 
  .node-name {

@@ -11,6 +11,7 @@
  import { ImageViewer } from "$lib/ImageViewer";
  import type { ComfyAPIStatus } from "$lib/api";
  import { SvelteToast, toast } from '@zerodevx/svelte-toast'
+ import defaultGraph from "$lib/defaultGraph"
 
  import { LGraph } from "@litegraph-ts/core";
  import LightboxModal from "./LightboxModal.svelte";
@@ -92,6 +93,13 @@
      var confirmed = confirm("Are you sure you want to clear the current workflow?");
      if (confirmed) {
          app.reset();
+     }
+ }
+
+ async function doLoadDefault(): void {
+     var confirmed = confirm("Are you sure you want to clear the current workflow and load the default graph?");
+     if (confirmed) {
+         await app.deserialize(defaultGraph)
      }
  }
 
@@ -179,6 +187,9 @@
         </Button>
         <Button variant="secondary" on:click={doReset}>
             Reset
+        </Button>
+        <Button variant="secondary" on:click={doLoadDefault}>
+            Load Default
         </Button>
         <Button variant="secondary" on:click={doRecenter}>
             Recenter
