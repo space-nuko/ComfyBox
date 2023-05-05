@@ -1,4 +1,4 @@
-import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, BuiltInSlotType, type ITextWidget } from "@litegraph-ts/core";
+import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, BuiltInSlotType, type ITextWidget, type SerializedLGraphNode } from "@litegraph-ts/core";
 import ComfyGraphNode from "./ComfyGraphNode";
 import { Watch } from "@litegraph-ts/nodes-basic";
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
@@ -32,6 +32,11 @@ export class ComfyAfterQueuedAction extends ComfyGraphNode {
     override afterQueued(p: SerializedPrompt) {
         this.setProperty("value", p)
         this.triggerSlot(0, "bang")
+    }
+
+    override onSerialize(o: SerializedLGraphNode) {
+        super.onSerialize(o)
+        o.properties = { prompt: null }
     }
 }
 

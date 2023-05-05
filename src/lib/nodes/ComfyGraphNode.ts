@@ -33,7 +33,8 @@ export default class ComfyGraphNode extends LGraphNode {
                 const ty = Object.values(LiteGraph.registered_node_types)
                     .find(v => v.class === widgetNode)
                 if (ty)
-                    (serInput as any).widgetNodeType = ty.type
+                    (serInput as any).widgetNodeType = ty.type;
+                (serInput as any).defaultWidgetNode = null
             }
         }
     }
