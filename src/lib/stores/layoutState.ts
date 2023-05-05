@@ -21,6 +21,16 @@ export type LayoutState = {
     isMenuOpen: boolean
 }
 
+export type Attributes = {
+    direction: "horizontal" | "vertical",
+    title: string,
+    showTitle: boolean,
+    classes: string,
+    blockVariant?: "block" | "hidden",
+    hidden?: boolean,
+    flexGrow?: number
+}
+
 export type AttributesSpec = {
     name: string,
     type: string,
@@ -62,6 +72,12 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 values: ["horizontal", "vertical"]
             },
             {
+                name: "flexGrow",
+                type: "number",
+                location: "widget",
+                editable: true
+            },
+            {
                 name: "classes",
                 type: "string",
                 location: "widget",
@@ -101,15 +117,6 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
     }
 ];
 export { ALL_ATTRIBUTES };
-
-export type Attributes = {
-    direction: "horizontal" | "vertical",
-    title: string,
-    showTitle: boolean,
-    classes: string,
-    blockVariant?: "block" | "hidden",
-    hidden?: boolean
-}
 
 export interface IDragItem {
     type: string,
@@ -190,6 +197,7 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
             direction: "vertical",
             classes: "",
             blockVariant: "block",
+            flexGrow: 100,
             ...attrs
         }
     }
@@ -216,6 +224,7 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
             showTitle: true,
             direction: "horizontal",
             classes: "",
+            flexGrow: 100,
             ...attrs
         }
     }
@@ -413,6 +422,7 @@ function initDefaultLayout() {
     store.set({
         root: null,
         allItems: {},
+        allItemsByNode: {},
         currentId: 0,
         currentSelection: [],
         isMenuOpen: false,
@@ -486,6 +496,8 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
             attrs: entry.dragItem.attrs,
             attrsChanged: writable(false)
         };
+
+        dragItem.attrs.flexGrow = 100;
 
         const dragEntry: DragItemEntry = {
             dragItem,

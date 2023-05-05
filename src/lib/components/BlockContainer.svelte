@@ -72,7 +72,9 @@
                         {@const hidden = item?.attrs?.hidden}
                         <div class="animation-wrapper"
                              class:hidden={hidden}
-                             animate:flip={{duration:flipDurationMs}}>
+                             animate:flip={{duration:flipDurationMs}}
+                             style={item?.attrs?.flexGrow ? `flex-grow: ${item.attrs.flexGrow}` : ""}
+                        >
                             <WidgetContainer dragItem={item} zIndex={zIndex+1} />
                             {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
                                 <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>

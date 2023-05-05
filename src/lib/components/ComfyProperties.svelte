@@ -103,13 +103,15 @@
                             {:else if spec.type === "number"}
                                 <label class="number-wrapper">
                                     <BlockTitle>{spec.name}</BlockTitle>
-                                    <input
-                                        type="number"
-                                        value={target.attrs[spec.name]}
-                                        step={1}
-                                        on:change={(e) => updateAttribute(spec, e.currentTarget.valueAsNumber)}
-                                        on:input={(e) => updateAttribute(spec, e.currentTarget.valueAsNumber)}
-                                    />
+                                    <div class="number">
+                                        <input
+                                            type="number"
+                                            value={target.attrs[spec.name]}
+                                            step={1}
+                                            on:change={(e) => updateAttribute(spec, e.currentTarget.valueAsNumber)}
+                                            on:input={(e) => updateAttribute(spec, e.currentTarget.valueAsNumber)}
+                                        />
+                                    </div>
                                 </label>
                             {:else if spec.type === "enum"}
                                 <label class="select-wrapper">
@@ -135,7 +137,7 @@
                                     <TextBox
                                         value={node.properties[spec.name]}
                                         on:change={(e) => updateProperty(spec, e.detail)}
-                                        on:input={(e) => updateAttribute(spec, e.detail)}
+                                        on:input={(e) => updateProperty(spec, e.detail)}
                                         label={spec.name}
                                         max_lines={1}
                                         />

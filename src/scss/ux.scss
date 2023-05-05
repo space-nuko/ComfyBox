@@ -152,21 +152,20 @@ body {
      }
  }
 
-.widget.selected {
-    background: var(--ae-primary-color) !important;
-}
-
-.animation-wrapper > .widget {
+.animation-wrapper > .widget:not(.selected) {
     background: var(--ae-panel-bg-color) !important;
 }
 
-.container.z-index2 > .block > .v-pane > .animation-wrapper > .widget:not(.edit) {
-    padding: var(--ae-inside-padding-size) !important;
-    border: 1px solid var(--ae-panel-border-color) !important;
+.container {
+    .z-index0, .z-index1, .z-index2  {
+        > .block > .v-pane > .animation-wrapper > .widget:not(.edit) {
+            padding: var(--ae-inside-padding-size) !important;
+            border: 1px solid var(--ae-panel-border-color) !important;
+        }
+    }
 }
-
 .widget:has(> .gradio-button) {
-     height: 100%;
+    height: 100%;
 
      .gradio-button {
          height: 100%;
@@ -226,9 +225,14 @@ div.float {
     color: var(--ae-primary-color)!important;
 }
 
-.widget.edit {
-    border-width: 2px;
-    border-color: var(--ae-primary-color) !important;
+.widget {
+    &.selected {
+        background: var(--ae-primary-color) !important;
+    }
+    &.edit:not(.selected) {
+        border-width: 2px;
+        border-color: var(--ae-primary-color) !important;
+    }
 }
 
 .target-name {
@@ -722,6 +726,12 @@ input[type=range]::-ms-fill-upper {
 }
 
 .widget > .wrapper.comfy-combo .svelte-select {
+    --font-size: 13px;
+    --height: 32px;
+    --input-padding: 0px;
+    --chevron-height: 32px;
+    --padding: 0 0 0 8px;
+
     background: var(--ae-input-bg-color) !important;
     border-radius: 0px !important;
 	border-color: var(--ae-input-border-color) !important;
