@@ -23,6 +23,10 @@ export default class ComfyGraphNode extends LGraphNode {
 
     defaultWidgets?: DefaultWidgetLayout
 
+    /** Called when a backend node sends a ComfyUI output over a link */
+    receiveOutput(output: any) {
+    }
+
     override onSerialize(o: SerializedLGraphNode) {
         for (let index = 0; index < this.inputs.length; index++) {
             const input = this.inputs[index]

@@ -41,13 +41,14 @@
 </script>
 
 {#if container && children}
+    {@const edit = $uiState.uiEditMode === "widgets" && zIndex > 1}
     {#key $attrsChanged}
         <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')} z-index{zIndex}"
              class:hide-block={container.attrs.blockVariant === "hidden"}
              class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(container.id)}
              class:root-container={zIndex === 0}
              class:is-executing={container.isNodeExecuting}
-             class:edit={$uiState.uiEditMode === "widgets" && zIndex > 1}>
+             class:edit={edit}>
             <Block>
                 {#if container.attrs.title !== ""}
                     <label for={String(container.id)} class={$uiState.uiEditMode === "widgets" ? "edit-title-label" : ""}>
@@ -56,7 +57,7 @@
                 {/if}
                 <div class="v-pane"
                      class:empty={children.length === 0}
-                     class:edit={$uiState.uiEditMode === "widgets" && zIndex > 1}
+                     class:edit={edit}
                     use:dndzone="{{
                                  items: children,
                                  flipDurationMs,
@@ -82,6 +83,9 @@
                         </div>
                     {/each}
                 </div>
+                {#if container.attrs.hidden && edit}
+                    <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>
+                {/if}
                 {#if showHandles}
                     <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
                 {/if}

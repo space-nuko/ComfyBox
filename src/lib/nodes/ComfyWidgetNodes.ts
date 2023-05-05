@@ -135,10 +135,6 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         }
     }
 
-    /** Called when a backend node sends a ComfyUI output over a link */
-    receiveOutput() {
-    }
-
     onConnectOutput(
         outputIndex: number,
         inputType: INodeInputSlot["type"],
@@ -411,7 +407,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "images", type: "OUTPUT" }
+            { name: "images", type: "IMAGE" }
         ]
     }
 

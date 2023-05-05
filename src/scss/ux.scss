@@ -113,6 +113,12 @@ body {
 
 .v-pane {
     gap: var(--ae-outside-gap-size) !important;
+
+    &.empty {
+        border-color: var(--ae-subpanel-border-color) !important;
+        border-radius: 0 !important;
+        background: var(--ae-subpanel-bg-color) !important;
+    }
 }
 
 .container {
@@ -133,13 +139,18 @@ body {
     }
     &.z-index1, &.z-index2 {
         // padding: var(--ae-outside-gap-size);
-        border: 1px solid var(--ae-panel-border-color);
+        // border: 1px solid var(--ae-panel-border-color);
         > .block {
             background: var(--ae-frame-bg-color) !important;
         }
     }
 
     &:not(.edit) {
+        &.z-index1 > .block {
+            padding: calc(var(--ae-outside-gap-size) / 2) !important;
+            border-width: 0px !important;
+        }
+
         > .block {
             border: solid var(--ae-panel-border-width) var(--ae-panel-border-color) !important;
         }
@@ -236,11 +247,11 @@ div.float {
 }
 
 .target-name {
-    background: var(--ae-subpanel-bg-color);
-    border-color: var(--ae-subpanel-border-color);
+    background: var(--ae-subpanel-bg-color) !important;
+    border-color: var(--ae-subpanel-border-color) !important;
 
     .title, .type {
-        color: var(--ae-label-color)
+        color: var(--ae-label-color) !important;
     }
 }
 

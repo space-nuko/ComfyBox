@@ -2,6 +2,7 @@ import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnec
 import ComfyGraphNode from "./ComfyGraphNode";
 import { Watch } from "@litegraph-ts/nodes-basic";
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
+import { toast } from '@zerodevx/svelte-toast'
 
 export interface ComfyAfterQueuedEventProperties extends Record<any, any> {
     prompt: SerializedPrompt
@@ -45,6 +46,40 @@ LiteGraph.registerNodeType({
     title: "Comfy.AfterQueuedEvent",
     desc: "Triggers a 'bang' event when a prompt is queued.",
     type: "actions/after_queued"
+})
+
+export interface ComfyOnExecutedEventProperties extends Record<any, any> {
+}
+
+export class ComfyOnExecutedEvent extends ComfyGraphNode {
+    override properties: ComfyOnExecutedEventProperties = {
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "images", type: "IMAGE" }
+        ],
+        outputs: [
+            { name: "onExecuted", type: BuiltInSlotType.EVENT },
+        ],
+    }
+
+    private _output: any = null;
+
+    override receiveOutput(output: any) {
+        if (this._output !== output) {
+            console.error(output)
+            this.triggerSlot(0, "bang")
+            this._output = output
+        }
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyOnExecutedEvent,
+    title: "Comfy.OnExecutedEvent",
+    desc: "Triggers a 'bang' event when a prompt output is received.",
+    type: "actions/on_executed"
 })
 
 export interface ComfyCopyActionProperties extends Record<any, any> {
@@ -129,4 +164,35 @@ LiteGraph.registerNodeType({
     title: "Comfy.SwapAction",
     desc: "Swaps two inputs when triggered",
     type: "actions/swap"
+})
+
+export interface ComfyNotifyActionProperties extends Record<any, any> {
+    message: string
+}
+
+export class ComfyNotifyAction extends ComfyGraphNode {
+    override properties: ComfyNotifyActionProperties = {
+        message: "Nya."
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "message", type: "string" },
+            { name: "trigger", type: BuiltInSlotType.ACTION }
+        ],
+    }
+
+    override onAction(action: any, param: any) {
+        const message = this.getInputData(0);
+        if (message) {
+            toast.push(message);
+        }
+    };
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyNotifyAction,
+    title: "Comfy.NotifyAction",
+    desc: "Displays a message.",
+    type: "actions/notify"
 })

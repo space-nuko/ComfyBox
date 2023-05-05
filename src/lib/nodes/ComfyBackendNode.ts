@@ -25,7 +25,7 @@ export class ComfyBackendNode extends ComfyGraphNode {
         // It just returns a hash like { "ui": { "images": results } } internally.
         // So this will need to be hardcoded for now.
         if (["PreviewImage", "SaveImage"].indexOf(comfyClass) !== -1) {
-            this.addOutput("output", "OUTPUT");
+            this.addOutput("output", "IMAGE");
         }
     }
 
@@ -78,12 +78,13 @@ export class ComfyBackendNode extends ComfyGraphNode {
         console.warn("onExecuted outputs", outputData)
         for (let index = 0; index < this.outputs.length; index++) {
             const output = this.outputs[index]
-            if (output.type === "OUTPUT") {
+            if (output.type === "IMAGE") {
                 this.setOutputData(index, outputData)
                 for (const node of this.getOutputNodes(index)) {
+                    console.warn(node)
                     if ("receiveOutput" in node) {
-                        const widgetNode = node as ComfyWidgetNode;
-                        widgetNode.receiveOutput();
+                        const widgetNode = node as ComfyGraphNode;
+                        widgetNode.receiveOutput(outputData);
                     }
                 }
             }
