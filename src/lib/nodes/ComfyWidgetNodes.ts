@@ -407,7 +407,8 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "images", type: "IMAGE" }
+            { name: "images", type: "IMAGE" },
+            { name: "store", type: BuiltInSlotType.ACTION }
         ]
     }
 
@@ -422,6 +423,19 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
         let queue = get(queueState)
         if (!(typeof queue.queueRemaining === "number" && queue.queueRemaining > 1)) {
             this.setValue([])
+        }
+    }
+
+    override onAction() {
+        const link = this.getInputLink(0)
+        if (link.data && "images" in link.data) {
+            const data = link.data as GalleryOutput
+            console.debug("[ComfyGalleryNode] Received output!", data)
+
+            const galleryItems: GradioFileData[] = this.convertItems(link.data)
+
+            const currentValue = get(this.value)
+            this.setValue(currentValue.concat(galleryItems))
         }
     }
 
@@ -447,19 +461,6 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
         }
         else {
             super.setValue([])
-        }
-    }
-
-    receiveOutput() {
-        const link = this.getInputLink(0)
-        if (link.data && "images" in link.data) {
-            const data = link.data as GalleryOutput
-            console.debug("[ComfyGalleryNode] Received output!", data)
-
-            const galleryItems: GradioFileData[] = this.convertItems(link.data)
-
-            const currentValue = get(this.value)
-            this.setValue(currentValue.concat(galleryItems))
         }
     }
 }

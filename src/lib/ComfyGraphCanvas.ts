@@ -3,6 +3,7 @@ import type ComfyApp from "./components/ComfyApp";
 import queueState from "./stores/queueState";
 import { get } from "svelte/store";
 import uiState from "./stores/uiState";
+import layoutState from "./stores/layoutState";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
@@ -228,6 +229,13 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         }
 
         return res;
+    }
+
+    override onNodeSelected(node: LGraphNode) {
+        const ls = get(layoutState)
+        ls.currentSelectionNodes = [node]
+        ls.currentSelection = []
+        layoutState.set(ls)
     }
 
     override onNodeMoved(node: LGraphNode) {

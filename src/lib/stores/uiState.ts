@@ -9,7 +9,8 @@ export type UIState = {
     nodesLocked: boolean,
     graphLocked: boolean,
     autoAddUI: boolean,
-    uiEditMode: UIEditMode
+    uiEditMode: UIEditMode,
+    subWorkflow: string
 }
 
 export type WritableUIStateStore = Writable<UIState>;
@@ -19,7 +20,8 @@ const store: WritableUIStateStore = writable(
         graphLocked: false,
         nodesLocked: false,
         autoAddUI: true,
-        uiEditMode: "disabled"
+        uiEditMode: "disabled",
+        subWorkflow: "default"
     })
 
 const uiStateStore: WritableUIStateStore =

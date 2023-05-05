@@ -11,14 +11,20 @@ type DragItemEntry = {
     parent: IDragItem | null
 }
 
+export type LayoutAttributes = {
+    defaultWorkflow: string
+}
+
 export type LayoutState = {
     root: IDragItem | null,
     allItems: Record<DragItemID, DragItemEntry>,
     allItemsByNode: Record<number, DragItemEntry>,
     currentId: number,
     currentSelection: DragItemID[],
+    currentSelectionNodes: LGraphNode[],
     isConfiguring: boolean,
-    isMenuOpen: boolean
+    isMenuOpen: boolean,
+    attrs: LayoutAttributes
 }
 
 export type Attributes = {
@@ -34,11 +40,14 @@ export type Attributes = {
 export type AttributesSpec = {
     name: string,
     type: string,
-    location: "widget" | "nodeProps"
+    location: "widget" | "nodeProps" | "nodeVars" | "workflow"
     editable: boolean,
 
     values?: string[],
-    hidden?: boolean
+    hidden?: boolean,
+
+    serialize?: (arg: any) => string,
+    deserialize?: (arg: string) => any,
 }
 
 export type AttributesCategorySpec = {
@@ -96,6 +105,18 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
         categoryName: "behavior",
         specs: [
             {
+                name: "tags",
+                type: "string",
+                location: "nodeVars",
+                editable: true,
+                serialize: (arg: string[]) => arg.join(","),
+                deserialize: (arg: string) => {
+                    if (arg === "")
+                        return []
+                    return arg.split(",").map(s => s.trim())
+                }
+            },
+            {
                 name: "min",
                 type: "number",
                 location: "nodeProps",
@@ -113,6 +134,12 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "nodeProps",
                 editable: true,
             },
+            {
+                name: "defaultWorkflow",
+                type: "string",
+                location: "workflow",
+                editable: true
+            }
         ]
     }
 ];
@@ -161,8 +188,12 @@ const store: Writable<LayoutState> = writable({
     allItemsByNode: {},
     currentId: 0,
     currentSelection: [],
+    currentSelectionNodes: [],
     isMenuOpen: false,
-    isConfiguring: true
+    isConfiguring: true,
+    attrs: {
+        defaultWorkflow: ""
+    }
 })
 
 function findDefaultContainerForInsertion(): ContainerLayout | null {
@@ -425,6 +456,7 @@ function initDefaultLayout() {
         allItemsByNode: {},
         currentId: 0,
         currentSelection: [],
+        currentSelectionNodes: [],
         isMenuOpen: false,
         isConfiguring: false
     })
@@ -444,6 +476,7 @@ export type SerializedLayoutState = {
     root: DragItemID | null,
     allItems: Record<DragItemID, SerializedDragEntry>,
     currentId: number,
+    attrs: LayoutAttributes
 }
 
 export type SerializedDragEntry = {
@@ -481,6 +514,7 @@ function serialize(): SerializedLayoutState {
         root: state.root?.id,
         allItems,
         currentId: state.currentId,
+        attrs: state.attrs
     }
 }
 
@@ -536,8 +570,10 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
         allItemsByNode,
         currentId: data.currentId,
         currentSelection: [],
+        currentSelectionNodes: [],
         isMenuOpen: false,
-        isConfiguring: false
+        isConfiguring: false,
+        attrs: data.attrs
     }
 
     console.debug("[layoutState] deserialize", data, state)

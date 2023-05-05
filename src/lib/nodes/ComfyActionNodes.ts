@@ -3,6 +3,7 @@ import ComfyGraphNode from "./ComfyGraphNode";
 import { Watch } from "@litegraph-ts/nodes-basic";
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
 import { toast } from '@zerodevx/svelte-toast'
+import type { GalleryOutput } from "./ComfyWidgetNodes";
 
 export interface ComfyAfterQueuedEventProperties extends Record<any, any> {
     prompt: SerializedPrompt
@@ -49,10 +50,12 @@ LiteGraph.registerNodeType({
 })
 
 export interface ComfyOnExecutedEventProperties extends Record<any, any> {
+    images: GalleryOutput | null
 }
 
 export class ComfyOnExecutedEvent extends ComfyGraphNode {
     override properties: ComfyOnExecutedEventProperties = {
+        images: null
     }
 
     static slotLayout: SlotLayout = {
@@ -60,17 +63,20 @@ export class ComfyOnExecutedEvent extends ComfyGraphNode {
             { name: "images", type: "IMAGE" }
         ],
         outputs: [
+            { name: "images", type: "IMAGE" },
             { name: "onExecuted", type: BuiltInSlotType.EVENT },
         ],
     }
 
-    private _output: any = null;
+    override onExecute() {
+        if (this.properties.images !== null)
+            this.setOutputData(0, this.properties.images)
+    }
 
     override receiveOutput(output: any) {
-        if (this._output !== output) {
-            console.error(output)
-            this.triggerSlot(0, "bang")
-            this._output = output
+        if (output && "images" in output) {
+            this.setProperty("images", output as GalleryOutput)
+            this.triggerSlot(1, "bang")
         }
     }
 }

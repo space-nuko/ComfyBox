@@ -2,10 +2,11 @@
  import { Block, BlockTitle } from "@gradio/atoms";
  import { TextBox, Checkbox } from "@gradio/form";
  import { LGraphNode } from "@litegraph-ts/core"
- import layoutState, { type IDragItem, type WidgetLayout, ALL_ATTRIBUTES } from "$lib/stores/layoutState"
+ import layoutState, { type IDragItem, type WidgetLayout, ALL_ATTRIBUTES, type AttributesSpec } from "$lib/stores/layoutState"
  import { get } from "svelte/store"
-	import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
-	import type { ComfyWidgetNode } from "$lib/nodes";
+ import type { ComfyWidgetNode } from "$lib/nodes";
+ import ComfyNumberProperty from "./ComfyNumberProperty.svelte";
+ import ComfyComboProperty from "./ComfyComboProperty.svelte";
 
  let target: IDragItem | null = null;
  let node: LGraphNode | null = null;
@@ -20,6 +21,10 @@
          node = null;
      }
  }
+ else if ($layoutState.currentSelectionNodes.length > 0) {
+     target = null;
+     node = $layoutState.currentSelectionNodes[0]
+ }
  else {
      target = null
      node = null;
@@ -29,14 +34,14 @@
 
  $: {
      if (node != null)
-         targetType = node.type || "Widget"
+         targetType = node.type || "Node"
      else if (target)
-         targetType = "group"
+         targetType = "Group"
      else
-         targetType = "???"
+         targetType = ""
  }
 
- function updateAttribute(entry: any, value: any) {
+ function updateAttribute(entry: AttributesSpec, value: any) {
      if (target) {
          const name = entry.name
          console.warn("updateAttribute", name, value)
@@ -51,7 +56,7 @@
      }
  }
 
- function updateProperty(entry: any, value: any) {
+ function updateProperty(entry: AttributesSpec, value: any) {
      if (node) {
          const name = entry.name
          console.warn("updateProperty", name, value)
@@ -64,125 +69,195 @@
          }
      }
  }
+
+ function getVar(node: LGraphNode, entry: AttributesSpec) {
+     let value = node[entry.name]
+     if (entry.serialize)
+         value = entry.serialize(value)
+     console.debug("[ComfyProperties] getVar", entry, value, node)
+     return value
+ }
+
+ function updateVar(entry: any, value: any) {
+     if (node) {
+         const name = entry.name
+         console.warn("updateProperty", name, value)
+
+         if (entry.deserialize)
+             value = entry.deserialize(value)
+
+         console.debug("[ComfyProperties] updateVar", entry, value, name, node)
+         node[name] = value;
+
+         if ("propsChanged" in node) {
+             const comfyNode = node as ComfyWidgetNode
+             comfyNode.propsChanged.set(get(comfyNode.propsChanged) + 1)
+         }
+     }
+ }
+
+ function updateWorkflowAttribute(entry: AttributesSpec, value: any) {
+    const name = entry.name
+    console.warn("updateWorkflowAttribute", name, value)
+
+    $layoutState.attrs[name] = value
+    $layoutState = $layoutState
+ }
 </script>
 
 <div class="props">
-    {#if target}
-        <div class="top">
-            <div class="target-name">
-                <span>
-                    <span class="title">{target.attrs.title}</span>
+    <div class="top">
+        <div class="target-name">
+            <span>
+                <span class="title">{target?.attrs?.title || node?.title || "Workflow"}<span>
+                {#if targetType !== ""}
                     <span class="type">({targetType})</span>
+                {/if}
+            </span>
+        </div>
+    </div>
+    <div class="props-entries">
+        {#each ALL_ATTRIBUTES as category(category.categoryName)}
+            <div class="category-name">
+                <span>
+                    <span class="title">{category.categoryName}</span>
                 </span>
             </div>
-        </div>
-        <div class="props-entries">
-            {#each ALL_ATTRIBUTES as category(category.categoryName)}
-                <div class="category-name">
-                    <span>
-                        <span class="title">{category.categoryName}</span>
-                    </span>
-                </div>
-                {#each category.specs as spec(spec.name)}
-                    {#if spec.location === "widget" && spec.name in target.attrs}
+            {#each category.specs as spec(spec.name)}
+                {#if spec.location === "widget" && target && spec.name in target.attrs}
+                    <div class="props-entry">
+                        {#if spec.type === "string"}
+                            <TextBox
+                                value={target.attrs[spec.name]}
+                                on:change={(e) => updateAttribute(spec, e.detail)}
+                                on:input={(e) => updateAttribute(spec, e.detail)}
+                                label={spec.name}
+                                max_lines={1}
+                                />
+                        {:else if spec.type === "boolean"}
+                            <Checkbox
+                                value={target.attrs[spec.name]}
+                                on:change={(e) => updateAttribute(spec, e.detail)}
+                                label={spec.name}
+                                />
+                        {:else if spec.type === "number"}
+                            <ComfyNumberProperty
+                                name={spec.name}
+                                value={target.attrs[spec.name]}
+                                step={1}
+                                on:change={(e) => updateAttribute(spec, e.detail)}
+                            />
+                        {:else if spec.type === "enum"}
+                            <ComfyComboProperty
+                                name={spec.name}
+                                value={target.attrs[spec.name]}
+                                values={spec.values}
+                                on:changed={(e) => updateAttribute(spec, e.detail)}
+                            />
+                        {/if}
+                    </div>
+                {:else if node}
+                    {#if spec.location === "nodeProps" && spec.name in node.properties}
                         <div class="props-entry">
                             {#if spec.type === "string"}
                                 <TextBox
-                                    value={target.attrs[spec.name]}
-                                    on:change={(e) => updateAttribute(spec, e.detail)}
-                                    on:input={(e) => updateAttribute(spec, e.detail)}
+                                    value={node.properties[spec.name]}
+                                    on:change={(e) => updateProperty(spec, e.detail)}
+                                    on:input={(e) => updateProperty(spec, e.detail)}
                                     label={spec.name}
                                     max_lines={1}
                                     />
                             {:else if spec.type === "boolean"}
                                 <Checkbox
-                                    value={target.attrs[spec.name]}
-                                    on:change={(e) => updateAttribute(spec, e.detail)}
+                                    value={node.properties[spec.name]}
+                                    label={spec.name}
+                                    on:change={(e) => updateProperty(spec, e.detail)}
+                                    />
+                            {:else if spec.type === "number"}
+                                <ComfyNumberProperty
+                                    name={spec.name}
+                                    value={node.properties[spec.name]}
+                                    step={1}
+                                    on:change={(e) => updateProperty(spec, e.detail)}
+                                />
+                            {:else if spec.type === "enum"}
+                                <ComfyComboProperty
+                                    name={spec.name}
+                                    value={node.properties[spec.name]}
+                                    values={spec.values}
+                                    on:changed={(e) => updateProperty(spec, e.detail)}
+                                />
+                            {/if}
+                        </div>
+                    {:else if spec.location === "nodeVars" && spec.name in node}
+                        <div class="props-entry">
+                            {#if spec.type === "string"}
+                                <TextBox
+                                    value={getVar(node, spec)}
+                                    on:change={(e) => updateVar(spec, e.detail)}
+                                    on:input={(e) => updateVar(spec, e.detail)}
+                                    label={spec.name}
+                                    max_lines={1}
+                                    />
+                            {:else if spec.type === "boolean"}
+                                <Checkbox
+                                    value={getVar(node, spec)}
+                                    on:change={(e) => updateVar(spec, e.detail)}
                                     label={spec.name}
                                     />
                             {:else if spec.type === "number"}
-                                <label class="number-wrapper">
-                                    <BlockTitle>{spec.name}</BlockTitle>
-                                    <div class="number">
-                                        <input
-                                            type="number"
-                                            value={target.attrs[spec.name]}
-                                            step={1}
-                                            on:change={(e) => updateAttribute(spec, e.currentTarget.valueAsNumber)}
-                                            on:input={(e) => updateAttribute(spec, e.currentTarget.valueAsNumber)}
-                                        />
-                                    </div>
-                                </label>
+                                <ComfyNumberProperty
+                                    name={spec.name}
+                                    value={getVar(node, spec)}
+                                    step={1}
+                                    on:change={(e) => updateVar(spec, e.detail)}
+                                />
                             {:else if spec.type === "enum"}
-                                <label class="select-wrapper">
-                                    <BlockTitle>{spec.name}</BlockTitle>
-                                    <div class="select">
-                                        <select
-                                            value={target.attrs[spec.name]}
-                                            on:change={(e) => updateAttribute(spec, e.currentTarget.options[e.currentTarget.selectedIndex].value)}>
-                                            {#each spec.values as value}
-                                                <option value={value}>
-                                                    {value}
-                                                </option>
-                                            {/each}
-                                        </select>
-                                    </div>
-                                </label>
+                                <ComfyComboProperty
+                                    name={spec.name}
+                                    value={getVar(node, spec)}
+                                    values={spec.values}
+                                    on:changed={(e) => updateVar(spec, e.detail)}
+                                />
                             {/if}
                         </div>
-                    {:else if node}
-                        {#if spec.location === "nodeProps" && spec.name in node.properties}
-                            <div class="props-entry">
-                                {#if spec.type === "string"}
-                                    <TextBox
-                                        value={node.properties[spec.name]}
-                                        on:change={(e) => updateProperty(spec, e.detail)}
-                                        on:input={(e) => updateProperty(spec, e.detail)}
-                                        label={spec.name}
-                                        max_lines={1}
-                                        />
-                                {:else if spec.type === "boolean"}
-                                    <Checkbox
-                                        value={node.properties[spec.name]}
-                                        on:change={(e) => updateProperty(spec, e.detail)}
-                                        label={spec.name}
-                                        />
-                                {:else if spec.type === "number"}
-                                    <label class="number-wrapper">
-                                        <BlockTitle>{spec.name}</BlockTitle>
-                                        <div class="number">
-                                            <input
-                                                type="number"
-                                                value={node.properties[spec.name]}
-                                                step={1}
-                                                on:change={(e) => updateProperty(spec, e.currentTarget.valueAsNumber)}
-                                                on:input={(e) => updateProperty(spec, e.currentTarget.valueAsNumber)}
-                                            />
-                                        </div>
-                                    </label>
-                                {:else if spec.type === "enum"}
-                                    <label class="select-wrapper">
-                                        <BlockTitle>{spec.name}</BlockTitle>
-                                        <div class="select">
-                                            <select
-                                                value={node.properties[spec.name]}
-                                                on:change={(e) => updateProperty(spec, e.currentTarget.options[e.currentTarget.selectedIndex].value)}>
-                                                {#each spec.values as value}
-                                                    <option value={value}>
-                                                        {value}
-                                                    </option>
-                                                {/each}
-                                            </select>
-                                        </div>
-                                    </label>
-                                {/if}
-                            </div>
-                        {/if}
                     {/if}
-                {/each}
+                {:else if spec.location === "workflow" && spec.name in $layoutState.attrs}
+                    <div class="props-entry">
+                        {#if spec.type === "string"}
+                            <TextBox
+                                value={$layoutState.attrs[spec.name]}
+                                on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
+                                on:input={(e) => updateWorkflowAttribute(spec, e.detail)}
+                                label={spec.name}
+                                max_lines={1}
+                                />
+                        {:else if spec.type === "boolean"}
+                            <Checkbox
+                                value={$layoutState.attrs[spec.name]}
+                                on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
+                                label={spec.name}
+                                />
+                        {:else if spec.type === "number"}
+                            <ComfyNumberProperty
+                                name={spec.name}
+                                value={$layoutState.attrs[spec.name]}
+                                step={1}
+                                on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
+                            />
+                        {:else if spec.type === "enum"}
+                            <ComfyComboProperty
+                                name={spec.name}
+                                value={$layoutState.attrs[spec.name]}
+                                values={spec.values}
+                                on:changed={(e) => updateWorkflowAttribute(spec, e.detail)}
+                            />
+                        {/if}
+                    </div>
+                {/if}
             {/each}
-        </div>
-    {/if}
+        {/each}
+    </div>
 </div>
 
 <style lang="scss">
@@ -216,34 +291,6 @@
      .type {
          color: var(--neutral-500);
      }
- }
-
- .number-wrapper {
-     width: 100%;
-
-     .number {
-         width: 100%;
-
-         input {
-             width: 100%
-         }
-     }
- }
-
- .select-wrapper {
-     width: 100%;
-
-     .select {
-         width: 100%;
-
-         select {
-             width: 100%
-         }
-     }
- }
-
- .select-title {
-     padding: 0.2rem;
  }
 
  .bottom {

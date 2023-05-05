@@ -6,7 +6,7 @@
  import { BlockTitle } from "@gradio/atoms";
  import ComfyUIPane from "./ComfyUIPane.svelte";
  import ComfyApp, { type SerializedAppState } from "./ComfyApp";
- import { Checkbox } from "@gradio/form"
+ import { Checkbox, TextBox } from "@gradio/form"
  import uiState from "$lib/stores/uiState";
  import layoutState from "$lib/stores/layoutState";
  import { ImageViewer } from "$lib/ImageViewer";
@@ -29,6 +29,7 @@
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
  let hasShownUIHelpToast: boolean = false;
+ let uiTheme: string = "";
 
  let debugLayout: boolean = false;
 
@@ -46,7 +47,10 @@
 
  function queuePrompt() {
      console.log("Queuing!");
-     app.queuePrompt(0, 1);
+     let subworkflow = $uiState.subWorkflow;
+     if (subworkflow === "")
+         subworkflow = null
+     app.queuePrompt(0, 1, subworkflow);
  }
 
  $: if (app?.lCanvas) app.lCanvas.allow_dragnodes = !$uiState.nodesLocked;
@@ -164,6 +168,12 @@
  }
 </script>
 
+<svelte:head>
+    {#if uiTheme === "anapnoe"}
+        <link rel="stylesheet" href="/src/scss/ux.scss">
+    {/if}
+</svelte:head>
+
 <div id="main">
     <div id="dropzone" class="dropzone"></div>
     <div id="container" bind:this={containerElem}>
@@ -220,16 +230,24 @@
         <Button variant="secondary" on:click={doRefreshCombos}>
             🔄
         </Button>
-        <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
-        <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/>
+        <!-- <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
+             <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/> -->
         <Checkbox label="Auto-Add UI" bind:value={$uiState.autoAddUI}/>
+        <TextBox bind:value={$uiState.subWorkflow} label="Subworkflow" show_label={true} lines={1} max_lines={1}/>
         <label class="label" for="enable-ui-editing">
             <BlockTitle>Enable UI Editing</BlockTitle>
+            <select id="enable-ui-editing" name="enable-ui-editing" bind:value={$uiState.uiEditMode}>
+                <option value="disabled">Disabled</option>
+                <option value="widgets">Widgets</option>
+            </select>
         </label>
-        <select id="enable-ui-editing" name="enable-ui-editing" bind:value={$uiState.uiEditMode}>
-            <option value="disabled">Disabled</option>
-            <option value="widgets">Widgets</option>
-        </select>
+        <label class="label" for="ui-theme">
+            <BlockTitle>Theme</BlockTitle>
+            <select id="ui-theme" name="ui-theme" bind:value={uiTheme}>
+                <option value="">None</option>
+                <option value="anapnoe">Anapnoe</option>
+            </select>
+        </label>
     </div>
     <LightboxModal />
 </div>

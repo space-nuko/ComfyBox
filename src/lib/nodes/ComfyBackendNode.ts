@@ -2,6 +2,7 @@ import LGraphCanvas from "@litegraph-ts/core/src/LGraphCanvas";
 import ComfyGraphNode from "./ComfyGraphNode";
 import ComfyWidgets from "$lib/widgets"
 import type { ComfyWidgetNode } from "./ComfyWidgetNodes";
+import type { SerializedLGraphNode } from "@litegraph-ts/core";
 
 /*
  * Base class for any node with configuration sent by the backend.
@@ -28,6 +29,12 @@ export class ComfyBackendNode extends ComfyGraphNode {
             this.addOutput("output", "IMAGE");
         }
     }
+
+    /*
+     * Tags this node belongs to
+     * Allows you to run subsections of the graph
+     */
+    tags: string[] = []
 
     private setup(nodeData: any) {
         var inputs = nodeData["input"]["required"];
@@ -72,6 +79,16 @@ export class ComfyBackendNode extends ComfyGraphNode {
         this.serialize_widgets = false;
 
         // app.#invokeExtensionsAsync("nodeCreated", this);
+    }
+
+    override onSerialize(o: SerializedLGraphNode) {
+        super.onSerialize(o);
+        (o as any).tags = this.tags
+    }
+
+    override onConfigure(o: SerializedLGraphNode) {
+        super.onConfigure(o);
+        this.tags = (o as any).tags || []
     }
 
     override onExecuted(outputData: any) {
