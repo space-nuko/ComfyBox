@@ -67,12 +67,12 @@
     {#key $propsChanged}
         {#if node !== null && nodeValue !== null}
             <label>
-                {#if widget.attrs.showTitle}
-                    <BlockTitle show_label={widget.attrs.showTitle}>{widget.attrs.title}</BlockTitle>
+                {#if widget.attrs.title !== ""}
+                    <BlockTitle show_label={true}>{widget.attrs.title}</BlockTitle>
                 {/if}
                 <Select
                     bind:value={option}
-                    bind:items={node.properties.values}
+                    items={node.properties.values}
                     disabled={node.properties.values.length === 0}
                     clearable={false}
                     on:change

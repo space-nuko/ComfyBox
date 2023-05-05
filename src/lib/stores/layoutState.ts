@@ -24,8 +24,10 @@ export type LayoutState = {
 export type AttributesSpec = {
     name: string,
     type: string,
+    location: "widget" | "nodeProps"
     editable: boolean,
-    values?: string[]
+
+    values?: string[],
 }
 
 export type AttributesCategorySpec = {
@@ -42,22 +44,56 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
             {
                 name: "title",
                 type: "string",
-                editable: true,
-            },
-            {
-                name: "showTitle",
-                type: "boolean",
+                location: "widget",
                 editable: true,
             },
             {
                 name: "direction",
                 type: "enum",
+                location: "widget",
                 editable: true,
                 values: ["horizontal", "vertical"]
             },
             {
                 name: "classes",
                 type: "string",
+                location: "widget",
+                editable: true,
+            },
+            {
+                name: "blockVariant",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                values: ["block", "hidden"]
+            },
+        ]
+    },
+    {
+        categoryName: "behavior",
+        specs: [
+            {
+                name: "hidden",
+                type: "boolean",
+                location: "nodeProps",
+                editable: true
+            },
+            {
+                name: "min",
+                type: "number",
+                location: "nodeProps",
+                editable: true,
+            },
+            {
+                name: "max",
+                type: "number",
+                location: "nodeProps",
+                editable: true
+            },
+            {
+                name: "step",
+                type: "number",
+                location: "nodeProps",
                 editable: true,
             },
         ]
@@ -69,7 +105,8 @@ export type Attributes = {
     direction: "horizontal" | "vertical",
     title: string,
     showTitle: boolean,
-    classes: string
+    classes: string,
+    blockVariant?: "block" | "hidden"
 }
 
 export interface IDragItem {
@@ -150,6 +187,7 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
             showTitle: true,
             direction: "vertical",
             classes: "",
+            blockVariant: "block",
             ...attrs
         }
     }
@@ -377,9 +415,9 @@ function initDefaultLayout() {
         isConfiguring: false
     })
 
-    const root = addContainer(null, { direction: "horizontal", showTitle: false });
-    const left = addContainer(root, { direction: "vertical", showTitle: false });
-    const right = addContainer(root, { direction: "vertical", showTitle: false });
+    const root = addContainer(null, { direction: "horizontal", title: "" });
+    const left = addContainer(root, { direction: "vertical", title: "" });
+    const right = addContainer(root, { direction: "vertical", title: "" });
 
     const state = get(store)
     state.root = root;

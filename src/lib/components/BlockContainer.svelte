@@ -43,12 +43,13 @@
 {#if container && children}
     {#key $attrsChanged}
         <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')}"
+             class:hide-block={container.attrs.blockVariant === "hidden"}
              class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(container.id)}
              class:root-container={zIndex === 0}
              class:is-executing={container.isNodeExecuting}
-             class:container-edit-outline={$uiState.uiEditMode === "widgets" && zIndex > 1}>
+             class:edit={$uiState.uiEditMode === "widgets" && zIndex > 1}>
             <Block>
-                {#if container.attrs.showTitle}
+                {#if container.attrs.title !== ""}
                     <label for={String(container.id)} class={$uiState.uiEditMode === "widgets" ? "edit-title-label" : ""}>
                         <BlockTitle>{container.attrs.title}</BlockTitle>
                     </label>
@@ -68,7 +69,9 @@
                     on:finalize="{handleFinalize}"
                     >
                     {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
+                        {@const hidden = item?.node?.properties?.hidden}
                         <div class="animation-wrapper"
+                             class:hidden={hidden}
                              animate:flip={{duration:flipDurationMs}}>
                             <WidgetContainer dragItem={item} zIndex={zIndex+1} />
                             {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
@@ -94,6 +97,10 @@
 
      .edit {
          min-width: 200px;
+     }
+
+     &:not(.edit) > .animation-wrapper.hidden {
+         display: none;
      }
 
      &.empty {
@@ -137,6 +144,25 @@
          height: fit-content;
      }
 
+     .edit > :global(.block) {
+         border-color: var(--color-pink-500);
+         border-width: 2px;
+         border-style: dashed !important;
+         margin: 0.2em;
+         padding: 1.4em;
+     }
+
+     :global(.hide-block > .block) {
+         padding: 0.5em 0.25em;
+         box-shadow: unset;
+         border-width: 0;
+         border-color: unset;
+         border-radius: unset;
+         background: var(--block-background-fill);
+         width: 100%;
+         line-height: var(--line-sm);
+     }
+
      &.horizontal {
          flex-wrap: wrap;
          gap: var(--layout-gap);
@@ -176,14 +202,6 @@
      padding: 0.2em;
  }
 
- .animation-wrapper {
-     position: relative;
-
-     &:not(.edit) {
-         flex-grow: 1;
-     }
- }
-
  .handle {
      cursor: grab;
      z-index: 99999;
@@ -192,6 +210,11 @@
      top: 0;
      width: 100%;
      height: 100%;
+ }
+
+ .animation-wrapper {
+     position: relative;
+     flex-grow: 1;
  }
 
  .handle-widget:hover {
@@ -246,14 +269,6 @@
 
  .edit-title::placeholder {
      color: var(--input-placeholder-color);
- }
-
- .container-edit-outline > :global(.block) {
-     border-color: var(--color-pink-500);
-     border-width: 2px;
-     border-style: dashed !important;
-     margin: 0.2em;
-     padding: 1.4em;
  }
 
  .widget-edit-outline {

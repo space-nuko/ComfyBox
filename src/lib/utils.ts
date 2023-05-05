@@ -36,6 +36,8 @@ export function startDrag(evt: MouseEvent) {
 
     const item = ls.allItems[dragItemId].dragItem
 
+    console.debug("startDrag", item)
+
     if (evt.ctrlKey) {
         const index = ls.currentSelection.indexOf(item.id)
         if (index === -1)
