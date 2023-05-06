@@ -3,6 +3,8 @@
 	import { createEventDispatcher } from "svelte";
 
  export let value: number = 0;
+ export let min: number = -1024
+ export let max: number = 1024
  export let step: number = 1;
  export let name: string = "";
  export let disabled: boolean = false;
@@ -27,7 +29,7 @@
 <label class="number-wrapper">
     <BlockTitle>{name}</BlockTitle>
     <div class="number">
-        <input type="number" bind:value {step} {disabled}>
+        <input type="number" bind:value {min} {max} {step} {disabled}>
     </div>
 </label>
 

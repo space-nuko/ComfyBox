@@ -299,7 +299,10 @@ div.float {
 	padding: var(--ae-accordion-vertical-padding) var(--ae-accordion-horizontal-padding);
 	border-radius: var(--ae-panel-border-radius);
 	line-height: var(--ae-accordion-line-height);
-	color: var(--ae-label-color);
+
+    > span {
+        color: var(--ae-label-color) !important;
+    }
 	/*pointer-events: none !important;*/
 }
 .block.gradio-accordion .hide + .open.label-wrap {
@@ -588,12 +591,16 @@ button.primary {
 	border-radius: var(--ae-panel-border-radius) !important;
     background: var(--ae-input-bg-color) !important;
     color: var(--ae-input-color) !important;
-}
 
-button.secondary:hover,
-button.primary:hover {
-    background: var(--ae-primary-color) !important;
-    color: var(--ae-input-bg-color) !important;
+    &:hover {
+        background: var(--ae-primary-color) !important;
+        color: var(--ae-input-bg-color) !important;
+    }
+
+    &:active {
+        background: var(--ae-input-bg-color) !important;
+        color: var(--ae-input-color) !important;
+    }
 }
 
 /**********************/

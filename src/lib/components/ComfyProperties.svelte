@@ -245,13 +245,15 @@
                                         label={spec.name}
                                         />
                             {:else if spec.type === "number"}
-                                        <ComfyNumberProperty
-                                            name={spec.name}
-                                            value={getAttribute(target, spec)}
-                                            step={1}
-                                            disabled={!$uiState.uiUnlocked || !spec.editable}
-                                            on:change={(e) => updateAttribute(spec, target, e.detail)}
-                                            />
+                                    <ComfyNumberProperty
+                                        name={spec.name}
+                                        value={getAttribute(target, spec)}
+                                        step={spec.step || 1}
+                                        min={spec.min || -1024}
+                                        max={spec.max || 1024}
+                                        disabled={!$uiState.uiUnlocked || !spec.editable}
+                                        on:change={(e) => updateAttribute(spec, target, e.detail)}
+                                        />
                             {:else if spec.type === "enum"}
                                             <ComfyComboProperty
                                                 name={spec.name}
@@ -285,7 +287,9 @@
                                             <ComfyNumberProperty
                                                 name={spec.name}
                                                 value={node.properties[spec.name] || spec.defaultValue}
-                                                step={1}
+                                                step={spec.step || 1}
+                                                min={spec.min || -1024}
+                                                max={spec.max || 1024}
                                                 disabled={!$uiState.uiUnlocked || !spec.editable}
                                                 on:change={(e) => updateProperty(spec, e.detail)}
                                                 />
@@ -321,7 +325,9 @@
                                             <ComfyNumberProperty
                                                 name={spec.name}
                                                 value={getVar(node, spec)}
-                                                step={1}
+                                                step={spec.step || 1}
+                                                min={spec.min || -1024}
+                                                max={spec.max || 1024}
                                                 disabled={!$uiState.uiUnlocked || !spec.editable}
                                                 on:change={(e) => updateVar(spec, e.detail)}
                                                 />
@@ -358,7 +364,9 @@
                                         <ComfyNumberProperty
                                             name={spec.name}
                                             value={$layoutState.attrs[spec.name] || spec.defaultValue}
-                                            step={1}
+                                            step={spec.step || 1}
+                                            min={spec.min || -1024}
+                                            max={spec.max || 1024}
                                             disabled={!$uiState.uiUnlocked || !spec.editable}
                                             on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
                                             />

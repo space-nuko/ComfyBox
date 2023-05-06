@@ -163,6 +163,10 @@
      }
  }
 
+ :global(.label-wrap > span:not(.icon)) {
+     color: var(--block-title-text-color);
+ }
+
  .handle {
      cursor: grab;
      z-index: 99999;

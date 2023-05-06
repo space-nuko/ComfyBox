@@ -107,11 +107,6 @@ export type Attributes = {
     title: string,
 
     /*
-     * If false, hide the title.
-     */
-    showTitle: boolean,
-
-    /*
      * List of classes to apply to the component.
      */
     classes: string,
@@ -202,6 +197,21 @@ export type AttributesSpec = {
      * If `type` is "enum", the valid values for the combo widget.
      */
     values?: string[],
+
+    /*
+     * If `type` is "number", step for the slider
+     */
+    step?: number,
+
+    /*
+     * If `type` is "number", min for the slider
+     */
+    min?: number,
+
+    /*
+     * If `type` is "number", max for the slider
+     */
+    max?: number,
 
     /*
      * Valid `LGraphNode.type`s this property applies to if it's located in a node.
@@ -379,6 +389,8 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "nodeProps",
                 editable: true,
                 defaultValue: 0,
+                min: -2 ^ 16,
+                max: 2 ^ 16,
                 validNodeTypes: ["ui/slider"],
             },
             {
@@ -387,6 +399,8 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "nodeProps",
                 editable: true,
                 defaultValue: 10,
+                min: -2 ^ 16,
+                max: 2 ^ 16,
                 validNodeTypes: ["ui/slider"],
             },
             {
@@ -395,6 +409,8 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "nodeProps",
                 editable: true,
                 defaultValue: 1,
+                min: -2 ^ 16,
+                max: 2 ^ 16,
                 validNodeTypes: ["ui/slider"],
             },
 
@@ -406,6 +422,17 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 editable: true,
                 validNodeTypes: ["ui/button"],
                 defaultValue: "bang"
+            },
+
+            // gallery
+            {
+                name: "updateMode",
+                type: "enum",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/gallery"],
+                values: ["replace", "append"],
+                defaultValue: "replace"
             },
 
             // Workflow
@@ -544,7 +571,6 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
         attrsChanged: writable(false),
         attrs: {
             title: "Container",
-            showTitle: true,
             direction: "vertical",
             classes: "",
             containerVariant: "block",
@@ -572,7 +598,6 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
         attrsChanged: writable(false),
         attrs: {
             title: widgetName,
-            showTitle: true,
             direction: "horizontal",
             classes: "",
             flexGrow: 100,

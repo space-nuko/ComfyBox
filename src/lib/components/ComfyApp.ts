@@ -590,7 +590,7 @@ export default class ComfyApp {
                 for (let i = 0; i < batchCount; i++) {
                     for (const node of this.lGraph._nodes_in_order) {
                         if ("beforeQueued" in node) {
-                            (node as ComfyGraphNode).beforeQueued();
+                            (node as ComfyGraphNode).beforeQueued(tag);
                         }
                     }
 
@@ -613,7 +613,7 @@ export default class ComfyApp {
                     for (const n of p.workflow.nodes) {
                         const node = this.lGraph.getNodeById(n.id);
                         if ("afterQueued" in node) {
-                            (node as ComfyGraphNode).afterQueued(p);
+                            (node as ComfyGraphNode).afterQueued(p, tag);
                         }
                     }
 

@@ -50,6 +50,7 @@ export class ImageViewer {
     showModal(event: Event) {
         const source = (event.target || event.srcElement) as HTMLImageElement;
         const galleryElem = source.closest<HTMLDivElement>("div.block")
+        console.debug("[ImageViewer] showModal", event, source, galleryElem);
         if (!galleryElem || ImageViewer.all_gallery_buttons(galleryElem).length === 0) {
             console.error("No buttons found on gallery element!", galleryElem)
             return;

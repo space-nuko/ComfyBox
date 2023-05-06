@@ -1,4 +1,4 @@
-import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot, type SerializedLGraphNode, BuiltInSlotType } from "@litegraph-ts/core";
+import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot, type SerializedLGraphNode, BuiltInSlotType, type PropertyLayout } from "@litegraph-ts/core";
 import ComfyGraphNode from "./ComfyGraphNode";
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import RangeWidget from "$lib/widgets/RangeWidget.svelte";
@@ -397,13 +397,15 @@ export type GalleryOutputEntry = {
 }
 
 export interface ComfyGalleryProperties extends ComfyWidgetProperties {
-    index: number
+    index: number,
+    updateMode: "replace" | "append"
 }
 
 export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     override properties: ComfyGalleryProperties = {
         defaultValue: [],
-        index: 0
+        index: 0,
+        updateMode: "replace"
     }
 
     static slotLayout: SlotLayout = {
@@ -416,6 +418,10 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
             { name: "selected_index", type: "number" }
         ]
     }
+
+    static propertyLayout: PropertyLayout = [
+        { name: "updateMode", defaultValue: "replace", type: "enum", options: { values: ["replace", "append"] } }
+    ]
 
     override svelteComponentType = GalleryWidget
     override copyFromInputLink = false;
@@ -442,9 +448,13 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
 
                 const galleryItems: GradioFileData[] = this.convertItems(link.data)
 
-                // const currentValue = get(this.value)
-                // this.setValue(currentValue.concat(galleryItems))
-                this.setValue(galleryItems)
+                if (this.properties.updateMode === "append") {
+                    const currentValue = get(this.value)
+                    this.setValue(currentValue.concat(galleryItems))
+                }
+                else {
+                    this.setValue(galleryItems)
+                }
             }
             this.setProperty("index", 0)
         }

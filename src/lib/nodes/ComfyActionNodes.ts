@@ -4,6 +4,8 @@ import { Watch } from "@litegraph-ts/nodes-basic";
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
 import { toast } from '@zerodevx/svelte-toast'
 import type { GalleryOutput } from "./ComfyWidgetNodes";
+import { get } from "svelte/store";
+import queueState from "$lib/stores/queueState";
 
 export interface ComfyQueueEventsProperties extends Record<any, any> {
     prompt: SerializedPrompt | null
@@ -32,14 +34,27 @@ export class ComfyQueueEvents extends ComfyGraphNode {
         this.setOutputData(2, this.properties.prompt)
     }
 
-    override beforeQueued() {
-        this.setProperty("value", null)
-        this.triggerSlot(0, "bang")
+    private getActionParams(subgraph: string | null): any {
+        let queue = get(queueState)
+        let remaining = 0;
+
+        if (typeof queue.queueRemaining === "number")
+            remaining = queue.queueRemaining
+
+        return {
+            queueRemaining: remaining,
+            subgraph
+        }
     }
 
-    override afterQueued(p: SerializedPrompt) {
+    override beforeQueued(subgraph: string | null) {
+        this.setProperty("value", null)
+        this.triggerSlot(0, this.getActionParams(subgraph))
+    }
+
+    override afterQueued(p: SerializedPrompt, subgraph: string | null) {
         this.setProperty("value", p)
-        this.triggerSlot(1, "bang")
+        this.triggerSlot(1, this.getActionParams(subgraph))
     }
 
     override onSerialize(o: SerializedLGraphNode) {
