@@ -88,6 +88,12 @@ License: GNU General Public License
     --ae-selected-color:hsl(42deg, 100%, 42%);
 }/*BREAKPOINT_CSS_CONTENT*/
 
+:root {
+    --toastColor: var(--ae-text-color);
+    --toastBackground: var(--ae-panel-bg-color);
+    --toastBorder: 1px solid var(--ae-panel-border-color)
+}
+
 @media only screen and (max-width: 860px) {
 	:root{
 		--ae-outside-gap-size: var(--ae-mobile-outside-gap-size);
@@ -737,6 +743,30 @@ input[type=range]::-ms-fill-upper {
 
     &:hover:not([disabled]) {
         background: var(--ae-primary-color);
+    }
+}
+
+.queue .bottom {
+    color: var(--ae-text-color);
+    > .queue-remaining {
+        background-color: var(--ae-panel-bg-color);
+        border: 1px solid var(--ae-panel-border-color);
+    }
+    > .node-name {
+        background-color: var(--ae-panel-bg-color);
+        border: 1px solid var(--ae-panel-border-color);
+    }
+    .progress {
+        background-color: var(--ae-panel-bg-color);
+        border: 1px solid var(--ae-panel-border-color);
+        > .bar {
+            color: var(--ae-main-bg-color);
+            background-color: var(--ae-primary-color);
+
+            > .label {
+                color: var(--ae-text-color);
+            }
+        }
     }
 }
 
