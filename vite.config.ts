@@ -8,7 +8,11 @@ import { viteStaticCopy } from 'vite-plugin-static-copy'
 export default defineConfig({
     clearScreen: false,
     plugins: [
-        FullReload(["src/**/*.{js,ts,scss,svelte}"]),
+        FullReload([
+            // "src/**/*.{js,ts,scss,svelte}"
+            "src/**/*.{scss}",
+            "src/**/ComfyApp.{ts,svelte}"
+        ]),
         svelte(), ,
         viteStaticCopy({
             targets: [

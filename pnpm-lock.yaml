@@ -22,6 +22,9 @@ importers:
       '@gradio/icons':
         specifier: workspace:*
         version: link:gradio/js/icons
+      '@gradio/tabs':
+        specifier: workspace:*
+        version: link:gradio/js/tabs
       '@gradio/theme':
         specifier: workspace:*
         version: link:gradio/js/theme

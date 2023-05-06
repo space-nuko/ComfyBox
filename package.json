@@ -39,6 +39,7 @@
     "@gradio/form": "workspace:*",
     "@gradio/gallery": "workspace:*",
     "@gradio/icons": "workspace:*",
+    "@gradio/tabs": "workspace:*",
     "@gradio/theme": "workspace:*",
     "@gradio/upload": "workspace:*",
     "@gradio/utils": "workspace:*",

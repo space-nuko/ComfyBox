@@ -35,7 +35,12 @@ export type Attributes = {
     blockVariant?: "block" | "hidden",
     hidden?: boolean,
     disabled?: boolean,
-    flexGrow?: number
+    flexGrow?: number,
+
+    /** Display variant for widgets/containers (e.g. number widget can act as slider/knob/dial) */
+    variant?: string,
+
+    tabNames?: string[]
 }
 
 export type AttributesSpec = {
@@ -44,8 +49,8 @@ export type AttributesSpec = {
     type: string,
     location: "widget" | "nodeProps" | "nodeVars" | "workflow"
     editable: boolean,
+    defaultValue: any,
 
-    defaultValue?: any,
     values?: string[],
     hidden?: boolean,
     validNodeTypes?: string[],
@@ -53,6 +58,7 @@ export type AttributesSpec = {
     canShow?: (arg: IDragItem | LGraphNode) => boolean,
     serialize?: (arg: any) => string,
     deserialize?: (arg: string) => any,
+    refreshPanelOnChange?: boolean
 }
 
 export type AttributesCategorySpec = {
@@ -62,6 +68,13 @@ export type AttributesCategorySpec = {
 
 export type AttributesSpecList = AttributesCategorySpec[]
 
+const serializeStringArray = (arg: string[]) => arg.join(",")
+const deserializeStringArray = (arg: string) => {
+    if (arg === "")
+        return []
+    return arg.split(",").map(s => s.trim())
+}
+
 const ALL_ATTRIBUTES: AttributesSpecList = [
     {
         categoryName: "appearance",
@@ -70,18 +83,21 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 name: "title",
                 type: "string",
                 location: "widget",
+                defaultValue: "",
                 editable: true,
             },
             {
                 name: "hidden",
                 type: "boolean",
                 location: "widget",
+                defaultValue: false,
                 editable: true
             },
             {
                 name: "disabled",
                 type: "boolean",
                 location: "widget",
+                defaultValue: false,
                 editable: true
             },
             {
@@ -107,15 +123,6 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: "",
                 editable: true,
             },
-            {
-                name: "blockVariant",
-                type: "enum",
-                location: "widget",
-                editable: true,
-                values: ["block", "hidden"],
-                defaultValue: "block",
-                canShow: (di: IDragItem) => di.type === "container"
-            },
 
             // Container variants
             {
@@ -124,6 +131,28 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "widget",
                 editable: true,
                 values: ["block", "accordion", "tabs"],
+                defaultValue: "block",
+                canShow: (di: IDragItem) => di.type === "container",
+                refreshPanelOnChange: true
+            },
+
+            {
+                name: "tabNames",
+                type: "string",
+                location: "widget",
+                editable: true,
+                defaultValue: ["Tab 1", "Tab 2", "Tab 3"],
+                canShow: (di: IDragItem) => di.type === "container" && di.attrs.variant === "tabs",
+                serialize: serializeStringArray,
+                deserialize: deserializeStringArray
+            },
+
+            {
+                name: "blockVariant",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                values: ["block", "hidden"],
                 defaultValue: "block",
                 canShow: (di: IDragItem) => di.type === "container"
             },
@@ -138,12 +167,9 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 type: "string",
                 location: "nodeVars",
                 editable: true,
-                serialize: (arg: string[]) => arg.join(","),
-                deserialize: (arg: string) => {
-                    if (arg === "")
-                        return []
-                    return arg.split(",").map(s => s.trim())
-                }
+                defaultValue: [],
+                serialize: serializeStringArray,
+                deserialize: deserializeStringArray
             },
 
             // Range
@@ -152,6 +178,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 type: "number",
                 location: "nodeProps",
                 editable: true,
+                defaultValue: 0,
                 validNodeTypes: ["ui/slider"],
             },
             {
@@ -159,6 +186,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 type: "number",
                 location: "nodeProps",
                 editable: true,
+                defaultValue: 10,
                 validNodeTypes: ["ui/slider"],
             },
             {
@@ -166,6 +194,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 type: "number",
                 location: "nodeProps",
                 editable: true,
+                defaultValue: 1,
                 validNodeTypes: ["ui/slider"],
             },
 
@@ -221,8 +250,8 @@ export interface WidgetLayout extends IDragItem {
 type DragItemID = string;
 
 type LayoutStateOps = {
-    addContainer: (parent: ContainerLayout | null, attrs: Partial<Attributes>, index: number) => ContainerLayout,
-    addWidget: (parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes>, index: number) => WidgetLayout,
+    addContainer: (parent: ContainerLayout | null, attrs: Partial<Attributes>, index?: number) => ContainerLayout,
+    addWidget: (parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes>, index?: number) => WidgetLayout,
     findDefaultContainerForInsertion: () => ContainerLayout | null,
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode) => void,
@@ -272,7 +301,7 @@ function findDefaultContainerForInsertion(): ContainerLayout | null {
     return null
 }
 
-function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes> = {}, index: number = -1): ContainerLayout {
+function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes> = {}, index?: number): ContainerLayout {
     const state = get(store);
     const dragItem: ContainerLayout = {
         type: "container",
@@ -291,14 +320,14 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
     const entry: DragItemEntry = { dragItem, children: [], parent: null };
     state.allItems[dragItem.id] = entry;
     if (parent) {
-        moveItem(dragItem, parent)
+        moveItem(dragItem, parent, index)
     }
     console.debug("[layoutState] addContainer", state)
     store.set(state)
     return dragItem;
 }
 
-function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes> = {}, index: number = -1): WidgetLayout {
+function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes> = {}, index?: number): WidgetLayout {
     const state = get(store);
     const widgetName = "Widget"
     const dragItem: WidgetLayout = {
@@ -320,7 +349,7 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
     state.allItems[dragItem.id] = entry;
     state.allItemsByNode[node.id] = entry;
     console.debug("[layoutState] addWidget", state)
-    moveItem(dragItem, parent)
+    moveItem(dragItem, parent, index)
     return dragItem;
 }
 
@@ -398,7 +427,7 @@ function nodeRemoved(node: LGraphNode) {
     store.set(state)
 }
 
-function moveItem(target: IDragItem, to: ContainerLayout, index: number = -1) {
+function moveItem(target: IDragItem, to: ContainerLayout, index?: number) {
     const state = get(store)
     const entry = state.allItems[target.id]
     if (entry.parent && entry.parent.id === to.id)
@@ -406,9 +435,9 @@ function moveItem(target: IDragItem, to: ContainerLayout, index: number = -1) {
 
     if (entry.parent) {
         const parentEntry = state.allItems[entry.parent.id];
-        const index = parentEntry.children.findIndex(c => c.id === target.id)
-        if (index !== -1) {
-            parentEntry.children.splice(index, 1)
+        const parentIndex = parentEntry.children.findIndex(c => c.id === target.id)
+        if (parentIndex !== -1) {
+            parentEntry.children.splice(parentIndex, 1)
         }
         else {
             console.error(parentEntry)
@@ -418,7 +447,7 @@ function moveItem(target: IDragItem, to: ContainerLayout, index: number = -1) {
     }
 
     const toEntry = state.allItems[to.id];
-    if (index !== -1)
+    if (index != null && index >= 0)
         toEntry.children.splice(index, 0, target)
     else
         toEntry.children.push(target)

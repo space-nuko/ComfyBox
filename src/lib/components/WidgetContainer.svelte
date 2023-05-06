@@ -4,7 +4,7 @@
 
  import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
  import { startDrag, stopDrag } from "$lib/utils"
- import BlockContainer from "./BlockContainer.svelte"
+ import Container from "./Container.svelte"
  import { type Writable } from "svelte/store"
  import type { ComfyWidgetNode } from "$lib/nodes";
 
@@ -59,7 +59,7 @@
 
 {#if container}
     {#key $attrsChanged}
-        <BlockContainer {container} {classes} {zIndex} {showHandles} />
+        <Container {container} {classes} {zIndex} {showHandles} />
     {/key}
 {:else if widget && widget.node}
     {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets" && zIndex > 1}
