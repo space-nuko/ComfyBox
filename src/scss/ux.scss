@@ -332,6 +332,27 @@ div.float {
     opacity: 0 !important;
 }
 
+.gradio-tabs.tabs {
+    > .tab-nav {
+        border-bottom: 1px solid var(--ae-subpanel-border-color);
+        > button {
+            border-radius: 0;
+            border-width: var(--ae-border-width);
+            color: var(--ae-text-color);
+
+            &.selected {
+                border-color: var(--ae-subpanel-border-color);
+                background: var(--ae-subpanel-bg-color);
+                color: var(--ae-primary-color);
+            }
+        }
+    }
+    > .tabitem {
+        border: 1px solid var(--ae-subpanel-border-color);
+        border-top: none;
+        border-radius: 0px !important;
+    }
+}
 
 .form>.gradio-row>.form{
 	border:0 !important;
