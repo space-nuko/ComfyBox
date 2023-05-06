@@ -876,6 +876,9 @@ input[type=range]::-ms-fill-upper {
     &:hover svg {
         color: var(--ae-main-bg-color) !important;
     }
+    &:active svg {
+        color: var(--ae-placeholder-color) !important;
+    }
     svg {
         color: var(--ae-input-color) !important;
     }
@@ -885,6 +888,9 @@ input[type=range]::-ms-fill-upper {
         }
         &:hover svg {
             color: var(--ae-main-bg-color) !important;
+        }
+        &:active svg {
+            color: var(--ae-placeholder-color) !important;
         }
     }
 }
