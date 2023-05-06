@@ -232,17 +232,17 @@ export default class ComfyApp {
     }
 
     private addDropHandler() {
-        this.dropZone = document.getElementById("dropzone");
+        // this.dropZone = document.getElementById("dropzone");
 
-        if (this.dropZone) {
-            window.addEventListener('dragenter', this.allowDrag.bind(this));
-            this.dropZone.addEventListener('dragover', this.allowDrag.bind(this));
-            this.dropZone.addEventListener('dragleave', this.hideDropZone.bind(this));
-            this.dropZone.addEventListener('drop', this.handleDrop.bind(this));
-        }
-        else {
-            console.warn("No dropzone detected (probably on mobile).")
-        }
+        // if (this.dropZone) {
+        //     window.addEventListener('dragenter', this.allowDrag.bind(this));
+        //     this.dropZone.addEventListener('dragover', this.allowDrag.bind(this));
+        //     this.dropZone.addEventListener('dragleave', this.hideDropZone.bind(this));
+        //     this.dropZone.addEventListener('drop', this.handleDrop.bind(this));
+        // }
+        // else {
+        //     console.warn("No dropzone detected (probably on mobile).")
+        // }
     }
 
     /**

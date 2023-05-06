@@ -25,8 +25,12 @@
      width: var(--size-12);
      height: var(--size-12);
 
-     > :global(.lg) {
+     > :global(.secondary.lg) {
          border: var(--button-border-width) solid var(--neutral-400);
+     }
+
+     > :global(.primary.lg) {
+         border: var(--button-border-width) solid var(--primary-400);
      }
 
      &.toggled {

@@ -40,6 +40,9 @@
      for (const cat of Object.values(ALL_ATTRIBUTES)) {
          for (const spec of Object.values(cat.specs)) {
              if (spec.location === "widget" && target.attrs[spec.name] == null) {
+                 if (!spec.editable)
+                     continue;
+
                  if (spec.canShow && !spec.canShow(target))
                      continue;
 
@@ -117,7 +120,7 @@
  }
 
  function updateAttribute(spec: AttributesSpec, target: IDragItem | null, value: any) {
-     if (target == null)
+     if (target == null || !spec.editable)
          return;
 
      const name = spec.name
@@ -142,7 +145,7 @@
  }
 
  function updateProperty(spec: AttributesSpec, value: any) {
-     if (node == null)
+     if (node == null || !spec.editable)
          return
 
      const name = spec.name
@@ -170,7 +173,7 @@
  }
 
  function updateVar(spec: AttributesSpec, value: any) {
-     if (node == null)
+     if (node == null || !spec.editable)
          return;
 
      const name = spec.name
@@ -190,8 +193,11 @@
          $refreshPanel += 1;
  }
 
- function updateWorkflowAttribute(entry: AttributesSpec, value: any) {
-     const name = entry.name
+ function updateWorkflowAttribute(spec: AttributesSpec, value: any) {
+     if (!spec.editable)
+         return;
+
+     const name = spec.name
      console.warn("updateWorkflowAttribute", name, value)
 
      $layoutState.attrs[name] = value
@@ -389,6 +395,11 @@
 
      .title {
          font-weight: bold;
+
+         .type {
+             padding-left: 0.25rem;
+             font-weight: normal;
+         }
      }
  }
 

@@ -20,7 +20,7 @@ const store: WritableUIStateStore = writable(
         graphLocked: false,
         nodesLocked: false,
         autoAddUI: true,
-        uiUnlocked: true,
+        uiUnlocked: false,
         uiEditMode: "widgets"
     })
 
