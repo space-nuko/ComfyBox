@@ -55,7 +55,7 @@
          class:is-executing={container.isNodeExecuting}
          class:edit={edit}>
         {#if edit}
-            <Block>
+            <Block elem_classes={["gradio-accordion"]}>
                 <Accordion label={container.attrs.title} open={true}>
                     <div class="v-pane"
                          class:empty={children.length === 0}
@@ -94,7 +94,7 @@
                 </Accordion>
             </Block>
         {:else}
-            <Block>
+            <Block elem_classes={["gradio-accordion"]}>
                 <Accordion label={container.attrs.title} open={container.attrs.openOnStartup}>
                     {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
                         <WidgetContainer dragItem={item} zIndex={zIndex+1} />
@@ -188,5 +188,11 @@
 
  .container.selected > :global(.block) {
      background: var(--color-yellow-300);
+ }
+
+ .gradio-accordion {
+     .widget, .container {
+         padding: 5px;
+     }
  }
 </style>
