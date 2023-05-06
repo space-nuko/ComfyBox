@@ -8,12 +8,10 @@ import { get } from "svelte/store";
 import queueState from "$lib/stores/queueState";
 
 export interface ComfyQueueEventsProperties extends Record<any, any> {
-    prompt: SerializedPrompt | null
 }
 
 export class ComfyQueueEvents extends ComfyGraphNode {
     override properties: ComfyQueueEventsProperties = {
-        prompt: null
     }
 
     static slotLayout: SlotLayout = {
@@ -22,16 +20,6 @@ export class ComfyQueueEvents extends ComfyGraphNode {
             { name: "afterQueued", type: BuiltInSlotType.EVENT },
             { name: "prompt", type: "*" }
         ],
-    }
-
-    override onPropertyChanged(property: string, value: any, prevValue?: any) {
-        if (property === "prompt") {
-            this.setOutputData(2, value)
-        }
-    }
-
-    override onExecute() {
-        this.setOutputData(2, this.properties.prompt)
     }
 
     private getActionParams(subgraph: string | null): any {
@@ -48,18 +36,15 @@ export class ComfyQueueEvents extends ComfyGraphNode {
     }
 
     override beforeQueued(subgraph: string | null) {
-        this.setProperty("prompt", null)
         this.triggerSlot(0, this.getActionParams(subgraph))
     }
 
     override afterQueued(p: SerializedPrompt, subgraph: string | null) {
-        this.setProperty("prompt", p)
         this.triggerSlot(1, this.getActionParams(subgraph))
     }
 
     override onSerialize(o: SerializedLGraphNode) {
         super.onSerialize(o)
-        o.properties = { prompt: null }
     }
 }
 
