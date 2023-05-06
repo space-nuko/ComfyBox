@@ -499,14 +499,13 @@ LiteGraph.registerNodeType({
 })
 
 export interface ComfyButtonProperties extends ComfyWidgetProperties {
-    message: string,
-    variant: string
+    param: string
 }
 
 export class ComfyButtonNode extends ComfyWidgetNode<boolean> {
     override properties: ComfyButtonProperties = {
         defaultValue: false,
-        message: "bang"
+        param: "bang"
     }
 
     static slotLayout: SlotLayout = {
@@ -525,8 +524,8 @@ export class ComfyButtonNode extends ComfyWidgetNode<boolean> {
 
     onClick() {
         this.setValue(true)
-        this.triggerSlot(0, this.properties.message);
-        this.setValue(false)
+        this.triggerSlot(0, this.properties.param);
+        this.setValue(false) // TODO onRelease
     }
 
     constructor(name?: string) {

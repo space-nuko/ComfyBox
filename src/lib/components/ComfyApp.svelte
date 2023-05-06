@@ -145,7 +145,6 @@
  $: if (containerElem) {
      const canvas = containerElem.querySelector<HTMLDivElement>("#graph-canvas")
      if (canvas) {
-         console.warn("reg!");
          const paneNode = canvas.closest(".splitpanes__pane")
          if (paneNode) {
              (paneNode as HTMLElement).ontransitionstart = () => {

@@ -416,7 +416,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
 
             // Button
             {
-                name: "message",
+                name: "param",
                 type: "string",
                 location: "nodeProps",
                 editable: true,
