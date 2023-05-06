@@ -7,6 +7,7 @@
  import type { Writable } from "svelte/store";
  import type { ComfyGalleryNode } from "$lib/nodes/ComfyWidgetNodes";
  import type { FileData as GradioFileData } from "@gradio/upload";
+ import type { SelectData as GradioSelectData } from "@gradio/utils";
 
  export let widget: WidgetLayout | null = null;
  let node: ComfyGalleryNode | null = null;
@@ -21,6 +22,7 @@
          node = widget.node as ComfyGalleryNode
          nodeValue = node.value;
          propsChanged = node.propsChanged;
+         node.index = 0;
      }
  };
 
@@ -31,7 +33,8 @@
  }
  let element: HTMLDivElement;
 
- function updateForLightbox() {
+ function onSelect(e: CustomEvent<GradioSelectData>) {
+     // Setup lightbox
      // Wait for gradio gallery to show the large preview image, if no timeout then
      // the event might fire too early
      setTimeout(() => {
@@ -41,6 +44,9 @@
          }
          ImageViewer.instance.updateOnBackgroundChange();
      }, 200)
+
+     // Update index
+     node.index = e.detail.index as number;
  }
 
 </script>
@@ -55,7 +61,7 @@
                     {style}
                     root={""}
                     root_url={""}
-                    on:select={updateForLightbox}
+                    on:select={onSelect}
                 />
             </div>
         </Block>

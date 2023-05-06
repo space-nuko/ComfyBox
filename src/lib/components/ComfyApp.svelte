@@ -47,10 +47,7 @@
 
  function queuePrompt() {
      console.log("Queuing!");
-     let subworkflow = $uiState.subWorkflow;
-     if (subworkflow === "")
-         subworkflow = null
-     app.queuePrompt(0, 1, subworkflow);
+     app.queuePrompt(0, 1);
  }
 
  $: if (app?.lCanvas) app.lCanvas.allow_dragnodes = !$uiState.nodesLocked;
@@ -233,7 +230,6 @@
         <!-- <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
              <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/> -->
         <Checkbox label="Auto-Add UI" bind:value={$uiState.autoAddUI}/>
-        <TextBox bind:value={$uiState.subWorkflow} label="Subworkflow" show_label={true} lines={1} max_lines={1}/>
         <label class="label" for="enable-ui-editing">
             <BlockTitle>Enable UI Editing</BlockTitle>
             <select id="enable-ui-editing" name="enable-ui-editing" bind:value={$uiState.uiEditMode}>

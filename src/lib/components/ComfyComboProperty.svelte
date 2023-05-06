@@ -7,6 +7,7 @@
  export let name: string = "";
  let value_: string = ""
 
+ $: value;
  $: handleChange(value);
 
  const dispatch = createEventDispatcher<{
@@ -16,6 +17,7 @@
  }>();
 
  function handleChange(val: string) {
+     console.debug("combo handleChange", val, value_)
      if (val != value_)
          dispatch("change", val);
      value_ = val

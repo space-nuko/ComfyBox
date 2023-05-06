@@ -96,10 +96,10 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
     }
 
     private setIndex(newIndex: number, force: boolean = false) {
-        console.debug("[ComfyImageCacheNode] setIndex", newIndex, force)
-
         if (newIndex === this.properties.index && !force)
             return;
+
+        console.debug("[ComfyImageCacheNode] setIndex", newIndex, force)
 
         if (!this.properties.images || newIndex < 0 || newIndex >= this.properties.images.images.length) {
             console.debug("[ComfyImageCacheNode] invalid indexes", newIndex, this.properties.images)

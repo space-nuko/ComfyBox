@@ -48,7 +48,7 @@
      return spec.name in node.properties
  }
 
- function updateAttribute(entry: AttributesSpec, value: any) {
+ function updateAttribute(entry: AttributesSpec, target: IDragItem, value: any) {
      if (target) {
          const name = entry.name
          console.warn("updateAttribute", name, value)
@@ -136,15 +136,15 @@
                         {#if spec.type === "string"}
                             <TextBox
                                 value={target.attrs[spec.name]}
-                                on:change={(e) => updateAttribute(spec, e.detail)}
-                                on:input={(e) => updateAttribute(spec, e.detail)}
+                                on:change={(e) => updateAttribute(spec, target, e.detail)}
+                                on:input={(e) => updateAttribute(spec, target, e.detail)}
                                 label={spec.name}
                                 max_lines={1}
                                 />
                         {:else if spec.type === "boolean"}
                             <Checkbox
                                 value={target.attrs[spec.name]}
-                                on:change={(e) => updateAttribute(spec, e.detail)}
+                                on:change={(e) => updateAttribute(spec, target, e.detail)}
                                 label={spec.name}
                                 />
                         {:else if spec.type === "number"}
@@ -152,14 +152,14 @@
                                 name={spec.name}
                                 value={target.attrs[spec.name]}
                                 step={1}
-                                on:change={(e) => updateAttribute(spec, e.detail)}
+                                on:change={(e) => updateAttribute(spec, target, e.detail)}
                             />
                         {:else if spec.type === "enum"}
                             <ComfyComboProperty
                                 name={spec.name}
                                 value={target.attrs[spec.name]}
                                 values={spec.values}
-                                on:changed={(e) => updateAttribute(spec, e.detail)}
+                                on:change={(e) => updateAttribute(spec, target, e.detail)}
                             />
                         {/if}
                     </div>
@@ -192,7 +192,7 @@
                                     name={spec.name}
                                     value={node.properties[spec.name]}
                                     values={spec.values}
-                                    on:changed={(e) => updateProperty(spec, e.detail)}
+                                    on:change={(e) => updateProperty(spec, e.detail)}
                                 />
                             {/if}
                         </div>
@@ -224,7 +224,7 @@
                                     name={spec.name}
                                     value={getVar(node, spec)}
                                     values={spec.values}
-                                    on:changed={(e) => updateVar(spec, e.detail)}
+                                    on:change={(e) => updateVar(spec, e.detail)}
                                 />
                             {/if}
                         </div>
@@ -257,7 +257,7 @@
                                 name={spec.name}
                                 value={$layoutState.attrs[spec.name]}
                                 values={spec.values}
-                                on:changed={(e) => updateWorkflowAttribute(spec, e.detail)}
+                                on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
                             />
                         {/if}
                     </div>
