@@ -41,17 +41,17 @@
 </script>
 
 {#if container && children}
-    {@const edit = $uiState.uiEditMode === "widgets" && zIndex > 1}
+    {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets" && zIndex > 1}
     {#key $attrsChanged}
         <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')} z-index{zIndex}"
              class:hide-block={container.attrs.blockVariant === "hidden"}
-             class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(container.id)}
+             class:selected={$uiState.uiUnlocked && $layoutState.currentSelection.includes(container.id)}
              class:root-container={zIndex === 0}
              class:is-executing={container.isNodeExecuting}
              class:edit={edit}>
             <Block>
                 {#if container.attrs.title !== ""}
-                    <label for={String(container.id)} class={$uiState.uiEditMode === "widgets" ? "edit-title-label" : ""}>
+                    <label for={String(container.id)} class={($uiState.uiUnlocked && $uiState.uiEditMode === "widgets") ? "edit-title-label" : ""}>
                         <BlockTitle>{container.attrs.title}</BlockTitle>
                     </label>
                 {/if}
@@ -64,7 +64,7 @@
                                  centreDraggedOnCursor: true,
                                  morphDisabled: true,
                                  dropFromOthersDisabled: zIndex === 0,
-                                 dragDisabled: zIndex === 0 || $layoutState.currentSelection.length > 2 || $uiState.uiEditMode === "disabled"
+                                 dragDisabled: zIndex === 0 || $layoutState.currentSelection.length > 2 || !$uiState.uiUnlocked
                                  }}"
                     on:consider="{handleConsider}"
                     on:finalize="{handleFinalize}"

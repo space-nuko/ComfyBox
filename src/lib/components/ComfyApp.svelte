@@ -19,6 +19,7 @@
  import ComfyQueue from "./ComfyQueue.svelte";
  import ComfyProperties from "./ComfyProperties.svelte";
  import queueState from "$lib/stores/queueState";
+ import ComfyUnlockUIButton from "./ComfyUnlockUIButton.svelte";
 
  export let app: ComfyApp = undefined;
  let imageViewer: ImageViewer;
@@ -29,7 +30,7 @@
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
  let hasShownUIHelpToast: boolean = false;
- let uiTheme: string = "anapnoe";
+ let uiTheme: string = "";
 
  let debugLayout: boolean = false;
 
@@ -69,7 +70,7 @@
      }
  }
 
- let propsSidebarSize = 0; //15;
+ let propsSidebarSize = 15; //15;
 
  function toggleProps() {
      if (propsSidebarSize == 0) {
@@ -124,7 +125,7 @@
      app.lCanvas.recenter();
  }
 
- $: if ($uiState.uiEditMode !== "disabled" && !hasShownUIHelpToast) {
+ $: if ($uiState.uiUnlocked && !hasShownUIHelpToast) {
      hasShownUIHelpToast = true;
      toast.push("Right-click to open context menu.")
  }
@@ -158,7 +159,7 @@
      (window as any).app = app;
      (window as any).appPane = uiPane;
 
-     await import('../../scss/ux.scss');
+     // await import('../../scss/ux.scss');
 
      refreshView();
  })
@@ -203,50 +204,56 @@
         </Splitpanes>
     </div>
     <div id="bottombar">
-        <Button variant="primary" on:click={queuePrompt}>
-            Queue Prompt
-        </Button>
-        <Button variant="secondary" on:click={toggleGraph}>
-            Toggle Graph
-        </Button>
-        <Button variant="secondary" on:click={toggleProps}>
-            Toggle Props
-        </Button>
-        <Button variant="secondary" on:click={toggleQueue}>
-            Toggle Queue
-        </Button>
-        <Button variant="secondary" on:click={doSave}>
-            Save
-        </Button>
-        <Button variant="secondary" on:click={doReset}>
-            Reset
-        </Button>
-        <Button variant="secondary" on:click={doLoadDefault}>
-            Load Default
-        </Button>
-        <Button variant="secondary" on:click={doRecenter}>
-            Recenter
-        </Button>
-        <Button variant="secondary" on:click={doRefreshCombos}>
-            🔄
-        </Button>
-        <!-- <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
-             <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/> -->
-        <Checkbox label="Auto-Add UI" bind:value={$uiState.autoAddUI}/>
-        <label class="label" for="enable-ui-editing">
-            <BlockTitle>Enable UI Editing</BlockTitle>
-            <select id="enable-ui-editing" name="enable-ui-editing" bind:value={$uiState.uiEditMode}>
-                <option value="disabled">Disabled</option>
-                <option value="widgets">Widgets</option>
-            </select>
-        </label>
-        <label class="label" for="ui-theme">
-            <BlockTitle>Theme</BlockTitle>
-            <select id="ui-theme" name="ui-theme" bind:value={uiTheme}>
-                <option value="">None</option>
-                <option value="anapnoe">Anapnoe</option>
-            </select>
-        </label>
+        <div class="left">
+            <Button variant="primary" on:click={queuePrompt}>
+                Queue Prompt
+            </Button>
+            <Button variant="secondary" on:click={toggleGraph}>
+                Toggle Graph
+            </Button>
+            <Button variant="secondary" on:click={toggleProps}>
+                Toggle Props
+            </Button>
+            <Button variant="secondary" on:click={toggleQueue}>
+                Toggle Queue
+            </Button>
+            <Button variant="secondary" on:click={doSave}>
+                Save
+            </Button>
+            <Button variant="secondary" on:click={doReset}>
+                Reset
+            </Button>
+            <Button variant="secondary" on:click={doLoadDefault}>
+                Load Default
+            </Button>
+            <Button variant="secondary" on:click={doRecenter}>
+                Recenter
+            </Button>
+            <Button variant="secondary" on:click={doRefreshCombos}>
+                🔄
+            </Button>
+            <!-- <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
+                 <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/> -->
+            <span style="display: inline-flex !important">
+                <Checkbox label="Auto-Add UI" bind:value={$uiState.autoAddUI}/>
+            </span>
+            <span class="label" for="ui-edit-mode">
+                <BlockTitle>UI Edit mode</BlockTitle>
+                <select id="ui-edit-mode" name="ui-edit-mode" bind:value={$uiState.uiEditMode}>
+                    <option value="widgets">Widgets</option>
+                </select>
+            </span>
+            <span class="label" for="ui-theme">
+                <BlockTitle>Theme</BlockTitle>
+                <select id="ui-theme" name="ui-theme" bind:value={uiTheme}>
+                    <option value="">None</option>
+                    <option value="anapnoe">Anapnoe</option>
+                </select>
+            </span>
+        </div>
+        <div class="right">
+            <ComfyUnlockUIButton bind:toggled={$uiState.uiUnlocked} />
+        </div>
     </div>
     <LightboxModal />
 </div>
@@ -276,10 +283,23 @@
  }
 
  #bottombar {
+     padding-top: 0.5em;
      display: flex;
-     flex-wrap: wrap;
+     align-items: center;
+     width: 100%;
      gap: var(--layout-gap);
-     margin: 10px;
+     padding-left: 1em;
+     padding-right: 1em;
+     margin-top: auto;
+     overflow-x: auto;
+
+     > .left {
+         flex-shrink: 0;
+     }
+
+     > .right {
+         margin-left: auto
+     }
  }
 
  .canvas-wrapper {
@@ -349,5 +369,9 @@
 
  label.label > :global(span) {
      top: 20%;
+ }
+
+ span.left {
+     right: 0px;
  }
 </style>

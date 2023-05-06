@@ -69,7 +69,7 @@
  }
 
  async function onRightClick(e) {
-     if ($uiState.uiEditMode === "disabled")
+     if (!$uiState.uiUnlocked)
          return;
 
      e.preventDefault();

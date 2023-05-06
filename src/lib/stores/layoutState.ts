@@ -39,15 +39,18 @@ export type Attributes = {
 }
 
 export type AttributesSpec = {
+    id?: number, // for svelte keyed each
     name: string,
     type: string,
     location: "widget" | "nodeProps" | "nodeVars" | "workflow"
     editable: boolean,
 
+    defaultValue?: any,
     values?: string[],
     hidden?: boolean,
     validNodeTypes?: string[],
 
+    canShow?: (arg: IDragItem | LGraphNode) => boolean,
     serialize?: (arg: any) => string,
     deserialize?: (arg: string) => any,
 }
@@ -86,18 +89,22 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 type: "enum",
                 location: "widget",
                 editable: true,
-                values: ["horizontal", "vertical"]
+                values: ["horizontal", "vertical"],
+                defaultValue: "vertical",
+                canShow: (di: IDragItem) => di.type === "container"
             },
             {
                 name: "flexGrow",
                 type: "number",
                 location: "widget",
+                defaultValue: 100,
                 editable: true
             },
             {
                 name: "classes",
                 type: "string",
                 location: "widget",
+                defaultValue: "",
                 editable: true,
             },
             {
@@ -105,7 +112,20 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 type: "enum",
                 location: "widget",
                 editable: true,
-                values: ["block", "hidden"]
+                values: ["block", "hidden"],
+                defaultValue: "block",
+                canShow: (di: IDragItem) => di.type === "container"
+            },
+
+            // Container variants
+            {
+                name: "variant",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                values: ["block", "accordion", "tabs"],
+                defaultValue: "block",
+                canShow: (di: IDragItem) => di.type === "container"
             },
         ]
     },
@@ -156,6 +176,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "nodeProps",
                 editable: true,
                 validNodeTypes: ["ui/button"],
+                defaultValue: "bang"
             },
 
             // Workflow
@@ -163,11 +184,21 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 name: "defaultSubgraph",
                 type: "string",
                 location: "workflow",
-                editable: true
+                editable: true,
+                defaultValue: ""
             }
         ]
     }
 ];
+
+let i = 0;
+for (const cat of Object.values(ALL_ATTRIBUTES)) {
+    for (const val of Object.values(cat.specs)) {
+        val.id = i;
+        i += 1;
+    }
+}
+
 export { ALL_ATTRIBUTES };
 
 export interface IDragItem {
