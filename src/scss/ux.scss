@@ -303,6 +303,11 @@ div.float {
     > span {
         color: var(--ae-label-color) !important;
     }
+    &:hover {
+        > span {
+            color: var(--ae-main-bg-color) !important;
+        }
+    }
 	/*pointer-events: none !important;*/
 }
 .block.gradio-accordion .hide + .open.label-wrap {
