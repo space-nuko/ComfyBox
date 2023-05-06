@@ -3,6 +3,7 @@
  import uiState from "$lib/stores/uiState";
  import WidgetContainer from "./WidgetContainer.svelte"
  import BlockContainer from "./BlockContainer.svelte"
+ import AccordionContainer from "./AccordionContainer.svelte"
  import TabsContainer from "./TabsContainer.svelte"
 
  import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
@@ -34,6 +35,8 @@
     {#key $attrsChanged}
         {#if container.attrs.variant === "tabs"}
             <TabsContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} />
+        {:else if container.attrs.variant === "accordion"}
+            <AccordionContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} />
         {:else}
             <BlockContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} />
         {/if}

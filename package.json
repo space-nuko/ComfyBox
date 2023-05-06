@@ -33,6 +33,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@gradio/accordion": "workspace:*",
     "@gradio/atoms": "workspace:*",
     "@gradio/button": "workspace:*",
     "@gradio/client": "workspace:*",

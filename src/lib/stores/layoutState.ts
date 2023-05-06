@@ -40,7 +40,7 @@ export type Attributes = {
     /** Display variant for widgets/containers (e.g. number widget can act as slider/knob/dial) */
     variant?: string,
 
-    tabNames?: string[]
+    openOnStartup?: boolean
 }
 
 export type AttributesSpec = {
@@ -135,18 +135,6 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 canShow: (di: IDragItem) => di.type === "container",
                 refreshPanelOnChange: true
             },
-
-            {
-                name: "tabNames",
-                type: "string",
-                location: "widget",
-                editable: true,
-                defaultValue: ["Tab 1", "Tab 2", "Tab 3"],
-                canShow: (di: IDragItem) => di.type === "container" && di.attrs.variant === "tabs",
-                serialize: serializeStringArray,
-                deserialize: deserializeStringArray
-            },
-
             {
                 name: "blockVariant",
                 type: "enum",
@@ -155,6 +143,16 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 values: ["block", "hidden"],
                 defaultValue: "block",
                 canShow: (di: IDragItem) => di.type === "container"
+            },
+
+            // Accordion
+            {
+                name: "openOnStartup",
+                type: "boolean",
+                location: "widget",
+                editable: true,
+                defaultValue: false,
+                canShow: (di: IDragItem) => di.type === "container" && di.attrs.variant === "accordion"
             },
         ]
     },

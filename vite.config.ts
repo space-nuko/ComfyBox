@@ -11,9 +11,10 @@ export default defineConfig({
         FullReload([
             // "src/**/*.{js,ts,scss,svelte}"
             "src/**/*.{scss}",
+            "src/lib/stores/*.*",
             "src/**/ComfyApp.{ts,svelte}"
         ]),
-        svelte(), ,
+        svelte(),
         viteStaticCopy({
             targets: [
                 {

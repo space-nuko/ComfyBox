@@ -1,6 +1,6 @@
 <script lang="ts">
  import { Block, BlockTitle } from "@gradio/atoms";
- import { Tabs, TabItem } from "@gradio/tabs";
+ import { Accordion } from "@gradio/accordion";
  import uiState from "$lib/stores/uiState";
  import WidgetContainer from "./WidgetContainer.svelte"
 
@@ -45,20 +45,6 @@
      children = layoutState.updateChildren(container, evt.detail.items)
      // Ensure dragging is stopped on drag finish
  };
-
- function getTabName(container: ContainerLayout, i: number): string {
-     const title = container.attrs.title
-     if (!title)
-         return `Tab ${i+1}`
-
-     const tabNames = title.split(",").map(s => s.trim());
-
-     const tabName = tabNames[i]
-     if (tabName == null || tabName === "")
-         return `Tab ${i+1}`
-
-     return tabName
- }
 </script>
 
 {#if container && children}
@@ -70,63 +56,57 @@
          class:edit={edit}>
         {#if edit}
             <Block>
-                <div class="v-pane"
-                     class:empty={children.length === 0}
-                     class:edit={edit}
-                     use:dndzone="{{
-                          items: children,
-                          flipDurationMs,
-                          centreDraggedOnCursor: true,
-                          morphDisabled: true,
-                          dropFromOthersDisabled: zIndex === 0,
-                          dragDisabled
-                                  }}"
-                     on:consider="{handleConsider}"
-                     on:finalize="{handleFinalize}"
-                >
-                    {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item, i(item.id)}
-                        {@const hidden = item?.attrs?.hidden}
-                        {@const tabName = getTabName(container, i)}
-                        <div class="animation-wrapper"
-                             class:hidden={hidden}
-                             animate:flip={{duration:flipDurationMs}}
-                             style={item?.attrs?.flexGrow ? `flex-grow: ${item.attrs.flexGrow}` : ""}>
-                            <Block>
-                                <label for={String(item.id)}>
-                                    <BlockTitle><strong>Tab {i+1}:</strong> {tabName}</BlockTitle>
-                                </label>
+                <Accordion label={container.attrs.title} open={true}>
+                    <div class="v-pane"
+                         class:empty={children.length === 0}
+                         class:edit={edit}
+                         use:dndzone="{{
+                             items: children,
+                             flipDurationMs,
+                             centreDraggedOnCursor: true,
+                             morphDisabled: true,
+                             dropFromOthersDisabled: zIndex === 0,
+                             dragDisabled
+                                      }}"
+                         on:consider="{handleConsider}"
+                         on:finalize="{handleFinalize}"
+                    >
+                        {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
+                            {@const hidden = item?.attrs?.hidden}
+                            <div class="animation-wrapper"
+                                 class:hidden={hidden}
+                                 animate:flip={{duration:flipDurationMs}}
+                                 style={item?.attrs?.flexGrow ? `flex-grow: ${item.attrs.flexGrow}` : ""}
+                            >
                                 <WidgetContainer dragItem={item} zIndex={zIndex+1} />
                                 {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
                                     <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
                                 {/if}
-                            </Block>
-                        </div>
-                    {/each}
-                </div>
-                {#if container.attrs.hidden && edit}
-                    <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>
-                {/if}
-                {#if showHandles}
-                    <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
-                {/if}
+                            </div>
+                        {/each}
+                    </div>
+                    {#if container.attrs.hidden && edit}
+                        <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>
+                    {/if}
+                    {#if showHandles}
+                        <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+                    {/if}
+                </Accordion>
             </Block>
         {:else}
-            <Tabs>
-                {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item, i(item.id)}
-                    {@const tabName = getTabName(container, i)}
-                    <TabItem name={tabName} on:select={() => console.log("tab " + i)}>
+            <Block>
+                <Accordion label={container.attrs.title} open={container.attrs.openOnStartup}>
+                    {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
                         <WidgetContainer dragItem={item} zIndex={zIndex+1} />
-                    </TabItem>
-                {/each}
-            </Tabs>
+                    {/each}
+                </Accordion>
+            </Block>
         {/if}
     </div>
 {/if}
 
 <style lang="scss">
  .container {
-     display: flex;
-
      > :global(*) {
          border-radius: 0;
      }
