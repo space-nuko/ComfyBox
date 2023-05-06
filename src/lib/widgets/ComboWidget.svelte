@@ -73,7 +73,7 @@
                 <Select
                     bind:value={option}
                     items={node.properties.values}
-                    disabled={node.properties.values.length === 0}
+                    disabled={widget.attrs.disabled || node.properties.values.length === 0}
                     clearable={false}
                     showChevron={true}
                     on:change

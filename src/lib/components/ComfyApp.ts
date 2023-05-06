@@ -10,6 +10,8 @@ import type TypedEmitter from "typed-emitter";
 import "@litegraph-ts/nodes-basic"
 import "@litegraph-ts/nodes-events"
 import "@litegraph-ts/nodes-math"
+import "@litegraph-ts/nodes-strings"
+import "$lib/nodes/index"
 import * as nodes from "$lib/nodes/index"
 
 import ComfyGraphCanvas, { type SerializedGraphCanvasState } from "$lib/ComfyGraphCanvas";
@@ -25,7 +27,7 @@ import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import { get } from "svelte/store";
 import uiState from "$lib/stores/uiState";
-import { promptToGraphVis, toGraphVis } from "$lib/utils";
+import { promptToGraphVis } from "$lib/utils";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -578,9 +580,15 @@ export default class ComfyApp {
         try {
             while (this.queueItems.length) {
                 ({ num, batchCount } = this.queueItems.pop());
-                console.log(`Queue get! ${num} ${batchCount}`);
+                console.debug(`Queue get! ${num} ${batchCount} ${tag}`);
 
                 for (let i = 0; i < batchCount; i++) {
+                    for (const node of this.lGraph._nodes_in_order) {
+                        if ("beforeQueued" in node) {
+                            (node as ComfyGraphNode).beforeQueued();
+                        }
+                    }
+
                     const p = await this.graphToPrompt(tag);
 
                     try {

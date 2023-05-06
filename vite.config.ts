@@ -7,11 +7,11 @@ import FullReload from 'vite-plugin-full-reload';
 export default defineConfig({
     clearScreen: false,
     plugins: [
+        FullReload(["src/**/*.{js,ts,svelte}"]),
         svelte(),
-        // FullReload(["src/**/*.{js,ts,svelte}"])
     ],
     resolve: {
-        alias:{
+        alias: {
             '$lib': resolve(__dirname, './src/lib'),
         },
     },
@@ -28,9 +28,9 @@ export default defineConfig({
     server: {
         port: 3000,
 
-    // hmr: {
-    //   clientPort: 443,
-    // },
+        // hmr: {
+        //   clientPort: 443,
+        // },
         // fs: {
         //     allow: [
         //         "src",

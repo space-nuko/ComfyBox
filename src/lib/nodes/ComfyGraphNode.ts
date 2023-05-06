@@ -20,6 +20,7 @@ export type DefaultWidgetLayout = {
 export default class ComfyGraphNode extends LGraphNode {
     isBackendNode?: boolean;
 
+    beforeQueued?(): void;
     afterQueued?(prompt: SerializedPrompt): void;
     onExecuted?(output: any): void;
 
@@ -61,7 +62,7 @@ export default class ComfyGraphNode extends LGraphNode {
         for (let index = 0; index < this.inputs.length; index++) {
             const input = this.inputs[index]
             const serInput = o.inputs[index]
-            if ("widgetNodeType" in serInput) {
+            if (serInput && "widgetNodeType" in serInput) {
                 const comfyInput = input as IComfyInputSlot
                 const ty: string = serInput.widgetNodeType as any
                 const widgetNode = Object.values(LiteGraph.registered_node_types)

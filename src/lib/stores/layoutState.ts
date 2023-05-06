@@ -34,6 +34,7 @@ export type Attributes = {
     classes: string,
     blockVariant?: "block" | "hidden",
     hidden?: boolean,
+    disabled?: boolean,
     flexGrow?: number
 }
 
@@ -45,6 +46,7 @@ export type AttributesSpec = {
 
     values?: string[],
     hidden?: boolean,
+    validNodeTypes?: string[],
 
     serialize?: (arg: any) => string,
     deserialize?: (arg: string) => any,
@@ -69,6 +71,12 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
             },
             {
                 name: "hidden",
+                type: "boolean",
+                location: "widget",
+                editable: true
+            },
+            {
+                name: "disabled",
                 type: "boolean",
                 location: "widget",
                 editable: true
@@ -104,6 +112,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
     {
         categoryName: "behavior",
         specs: [
+            // Node variables
             {
                 name: "tags",
                 type: "string",
@@ -116,24 +125,40 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                     return arg.split(",").map(s => s.trim())
                 }
             },
+
+            // Range
             {
                 name: "min",
                 type: "number",
                 location: "nodeProps",
                 editable: true,
+                validNodeTypes: ["ui/slider"],
             },
             {
                 name: "max",
                 type: "number",
                 location: "nodeProps",
-                editable: true
+                editable: true,
+                validNodeTypes: ["ui/slider"],
             },
             {
                 name: "step",
                 type: "number",
                 location: "nodeProps",
                 editable: true,
+                validNodeTypes: ["ui/slider"],
             },
+
+            // Button
+            {
+                name: "message",
+                type: "string",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/button"],
+            },
+
+            // Workflow
             {
                 name: "defaultWorkflow",
                 type: "string",
@@ -530,8 +555,6 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
             attrs: entry.dragItem.attrs,
             attrsChanged: writable(false)
         };
-
-        dragItem.attrs.flexGrow = 100;
 
         const dragEntry: DragItemEntry = {
             dragItem,

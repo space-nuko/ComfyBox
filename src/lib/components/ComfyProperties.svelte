@@ -41,6 +41,13 @@
          targetType = ""
  }
 
+ function validNodeProperty(spec: AttributesSpec, node: LGraphNode): boolean {
+     if (spec.validNodeTypes) {
+         return spec.validNodeTypes.indexOf(node.type) !== -1;
+     }
+     return spec.name in node.properties
+ }
+
  function updateAttribute(entry: AttributesSpec, value: any) {
      if (target) {
          const name = entry.name
@@ -157,7 +164,7 @@
                         {/if}
                     </div>
                 {:else if node}
-                    {#if spec.location === "nodeProps" && spec.name in node.properties}
+                    {#if spec.location === "nodeProps" && validNodeProperty(spec, node)}
                         <div class="props-entry">
                             {#if spec.type === "string"}
                                 <TextBox

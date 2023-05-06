@@ -5,17 +5,18 @@ import type { SerializedPrompt } from "$lib/components/ComfyApp";
 import { toast } from '@zerodevx/svelte-toast'
 import type { GalleryOutput } from "./ComfyWidgetNodes";
 
-export interface ComfyAfterQueuedEventProperties extends Record<any, any> {
-    prompt: SerializedPrompt
+export interface ComfyQueueEventsProperties extends Record<any, any> {
+    prompt: SerializedPrompt | null
 }
 
-export class ComfyAfterQueuedEvent extends ComfyGraphNode {
-    override properties: ComfyAfterQueuedEventProperties = {
+export class ComfyQueueEvents extends ComfyGraphNode {
+    override properties: ComfyQueueEventsProperties = {
         prompt: null
     }
 
     static slotLayout: SlotLayout = {
         outputs: [
+            { name: "beforeQueued", type: BuiltInSlotType.EVENT },
             { name: "afterQueued", type: BuiltInSlotType.EVENT },
             { name: "prompt", type: "*" }
         ],
@@ -23,17 +24,22 @@ export class ComfyAfterQueuedEvent extends ComfyGraphNode {
 
     override onPropertyChanged(property: string, value: any, prevValue?: any) {
         if (property === "value") {
-            this.setOutputData(0, this.properties.prompt)
+            this.setOutputData(2, this.properties.prompt)
         }
     }
 
     override onExecute() {
-        this.setOutputData(0, this.properties.prompt)
+        this.setOutputData(2, this.properties.prompt)
+    }
+
+    override beforeQueued() {
+        this.setProperty("value", null)
+        this.triggerSlot(0, "bang")
     }
 
     override afterQueued(p: SerializedPrompt) {
         this.setProperty("value", p)
-        this.triggerSlot(0, "bang")
+        this.triggerSlot(1, "bang")
     }
 
     override onSerialize(o: SerializedLGraphNode) {
@@ -43,19 +49,21 @@ export class ComfyAfterQueuedEvent extends ComfyGraphNode {
 }
 
 LiteGraph.registerNodeType({
-    class: ComfyAfterQueuedEvent,
-    title: "Comfy.AfterQueuedEvent",
+    class: ComfyQueueEvents,
+    title: "Comfy.QueueEvents",
     desc: "Triggers a 'bang' event when a prompt is queued.",
-    type: "actions/after_queued"
+    type: "actions/queue_events"
 })
 
 export interface ComfyOnExecutedEventProperties extends Record<any, any> {
-    images: GalleryOutput | null
+    images: GalleryOutput | null,
+    filename: string | null
 }
 
 export class ComfyOnExecutedEvent extends ComfyGraphNode {
     override properties: ComfyOnExecutedEventProperties = {
-        images: null
+        images: null,
+        filename: null
     }
 
     static slotLayout: SlotLayout = {
@@ -63,7 +71,7 @@ export class ComfyOnExecutedEvent extends ComfyGraphNode {
             { name: "images", type: "IMAGE" }
         ],
         outputs: [
-            { name: "images", type: "IMAGE" },
+            { name: "images", type: "OUTPUT" },
             { name: "onExecuted", type: BuiltInSlotType.EVENT },
         ],
     }
@@ -76,6 +84,7 @@ export class ComfyOnExecutedEvent extends ComfyGraphNode {
     override receiveOutput(output: any) {
         if (output && "images" in output) {
             this.setProperty("images", output as GalleryOutput)
+            this.setOutputData(0, this.properties.images)
             this.triggerSlot(1, "bang")
         }
     }
@@ -201,4 +210,44 @@ LiteGraph.registerNodeType({
     title: "Comfy.NotifyAction",
     desc: "Displays a message.",
     type: "actions/notify"
+})
+
+export interface ComfyExecuteSubgraphActionProperties extends Record<any, any> {
+    tag: string | null,
+}
+
+export class ComfyExecuteSubgraphAction extends ComfyGraphNode {
+    override properties: ComfyExecuteSubgraphActionProperties = {
+        tag: null
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "execute", type: BuiltInSlotType.ACTION },
+            { name: "tag", type: "string" }
+        ],
+    }
+
+    override onExecute() {
+        const tag = this.getInputData(1)
+        if (tag)
+            this.setProperty("tag", tag)
+    }
+
+    override onAction(action: any, param: any) {
+        const tag = this.getInputData(1) || this.properties.tag;
+
+        const app = (window as any)?.app;
+        if (!app)
+            return;
+
+        app.queuePrompt(0, 1, tag);
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyExecuteSubgraphAction,
+    title: "Comfy.ExecuteSubgraphAction",
+    desc: "Runs a part of the graph based on a tag",
+    type: "actions/execute_subgraph"
 })

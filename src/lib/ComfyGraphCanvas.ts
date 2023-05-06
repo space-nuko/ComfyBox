@@ -231,9 +231,9 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         return res;
     }
 
-    override onNodeSelected(node: LGraphNode) {
+    override onSelectionChange(nodes: Record<number, LGraphNode>) {
         const ls = get(layoutState)
-        ls.currentSelectionNodes = [node]
+        ls.currentSelectionNodes = Object.values(nodes)
         ls.currentSelection = []
         layoutState.set(ls)
     }

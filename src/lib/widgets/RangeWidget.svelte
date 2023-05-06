@@ -56,6 +56,7 @@
     {#if node !== null && option !== null}
         <Range
             bind:value={option}
+            disabled={widget.attrs.disabled}
             minimum={node.properties.min}
             maximum={node.properties.max}
             step={node.properties.step}

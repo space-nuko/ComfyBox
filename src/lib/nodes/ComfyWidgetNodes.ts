@@ -119,7 +119,6 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
             if (this.inputs.length >= this.inputIndex) {
                 const data = this.getInputData(this.inputIndex)
                 if (data) { // TODO can "null" be a legitimate value here?
-                    console.log(data)
                     this.setValue(data)
                     const input = this.getInputLink(this.inputIndex)
                     input.data = null;
@@ -407,7 +406,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "images", type: "IMAGE" },
+            { name: "images", type: "OUTPUT" },
             { name: "store", type: BuiltInSlotType.ACTION }
         ]
     }
