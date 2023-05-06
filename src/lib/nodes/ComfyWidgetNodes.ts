@@ -141,7 +141,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         inputNode: LGraphNode,
         inputIndex: number
     ): boolean {
-        if (this.autoConfig && "config" in input) {
+        if (this.autoConfig && "config" in input && this.outputs.length === 0) {
             this.doAutoConfig(input as IComfyInputSlot)
         }
 
@@ -397,11 +397,13 @@ export type GalleryOutputEntry = {
 }
 
 export interface ComfyGalleryProperties extends ComfyWidgetProperties {
+    index: number
 }
 
 export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     override properties: ComfyGalleryProperties = {
-        defaultValue: []
+        defaultValue: [],
+        index: 0
     }
 
     static slotLayout: SlotLayout = {
@@ -420,14 +422,12 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     override outputIndex = null;
     override changedIndex = null;
 
-    index: number = 0;
-
     constructor(name?: string) {
         super(name, [])
     }
 
     override onExecute() {
-        this.setOutputData(0, this.index)
+        this.setOutputData(0, this.properties.index)
     }
 
     override onAction(action: any) {
@@ -446,6 +446,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
                 // this.setValue(currentValue.concat(galleryItems))
                 this.setValue(galleryItems)
             }
+            this.setProperty("index", 0)
         }
     }
 
@@ -472,7 +473,11 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
         else {
             super.setValue([])
         }
-        this.index = 0;
+
+        const len = get(this.value).length
+        if (this.properties.index < 0 || this.properties.index >= len) {
+            this.setProperty("index", clamp(this.properties.index, 0, len))
+        }
     }
 }
 

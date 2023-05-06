@@ -8,6 +8,7 @@
  import type { ComfyGalleryNode } from "$lib/nodes/ComfyWidgetNodes";
  import type { FileData as GradioFileData } from "@gradio/upload";
  import type { SelectData as GradioSelectData } from "@gradio/utils";
+	import { clamp } from "$lib/utils";
 
  export let widget: WidgetLayout | null = null;
  let node: ComfyGalleryNode | null = null;
@@ -22,7 +23,11 @@
          node = widget.node as ComfyGalleryNode
          nodeValue = node.value;
          propsChanged = node.propsChanged;
-         node.index = 0;
+
+         const len = $nodeValue.length
+         if (node.properties.index < 0 || node.properties.index >= len) {
+             node.setProperty("index", clamp(node.properties.index, 0, len))
+         }
      }
  };
 
@@ -46,7 +51,7 @@
      }, 200)
 
      // Update index
-     node.index = e.detail.index as number;
+     node.setProperty("index", e.detail.index as number)
  }
 
 </script>

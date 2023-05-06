@@ -12,7 +12,7 @@ type DragItemEntry = {
 }
 
 export type LayoutAttributes = {
-    defaultWorkflow: string
+    defaultSubgraph: string
 }
 
 export type LayoutState = {
@@ -160,7 +160,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
 
             // Workflow
             {
-                name: "defaultWorkflow",
+                name: "defaultSubgraph",
                 type: "string",
                 location: "workflow",
                 editable: true
@@ -217,7 +217,7 @@ const store: Writable<LayoutState> = writable({
     isMenuOpen: false,
     isConfiguring: true,
     attrs: {
-        defaultWorkflow: ""
+        defaultSubgraph: ""
     }
 })
 

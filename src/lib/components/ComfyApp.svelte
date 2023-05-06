@@ -29,7 +29,7 @@
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
  let hasShownUIHelpToast: boolean = false;
- let uiTheme: string = "";
+ let uiTheme: string = "anapnoe";
 
  let debugLayout: boolean = false;
 
@@ -47,7 +47,8 @@
 
  function queuePrompt() {
      console.log("Queuing!");
-     app.queuePrompt(0, 1);
+     const workflow = $layoutState.attrs.defaultSubgraph;
+     app.queuePrompt(0, 1, workflow);
  }
 
  $: if (app?.lCanvas) app.lCanvas.allow_dragnodes = !$uiState.nodesLocked;
@@ -56,11 +57,11 @@
  $: if ($uiState.uiEditMode)
      $layoutState.currentSelection = []
 
- let graphSize = null;
+ let graphSize = 0;
 
  function toggleGraph() {
      if (graphSize == 0) {
-         graphSize = 100;
+         graphSize = 50;
          app.resizeCanvas();
      }
      else {
@@ -68,7 +69,7 @@
      }
  }
 
- let propsSidebarSize = 15;
+ let propsSidebarSize = 0; //15;
 
  function toggleProps() {
      if (propsSidebarSize == 0) {
@@ -157,6 +158,8 @@
      (window as any).app = app;
      (window as any).appPane = uiPane;
 
+     await import('../../scss/ux.scss');
+
      refreshView();
  })
 
@@ -201,7 +204,7 @@
     </div>
     <div id="bottombar">
         <Button variant="primary" on:click={queuePrompt}>
-            Run
+            Queue Prompt
         </Button>
         <Button variant="secondary" on:click={toggleGraph}>
             Toggle Graph
@@ -252,7 +255,7 @@
 
 <style lang="scss">
  #container {
-     height: calc(100vh - 60px);
+     height: calc(100vh - 70px);
      max-width: 100vw;
      display: grid;
      width: 100%;
@@ -332,7 +335,7 @@
  }
 
  :global(.splitpanes.comfy) {
-     max-height: calc(100vh - 60px);
+     max-height: calc(100vh - 70px);
      max-width: 100vw;
  }
 

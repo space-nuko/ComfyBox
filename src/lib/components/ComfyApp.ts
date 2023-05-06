@@ -576,6 +576,9 @@ export default class ComfyApp {
             return;
         }
 
+        if (tag === "")
+            tag = null;
+
         this.processingQueue = true;
         try {
             while (this.queueItems.length) {

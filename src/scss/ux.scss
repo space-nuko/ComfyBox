@@ -504,7 +504,7 @@ input[type=number],
 input[type=text],
 input[type=password],
 input[type=email] {
-	height:34px !important;
+	height: 34px;
 }
 .gradio-slider input[type=range] {
 	align-self: flex-start;
@@ -742,9 +742,10 @@ input[type=range]::-ms-fill-upper {
 
 .widget > .wrapper.comfy-combo .svelte-select {
     --font-size: 13px;
-    --height: 32px;
+    --height: 24px;
     --input-padding: 0px;
-    --chevron-height: 32px;
+    --chevron-width: 24px;
+    --chevron-height: 24px;
     --padding: 0 0 0 8px;
 
     background: var(--ae-input-bg-color) !important;
