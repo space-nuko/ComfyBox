@@ -1,10 +1,11 @@
-import ComfyApp from "./components/ComfyApp";
+import ComfyApp, { type SerializedPrompt } from "./components/ComfyApp";
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import RangeWidget from "$lib/widgets/RangeWidget.svelte";
 import TextWidget from "$lib/widgets/TextWidget.svelte";
 import { get } from "svelte/store"
 import layoutState from "$lib/stores/layoutState"
 import type { SvelteComponentDev } from "svelte/internal";
+import type { SerializedLGraph } from "@litegraph-ts/core";
 
 export function clamp(n: number, min: number, max: number): number {
     return Math.min(Math.max(n, min), max)
@@ -36,6 +37,8 @@ export function startDrag(evt: MouseEvent) {
 
     const item = ls.allItems[dragItemId].dragItem
 
+    console.debug("startDrag", item)
+
     if (evt.ctrlKey) {
         const index = ls.currentSelection.indexOf(item.id)
         if (index === -1)
@@ -47,8 +50,48 @@ export function startDrag(evt: MouseEvent) {
     else {
         ls.currentSelection = [item.id]
     }
+    ls.currentSelectionNodes = [];
+
     layoutState.set(ls)
 };
 
 export function stopDrag(evt: MouseEvent) {
 };
+
+export function workflowToGraphVis(workflow: SerializedLGraph): string {
+    let out = "digraph {\n"
+
+    for (const link of workflow.links) {
+        const nodeA = workflow.nodes.find(n => n.id === link[1])
+        const nodeB = workflow.nodes.find(n => n.id === link[3])
+        out += `"${link[1]}_${nodeA.title}" -> "${link[3]}_${nodeB.title}"\n`;
+    }
+
+    out += "}"
+    return out
+}
+
+export function promptToGraphVis(prompt: SerializedPrompt): string {
+    let out = "digraph {\n"
+
+    for (const pair of Object.entries(prompt.output)) {
+        const [id, o] = pair;
+        const outNode = prompt.workflow.nodes.find(n => n.id == id)
+        for (const pair2 of Object.entries(o.inputs)) {
+            const [inpName, i] = pair2;
+
+            if (Array.isArray(i) && i.length === 2 && typeof i[0] === "string" && typeof i[1] === "number") {
+                // Link
+                const inpNode = prompt.workflow.nodes.find(n => n.id == i[0])
+                out += `"${inpNode.title}" -> "${outNode.title}"\n`
+            }
+            else {
+                // Value
+                out += `"${id}-${inpName}-${typeof i}" -> "${outNode.title}"\n`
+            }
+        }
+    }
+
+    out += "}"
+    return out
+}

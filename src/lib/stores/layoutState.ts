@@ -11,20 +11,45 @@ type DragItemEntry = {
     parent: IDragItem | null
 }
 
+export type LayoutAttributes = {
+    defaultSubgraph: string
+}
+
 export type LayoutState = {
     root: IDragItem | null,
     allItems: Record<DragItemID, DragItemEntry>,
     allItemsByNode: Record<number, DragItemEntry>,
     currentId: number,
     currentSelection: DragItemID[],
+    currentSelectionNodes: LGraphNode[],
     isConfiguring: boolean,
-    isMenuOpen: boolean
+    isMenuOpen: boolean,
+    attrs: LayoutAttributes
+}
+
+export type Attributes = {
+    direction: "horizontal" | "vertical",
+    title: string,
+    showTitle: boolean,
+    classes: string,
+    blockVariant?: "block" | "hidden",
+    hidden?: boolean,
+    disabled?: boolean,
+    flexGrow?: number
 }
 
 export type AttributesSpec = {
     name: string,
     type: string,
-    editable: boolean
+    location: "widget" | "nodeProps" | "nodeVars" | "workflow"
+    editable: boolean,
+
+    values?: string[],
+    hidden?: boolean,
+    validNodeTypes?: string[],
+
+    serialize?: (arg: any) => string,
+    deserialize?: (arg: string) => any,
 }
 
 export type AttributesCategorySpec = {
@@ -41,40 +66,116 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
             {
                 name: "title",
                 type: "string",
+                location: "widget",
                 editable: true,
             },
             {
-                name: "showTitle",
+                name: "hidden",
                 type: "boolean",
-                editable: true,
+                location: "widget",
+                editable: true
+            },
+            {
+                name: "disabled",
+                type: "boolean",
+                location: "widget",
+                editable: true
             },
             {
                 name: "direction",
-                type: "string",
+                type: "enum",
+                location: "widget",
                 editable: true,
+                values: ["horizontal", "vertical"]
+            },
+            {
+                name: "flexGrow",
+                type: "number",
+                location: "widget",
+                editable: true
             },
             {
                 name: "classes",
                 type: "string",
+                location: "widget",
                 editable: true,
             },
+            {
+                name: "blockVariant",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                values: ["block", "hidden"]
+            },
+        ]
+    },
+    {
+        categoryName: "behavior",
+        specs: [
+            // Node variables
+            {
+                name: "tags",
+                type: "string",
+                location: "nodeVars",
+                editable: true,
+                serialize: (arg: string[]) => arg.join(","),
+                deserialize: (arg: string) => {
+                    if (arg === "")
+                        return []
+                    return arg.split(",").map(s => s.trim())
+                }
+            },
+
+            // Range
+            {
+                name: "min",
+                type: "number",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/slider"],
+            },
+            {
+                name: "max",
+                type: "number",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/slider"],
+            },
+            {
+                name: "step",
+                type: "number",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/slider"],
+            },
+
+            // Button
+            {
+                name: "message",
+                type: "string",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/button"],
+            },
+
+            // Workflow
+            {
+                name: "defaultSubgraph",
+                type: "string",
+                location: "workflow",
+                editable: true
+            }
         ]
     }
 ];
 export { ALL_ATTRIBUTES };
 
-export type Attributes = {
-    direction: "horizontal" | "vertical",
-    title: string,
-    showTitle: boolean,
-    classes: string
-}
-
 export interface IDragItem {
     type: string,
     id: DragItemID,
     isNodeExecuting?: boolean,
-    attrs: Attributes
+    attrs: Attributes,
+    attrsChanged: Writable<boolean>
 }
 
 export interface ContainerLayout extends IDragItem {
@@ -112,8 +213,12 @@ const store: Writable<LayoutState> = writable({
     allItemsByNode: {},
     currentId: 0,
     currentSelection: [],
+    currentSelectionNodes: [],
     isMenuOpen: false,
-    isConfiguring: true
+    isConfiguring: true,
+    attrs: {
+        defaultSubgraph: ""
+    }
 })
 
 function findDefaultContainerForInsertion(): ContainerLayout | null {
@@ -141,11 +246,14 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
     const dragItem: ContainerLayout = {
         type: "container",
         id: `${state.currentId++}`,
+        attrsChanged: writable(false),
         attrs: {
             title: "Container",
             showTitle: true,
             direction: "vertical",
             classes: "",
+            blockVariant: "block",
+            flexGrow: 100,
             ...attrs
         }
     }
@@ -166,11 +274,13 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
         type: "widget",
         id: `${state.currentId++}`,
         node: node,
+        attrsChanged: writable(false),
         attrs: {
             title: widgetName,
             showTitle: true,
             direction: "horizontal",
             classes: "",
+            flexGrow: 100,
             ...attrs
         }
     }
@@ -310,7 +420,9 @@ function groupItems(dragItems: IDragItem[], attrs: Partial<Attributes> = {}): Co
             index = indexFound
     }
 
-    const container = addContainer(parent as ContainerLayout, attrs, index)
+    const title = dragItems.length <= 1 ? "" : "Group";
+
+    const container = addContainer(parent as ContainerLayout, { title, ...attrs }, index)
 
     for (const item of dragItems) {
         moveItem(item, container)
@@ -366,15 +478,17 @@ function initDefaultLayout() {
     store.set({
         root: null,
         allItems: {},
+        allItemsByNode: {},
         currentId: 0,
         currentSelection: [],
+        currentSelectionNodes: [],
         isMenuOpen: false,
         isConfiguring: false
     })
 
-    const root = addContainer(null, { direction: "horizontal", showTitle: false });
-    const left = addContainer(root, { direction: "vertical", showTitle: false });
-    const right = addContainer(root, { direction: "vertical", showTitle: false });
+    const root = addContainer(null, { direction: "horizontal", title: "" });
+    const left = addContainer(root, { direction: "vertical", title: "" });
+    const right = addContainer(root, { direction: "vertical", title: "" });
 
     const state = get(store)
     state.root = root;
@@ -387,6 +501,7 @@ export type SerializedLayoutState = {
     root: DragItemID | null,
     allItems: Record<DragItemID, SerializedDragEntry>,
     currentId: number,
+    attrs: LayoutAttributes
 }
 
 export type SerializedDragEntry = {
@@ -424,6 +539,7 @@ function serialize(): SerializedLayoutState {
         root: state.root?.id,
         allItems,
         currentId: state.currentId,
+        attrs: state.attrs
     }
 }
 
@@ -436,7 +552,8 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
         const dragItem: IDragItem = {
             type: entry.dragItem.type,
             id: entry.dragItem.id,
-            attrs: entry.dragItem.attrs
+            attrs: entry.dragItem.attrs,
+            attrsChanged: writable(false)
         };
 
         const dragEntry: DragItemEntry = {
@@ -476,8 +593,10 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
         allItemsByNode,
         currentId: data.currentId,
         currentSelection: [],
+        currentSelectionNodes: [],
         isMenuOpen: false,
-        isConfiguring: false
+        isConfiguring: false,
+        attrs: data.attrs
     }
 
     console.debug("[layoutState] deserialize", data, state)

@@ -63,16 +63,19 @@
  }
 </script>
 
-<div class="wrapper gr-combo" class:updated={werePropsChanged}>
+<div class="wrapper comfy-combo" class:updated={werePropsChanged}>
     {#key $propsChanged}
         {#if node !== null && nodeValue !== null}
             <label>
-                <BlockTitle show_label={true}>{widget.attrs.title}</BlockTitle>
+                {#if widget.attrs.title !== ""}
+                    <BlockTitle show_label={true}>{widget.attrs.title}</BlockTitle>
+                {/if}
                 <Select
                     bind:value={option}
-                    bind:items={node.properties.values}
-                    disabled={node.properties.values.length === 0}
+                    items={node.properties.values}
+                    disabled={widget.attrs.disabled || node.properties.values.length === 0}
                     clearable={false}
+                    showChevron={true}
                     on:change
                     on:select
                     on:filter

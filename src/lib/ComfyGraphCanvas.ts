@@ -1,7 +1,9 @@
-import { BuiltInSlotShape, LGraph, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type MouseEventExt, type Vector2, type Vector4 } from "@litegraph-ts/core";
+import { BuiltInSlotShape, LGraph, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type MouseEventExt, type Vector2, type Vector4, TitleMode } from "@litegraph-ts/core";
 import type ComfyApp from "./components/ComfyApp";
 import queueState from "./stores/queueState";
 import { get } from "svelte/store";
+import uiState from "./stores/uiState";
+import layoutState from "./stores/layoutState";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
@@ -101,7 +103,39 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         }
     }
 
+    private alignToGrid(node: LGraphNode, ctx: CanvasRenderingContext2D) {
+        const x = LiteGraph.CANVAS_GRID_SIZE * Math.round(node.pos[0] / LiteGraph.CANVAS_GRID_SIZE);
+        const y = LiteGraph.CANVAS_GRID_SIZE * Math.round(node.pos[1] / LiteGraph.CANVAS_GRID_SIZE);
+
+        const shiftX = x - node.pos[0];
+        let shiftY = y - node.pos[1];
+
+        let w, h;
+        if (node.flags.collapsed) {
+            w = node._collapsed_width;
+            h = LiteGraph.NODE_TITLE_HEIGHT;
+            shiftY -= LiteGraph.NODE_TITLE_HEIGHT;
+        } else {
+            w = node.size[0];
+            h = node.size[1];
+            let titleMode = node.titleMode
+            if (titleMode !== TitleMode.TRANSPARENT_TITLE && titleMode !== TitleMode.NO_TITLE) {
+                h += LiteGraph.NODE_TITLE_HEIGHT;
+                shiftY -= LiteGraph.NODE_TITLE_HEIGHT;
+            }
+        }
+        const f = ctx.fillStyle;
+        ctx.fillStyle = "rgba(100, 100, 100, 0.5)";
+        ctx.fillRect(shiftX, shiftY, w, h);
+        ctx.fillStyle = f;
+    }
+
     override drawNode(node: LGraphNode, ctx: CanvasRenderingContext2D): void {
+        if ((window as any)?.app?.shiftDown && this.node_dragged && node.id in this.selected_nodes) {
+            this.alignToGrid(node, ctx)
+        }
+
+        // Fade out inactive nodes
         var editor_alpha = this.editor_alpha;
         if (node.mode === NodeMode.NEVER) { // never
             this.editor_alpha = 0.4;
@@ -195,5 +229,24 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         }
 
         return res;
+    }
+
+    override onSelectionChange(nodes: Record<number, LGraphNode>) {
+        const ls = get(layoutState)
+        ls.currentSelectionNodes = Object.values(nodes)
+        ls.currentSelection = []
+        layoutState.set(ls)
+    }
+
+    override onNodeMoved(node: LGraphNode) {
+        if (super.onNodeMoved)
+            super.onNodeMoved(node);
+
+        if ((window as any)?.app?.shiftDown) {
+            // Ensure all selected nodes are realigned
+            for (const id in this.selected_nodes) {
+                this.selected_nodes[id].alignToGrid();
+            }
+        }
     }
 }

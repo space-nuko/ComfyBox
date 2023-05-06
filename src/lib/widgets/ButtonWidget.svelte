@@ -28,15 +28,19 @@
  }
 </script>
 
-<div class="wrapper gr-button">
+<div class="wrapper gradio-button">
     {#if node !== null}
-        <Button on:click={onClick} variant="primary" {style}>
+        <Button
+            disabled={widget.attrs.disabled}
+            on:click={onClick}
+            variant="primary"
+            {style}>
             {widget.attrs.title}
         </Button>
     {/if}
 </div>
 
-<style>
+<style lang="scss">
  .wrapper {
      padding: 2px;
      width: 100%;

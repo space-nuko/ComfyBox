@@ -2,6 +2,7 @@ import LGraphCanvas from "@litegraph-ts/core/src/LGraphCanvas";
 import ComfyGraphNode from "./ComfyGraphNode";
 import ComfyWidgets from "$lib/widgets"
 import type { ComfyWidgetNode } from "./ComfyWidgetNodes";
+import type { SerializedLGraphNode } from "@litegraph-ts/core";
 
 /*
  * Base class for any node with configuration sent by the backend.
@@ -25,9 +26,15 @@ export class ComfyBackendNode extends ComfyGraphNode {
         // It just returns a hash like { "ui": { "images": results } } internally.
         // So this will need to be hardcoded for now.
         if (["PreviewImage", "SaveImage"].indexOf(comfyClass) !== -1) {
-            this.addOutput("output", "OUTPUT");
+            this.addOutput("output", "IMAGE");
         }
     }
+
+    /*
+     * Tags this node belongs to
+     * Allows you to run subsections of the graph
+     */
+    tags: string[] = []
 
     private setup(nodeData: any) {
         var inputs = nodeData["input"]["required"];
@@ -74,16 +81,27 @@ export class ComfyBackendNode extends ComfyGraphNode {
         // app.#invokeExtensionsAsync("nodeCreated", this);
     }
 
+    override onSerialize(o: SerializedLGraphNode) {
+        super.onSerialize(o);
+        (o as any).tags = this.tags
+    }
+
+    override onConfigure(o: SerializedLGraphNode) {
+        super.onConfigure(o);
+        this.tags = (o as any).tags || []
+    }
+
     override onExecuted(outputData: any) {
         console.warn("onExecuted outputs", outputData)
         for (let index = 0; index < this.outputs.length; index++) {
             const output = this.outputs[index]
-            if (output.type === "OUTPUT") {
+            if (output.type === "IMAGE") {
                 this.setOutputData(index, outputData)
                 for (const node of this.getOutputNodes(index)) {
+                    console.warn(node)
                     if ("receiveOutput" in node) {
-                        const widgetNode = node as ComfyWidgetNode;
-                        widgetNode.receiveOutput();
+                        const widgetNode = node as ComfyGraphNode;
+                        widgetNode.receiveOutput(outputData);
                     }
                 }
             }

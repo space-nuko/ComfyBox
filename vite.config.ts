@@ -3,15 +3,28 @@ import { defineConfig } from 'vitest/config';
 import { resolve } from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import FullReload from 'vite-plugin-full-reload';
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 export default defineConfig({
     clearScreen: false,
     plugins: [
-        svelte(),
-        // FullReload(["src/**/*.{js,ts,svelte}"])
+        FullReload(["src/**/*.{js,ts,scss,svelte}"]),
+        svelte(), ,
+        viteStaticCopy({
+            targets: [
+                {
+                    src: 'bin/run.sh',
+                    dest: './'
+                },
+                {
+                    src: 'bin/run.bat',
+                    dest: './'
+                }
+            ]
+        })
     ],
     resolve: {
-        alias:{
+        alias: {
             '$lib': resolve(__dirname, './src/lib'),
         },
     },
@@ -28,9 +41,9 @@ export default defineConfig({
     server: {
         port: 3000,
 
-    // hmr: {
-    //   clientPort: 443,
-    // },
+        // hmr: {
+        //   clientPort: 443,
+        // },
         // fs: {
         //     allow: [
         //         "src",

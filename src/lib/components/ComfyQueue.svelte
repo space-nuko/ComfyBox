@@ -57,18 +57,18 @@
 
  $: if (entries) {
      _entries = []
-     for (const entry of entries) {
-         for (const outputs of Object.values(entry.outputs)) {
-             const allImages = outputs.images.map(r => {
-                 // TODO configure backend URL
-                 const url = "http://localhost:8188/view?"
-                 const params = new URLSearchParams(r)
-                 return url + params
-             });
-
-             _entries.push({ allImages, name: "Output" })
-         }
-     }
+     // for (const entry of entries) {
+     //     for (const outputs of Object.values(entry.outputs)) {
+     //         const allImages = outputs.images.map(r => {
+     //             // TODO configure backend URL
+     //             const url = "http://localhost:8188/view?"
+     //             const params = new URLSearchParams(r)
+     //             return url + params
+     //         });
+     //
+     //         _entries.push({ allImages, name: "Output" })
+     //     }
+     // }
  }
 </script>
 

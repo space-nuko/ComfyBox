@@ -10,6 +10,8 @@ import type TypedEmitter from "typed-emitter";
 import "@litegraph-ts/nodes-basic"
 import "@litegraph-ts/nodes-events"
 import "@litegraph-ts/nodes-math"
+import "@litegraph-ts/nodes-strings"
+import "$lib/nodes/index"
 import * as nodes from "$lib/nodes/index"
 
 import ComfyGraphCanvas, { type SerializedGraphCanvasState } from "$lib/ComfyGraphCanvas";
@@ -24,10 +26,13 @@ import { toast } from '@zerodevx/svelte-toast'
 import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import { get } from "svelte/store";
+import uiState from "$lib/stores/uiState";
+import { promptToGraphVis } from "$lib/utils";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
 LiteGraph.catch_exceptions = false;
+LiteGraph.CANVAS_GRID_SIZE = 32;
 
 if (typeof window !== "undefined") {
     // Load default visibility
@@ -52,9 +57,11 @@ export type SerializedPromptInputs = {
     class_type: string
 }
 
+export type SerializedPromptOutput = Record<string, SerializedPromptInputs>
+
 export type SerializedPrompt = {
     workflow: SerializedLGraph,
-    output: Record<string, SerializedPromptInputs>
+    output: SerializedPromptOutput
 }
 
 export type Progress = {
@@ -318,12 +325,12 @@ export default class ComfyApp {
         }
 
         // Distinguish frontend/backend connections
-        const BACKEND_TYPES = ["CLIP", "CLIP_VISION", "CLIP_VISION_OUTPUT", "CONDITIONING", "CONTROL_NET", "IMAGE", "LATENT", "MASK", "MODEL", "STYLE_MODEL", "VAE"]
+        const BACKEND_TYPES = ["CLIP", "CLIP_VISION", "CLIP_VISION_OUTPUT", "CONDITIONING", "CONTROL_NET", "LATENT", "MASK", "MODEL", "STYLE_MODEL", "VAE"]
         for (const type of BACKEND_TYPES) {
             setColor(type, "orange")
         }
 
-        setColor("OUTPUT", "rebeccapurple")
+        setColor("IMAGE", "rebeccapurple")
         setColor(BuiltInSlotType.EVENT, "lightseagreen")
         setColor(BuiltInSlotType.ACTION, "lightseagreen")
     }
@@ -418,7 +425,7 @@ export default class ComfyApp {
      * Converts the current graph workflow for sending to the API
      * @returns The workflow and node links
      */
-    async graphToPrompt(): Promise<SerializedPrompt> {
+    async graphToPrompt(tag: string | null = null): Promise<SerializedPrompt> {
         // Run frontend-only logic
         this.lGraph.runStep(1)
 
@@ -436,6 +443,11 @@ export default class ComfyApp {
 
             const node = node_ as ComfyBackendNode;
 
+            if (tag && node.tags.indexOf(tag) === -1) {
+                console.debug("Skipping tagged node", tag, node.tags)
+                continue;
+            }
+
             if (node.mode === NodeMode.NEVER) {
                 // Don't serialize muted nodes
                 continue;
@@ -449,6 +461,11 @@ export default class ComfyApp {
                     const inp = node.inputs[i];
                     const inputLink = node.getInputLink(i)
                     const inputNode = node.getInputNode(i)
+
+                    if (inputNode && tag && "tags" in inputNode && (inputNode.tags as string[]).indexOf(tag) === -1) {
+                        continue;
+                    }
+
                     if (!inputLink || !inputNode) {
                         if ("config" in inp) {
                             const defaultValue = (inp as IComfyInputSlot).config?.defaultValue
@@ -487,17 +504,36 @@ export default class ComfyApp {
                 if (parent) {
                     const seen = {}
                     let link = node.getInputLink(i);
-                    while (parent && !parent.isBackendNode) {
+
+                    const isValidParent = (parent: ComfyGraphNode) => {
+                        if (!parent || parent.isBackendNode)
+                            return false;
+                        if ("tags" in parent && (parent.tags as string[]).indexOf(tag) === -1)
+                            return false;
+                        return true;
+                    }
+
+                    while (isValidParent(parent)) {
                         link = parent.getInputLink(link.origin_slot);
                         if (link && !seen[link.id]) {
                             seen[link.id] = true
-                            parent = parent.getInputNode(link.origin_slot) as ComfyGraphNode;
+                            const inputNode = parent.getInputNode(link.origin_slot) as ComfyGraphNode;
+                            if (inputNode && "tags" in inputNode && tag && (inputNode.tags as string[]).indexOf(tag) === -1) {
+                                console.debug("Skipping tagged parent node", tag, node.tags)
+                                parent = null;
+                            }
+                            else {
+                                parent = inputNode;
+                            }
                         } else {
                             parent = null;
                         }
                     }
 
                     if (link && parent && parent.isBackendNode) {
+                        if ("tags" in parent && tag && (parent.tags as string[]).indexOf(tag) === -1)
+                            continue;
+
                         const input = node.inputs[i]
                         // TODO can null be a legitimate value in some cases?
                         // Nodes like CLIPLoader will never have a value in the frontend, hence "null".
@@ -520,15 +556,19 @@ export default class ComfyApp {
                 if (Array.isArray(output[o].inputs[i])
                     && output[o].inputs[i].length === 2
                     && !output[output[o].inputs[i][0]]) {
+                    console.debug("Prune removed node link", o, i, output[o].inputs[i])
                     delete output[o].inputs[i];
                 }
             }
         }
 
+        console.warn({ workflow, output })
+        console.warn(promptToGraphVis({ workflow, output }))
+
         return { workflow, output };
     }
 
-    async queuePrompt(num: number, batchCount: number = 1) {
+    async queuePrompt(num: number, batchCount: number = 1, tag: string | null = null) {
         this.queueItems.push({ num, batchCount });
 
         // Only have one action process the items so each one gets a unique seed correctly
@@ -536,14 +576,23 @@ export default class ComfyApp {
             return;
         }
 
+        if (tag === "")
+            tag = null;
+
         this.processingQueue = true;
         try {
             while (this.queueItems.length) {
                 ({ num, batchCount } = this.queueItems.pop());
-                console.log(`Queue get! ${num} ${batchCount}`);
+                console.debug(`Queue get! ${num} ${batchCount} ${tag}`);
 
                 for (let i = 0; i < batchCount; i++) {
-                    const p = await this.graphToPrompt();
+                    for (const node of this.lGraph._nodes_in_order) {
+                        if ("beforeQueued" in node) {
+                            (node as ComfyGraphNode).beforeQueued();
+                        }
+                    }
+
+                    const p = await this.graphToPrompt(tag);
 
                     try {
                         await this.api.queuePrompt(num, p);
@@ -624,12 +673,8 @@ export default class ComfyApp {
                 if ("config" in input) {
                     const comfyInput = input as IComfyInputSlot;
 
-                    console.warn("RefreshCombo", comfyInput.defaultWidgetNode, comfyInput)
-
                     if (comfyInput.defaultWidgetNode == nodes.ComfyComboNode && def["input"]["required"][comfyInput.name] !== undefined) {
                         comfyInput.config.values = def["input"]["required"][comfyInput.name][0];
-
-                        console.warn("RefreshCombo", comfyInput.config.values, def["input"]["required"][comfyInput.name])
                         const inputNode = node.getInputNode(index)
 
                         if (inputNode && "doAutoConfig" in inputNode) {

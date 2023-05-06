@@ -7,6 +7,8 @@
  import type { Writable } from "svelte/store";
  import type { ComfyGalleryNode } from "$lib/nodes/ComfyWidgetNodes";
  import type { FileData as GradioFileData } from "@gradio/upload";
+ import type { SelectData as GradioSelectData } from "@gradio/utils";
+	import { clamp } from "$lib/utils";
 
  export let widget: WidgetLayout | null = null;
  let node: ComfyGalleryNode | null = null;
@@ -21,6 +23,11 @@
          node = widget.node as ComfyGalleryNode
          nodeValue = node.value;
          propsChanged = node.propsChanged;
+
+         const len = $nodeValue.length
+         if (node.properties.index < 0 || node.properties.index >= len) {
+             node.setProperty("index", clamp(node.properties.index, 0, len))
+         }
      }
  };
 
@@ -31,7 +38,8 @@
  }
  let element: HTMLDivElement;
 
- function updateForLightbox() {
+ function onSelect(e: CustomEvent<GradioSelectData>) {
+     // Setup lightbox
      // Wait for gradio gallery to show the large preview image, if no timeout then
      // the event might fire too early
      setTimeout(() => {
@@ -41,21 +49,24 @@
          }
          ImageViewer.instance.updateOnBackgroundChange();
      }, 200)
+
+     // Update index
+     node.setProperty("index", e.detail.index as number)
  }
 
 </script>
-<div class="wrapper comfy-gallery-widget gr-gallery" bind:this={element}>
+<div class="wrapper comfy-gallery-widget gradio-gallery" bind:this={element}>
     {#if widget && node && nodeValue}
         <Block variant="solid" padding={false}>
             <div class="padding">
                 <Gallery
                     bind:value={$nodeValue}
                     label={widget.attrs.title}
-                    show_label={true}
+                    show_label={widget.attrs.title !== ""}
                     {style}
                     root={""}
                     root_url={""}
-                    on:select={updateForLightbox}
+                    on:select={onSelect}
                 />
             </div>
         </Block>

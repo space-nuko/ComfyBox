@@ -9,7 +9,7 @@ export type UIState = {
     nodesLocked: boolean,
     graphLocked: boolean,
     autoAddUI: boolean,
-    uiEditMode: UIEditMode
+    uiEditMode: UIEditMode,
 }
 
 export type WritableUIStateStore = Writable<UIState>;

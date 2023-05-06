@@ -27,11 +27,12 @@
  }
 </script>
 
-<div class="wrapper gr-textbox">
+<div class="wrapper gradio-textbox">
     {#if node !== null && nodeValue !== null}
         <TextBox
             bind:value={$nodeValue}
             label={widget.attrs.title}
+            disabled={widget.attrs.disabled}
             lines={node.properties.multiline ? 5 : 1}
             max_lines={node.properties.multiline ? 5 : 1}
             show_label={true}

@@ -37,12 +37,26 @@
          $nodeValue = option
      }
  }
+
+ let gradient: string = ""
+ let elem: HTMLDivElement = null;
+
+ $: if (elem && node !== null && option !== null && (!$propsChanged || $propsChanged)) {
+     const slider = elem.querySelector("input[type='range']") as any
+     //const range_selectors = "[id$='_clone']:is(input[type='range'])";
+     let spacing = ((slider.step / ( slider.max - slider.min )) * 100.0);
+     let tsp = 'max(3px, calc('+spacing+'% - 2px))';
+     let fsp = 'max(4px, calc('+spacing+'% + 0px))';
+     const style = elem.style;
+     style.setProperty('--ae-slider-bg-overlay', 'repeating-linear-gradient( 90deg, transparent, transparent '+tsp+', var(--ae-input-border-color) '+tsp+', var(--ae-input-border-color) '+fsp+' )');
+ }
 </script>
 
-<div class="wrapper gr-range">
+<div class="wrapper gradio-slider" bind:this={elem}>
     {#if node !== null && option !== null}
         <Range
             bind:value={option}
+            disabled={widget.attrs.disabled}
             minimum={node.properties.min}
             maximum={node.properties.max}
             step={node.properties.step}

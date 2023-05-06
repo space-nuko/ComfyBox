@@ -94,9 +94,9 @@ export class ComfySelectorTwo extends ComfyGraphNode {
         ctx.fillStyle = "#AFB";
         var y = (this.selected + 1) * LiteGraph.NODE_SLOT_HEIGHT + 6;
         ctx.beginPath();
-        ctx.moveTo(50, y);
-        ctx.lineTo(50, y + LiteGraph.NODE_SLOT_HEIGHT);
-        ctx.lineTo(34, y + LiteGraph.NODE_SLOT_HEIGHT * 0.5);
+        ctx.moveTo(65, y);
+        ctx.lineTo(65, y + LiteGraph.NODE_SLOT_HEIGHT);
+        ctx.lineTo(49, y + LiteGraph.NODE_SLOT_HEIGHT * 0.5);
         ctx.fill();
     };
 

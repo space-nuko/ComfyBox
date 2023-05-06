@@ -3,9 +3,10 @@
  import { get } from "svelte/store";
  import { Pane, Splitpanes } from 'svelte-splitpanes';
  import { Button } from "@gradio/button";
+ import { BlockTitle } from "@gradio/atoms";
  import ComfyUIPane from "./ComfyUIPane.svelte";
  import ComfyApp, { type SerializedAppState } from "./ComfyApp";
- import { Checkbox } from "@gradio/form"
+ import { Checkbox, TextBox } from "@gradio/form"
  import uiState from "$lib/stores/uiState";
  import layoutState from "$lib/stores/layoutState";
  import { ImageViewer } from "$lib/ImageViewer";
@@ -16,6 +17,7 @@
  import { LGraph } from "@litegraph-ts/core";
  import LightboxModal from "./LightboxModal.svelte";
  import ComfyQueue from "./ComfyQueue.svelte";
+ import ComfyProperties from "./ComfyProperties.svelte";
  import queueState from "$lib/stores/queueState";
 
  export let app: ComfyApp = undefined;
@@ -23,9 +25,11 @@
  let queue: ComfyQueue = undefined;
  let mainElem: HTMLDivElement;
  let uiPane: ComfyUIPane = undefined;
+ let props: ComfyProperties = undefined;
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
  let hasShownUIHelpToast: boolean = false;
+ let uiTheme: string = "anapnoe";
 
  let debugLayout: boolean = false;
 
@@ -43,7 +47,8 @@
 
  function queuePrompt() {
      console.log("Queuing!");
-     app.queuePrompt(0, 1);
+     const workflow = $layoutState.attrs.defaultSubgraph;
+     app.queuePrompt(0, 1, workflow);
  }
 
  $: if (app?.lCanvas) app.lCanvas.allow_dragnodes = !$uiState.nodesLocked;
@@ -52,11 +57,11 @@
  $: if ($uiState.uiEditMode)
      $layoutState.currentSelection = []
 
- let graphSize = null;
+ let graphSize = 0;
 
  function toggleGraph() {
      if (graphSize == 0) {
-         graphSize = 100;
+         graphSize = 50;
          app.resizeCanvas();
      }
      else {
@@ -64,15 +69,27 @@
      }
  }
 
- let sidebarSize = 20;
+ let propsSidebarSize = 0; //15;
 
- function toggleSidebar() {
-     if (sidebarSize == 0) {
-         sidebarSize = 20;
+ function toggleProps() {
+     if (propsSidebarSize == 0) {
+         propsSidebarSize = 15;
          app.resizeCanvas();
      }
      else {
-         sidebarSize = 0;
+         propsSidebarSize = 0;
+     }
+ }
+
+ let queueSidebarSize = 15;
+
+ function toggleQueue() {
+     if (queueSidebarSize == 0) {
+         queueSidebarSize = 15;
+         app.resizeCanvas();
+     }
+     else {
+         queueSidebarSize = 0;
      }
  }
 
@@ -141,6 +158,8 @@
      (window as any).app = app;
      (window as any).appPane = uiPane;
 
+     await import('../../scss/ux.scss');
+
      refreshView();
  })
 
@@ -149,10 +168,21 @@
  }
 </script>
 
+<svelte:head>
+    {#if uiTheme === "anapnoe"}
+        <link rel="stylesheet" href="/src/scss/ux.scss">
+    {/if}
+</svelte:head>
+
 <div id="main">
     <div id="dropzone" class="dropzone"></div>
     <div id="container" bind:this={containerElem}>
         <Splitpanes theme="comfy" on:resize={refreshView}>
+            <Pane bind:size={propsSidebarSize}>
+                <div class="sidebar-wrapper pane-wrapper">
+                    <ComfyProperties bind:this={props} />
+                </div>
+            </Pane>
             <Pane>
                 <Splitpanes theme="comfy" on:resize={refreshView} horizontal="{true}">
                     <Pane>
@@ -165,7 +195,7 @@
                     </Pane>
                 </Splitpanes>
             </Pane>
-            <Pane bind:size={sidebarSize}>
+            <Pane bind:size={queueSidebarSize}>
                 <div class="sidebar-wrapper pane-wrapper">
                     <ComfyQueue bind:this={queue} />
                 </div>
@@ -174,13 +204,16 @@
     </div>
     <div id="bottombar">
         <Button variant="primary" on:click={queuePrompt}>
-            Run
+            Queue Prompt
         </Button>
         <Button variant="secondary" on:click={toggleGraph}>
             Toggle Graph
         </Button>
-        <Button variant="secondary" on:click={toggleSidebar}>
-            Toggle Sidebar
+        <Button variant="secondary" on:click={toggleProps}>
+            Toggle Props
+        </Button>
+        <Button variant="secondary" on:click={toggleQueue}>
+            Toggle Queue
         </Button>
         <Button variant="secondary" on:click={doSave}>
             Save
@@ -197,14 +230,23 @@
         <Button variant="secondary" on:click={doRefreshCombos}>
             🔄
         </Button>
-        <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
-        <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/>
+        <!-- <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
+             <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/> -->
         <Checkbox label="Auto-Add UI" bind:value={$uiState.autoAddUI}/>
-        <label for="enable-ui-editing">Enable UI Editing</label>
-        <select id="enable-ui-editing" name="enable-ui-editing" bind:value={$uiState.uiEditMode}>
-            <option value="disabled">Disabled</option>
-            <option value="widgets">Widgets</option>
-        </select>
+        <label class="label" for="enable-ui-editing">
+            <BlockTitle>Enable UI Editing</BlockTitle>
+            <select id="enable-ui-editing" name="enable-ui-editing" bind:value={$uiState.uiEditMode}>
+                <option value="disabled">Disabled</option>
+                <option value="widgets">Widgets</option>
+            </select>
+        </label>
+        <label class="label" for="ui-theme">
+            <BlockTitle>Theme</BlockTitle>
+            <select id="ui-theme" name="ui-theme" bind:value={uiTheme}>
+                <option value="">None</option>
+                <option value="anapnoe">Anapnoe</option>
+            </select>
+        </label>
     </div>
     <LightboxModal />
 </div>
@@ -213,7 +255,7 @@
 
 <style lang="scss">
  #container {
-     height: calc(100vh - 60px);
+     height: calc(100vh - 70px);
      max-width: 100vw;
      display: grid;
      width: 100%;
@@ -293,7 +335,7 @@
  }
 
  :global(.splitpanes.comfy) {
-     max-height: calc(100vh - 60px);
+     max-height: calc(100vh - 70px);
      max-width: 100vw;
  }
 
@@ -303,5 +345,9 @@
      align-items: center;
      display: flex;
      position: relative;
+ }
+
+ label.label > :global(span) {
+     top: 20%;
  }
 </style>
