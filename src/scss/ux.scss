@@ -856,3 +856,23 @@ input[type=range]::-ms-fill-upper {
         color: var(--ae-input-color) !important;
     }
 }
+
+.unlock-button {
+    > .lg {
+        border-color: var(--ae-subpanel-border-color) !important;
+    }
+    &:hover svg {
+        color: var(--ae-main-bg-color) !important;
+    }
+    svg {
+        color: var(--ae-input-color) !important;
+    }
+    &.toggled {
+        svg {
+            color: var(--ae-icon-color) !important;
+        }
+        &:hover svg {
+            color: var(--ae-main-bg-color) !important;
+        }
+    }
+}

@@ -20,6 +20,7 @@
  import ComfyProperties from "./ComfyProperties.svelte";
  import queueState from "$lib/stores/queueState";
  import ComfyUnlockUIButton from "./ComfyUnlockUIButton.svelte";
+	import ComfyGraphView from "./ComfyGraphView.svelte";
 
  export let app: ComfyApp = undefined;
  let imageViewer: ImageViewer;
@@ -59,6 +60,7 @@
      $layoutState.currentSelection = []
 
  let graphSize = 0;
+ let graphTransitioning = false;
 
  function toggleGraph() {
      if (graphSize == 0) {
@@ -121,10 +123,6 @@
      }
  }
 
- function doRecenter(): void {
-     app.lCanvas.recenter();
- }
-
  $: if ($uiState.uiUnlocked && !hasShownUIHelpToast) {
      hasShownUIHelpToast = true;
      toast.push("Right-click to open context menu.")
@@ -145,11 +143,18 @@
  }
 
  $: if (containerElem) {
-     let wrappers = containerElem.querySelectorAll<HTMLDivElement>(".pane-wrapper")
-     for (const wrapper of wrappers) {
-         const paneNode = wrapper.parentNode as HTMLElement; // get the node inside the <Pane/>
-         paneNode.ontransitionend = () => {
-             app.resizeCanvas()
+     const canvas = containerElem.querySelector<HTMLDivElement>("#graph-canvas")
+     if (canvas) {
+         console.warn("reg!");
+         const paneNode = canvas.closest(".splitpanes__pane")
+         if (paneNode) {
+             (paneNode as HTMLElement).ontransitionstart = () => {
+                 graphTransitioning = true
+             }
+             (paneNode as HTMLElement).ontransitionend = () => {
+                 graphTransitioning = false
+                 app.resizeCanvas()
+             }
          }
      }
  }
@@ -190,9 +195,7 @@
                         <ComfyUIPane bind:this={uiPane} {app} />
                     </Pane>
                     <Pane bind:size={graphSize}>
-                        <div class="canvas-wrapper pane-wrapper">
-                            <canvas id="graph-canvas" />
-                        </div>
+                        <ComfyGraphView {app} transitioning={graphTransitioning} />
                     </Pane>
                 </Splitpanes>
             </Pane>
@@ -225,9 +228,6 @@
             </Button>
             <Button variant="secondary" on:click={doLoadDefault}>
                 Load Default
-            </Button>
-            <Button variant="secondary" on:click={doRecenter}>
-                Recenter
             </Button>
             <Button variant="secondary" on:click={doRefreshCombos}>
                 🔄
@@ -273,15 +273,6 @@
      height: 100vh;
  }
 
- #comfy-ui {
- }
-
- #comfy-graph {
- }
-
- #graph-canvas {
- }
-
  #bottombar {
      padding-top: 0.5em;
      display: flex;
@@ -300,12 +291,6 @@
      > .right {
          margin-left: auto
      }
- }
-
- .canvas-wrapper {
-     width: 100%;
-     height: 100%;
-     background-color: #333;
  }
 
  .sidebar-wrapper {

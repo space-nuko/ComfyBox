@@ -9,7 +9,7 @@
  }
 </script>
 
-<div class="wrapper button lg" class:toggled>
+<div class="unlock-button" class:toggled>
     <Button on:click={toggle} variant={toggled ? "primary" : "secondary"}>
         {#if toggled}
             <LockOpen2 />
@@ -20,7 +20,7 @@
 </div>
 
 <style lang="scss">
- .wrapper {
+ .unlock-button {
      display: inline-flex;
      width: var(--size-12);
      height: var(--size-12);

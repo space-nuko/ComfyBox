@@ -65,7 +65,7 @@
  }
 
  function validNodeProperty(spec: AttributesSpec, node: LGraphNode | null): boolean {
-     if (node == null)
+     if (node == null || spec.location !== "nodeProps")
          return false;
 
      if (spec.canShow && !spec.canShow(node))
@@ -77,13 +77,33 @@
      return spec.name in node.properties
  }
 
+ function validNodeVar(spec: AttributesSpec, node: LGraphNode | null): boolean {
+     if (node == null || spec.location !== "nodeVars")
+         return false;
+
+     if (spec.canShow && !spec.canShow(node))
+         return false;
+
+     if (spec.validNodeTypes) {
+         return spec.validNodeTypes.indexOf(node.type) !== -1;
+     }
+     return spec.name in node
+ }
+
  function validWidgetAttribute(spec: AttributesSpec, widget: IDragItem | null): boolean {
-     if (widget == null)
+     if (widget == null || spec.location !== "widget")
          return false;
      if (spec.canShow)
          return spec.canShow(widget);
 
      return spec.name in widget.attrs
+ }
+
+ function validWorkflowAttribute(spec: AttributesSpec): boolean {
+     if (spec.location !== "workflow")
+         return false;
+
+     return spec.name in $layoutState.attrs
  }
 
  function getAttribute(target: IDragItem, spec: AttributesSpec): any {
@@ -200,7 +220,7 @@
                     </span>
                 </div>
                 {#each category.specs as spec(spec.id)}
-                    {#if spec.location === "widget" && validWidgetAttribute(spec, target)}
+                    {#if validWidgetAttribute(spec, target)}
                         <div class="props-entry">
                             {#if spec.type === "string"}
                                 <TextBox
@@ -237,7 +257,7 @@
                             {/if}
                         </div>
                     {:else if node}
-                        {#if spec.location === "nodeProps" && validNodeProperty(spec, node)}
+                        {#if validNodeProperty(spec, node)}
                             <div class="props-entry">
                                 {#if spec.type === "string"}
                                     <TextBox
@@ -273,7 +293,7 @@
                                                     />
                                 {/if}
                             </div>
-                        {:else if spec.location === "nodeVars" && spec.name in node}
+                        {:else if validNodeVar(spec, node)}
                             <div class="props-entry">
                                 {#if spec.type === "string"}
                                     <TextBox
@@ -310,7 +330,7 @@
                                 {/if}
                             </div>
                         {/if}
-                    {:else if spec.location === "workflow" && spec.name in $layoutState.attrs}
+                    {:else if !node && !target && validWorkflowAttribute(spec)}
                         <div class="props-entry">
                             {#if spec.type === "string"}
                                 <TextBox

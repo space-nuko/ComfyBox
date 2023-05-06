@@ -106,6 +106,8 @@ export default class ComfyApp {
         LiteGraph.release_link_on_empty_shows_menu = true;
         LiteGraph.alt_drag_do_clone_nodes = true;
 
+        (window as any).LiteGraph = LiteGraph;
+
         // await this.#invokeExtensionsAsync("init");
         await this.registerNodes();
 
