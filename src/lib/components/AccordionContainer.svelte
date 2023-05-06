@@ -49,7 +49,7 @@
 
 {#if container && children}
     <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')} z-index{zIndex}"
-         class:hide-block={container.attrs.blockVariant === "hidden"}
+         class:hide-block={container.attrs.containerVariant === "hidden"}
          class:selected={$uiState.uiUnlocked && $layoutState.currentSelection.includes(container.id)}
          class:root-container={zIndex === 0}
          class:is-executing={container.isNodeExecuting}

@@ -4560,7 +4560,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: false,
             direction: "horizontal",
             classes: "",
-            blockVariant: "block",
+            containerVariant: "block",
             hidden: false,
             flexGrow: 100,
             disabled: false
@@ -4580,7 +4580,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: false,
             direction: "vertical",
             classes: "",
-            blockVariant: "block",
+            containerVariant: "block",
             hidden: false,
             flexGrow: 100,
             disabled: false
@@ -4605,7 +4605,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: false,
             direction: "vertical",
             classes: "",
-            blockVariant: "block",
+            containerVariant: "block",
             hidden: false,
             flexGrow: 100,
             disabled: false
@@ -4736,7 +4736,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "vertical",
             classes: "",
-            blockVariant: "block",
+            containerVariant: "block",
             hidden: false,
             flexGrow: 100,
             disabled: false
@@ -4776,7 +4776,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "horizontal",
             classes: "",
-            blockVariant: "hidden",
+            containerVariant: "hidden",
             hidden: false,
             flexGrow: 100,
             disabled: false
@@ -4869,7 +4869,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "vertical",
             classes: "",
-            blockVariant: "block",
+            containerVariant: "block",
             hidden: false,
             flexGrow: 100,
             disabled: false
@@ -4908,7 +4908,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "horizontal",
             classes: "",
-            blockVariant: "block",
+            containerVariant: "block",
             hidden: true,
             flexGrow: 100,
             disabled: false
@@ -4962,7 +4962,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "horizontal",
             classes: "",
-            blockVariant: "hidden",
+            containerVariant: "hidden",
             hidden: false,
             flexGrow: 100,
             disabled: false
@@ -4984,7 +4984,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "horizontal",
             classes: "",
-            blockVariant: "hidden",
+            containerVariant: "hidden",
             hidden: false,
             flexGrow: 100,
             disabled: false
@@ -5023,7 +5023,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: false,
             direction: "horizontal",
             classes: "",
-            blockVariant: "hidden",
+            containerVariant: "hidden",
             hidden: false,
             flexGrow: 100,
             disabled: false
@@ -5044,7 +5044,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "horizontal",
             classes: "",
-            blockVariant: "hidden",
+            containerVariant: "hidden",
             hidden: false,
             flexGrow: 100,
             disabled: false
@@ -5116,7 +5116,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "vertical",
             classes: "",
-            blockVariant: "block",
+            containerVariant: "block",
             flexGrow: 100,
             disabled: false
           }
@@ -5136,7 +5136,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "horizontal",
             classes: "",
-            blockVariant: "block",
+            containerVariant: "block",
             flexGrow: 100,
             disabled: false
           }
@@ -5241,7 +5241,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "horizontal",
             classes: "",
-            blockVariant: "hidden",
+            containerVariant: "hidden",
             flexGrow: 100,
             disabled: false
           }
@@ -5261,7 +5261,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "horizontal",
             classes: "",
-            blockVariant: "hidden",
+            containerVariant: "hidden",
             flexGrow: 100,
             disabled: false
           }
@@ -5331,7 +5331,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "vertical",
             classes: "",
-            blockVariant: "block",
+            containerVariant: "block",
             flexGrow: 100
           }
         },
@@ -5353,7 +5353,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "horizontal",
             classes: "",
-            blockVariant: "hidden",
+            containerVariant: "hidden",
             flexGrow: 100
           }
         },
@@ -5372,7 +5372,7 @@ const defaultGraph: SerializedAppState = {
             showTitle: true,
             direction: "horizontal",
             classes: "",
-            blockVariant: "hidden",
+            containerVariant: "hidden",
             flexGrow: 100
           }
         },

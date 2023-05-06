@@ -84,8 +84,12 @@
 {/if}
 
 <style lang="scss">
- .widget.selected {
-     background: var(--color-yellow-200);
+ .widget {
+     height: 100%;
+
+     &.selected {
+         background: var(--color-yellow-200);
+     }
  }
  .container.selected {
      background: var(--color-yellow-400);

@@ -35,7 +35,7 @@
             disabled={widget.attrs.disabled}
             lines={node.properties.multiline ? 5 : 1}
             max_lines={node.properties.multiline ? 5 : 1}
-            show_label={true}
+            show_label={widget.attrs.title !== ""}
             on:change
             on:submit
             on:blur
@@ -48,5 +48,9 @@
  .wrapper {
      padding: 2px;
      width: 100%;
+ }
+
+ :global(span.hide) {
+     display: none;
  }
 </style>

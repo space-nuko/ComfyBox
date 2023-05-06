@@ -489,7 +489,8 @@ LiteGraph.registerNodeType({
 })
 
 export interface ComfyButtonProperties extends ComfyWidgetProperties {
-    message: string
+    message: string,
+    variant: string
 }
 
 export class ComfyButtonNode extends ComfyWidgetNode<boolean> {

@@ -6,61 +6,233 @@ import { dndzone, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 import type { ComfyWidgetNode } from '$lib/nodes';
 
 type DragItemEntry = {
+    /*
+     * Drag item.
+     */
     dragItem: IDragItem,
+
+    /*
+     * Children of this drag item.
+     * Only applies if the drag item's type is "container"
+     */
     children: IDragItem[] | null,
+
+    /*
+     * Parent of this drag item.
+     */
     parent: IDragItem | null
 }
 
+/*
+ * Global workflow attributes
+ */
 export type LayoutAttributes = {
+    /*
+     * Default subgraph to run when the "Queue Prompt" button in the bottom bar
+     * is pressed.
+     *
+     * If it's an empty string, all backend nodes will be included in the prompt
+     * instead.
+     */
     defaultSubgraph: string
 }
 
+/*
+ * Keeps track of the tree of UI components - widgets and the containers that
+ * group them together.
+ */
 export type LayoutState = {
+    /*
+     * Root of the UI tree
+     */
     root: IDragItem | null,
+
+    /*
+     * All items indexed by their own ID
+     */
     allItems: Record<DragItemID, DragItemEntry>,
+
+    /*
+     * Items indexed by the litegraph node they're bound to
+     * Only contains drag items of type "widget"
+     */
     allItemsByNode: Record<number, DragItemEntry>,
+
+    /*
+     * Next ID to use for instantiating a new drag item
+     */
     currentId: number,
+
+    /*
+     * Selected drag items.
+     */
     currentSelection: DragItemID[],
+
+    /*
+     * Selected LGraphNodes inside the litegraph canvas.
+     */
     currentSelectionNodes: LGraphNode[],
+
+    /*
+     * If true, a saved workflow is being deserialized, so ignore any
+     * nodeAdded/nodeRemoved events.
+     *
+     * TODO: instead use LGraphAddNodeOptions.addedByDeserialize
+     */
     isConfiguring: boolean,
+
+    /*
+     * If true, the right-click context menu is open
+     */
     isMenuOpen: boolean,
+
+    /*
+     * Global workflow attributes
+     */
     attrs: LayoutAttributes
 }
 
+/**
+ * Attributes for both containers and nodes, or containers only.
+ * If the attribute can be applicable to both, then it should go here.
+ * If it only applies to a container it should go here too.
+ * If it only applies to a node it should be placed in its LGraphNode.properties (nodeProps) instead.
+ **/
 export type Attributes = {
+    /*
+     * Flex direction for containers.
+     */
     direction: "horizontal" | "vertical",
+
+    /*
+     * Display name of this item.
+     */
     title: string,
+
+    /*
+     * If false, hide the title.
+     */
     showTitle: boolean,
+
+    /*
+     * List of classes to apply to the component.
+     */
     classes: string,
-    blockVariant?: "block" | "hidden",
+
+    /*
+     * Variant for containers. "hidden" hides margin/borders.
+     */
+    containerVariant?: "block" | "hidden",
+
+    /*
+     * If true, don't show this component in the UI
+     */
     hidden?: boolean,
+
+    /*
+     * If true, grey out this component in the UI
+     */
     disabled?: boolean,
+
+    /*
+     * CSS Flex grow
+     */
     flexGrow?: number,
 
-    /** Display variant for widgets/containers (e.g. number widget can act as slider/knob/dial) */
+    /**
+     * Display variant for widgets/containers (e.g. number widget can act as slider/knob/dial)
+     * Valid values depend on the widget in question.
+     */
     variant?: string,
 
+    /*************************************/
+    /* Special attributes for containers */
+    /*************************************/
+
+    // Accordion
     openOnStartup?: boolean
 }
 
 export type AttributesSpec = {
-    id?: number, // for svelte keyed each
+    /*
+     * ID necessary for svelte's keyed each, autoset at the top level in this source file.
+     */
+    id?: number,
+
+    /*
+     * Attribute name. Corresponds to the name of the instance variable in the
+     * hashmap/class instance, which depends on `location`.
+     */
     name: string,
-    type: string,
+
+    /*
+     * Type of this attribute.
+     * If you want to support a custom type, use "string" combined with
+     * `serialize` and `deserialize`.
+     */
+    type: "string" | "enum" | "number" | "boolean",
+
+    /*
+     * Location of this attribute.
+     * - "widget":    inside IDragNode.attrs
+     * - "nodeProps": inside LGraphNode.properties
+     * - "nodeVars":  an instance variable directly on an LGraphNode
+     * - "workflow":  inside $layoutState.attrs
+     */
     location: "widget" | "nodeProps" | "nodeVars" | "workflow"
+
+    /*
+     * Can this attribute be edited in the properties pane.
+     */
     editable: boolean,
+
+    /*
+     * Default value to supply to this attribute if it is null when the properties pane is opened.
+     * NOTE: This means that any attribute can't have a default null value!
+     */
     defaultValue: any,
 
+    /*
+     * If `type` is "enum", the valid values for the combo widget.
+     */
     values?: string[],
-    hidden?: boolean,
+
+    /*
+     * Valid `LGraphNode.type`s this property applies to if it's located in a node.
+     * These are like "ui/button", "ui/slider".
+     */
     validNodeTypes?: string[],
 
+    /*
+     * Callback: if false, don't show the property in the pane.
+     * Useful if you need to show the property based on another property.
+     * Example: If the IDragItem is a container (not a widget), show its flex `direction`.
+     */
     canShow?: (arg: IDragItem | LGraphNode) => boolean,
+
+    /*
+     * If the type of this spec is "string", but the underlying type is something else,
+     * convert the value to a string here so it can be edited in the textbox.
+     */
     serialize?: (arg: any) => string,
+
+    /*
+     * If the type of this spec is "string", but the underlying type is something else,
+     * convert the textbox value into the underlying value.
+     */
     deserialize?: (arg: string) => any,
+
+    /*
+     * If true, when this property is changed the properties pane will be rebuilt.
+     * This should be used if there's a canShow dependent on this property so
+     * the pane can be updated with the new list of valid properties.
+     */
     refreshPanelOnChange?: boolean
 }
 
+/*
+ * A list of `AttributesSpec`s grouped under a category.
+ */
 export type AttributesCategorySpec = {
     categoryName: string,
     specs: AttributesSpec[]
@@ -75,6 +247,10 @@ const deserializeStringArray = (arg: string) => {
     return arg.split(",").map(s => s.trim())
 }
 
+/*
+ * Attributes that will show up in the properties panel.
+ * Their order in the list is the order they'll appear in the panel.
+ */
 const ALL_ATTRIBUTES: AttributesSpecList = [
     {
         categoryName: "appearance",
@@ -136,7 +312,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 refreshPanelOnChange: true
             },
             {
-                name: "blockVariant",
+                name: "containerVariant",
                 type: "enum",
                 location: "widget",
                 editable: true,
@@ -218,6 +394,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
     }
 ];
 
+// This is needed so the specs can be iterated with svelte's keyed #each.
 let i = 0;
 for (const cat of Object.values(ALL_ATTRIBUTES)) {
     for (const val of Object.values(cat.specs)) {
@@ -228,20 +405,54 @@ for (const cat of Object.values(ALL_ATTRIBUTES)) {
 
 export { ALL_ATTRIBUTES };
 
+/*
+ * Something that can be dragged around in the frontend - a widget or a container.
+ */
 export interface IDragItem {
-    type: string,
+    /*
+     * Type of the item.
+     */
+    type: "container" | "widget",
+
+    /*
+     * Unique ID of the item.
+     */
     id: DragItemID,
+
+    /*
+     * If true, the node associated with this drag item is executing.
+     * Used to show an indicator on the widget/container.
+     */
     isNodeExecuting?: boolean,
+
+    /*
+     * Attributes for this drag item.
+     */
     attrs: Attributes,
+
+    /*
+     * Hackish thing to indicate to Svelte that an attribute changed.
+     * TODO Use Writeable<Attributes> instead!
+     */
     attrsChanged: Writable<boolean>
 }
 
+/*
+ * A container (block, accordion, tabs). Has child drag items.
+ */
 export interface ContainerLayout extends IDragItem {
     type: "container",
 }
 
+/*
+ * A widget (slider, dropdown, textbox...)
+ */
 export interface WidgetLayout extends IDragItem {
     type: "widget",
+
+    /*
+     * litegraph node this widget is bound to.
+     */
     node: ComfyWidgetNode
 }
 
@@ -310,7 +521,7 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
             showTitle: true,
             direction: "vertical",
             classes: "",
-            blockVariant: "block",
+            containerVariant: "block",
             flexGrow: 100,
             ...attrs
         }
@@ -371,23 +582,10 @@ function nodeAdded(node: LGraphNode) {
 
     const parent = findDefaultContainerForInsertion();
 
-    // Two cases where we want to add nodes:
-    // 1. User adds a new UI node, so we should instantiate its widget in the frontend.
-    // 2. User adds a node with inputs that can be filled by frontend widgets.
-    // Depending on config, this means we should instantiate default UI nodes connected to those inputs.
-
-    console.debug(node)
+    console.debug("[layoutState] nodeAdded", node)
     if ("svelteComponentType" in node) {
         addWidget(parent, node as ComfyWidgetNode);
     }
-
-    // Add default node panel with all widgets autoinstantiated
-    // if (node.widgets && node.widgets.length > 0) {
-    //     const container = addContainer(parent.id, { title: node.title, direction: "vertical", associatedNode: node.id });
-    //     for (const widget of node.widgets) {
-    //         addWidget(container.id, node, widget, { associatedNode: node.id });
-    //     }
-    // }
 }
 
 function removeEntry(state: LayoutState, id: DragItemID) {
