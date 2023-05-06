@@ -3,12 +3,25 @@ import { defineConfig } from 'vitest/config';
 import { resolve } from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import FullReload from 'vite-plugin-full-reload';
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 export default defineConfig({
     clearScreen: false,
     plugins: [
         FullReload(["src/**/*.{js,ts,svelte}"]),
-        svelte(),
+        svelte(), ,
+        viteStaticCopy({
+            targets: [
+                {
+                    src: 'bin/run.sh',
+                    dest: './'
+                },
+                {
+                    src: 'bin/run.bat',
+                    dest: './'
+                }
+            ]
+        })
     ],
     resolve: {
         alias: {

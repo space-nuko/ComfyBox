@@ -125,6 +125,9 @@ importers:
       vite:
         specifier: ^4.3.1
         version: 4.3.1(sass@1.61.0)
+      vite-plugin-static-copy:
+        specifier: ^0.14.0
+        version: 0.14.0(vite@4.3.1)
       vite-tsconfig-paths:
         specifier: ^4.0.8
         version: 4.0.8(typescript@5.0.3)(vite@4.3.1)
@@ -7083,6 +7086,19 @@ packages:
       picomatch: 2.3.1
       vite: 4.3.1(sass@1.61.0)
     dev: false
+
+  /vite-plugin-static-copy@0.14.0(vite@4.3.1):
+    resolution: {integrity: sha512-RMFmb4czomcrsbQBiUZs9HcDGN3kxGvF+OrtkfTVocp12CuoUCuJQhcY26RK35A6KS4WasGzEwcYZqHMjkAvVw==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    peerDependencies:
+      vite: ^3.0.0 || ^4.0.0
+    dependencies:
+      chokidar: 3.5.3
+      fast-glob: 3.2.12
+      fs-extra: 11.1.1
+      picocolors: 1.0.0
+      vite: 4.3.1(sass@1.61.0)
+    dev: true
 
   /vite-tsconfig-paths@4.0.8(typescript@5.0.3)(vite@4.3.1):
     resolution: {integrity: sha512-p04zH+Ey+NT78571x0pdX7nVRIJSlmKVvYryFglSWOK3Hc72eDL0+JJfbyQiugaIBApJkaEqbBQvqpsFZOSVGg==}
