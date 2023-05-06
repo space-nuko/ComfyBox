@@ -158,6 +158,7 @@
                                 value={target.attrs[spec.name] || spec.defaultValue}
                                 on:change={(e) => updateAttribute(spec, target, e.detail)}
                                 on:input={(e) => updateAttribute(spec, target, e.detail)}
+                                disabled={!$uiState.uiUnlocked || !spec.editable}
                                 label={spec.name}
                                 max_lines={1}
                                 />
@@ -165,6 +166,7 @@
                                 <Checkbox
                                     value={target.attrs[spec.name] || spec.defaultValue}
                                     on:change={(e) => updateAttribute(spec, target, e.detail)}
+                                    disabled={!$uiState.uiUnlocked || !spec.editable}
                                     label={spec.name}
                                     />
                         {:else if spec.type === "number"}
@@ -172,6 +174,7 @@
                                         name={spec.name}
                                         value={target.attrs[spec.name] || spec.defaultValue}
                                         step={1}
+                                        disabled={!$uiState.uiUnlocked || !spec.editable}
                                         on:change={(e) => updateAttribute(spec, target, e.detail)}
                                         />
                         {:else if spec.type === "enum"}
@@ -179,6 +182,7 @@
                                             name={spec.name}
                                             value={target.attrs[spec.name] || spec.defaultValue}
                                             values={spec.values}
+                                            disabled={!$uiState.uiUnlocked || !spec.editable}
                                             on:change={(e) => updateAttribute(spec, target, e.detail)}
                                             />
                         {/if}
@@ -192,12 +196,14 @@
                                     on:change={(e) => updateProperty(spec, e.detail)}
                                     on:input={(e) => updateProperty(spec, e.detail)}
                                     label={spec.name}
+                                    disabled={!$uiState.uiUnlocked || !spec.editable}
                                     max_lines={1}
                                     />
                             {:else if spec.type === "boolean"}
                                     <Checkbox
                                         value={node.properties[spec.name] || spec.defaultValue}
                                         label={spec.name}
+                                        disabled={!$uiState.uiUnlocked || !spec.editable}
                                         on:change={(e) => updateProperty(spec, e.detail)}
                                         />
                             {:else if spec.type === "number"}
@@ -205,6 +211,7 @@
                                             name={spec.name}
                                             value={node.properties[spec.name] || spec.defaultValue}
                                             step={1}
+                                            disabled={!$uiState.uiUnlocked || !spec.editable}
                                             on:change={(e) => updateProperty(spec, e.detail)}
                                             />
                             {:else if spec.type === "enum"}
@@ -212,6 +219,7 @@
                                                 name={spec.name}
                                                 value={node.properties[spec.name] || spec.defaultValue}
                                                 values={spec.values}
+                                                disabled={!$uiState.uiUnlocked || !spec.editable}
                                                 on:change={(e) => updateProperty(spec, e.detail)}
                                                 />
                             {/if}
@@ -224,12 +232,14 @@
                                     on:change={(e) => updateVar(spec, e.detail)}
                                     on:input={(e) => updateVar(spec, e.detail)}
                                     label={spec.name}
+                                    disabled={!$uiState.uiUnlocked || !spec.editable}
                                     max_lines={1}
                                     />
                             {:else if spec.type === "boolean"}
                                     <Checkbox
                                         value={getVar(node, spec)}
                                         on:change={(e) => updateVar(spec, e.detail)}
+                                        disabled={!$uiState.uiUnlocked || !spec.editable}
                                         label={spec.name}
                                         />
                             {:else if spec.type === "number"}
@@ -237,6 +247,7 @@
                                             name={spec.name}
                                             value={getVar(node, spec)}
                                             step={1}
+                                            disabled={!$uiState.uiUnlocked || !spec.editable}
                                             on:change={(e) => updateVar(spec, e.detail)}
                                             />
                             {:else if spec.type === "enum"}
@@ -244,6 +255,7 @@
                                                 name={spec.name}
                                                 value={getVar(node, spec)}
                                                 values={spec.values}
+                                                disabled={!$uiState.uiUnlocked || !spec.editable}
                                                 on:change={(e) => updateVar(spec, e.detail)}
                                                 />
                             {/if}
@@ -257,12 +269,14 @@
                                 on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
                                 on:input={(e) => updateWorkflowAttribute(spec, e.detail)}
                                 label={spec.name}
+                                disabled={!$uiState.uiUnlocked || !spec.editable}
                                 max_lines={1}
                                 />
                         {:else if spec.type === "boolean"}
                                 <Checkbox
                                     value={$layoutState.attrs[spec.name] || spec.defaultValue}
                                     on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
+                                    disabled={!$uiState.uiUnlocked || !spec.editable}
                                     label={spec.name}
                                     />
                         {:else if spec.type === "number"}
@@ -270,6 +284,7 @@
                                         name={spec.name}
                                         value={$layoutState.attrs[spec.name] || spec.defaultValue}
                                         step={1}
+                                        disabled={!$uiState.uiUnlocked || !spec.editable}
                                         on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
                                         />
                         {:else if spec.type === "enum"}
@@ -277,6 +292,7 @@
                                             name={spec.name}
                                             value={$layoutState.attrs[spec.name] || spec.defaultValue}
                                             values={spec.values}
+                                            disabled={!$uiState.uiUnlocked || !spec.editable}
                                             on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
                                             />
                         {/if}

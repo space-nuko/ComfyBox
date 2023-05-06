@@ -5,6 +5,7 @@
  export let value: string = "";
  export let values: string[] = [""];
  export let name: string = "";
+ export let disabled: boolean = false;
  let value_: string = ""
 
  $: value;
@@ -27,7 +28,7 @@
 <label class="select-wrapper">
     <BlockTitle>{name}</BlockTitle>
     <div class="select">
-        <select on:blur bind:value>
+        <select on:blur bind:value {disabled}>
             {#each values as value}
                 <option {value}>
                     {value}
@@ -52,5 +53,9 @@
 
  .select-title {
      padding: 0.2rem;
+ }
+
+ input:disabled {
+     cursor: not-allowed;
  }
 </style>

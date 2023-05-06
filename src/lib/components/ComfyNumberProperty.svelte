@@ -5,6 +5,7 @@
  export let value: number = 0;
  export let step: number = 1;
  export let name: string = "";
+ export let disabled: boolean = false;
  let value_: number = 0;
 
  $: value;
@@ -26,7 +27,7 @@
 <label class="number-wrapper">
     <BlockTitle>{name}</BlockTitle>
     <div class="number">
-        <input type="number" bind:value {step}>
+        <input type="number" bind:value {step} {disabled}>
     </div>
 </label>
 
@@ -41,5 +42,8 @@
              width: 100%
          }
      }
+ }
+ input[disabled] {
+     cursor: not-allowed;
  }
 </style>
