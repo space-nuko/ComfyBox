@@ -93,10 +93,7 @@ export type LayoutState = {
 }
 
 /**
- * Attributes for both containers and nodes, or containers only.
- * If the attribute can be applicable to both, then it should go here.
- * If it only applies to a container it should go here too.
- * If it only applies to a node it should be placed in its LGraphNode.properties (nodeProps) instead.
+ * Attributes for both containers and nodes.
  **/
 export type Attributes = {
     /*
@@ -135,6 +132,11 @@ export type Attributes = {
     disabled?: boolean,
 
     /*
+     * CSS height
+     */
+    height?: string,
+
+    /*
      * CSS Flex grow
      */
     flexGrow?: number,
@@ -145,12 +147,16 @@ export type Attributes = {
      */
     variant?: string,
 
-    /*************************************/
-    /* Special attributes for containers */
-    /*************************************/
+    /*********************************************/
+    /* Special attributes for widgets/containers */
+    /*********************************************/
 
     // Accordion
     openOnStartup?: boolean
+
+    // Button
+    buttonVariant?: "primary" | "secondary",
+    buttonSize?: "large" | "small"
 }
 
 export type AttributesSpec = {
@@ -329,6 +335,26 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 editable: true,
                 defaultValue: false,
                 canShow: (di: IDragItem) => di.type === "container" && di.attrs.variant === "accordion"
+            },
+
+            // Button
+            {
+                name: "buttonVariant",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                validNodeTypes: ["ui/button"],
+                values: ["primary", "secondary"],
+                defaultValue: "primary"
+            },
+            {
+                name: "buttonSize",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                validNodeTypes: ["ui/button"],
+                values: ["large", "small"],
+                defaultValue: "large"
             },
         ]
     },

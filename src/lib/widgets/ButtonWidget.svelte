@@ -3,11 +3,11 @@
  import type { ComfySliderNode } from "$lib/nodes/index";
  import { type WidgetLayout } from "$lib/stores/layoutState";
  import { Button } from "@gradio/button";
- import { get, type Writable } from "svelte/store";
+ import { get, type Writable, writable } from "svelte/store";
  export let widget: WidgetLayout | null = null;
  let node: ComfyButtonNode | null = null;
  let nodeValue: Writable<boolean> | null = null;
- let propsChanged: Writable<number> | null = null;
+ let attrsChanged: Writable<boolean> | null = null;
 
  $: widget && setNodeValue(widget);
 
@@ -15,7 +15,7 @@
      if (widget) {
          node = widget.node as ComfyButtonNode
          nodeValue = node.value;
-         propsChanged = node.propsChanged;
+         attrsChanged = widget.attrsChanged;
      }
  };
 
@@ -24,20 +24,23 @@
  }
 
  const style = {
-     full_width: "100%"
+     full_width: "100%",
  }
 </script>
 
 <div class="wrapper gradio-button">
-    {#if node !== null}
-        <Button
-            disabled={widget.attrs.disabled}
-            on:click={onClick}
-            variant="primary"
-            {style}>
-            {widget.attrs.title}
-        </Button>
-    {/if}
+    {#key $attrsChanged}
+        {#if node !== null}
+            <Button
+                disabled={widget.attrs.disabled}
+                on:click={onClick}
+                variant={widget.attrs.buttonVariant || "primary"}
+                size={widget.attrs.buttonSize === "small" ? "sm" : "lg"}
+                {style}>
+                {widget.attrs.title}
+            </Button>
+        {/if}
+    {/key}
 </div>
 
 <style lang="scss">
