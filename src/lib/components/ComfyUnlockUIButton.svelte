@@ -9,7 +9,7 @@
  }
 </script>
 
-<div class="unlock-button" class:toggled>
+<div class="comfy-toggle-button" class:toggled>
     <Button on:click={toggle} variant={toggled ? "primary" : "secondary"}>
         {#if toggled}
             <LockOpen2 />
@@ -20,7 +20,7 @@
 </div>
 
 <style lang="scss">
- .unlock-button {
+ .comfy-toggle-button {
      display: inline-flex;
      width: var(--size-12);
      height: var(--size-12);

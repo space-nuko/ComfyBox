@@ -25,8 +25,8 @@ export class ComfyQueueEvents extends ComfyGraphNode {
     }
 
     override onPropertyChanged(property: string, value: any, prevValue?: any) {
-        if (property === "value") {
-            this.setOutputData(2, this.properties.prompt)
+        if (property === "prompt") {
+            this.setOutputData(2, value)
         }
     }
 
@@ -48,12 +48,12 @@ export class ComfyQueueEvents extends ComfyGraphNode {
     }
 
     override beforeQueued(subgraph: string | null) {
-        this.setProperty("value", null)
+        this.setProperty("prompt", null)
         this.triggerSlot(0, this.getActionParams(subgraph))
     }
 
     override afterQueued(p: SerializedPrompt, subgraph: string | null) {
-        this.setProperty("value", p)
+        this.setProperty("prompt", p)
         this.triggerSlot(1, this.getActionParams(subgraph))
     }
 
