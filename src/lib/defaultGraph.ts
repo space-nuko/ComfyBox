@@ -4,8 +4,8 @@ const defaultGraph: SerializedAppState = {
   createdBy: "ComfyBox",
   version: 1,
   workflow: {
-    last_node_id: 156,
-    last_link_id: 234,
+    last_node_id: 160,
+    last_link_id: 245,
     nodes: [
       {
         id: 33,
@@ -63,7 +63,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: "a fluffy corgi wearing sunglasses",
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 35,
@@ -121,7 +122,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: "worst quality",
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 39,
@@ -220,7 +222,8 @@ const defaultGraph: SerializedAppState = {
             type: "number",
             index: 5
           }
-        }
+        },
+        saveUserState: true
       },
       {
         id: 75,
@@ -268,17 +271,16 @@ const defaultGraph: SerializedAppState = {
         ],
         title: "UI.Combo",
         properties: {
-          defaultValue: "",
+          defaultValue: null,
           values: [],
           hidden: false
         },
-        widgets_values: [
-          ""
-        ],
+        widgets_values: [],
         color: "#223",
         bgColor: "#335",
-        comfyValue: "",
-        shownOutputProperties: {}
+        comfyValue: "A",
+        shownOutputProperties: {},
+        saveUserState: false
       },
       {
         id: 80,
@@ -326,16 +328,15 @@ const defaultGraph: SerializedAppState = {
         ],
         title: "UI.Combo",
         properties: {
-          defaultValue: "",
+          defaultValue: null,
           values: []
         },
-        widgets_values: [
-          ""
-        ],
+        widgets_values: [],
         color: "#223",
         bgColor: "#335",
-        comfyValue: "",
-        shownOutputProperties: {}
+        comfyValue: "A",
+        shownOutputProperties: {},
+        saveUserState: false
       },
       {
         id: 91,
@@ -396,7 +397,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: "nearest-exact",
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 94,
@@ -456,7 +458,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: "disabled",
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 36,
@@ -477,39 +480,21 @@ const defaultGraph: SerializedAppState = {
             name: "width",
             type: "number",
             link: 93,
-            config: {
-              min: 64,
-              max: 8192,
-              step: 8,
-              precision: 0,
-              defaultValue: 512
-            },
+            config: {},
             serialize: true
           },
           {
             name: "height",
             type: "number",
             link: 94,
-            config: {
-              min: 64,
-              max: 8192,
-              step: 8,
-              precision: 0,
-              defaultValue: 512
-            },
+            config: {},
             serialize: true
           },
           {
             name: "batch_size",
             type: "number",
             link: 38,
-            config: {
-              min: 1,
-              max: 64,
-              step: 1,
-              precision: 0,
-              defaultValue: 1
-            },
+            config: {},
             serialize: true
           }
         ],
@@ -529,6 +514,7 @@ const defaultGraph: SerializedAppState = {
         properties: {},
         color: "#432",
         bgColor: "#653",
+        saveUserState: true,
         tags: [
           "default"
         ]
@@ -553,14 +539,16 @@ const defaultGraph: SerializedAppState = {
             type: "LATENT",
             link: 40,
             color_off: "orange",
-            color_on: "orange"
+            color_on: "orange",
+            config: {}
           },
           {
             name: "vae",
             type: "VAE",
             link: 101,
             color_off: "orange",
-            color_on: "orange"
+            color_on: "orange",
+            config: {}
           }
         ],
         outputs: [
@@ -568,7 +556,7 @@ const defaultGraph: SerializedAppState = {
             name: "IMAGE",
             type: "IMAGE",
             links: [
-              120
+              245
             ],
             color_off: "orange",
             color_on: "orange",
@@ -579,6 +567,7 @@ const defaultGraph: SerializedAppState = {
         properties: {},
         color: "#432",
         bgColor: "#653",
+        saveUserState: true,
         tags: [
           "default"
         ]
@@ -628,7 +617,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: false,
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 16,
@@ -650,85 +640,42 @@ const defaultGraph: SerializedAppState = {
             type: "MODEL",
             link: 112,
             color_off: "orange",
-            color_on: "orange"
+            color_on: "orange",
+            config: {}
           },
           {
             name: "seed",
             type: "number",
             link: 80,
-            config: {
-              min: 0,
-              max: 18446744073709552000,
-              step: 1,
-              precision: 0,
-              defaultValue: 0
-            },
+            config: {},
             serialize: true
           },
           {
             name: "steps",
             type: "number",
             link: 17,
-            config: {
-              min: 1,
-              max: 10000,
-              step: 1,
-              precision: 0,
-              defaultValue: 20
-            },
+            config: {},
             serialize: true
           },
           {
             name: "cfg",
             type: "number",
             link: 18,
-            config: {
-              min: 0,
-              max: 100,
-              step: 0.5,
-              precision: 0,
-              defaultValue: 8
-            },
+            config: {},
             serialize: true
           },
           {
             name: "sampler_name",
             type: "string",
             link: 19,
-            config: {
-              values: [
-                "euler",
-                "euler_ancestral",
-                "heun",
-                "dpm_2",
-                "dpm_2_ancestral",
-                "lms",
-                "dpm_fast",
-                "dpm_adaptive",
-                "dpmpp_2s_ancestral",
-                "dpmpp_sde",
-                "dpmpp_2m",
-                "ddim",
-                "uni_pc",
-                "uni_pc_bh2"
-              ],
-              defaultValue: "euler"
-            },
+            config: {},
             serialize: true
           },
           {
             name: "scheduler",
             type: "string",
             link: 20,
-            config: {
-              values: [
-                "karras",
-                "normal",
-                "simple",
-                "ddim_uniform"
-              ],
-              defaultValue: "karras"
-            },
+            config: {},
             serialize: true
           },
           {
@@ -736,33 +683,30 @@ const defaultGraph: SerializedAppState = {
             type: "CONDITIONING",
             link: 33,
             color_off: "orange",
-            color_on: "orange"
+            color_on: "orange",
+            config: {}
           },
           {
             name: "negative",
             type: "CONDITIONING",
             link: 32,
             color_off: "orange",
-            color_on: "orange"
+            color_on: "orange",
+            config: {}
           },
           {
             name: "latent_image",
             type: "LATENT",
             link: 39,
             color_off: "orange",
-            color_on: "orange"
+            color_on: "orange",
+            config: {}
           },
           {
             name: "denoise",
             type: "number",
             link: 178,
-            config: {
-              min: 0,
-              max: 1,
-              step: 0.01,
-              precision: 0,
-              defaultValue: 1
-            },
+            config: {},
             serialize: true
           }
         ],
@@ -782,6 +726,7 @@ const defaultGraph: SerializedAppState = {
         properties: {},
         color: "#432",
         bgColor: "#653",
+        saveUserState: true,
         tags: [
           "default"
         ]
@@ -849,7 +794,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: "normal",
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 19,
@@ -949,7 +895,8 @@ const defaultGraph: SerializedAppState = {
             type: "number",
             index: 5
           }
-        }
+        },
+        saveUserState: true
       },
       {
         id: 20,
@@ -1024,7 +971,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: "euler",
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 120,
@@ -1156,7 +1104,8 @@ const defaultGraph: SerializedAppState = {
             type: "number",
             index: 5
           }
-        }
+        },
+        saveUserState: true
       },
       {
         id: 121,
@@ -1254,7 +1203,8 @@ const defaultGraph: SerializedAppState = {
             type: "number",
             index: 5
           }
-        }
+        },
+        saveUserState: true
       },
       {
         id: 32,
@@ -1268,17 +1218,14 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 47,
+        order: 48,
         mode: 0,
         inputs: [
           {
             name: "text",
             type: "string",
             link: 30,
-            config: {
-              defaultValue: "",
-              multiline: true
-            },
+            config: {},
             serialize: true
           },
           {
@@ -1286,7 +1233,8 @@ const defaultGraph: SerializedAppState = {
             type: "CLIP",
             link: 110,
             color_off: "orange",
-            color_on: "orange"
+            color_on: "orange",
+            config: {}
           }
         ],
         outputs: [
@@ -1306,6 +1254,7 @@ const defaultGraph: SerializedAppState = {
         properties: {},
         color: "#432",
         bgColor: "#653",
+        saveUserState: true,
         tags: [
           "default",
           "hr"
@@ -1323,17 +1272,14 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 48,
+        order: 49,
         mode: 0,
         inputs: [
           {
             name: "text",
             type: "string",
             link: 31,
-            config: {
-              defaultValue: "",
-              multiline: true
-            },
+            config: {},
             serialize: true
           },
           {
@@ -1341,7 +1287,8 @@ const defaultGraph: SerializedAppState = {
             type: "CLIP",
             link: 111,
             color_off: "orange",
-            color_on: "orange"
+            color_on: "orange",
+            config: {}
           }
         ],
         outputs: [
@@ -1361,6 +1308,7 @@ const defaultGraph: SerializedAppState = {
         properties: {},
         color: "#432",
         bgColor: "#653",
+        saveUserState: true,
         tags: [
           "default",
           "hr"
@@ -1378,18 +1326,20 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 82,
+        order: 80,
         mode: 0,
         inputs: [
           {
             name: "pixels",
             type: "IMAGE",
-            link: 155
+            link: 155,
+            config: {}
           },
           {
             name: "vae",
             type: "VAE",
-            link: 133
+            link: 133,
+            config: {}
           }
         ],
         outputs: [
@@ -1406,6 +1356,7 @@ const defaultGraph: SerializedAppState = {
         properties: {},
         color: "#432",
         bgColor: "#653",
+        saveUserState: true,
         tags: [
           "hr"
         ]
@@ -1422,7 +1373,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 33,
+        order: 34,
         mode: 0,
         inputs: [
           {
@@ -1441,209 +1392,8 @@ const defaultGraph: SerializedAppState = {
         title: "Comfy.ExecuteSubgraphAction",
         properties: {
           tag: "hr"
-        }
-      },
-      {
-        id: 102,
-        type: "actions/on_executed",
-        pos: [
-          1842.9857870046837,
-          75.61589906416026
-        ],
-        size: [
-          176.4,
-          46
-        ],
-        flags: {},
-        order: 50,
-        mode: 0,
-        inputs: [
-          {
-            name: "images",
-            type: "IMAGE",
-            link: 190
-          }
-        ],
-        outputs: [
-          {
-            name: "images",
-            type: "IMAGE",
-            links: [
-              142
-            ],
-            slot_index: 0
-          },
-          {
-            name: "onExecuted",
-            type: -2,
-            links: [
-              141,
-              186
-            ],
-            shape: 1,
-            slot_index: 1
-          }
-        ],
-        title: "Comfy.OnExecutedEvent",
-        properties: {
-          images: {
-            images: [
-              {
-                filename: "ComfyUI_01228_.png",
-                subfolder: "",
-                type: "output"
-              }
-            ]
-          },
-          filename: null
-        }
-      },
-      {
-        id: 122,
-        type: "actions/notify",
-        pos: [
-          2045.9857870046853,
-          250.61589906416074
-        ],
-        size: [
-          151.2,
-          46
-        ],
-        flags: {
-          collapsed: true
         },
-        order: 59,
-        mode: 0,
-        inputs: [
-          {
-            name: "message",
-            type: "string",
-            link: 185
-          },
-          {
-            name: "trigger",
-            type: -1,
-            link: 186,
-            shape: 1,
-            slot_index: 1
-          }
-        ],
-        outputs: [],
-        title: "Comfy.NotifyAction",
-        properties: {
-          message: "Nya."
-        }
-      },
-      {
-        id: 77,
-        type: "actions/notify",
-        pos: [
-          673.9106933619984,
-          665.4708575549992
-        ],
-        size: [
-          151.2,
-          46
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 79,
-        mode: 0,
-        inputs: [
-          {
-            name: "message",
-            type: "string",
-            link: 104
-          },
-          {
-            name: "trigger",
-            type: -1,
-            link: 146,
-            shape: 1,
-            slot_index: 1
-          }
-        ],
-        outputs: [],
-        title: "Comfy.NotifyAction",
-        properties: {
-          message: "Nya."
-        }
-      },
-      {
-        id: 105,
-        type: "actions/on_executed",
-        pos: [
-          666.2486933619984,
-          541.4778575549989
-        ],
-        size: [
-          176.4,
-          46
-        ],
-        flags: {
-          collapsed: false
-        },
-        order: 53,
-        mode: 0,
-        inputs: [
-          {
-            name: "images",
-            type: "IMAGE",
-            link: 143,
-            slot_index: 0
-          }
-        ],
-        outputs: [
-          {
-            name: "images",
-            type: "OUTPUT",
-            links: [
-              144,
-              162
-            ],
-            slot_index: 0
-          },
-          {
-            name: "onExecuted",
-            type: -2,
-            links: [
-              145,
-              146,
-              163
-            ],
-            shape: 1,
-            slot_index: 1
-          }
-        ],
-        title: "Comfy.OnExecutedEvent",
-        properties: {
-          images: {
-            images: [
-              {
-                filename: "ComfyUI_01224_.png",
-                subfolder: "",
-                type: "output"
-              },
-              {
-                filename: "ComfyUI_01225_.png",
-                subfolder: "",
-                type: "output"
-              },
-              {
-                filename: "ComfyUI_01226_.png",
-                subfolder: "",
-                type: "output"
-              },
-              {
-                filename: "ComfyUI_01227_.png",
-                subfolder: "",
-                type: "output"
-              }
-            ]
-          },
-          filename: null
-        }
+        saveUserState: true
       },
       {
         id: 118,
@@ -1659,7 +1409,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 57,
+        order: 56,
         mode: 0,
         inputs: [
           {
@@ -1687,27 +1437,26 @@ const defaultGraph: SerializedAppState = {
           106
         ],
         flags: {},
-        order: 46,
+        order: 47,
         mode: 0,
         inputs: [
           {
             name: "model",
             type: "MODEL",
-            link: 108
+            link: 108,
+            config: {}
           },
           {
             name: "clip",
             type: "CLIP",
-            link: 109
+            link: 109,
+            config: {}
           },
           {
             name: "lora_name",
             type: "string",
             link: 105,
-            config: {
-              values: [],
-              defaultValue: ""
-            },
+            config: {},
             defaultWidgetNode: null,
             widgetNodeType: "ui/combo",
             serialize: true
@@ -1716,13 +1465,7 @@ const defaultGraph: SerializedAppState = {
             name: "strength_model",
             type: "number",
             link: 106,
-            config: {
-              min: -10,
-              max: 10,
-              step: 0.01,
-              precision: 0,
-              defaultValue: 1
-            },
+            config: {},
             defaultWidgetNode: null,
             widgetNodeType: "ui/slider",
             serialize: true
@@ -1731,13 +1474,7 @@ const defaultGraph: SerializedAppState = {
             name: "strength_clip",
             type: "number",
             link: 107,
-            config: {
-              min: -10,
-              max: 10,
-              step: 0.01,
-              precision: 0,
-              defaultValue: 1
-            },
+            config: {},
             defaultWidgetNode: null,
             widgetNodeType: "ui/slider",
             serialize: true
@@ -1767,6 +1504,7 @@ const defaultGraph: SerializedAppState = {
         properties: {},
         color: "#432",
         bgColor: "#653",
+        saveUserState: true,
         tags: [
           "default",
           "hr"
@@ -1791,10 +1529,7 @@ const defaultGraph: SerializedAppState = {
             name: "ckpt_name",
             type: "string",
             link: 97,
-            config: {
-              values: [],
-              defaultValue: ""
-            },
+            config: {},
             widgetNodeType: "ui/combo",
             serialize: true,
             defaultWidgetNode: null
@@ -1832,6 +1567,7 @@ const defaultGraph: SerializedAppState = {
         properties: {},
         color: "#432",
         bgColor: "#653",
+        saveUserState: true,
         tags: [
           "default",
           "hr"
@@ -1930,7 +1666,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: "randomize",
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 78,
@@ -2029,218 +1766,6 @@ const defaultGraph: SerializedAppState = {
         }
       },
       {
-        id: 83,
-        type: "SaveImage",
-        pos: [
-          378.6760126953125,
-          243.33800634765626
-        ],
-        size: [
-          186.4,
-          46
-        ],
-        flags: {},
-        order: 80,
-        mode: 0,
-        inputs: [
-          {
-            name: "images",
-            type: "IMAGE",
-            link: 120
-          },
-          {
-            name: "filename_prefix",
-            type: "string",
-            link: 113,
-            config: {
-              defaultValue: "ComfyUI",
-              multiline: false
-            },
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/text",
-            serialize: true,
-            slot_index: 1
-          }
-        ],
-        outputs: [
-          {
-            name: "output",
-            type: "IMAGE",
-            links: [
-              143
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "SaveImage",
-        properties: {},
-        color: "#432",
-        bgColor: "#653",
-        tags: [
-          "default"
-        ]
-      },
-      {
-        id: 119,
-        type: "KSampler",
-        pos: [
-          1569.419133004686,
-          -89.92794393583983
-        ],
-        size: [
-          241.79999999999998,
-          206
-        ],
-        flags: {},
-        order: 58,
-        mode: 0,
-        inputs: [
-          {
-            name: "model",
-            type: "MODEL",
-            link: 183
-          },
-          {
-            name: "seed",
-            type: "number",
-            link: 175,
-            config: {
-              min: 0,
-              max: 18446744073709552000,
-              step: 1,
-              precision: 0,
-              defaultValue: 0
-            },
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/slider",
-            serialize: true
-          },
-          {
-            name: "steps",
-            type: "number",
-            link: 180,
-            config: {
-              min: 1,
-              max: 10000,
-              step: 1,
-              precision: 0,
-              defaultValue: 20
-            },
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/slider",
-            serialize: true
-          },
-          {
-            name: "cfg",
-            type: "number",
-            link: 177,
-            config: {
-              min: 0,
-              max: 100,
-              step: 0.5,
-              precision: 0,
-              defaultValue: 8
-            },
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/slider",
-            serialize: true
-          },
-          {
-            name: "sampler_name",
-            type: "string",
-            link: 173,
-            config: {
-              values: [
-                "euler",
-                "euler_ancestral",
-                "heun",
-                "dpm_2",
-                "dpm_2_ancestral",
-                "lms",
-                "dpm_fast",
-                "dpm_adaptive",
-                "dpmpp_2s_ancestral",
-                "dpmpp_sde",
-                "dpmpp_2m",
-                "ddim",
-                "uni_pc",
-                "uni_pc_bh2"
-              ],
-              defaultValue: "euler"
-            },
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/combo",
-            serialize: true
-          },
-          {
-            name: "scheduler",
-            type: "string",
-            link: 174,
-            config: {
-              values: [
-                "karras",
-                "normal",
-                "simple",
-                "ddim_uniform"
-              ],
-              defaultValue: "karras"
-            },
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/combo",
-            serialize: true
-          },
-          {
-            name: "positive",
-            type: "CONDITIONING",
-            link: 182,
-            slot_index: 6
-          },
-          {
-            name: "negative",
-            type: "CONDITIONING",
-            link: 172,
-            slot_index: 7
-          },
-          {
-            name: "latent_image",
-            type: "LATENT",
-            link: 170
-          },
-          {
-            name: "denoise",
-            type: "number",
-            link: 169,
-            config: {
-              min: 0,
-              max: 1,
-              step: 0.01,
-              precision: 0,
-              defaultValue: 1
-            },
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/slider",
-            serialize: true
-          }
-        ],
-        outputs: [
-          {
-            name: "LATENT",
-            type: "LATENT",
-            links: [
-              179
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "KSampler",
-        properties: {},
-        color: "#432",
-        bgColor: "#653",
-        tags: [
-          "hr"
-        ]
-      },
-      {
         id: 108,
         type: "ui/text",
         pos: [
@@ -2254,7 +1779,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 54,
+        order: 53,
         mode: 0,
         inputs: [
           {
@@ -2293,7 +1818,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: "cached",
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 69,
@@ -2425,7 +1951,8 @@ const defaultGraph: SerializedAppState = {
             type: "number",
             index: 5
           }
-        }
+        },
+        saveUserState: true
       },
       {
         id: 63,
@@ -2473,7 +2000,8 @@ const defaultGraph: SerializedAppState = {
         title: "Comfy.Selector2",
         properties: {
           value: null
-        }
+        },
+        saveUserState: true
       },
       {
         id: 107,
@@ -2517,7 +2045,8 @@ const defaultGraph: SerializedAppState = {
         title: "Comfy.QueueEvents",
         properties: {
           prompt: null
-        }
+        },
+        saveUserState: true
       },
       {
         id: 56,
@@ -2583,16 +2112,23 @@ const defaultGraph: SerializedAppState = {
               67
             ],
             slot_index: 0
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: null,
+            shape: 1
           }
         ],
         title: "Comfy.ValueControl",
         properties: {
-          value: 736802441844388,
+          value: 730502003782738,
           action: "randomize",
           min: 0,
           max: 18446744073709552000,
           step: 1
-        }
+        },
+        saveUserState: true
       },
       {
         id: 17,
@@ -2681,11 +2217,11 @@ const defaultGraph: SerializedAppState = {
           hidden: false
         },
         widgets_values: [
-          "736802441844388.000"
+          "730502003782738.000"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: 736802441844388,
+        comfyValue: 730502003782738,
         shownOutputProperties: {
           min: {
             type: "number",
@@ -2703,7 +2239,8 @@ const defaultGraph: SerializedAppState = {
             type: "number",
             index: 5
           }
-        }
+        },
+        saveUserState: true
       },
       {
         id: 67,
@@ -2719,7 +2256,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 34,
+        order: 35,
         mode: 0,
         inputs: [
           {
@@ -2764,7 +2301,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 35,
+        order: 36,
         mode: 0,
         inputs: [
           {
@@ -2845,444 +2382,14 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 55,
+        order: 54,
         mode: 0,
         inputs: [
           {
             name: "image",
             type: "string",
             link: 164,
-            config: {
-              values: [
-                "ComfyUI_00527_.png",
-                "ComfyUI_00535_.png",
-                "ComfyUI_00536_.png",
-                "ComfyUI_00537_.png",
-                "ComfyUI_00538_.png",
-                "ComfyUI_00539_.png",
-                "ComfyUI_00540_.png",
-                "ComfyUI_00541_.png",
-                "ComfyUI_00542_.png",
-                "ComfyUI_00543_.png",
-                "ComfyUI_00545_.png",
-                "ComfyUI_00546_.png",
-                "ComfyUI_00547_.png",
-                "ComfyUI_00548_.png",
-                "ComfyUI_00549_.png",
-                "ComfyUI_00550_.png",
-                "ComfyUI_00551_.png",
-                "ComfyUI_00552_.png",
-                "ComfyUI_00553_.png",
-                "ComfyUI_00554_.png",
-                "ComfyUI_00555_.png",
-                "ComfyUI_00556_.png",
-                "ComfyUI_00557_.png",
-                "ComfyUI_00561_.png",
-                "ComfyUI_00577_.png",
-                "ComfyUI_00581_.png",
-                "ComfyUI_00585_.png",
-                "ComfyUI_00586_.png",
-                "ComfyUI_00587_.png",
-                "ComfyUI_00588_.png",
-                "ComfyUI_00589_.png",
-                "ComfyUI_00590_.png",
-                "ComfyUI_00591_.png",
-                "ComfyUI_00592_.png",
-                "ComfyUI_00593_.png",
-                "ComfyUI_00595_.png",
-                "ComfyUI_00596_.png",
-                "ComfyUI_00597_.png",
-                "ComfyUI_00600_.png",
-                "ComfyUI_00605_.png",
-                "ComfyUI_00607_.png",
-                "ComfyUI_00609_.png",
-                "ComfyUI_00613_.png",
-                "ComfyUI_00617_.png",
-                "ComfyUI_00618_.png",
-                "ComfyUI_00619_.png",
-                "ComfyUI_00620_.png",
-                "ComfyUI_00621_.png",
-                "ComfyUI_00622_.png",
-                "ComfyUI_00623_.png",
-                "ComfyUI_00624_.png",
-                "ComfyUI_00625_.png",
-                "ComfyUI_00626_.png",
-                "ComfyUI_00628_.png",
-                "ComfyUI_00629_.png",
-                "ComfyUI_00633_.png",
-                "ComfyUI_00636_.png",
-                "ComfyUI_00637_.png",
-                "ComfyUI_00641_.png",
-                "ComfyUI_00645_.png",
-                "ComfyUI_00649_.png",
-                "ComfyUI_00653_.png",
-                "ComfyUI_00654_.png",
-                "ComfyUI_00655_.png",
-                "ComfyUI_00656_.png",
-                "ComfyUI_00657_.png",
-                "ComfyUI_00658_.png",
-                "ComfyUI_00659_.png",
-                "ComfyUI_00660_.png",
-                "ComfyUI_00661_.png",
-                "ComfyUI_00662_.png",
-                "ComfyUI_00663_.png",
-                "ComfyUI_00664_.png",
-                "ComfyUI_00665_.png",
-                "ComfyUI_00669_.png",
-                "ComfyUI_00670_.png",
-                "ComfyUI_00671_.png",
-                "ComfyUI_00672_.png",
-                "ComfyUI_00673_.png",
-                "ComfyUI_00677_.png",
-                "ComfyUI_00678_.png",
-                "ComfyUI_00679_.png",
-                "ComfyUI_00680_.png",
-                "ComfyUI_00681_.png",
-                "ComfyUI_00682_ (1).png",
-                "ComfyUI_00682_.png",
-                "ComfyUI_00683_ (1).png",
-                "ComfyUI_00683_.png",
-                "ComfyUI_00684_.png",
-                "ComfyUI_00685_.png",
-                "ComfyUI_00686_.png",
-                "ComfyUI_00687_.png",
-                "ComfyUI_00688_.png",
-                "ComfyUI_00689_.png",
-                "ComfyUI_00690_.png",
-                "ComfyUI_00691_.png",
-                "ComfyUI_00692_.png",
-                "ComfyUI_00693_.png",
-                "ComfyUI_00697_.png",
-                "ComfyUI_00698_.png",
-                "ComfyUI_00699_.png",
-                "ComfyUI_00700_.png",
-                "ComfyUI_00701_.png",
-                "ComfyUI_00703_.png",
-                "ComfyUI_00704_.png",
-                "ComfyUI_00705_.png",
-                "ComfyUI_00706_.png",
-                "ComfyUI_00707_.png",
-                "ComfyUI_00708_.png",
-                "ComfyUI_00709_.png",
-                "ComfyUI_00710_.png",
-                "ComfyUI_00711_.png",
-                "ComfyUI_00713_.png",
-                "ComfyUI_00714_.png",
-                "ComfyUI_00715_.png",
-                "ComfyUI_00716_.png",
-                "ComfyUI_00717_.png",
-                "ComfyUI_00718_.png",
-                "ComfyUI_00719_.png",
-                "ComfyUI_00720_.png",
-                "ComfyUI_00721_.png",
-                "ComfyUI_00722_.png",
-                "ComfyUI_00723_.png",
-                "ComfyUI_00724_.png",
-                "ComfyUI_00725_.png",
-                "ComfyUI_00729_.png",
-                "ComfyUI_00730_.png",
-                "ComfyUI_00731_.png",
-                "ComfyUI_00732_.png",
-                "ComfyUI_00733_.png",
-                "ComfyUI_00737_.png",
-                "ComfyUI_00745_.png",
-                "ComfyUI_00749_.png",
-                "ComfyUI_00753_.png",
-                "ComfyUI_00757_.png",
-                "ComfyUI_00761_.png",
-                "ComfyUI_00765_.png",
-                "ComfyUI_00769_.png",
-                "ComfyUI_00777_.png",
-                "ComfyUI_00781_.png",
-                "ComfyUI_00783_.png",
-                "ComfyUI_00784_.png",
-                "ComfyUI_00785_.png",
-                "ComfyUI_00786_.png",
-                "ComfyUI_00787_.png",
-                "ComfyUI_00788_.png",
-                "ComfyUI_00789_.png",
-                "ComfyUI_00792_.png",
-                "ComfyUI_00793_.png",
-                "ComfyUI_00794_.png",
-                "ComfyUI_00795_.png",
-                "ComfyUI_00796_.png",
-                "ComfyUI_00797_.png",
-                "ComfyUI_00798_.png",
-                "ComfyUI_00799_.png",
-                "ComfyUI_00800_.png",
-                "ComfyUI_00801_.png",
-                "ComfyUI_00802_.png",
-                "ComfyUI_00803_.png",
-                "ComfyUI_00804_.png",
-                "ComfyUI_00805_.png",
-                "ComfyUI_00806_.png",
-                "ComfyUI_00807_.png",
-                "ComfyUI_00808_.png",
-                "ComfyUI_00809_.png",
-                "ComfyUI_00810_.png",
-                "ComfyUI_00811_.png",
-                "ComfyUI_00812_.png",
-                "ComfyUI_00813_.png",
-                "ComfyUI_00814_.png",
-                "ComfyUI_00815_.png",
-                "ComfyUI_00816_.png",
-                "ComfyUI_00817_.png",
-                "ComfyUI_00818_.png",
-                "ComfyUI_00819_.png",
-                "ComfyUI_00820_.png",
-                "ComfyUI_00821_.png",
-                "ComfyUI_00822_.png",
-                "ComfyUI_00823_.png",
-                "ComfyUI_00824_.png",
-                "ComfyUI_00825_.png",
-                "ComfyUI_00829_.png",
-                "ComfyUI_00830_.png",
-                "ComfyUI_00831_.png",
-                "ComfyUI_00832_.png",
-                "ComfyUI_00839_.png",
-                "ComfyUI_00842_.png",
-                "ComfyUI_00843_.png",
-                "ComfyUI_00844_.png",
-                "ComfyUI_00846_.png",
-                "ComfyUI_00848_ (1).png",
-                "ComfyUI_00848_.png",
-                "ComfyUI_00849_.png",
-                "ComfyUI_00850_.png",
-                "ComfyUI_00851_.png",
-                "ComfyUI_00854_ (1).png",
-                "ComfyUI_00854_.png",
-                "ComfyUI_00855_.png",
-                "ComfyUI_00856_.png",
-                "ComfyUI_00857_.png",
-                "ComfyUI_00859_ (1).png",
-                "ComfyUI_00859_.png",
-                "ComfyUI_00860_.png",
-                "ComfyUI_00861_.png",
-                "ComfyUI_00862_.png",
-                "ComfyUI_00864_ (1).png",
-                "ComfyUI_00864_.png",
-                "ComfyUI_00865_.png",
-                "ComfyUI_00866_.png",
-                "ComfyUI_00867_.png",
-                "ComfyUI_00869_.png",
-                "ComfyUI_00870_.png",
-                "ComfyUI_00871_.png",
-                "ComfyUI_00872_.png",
-                "ComfyUI_00874_.png",
-                "ComfyUI_00875_.png",
-                "ComfyUI_00876_.png",
-                "ComfyUI_00877_.png",
-                "ComfyUI_00878_.png",
-                "ComfyUI_00879_.png",
-                "ComfyUI_00880_.png",
-                "ComfyUI_00881_.png",
-                "ComfyUI_00883_.png",
-                "ComfyUI_00884_.png",
-                "ComfyUI_00885_.png",
-                "ComfyUI_00889_.png",
-                "ComfyUI_00890_.png",
-                "ComfyUI_00891_.png",
-                "ComfyUI_00892_.png",
-                "ComfyUI_00894_.png",
-                "ComfyUI_00895_.png",
-                "ComfyUI_00896_.png",
-                "ComfyUI_00897_.png",
-                "ComfyUI_00898_.png",
-                "ComfyUI_00899_.png",
-                "ComfyUI_00900_.png",
-                "ComfyUI_00901_.png",
-                "ComfyUI_00904_.png",
-                "ComfyUI_00905_.png",
-                "ComfyUI_00914_.png",
-                "ComfyUI_00915_.png",
-                "ComfyUI_00916_.png",
-                "ComfyUI_00917_.png",
-                "ComfyUI_00920_.png",
-                "ComfyUI_00922_.png",
-                "ComfyUI_00923_.png",
-                "ComfyUI_00926_ (1).png",
-                "ComfyUI_00926_.png",
-                "ComfyUI_00927_.png",
-                "ComfyUI_00928_.png",
-                "ComfyUI_00929_.png",
-                "ComfyUI_00933_.png",
-                "ComfyUI_00934_.png",
-                "ComfyUI_00935_.png",
-                "ComfyUI_00936_.png",
-                "ComfyUI_00943_.png",
-                "ComfyUI_00944_.png",
-                "ComfyUI_00945_.png",
-                "ComfyUI_00946_.png",
-                "ComfyUI_00947_.png",
-                "ComfyUI_00951_.png",
-                "ComfyUI_00955_.png",
-                "ComfyUI_00959_.png",
-                "ComfyUI_00963_.png",
-                "ComfyUI_00967_.png",
-                "ComfyUI_00971_.png",
-                "ComfyUI_00975_.png",
-                "ComfyUI_00976_.png",
-                "ComfyUI_00977_.png",
-                "ComfyUI_00978_ (1).png",
-                "ComfyUI_00978_.png",
-                "ComfyUI_00982_ (1).png",
-                "ComfyUI_00982_.png",
-                "ComfyUI_00986_ (1).png",
-                "ComfyUI_00986_.png",
-                "ComfyUI_00990_ (1).png",
-                "ComfyUI_00990_.png",
-                "ComfyUI_00991_ (1).png",
-                "ComfyUI_00991_.png",
-                "ComfyUI_00995_ (1).png",
-                "ComfyUI_00995_.png",
-                "ComfyUI_00996_.png",
-                "ComfyUI_00997_.png",
-                "ComfyUI_01001_.png",
-                "ComfyUI_01002_.png",
-                "ComfyUI_01003_.png",
-                "ComfyUI_01004_.png",
-                "ComfyUI_01005_.png",
-                "ComfyUI_01006_.png",
-                "ComfyUI_01007_.png",
-                "ComfyUI_01008_.png",
-                "ComfyUI_01009_.png",
-                "ComfyUI_01010_.png",
-                "ComfyUI_01011_.png",
-                "ComfyUI_01012_.png",
-                "ComfyUI_01013_.png",
-                "ComfyUI_01014_.png",
-                "ComfyUI_01028_.png",
-                "ComfyUI_01031_ (1).png",
-                "ComfyUI_01031_.png",
-                "ComfyUI_01032_ (1).png",
-                "ComfyUI_01032_.png",
-                "ComfyUI_01036_.png",
-                "ComfyUI_01037_.png",
-                "ComfyUI_01041_.png",
-                "ComfyUI_01042_.png",
-                "ComfyUI_01043_.png",
-                "ComfyUI_01044_.png",
-                "ComfyUI_01049_.png",
-                "ComfyUI_01050_.png",
-                "ComfyUI_01051_.png",
-                "ComfyUI_01052_.png",
-                "ComfyUI_01053_.png",
-                "ComfyUI_01057_.png",
-                "ComfyUI_01058_.png",
-                "ComfyUI_01059_.png",
-                "ComfyUI_01063_ (1).png",
-                "ComfyUI_01063_.png",
-                "ComfyUI_01064_.png",
-                "ComfyUI_01065_ (1).png",
-                "ComfyUI_01065_.png",
-                "ComfyUI_01069_ (1).png",
-                "ComfyUI_01069_.png",
-                "ComfyUI_01073_.png",
-                "ComfyUI_01074_.png",
-                "ComfyUI_01075_.png",
-                "ComfyUI_01076_.png",
-                "ComfyUI_01077_ (1).png",
-                "ComfyUI_01077_.png",
-                "ComfyUI_01078_.png",
-                "ComfyUI_01079_.png",
-                "ComfyUI_01080_.png",
-                "ComfyUI_01081_.png",
-                "ComfyUI_01085_.png",
-                "ComfyUI_01088_.png",
-                "ComfyUI_01089_.png",
-                "ComfyUI_01091_.png",
-                "ComfyUI_01093_.png",
-                "ComfyUI_01095_.png",
-                "ComfyUI_01096_.png",
-                "ComfyUI_01097_.png",
-                "ComfyUI_01098_.png",
-                "ComfyUI_01099_.png",
-                "ComfyUI_01100_.png",
-                "ComfyUI_01102_.png",
-                "ComfyUI_01103_.png",
-                "ComfyUI_01104_.png",
-                "ComfyUI_01105_.png",
-                "ComfyUI_01107_.png",
-                "ComfyUI_01108_.png",
-                "ComfyUI_01109_.png",
-                "ComfyUI_01110_.png",
-                "ComfyUI_01111_.png",
-                "ComfyUI_01112_.png",
-                "ComfyUI_01113_.png",
-                "ComfyUI_01114_.png",
-                "ComfyUI_01118_.png",
-                "ComfyUI_01122_.png",
-                "ComfyUI_01123_.png",
-                "ComfyUI_01124_.png",
-                "ComfyUI_01125_.png",
-                "ComfyUI_01126_.png",
-                "ComfyUI_01127_.png",
-                "ComfyUI_01128_.png",
-                "ComfyUI_01129_.png",
-                "ComfyUI_01130_.png",
-                "ComfyUI_01131_.png",
-                "ComfyUI_01132_.png",
-                "ComfyUI_01133_.png",
-                "ComfyUI_01134_.png",
-                "ComfyUI_01135_.png",
-                "ComfyUI_01136_.png",
-                "ComfyUI_01137_.png",
-                "ComfyUI_01141_ (1).png",
-                "ComfyUI_01141_.png",
-                "ComfyUI_01145_.png",
-                "ComfyUI_01146_.png",
-                "ComfyUI_01147_.png",
-                "ComfyUI_01148_.png",
-                "ComfyUI_01149_.png",
-                "ComfyUI_01150_.png",
-                "ComfyUI_01151_.png",
-                "ComfyUI_01152_.png",
-                "ComfyUI_01153_.png",
-                "ComfyUI_01157_.png",
-                "ComfyUI_01158_.png",
-                "ComfyUI_01159_.png",
-                "ComfyUI_01160_.png",
-                "ComfyUI_01162_.png",
-                "ComfyUI_01166_.png",
-                "ComfyUI_01168_.png",
-                "ComfyUI_01169_.png",
-                "ComfyUI_01178_.png",
-                "ComfyUI_01179_.png",
-                "ComfyUI_01180_.png",
-                "ComfyUI_01181_ (1).png",
-                "ComfyUI_01181_.png",
-                "ComfyUI_01182_.png",
-                "ComfyUI_01183_ (1).png",
-                "ComfyUI_01183_.png",
-                "ComfyUI_01190_.png",
-                "ComfyUI_01191_.png",
-                "ComfyUI_01196_.png",
-                "ComfyUI_01198_.png",
-                "ComfyUI_01199_.png",
-                "ComfyUI_01203_.png",
-                "ComfyUI_01204_.png",
-                "ComfyUI_01205_.png",
-                "ComfyUI_01206_.png",
-                "ComfyUI_01207_.png",
-                "ComfyUI_01211_.png",
-                "ComfyUI_01212_.png",
-                "ComfyUI_01213_.png",
-                "ComfyUI_01214_.png",
-                "ComfyUI_01215_.png",
-                "ComfyUI_01216_.png",
-                "ComfyUI_01217_.png",
-                "ComfyUI_01218_.png",
-                "__etna_and_flonne_disgaea_and_1_more__4fa15fd4c0d2233cc02b79bf903897ec.jpg",
-                "__fujiwara_no_mokou_and_houraisan_kaguya_touhou_drawn_by_tsuno_no_hito__3dd87f83b2e0bfb976fd2689598f0fb4.png",
-                "__marona_phantom_brave_drawn_by_yilx__496dbc0b6cc95cf8a00427b2db29ed21.jpg",
-                "blob",
-                "blob (1)",
-                "blob (2)",
-                "blob (3)",
-                "example.png"
-              ],
-              defaultValue: "ComfyUI_00527_.png"
-            },
+            config: {},
             defaultWidgetNode: null,
             widgetNodeType: "ui/combo",
             serialize: true
@@ -3307,6 +2414,7 @@ const defaultGraph: SerializedAppState = {
         properties: {},
         color: "#432",
         bgColor: "#653",
+        saveUserState: true,
         tags: [
           "hr"
         ]
@@ -3345,8 +2453,8 @@ const defaultGraph: SerializedAppState = {
             name: "value",
             type: "string",
             links: [
-              113,
-              188
+              238,
+              244
             ],
             slot_index: 0
           },
@@ -3369,58 +2477,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: "ComfyUI",
-        shownOutputProperties: {}
-      },
-      {
-        id: 124,
-        type: "SaveImage",
-        pos: [
-          1838.4379300390613,
-          -4.673272456054686
-        ],
-        size: [
-          186.4,
-          46
-        ],
-        flags: {},
-        order: 60,
-        mode: 0,
-        inputs: [
-          {
-            name: "images",
-            type: "IMAGE",
-            link: 189
-          },
-          {
-            name: "filename_prefix",
-            type: "string",
-            link: 188,
-            config: {
-              defaultValue: "ComfyUI",
-              multiline: false
-            },
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/text",
-            serialize: true
-          }
-        ],
-        outputs: [
-          {
-            name: "output",
-            type: "IMAGE",
-            links: [
-              190
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "SaveImage",
-        properties: {},
-        color: "#432",
-        bgColor: "#653",
-        tags: [
-          "hr"
-        ]
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 71,
@@ -3475,7 +2533,8 @@ const defaultGraph: SerializedAppState = {
           }
         ],
         title: "Comfy.SwapAction",
-        properties: {}
+        properties: {},
+        saveUserState: true
       },
       {
         id: 62,
@@ -3523,7 +2582,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: false,
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 127,
@@ -3537,7 +2597,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 36,
+        order: 37,
         mode: 0,
         inputs: [
           {
@@ -3556,7 +2616,8 @@ const defaultGraph: SerializedAppState = {
         title: "Comfy.ExecuteSubgraphAction",
         properties: {
           tag: "default"
-        }
+        },
+        saveUserState: true
       },
       {
         id: 128,
@@ -3635,7 +2696,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: false,
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 37,
@@ -3736,7 +2798,8 @@ const defaultGraph: SerializedAppState = {
             type: "number",
             index: 5
           }
-        }
+        },
+        saveUserState: true
       },
       {
         id: 38,
@@ -3837,7 +2900,8 @@ const defaultGraph: SerializedAppState = {
             type: "number",
             index: 5
           }
-        }
+        },
+        saveUserState: true
       },
       {
         id: 136,
@@ -3853,7 +2917,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 65,
+        order: 63,
         mode: 0,
         inputs: [
           {
@@ -3889,7 +2953,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 63,
+        order: 61,
         mode: 0,
         inputs: [
           {
@@ -3928,7 +2992,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: "1024",
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 137,
@@ -3944,7 +3009,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 66,
+        order: 64,
         mode: 0,
         inputs: [
           {
@@ -3980,7 +3045,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 64,
+        order: 62,
         mode: 0,
         inputs: [
           {
@@ -4019,7 +3084,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: "1024",
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 138,
@@ -4035,7 +3101,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 67,
+        order: 65,
         mode: 0,
         inputs: [
           {
@@ -4070,26 +3136,20 @@ const defaultGraph: SerializedAppState = {
           106
         ],
         flags: {},
-        order: 81,
+        order: 79,
         mode: 0,
         inputs: [
           {
             name: "samples",
             type: "LATENT",
-            link: 134
+            link: 134,
+            config: {}
           },
           {
             name: "upscale_method",
             type: "string",
             link: 126,
-            config: {
-              values: [
-                "nearest-exact",
-                "bilinear",
-                "area"
-              ],
-              defaultValue: "nearest-exact"
-            },
+            config: {},
             defaultWidgetNode: null,
             widgetNodeType: "ui/combo",
             serialize: true
@@ -4098,13 +3158,7 @@ const defaultGraph: SerializedAppState = {
             name: "width",
             type: "number",
             link: 207,
-            config: {
-              min: 64,
-              max: 8192,
-              step: 8,
-              precision: 0,
-              defaultValue: 512
-            },
+            config: {},
             defaultWidgetNode: null,
             widgetNodeType: "ui/slider",
             serialize: true
@@ -4113,13 +3167,7 @@ const defaultGraph: SerializedAppState = {
             name: "height",
             type: "number",
             link: 211,
-            config: {
-              min: 64,
-              max: 8192,
-              step: 8,
-              precision: 0,
-              defaultValue: 512
-            },
+            config: {},
             defaultWidgetNode: null,
             widgetNodeType: "ui/slider",
             serialize: true
@@ -4128,13 +3176,7 @@ const defaultGraph: SerializedAppState = {
             name: "crop",
             type: "string",
             link: 129,
-            config: {
-              values: [
-                "disabled",
-                "center"
-              ],
-              defaultValue: "disabled"
-            },
+            config: {},
             defaultWidgetNode: null,
             widgetNodeType: "ui/combo",
             serialize: true
@@ -4154,6 +3196,7 @@ const defaultGraph: SerializedAppState = {
         properties: {},
         color: "#432",
         bgColor: "#653",
+        saveUserState: true,
         tags: [
           "hr"
         ]
@@ -4172,7 +3215,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 62,
+        order: 60,
         mode: 0,
         inputs: [
           {
@@ -4217,7 +3260,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 61,
+        order: 59,
         mode: 0,
         inputs: [
           {
@@ -4262,7 +3305,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 68,
+        order: 66,
         mode: 0,
         inputs: [
           {
@@ -4382,7 +3425,8 @@ const defaultGraph: SerializedAppState = {
             type: "number",
             index: 5
           }
-        }
+        },
+        saveUserState: true
       },
       {
         id: 140,
@@ -4425,7 +3469,8 @@ const defaultGraph: SerializedAppState = {
         title: "Comfy.QueueEvents",
         properties: {
           prompt: null
-        }
+        },
+        saveUserState: true
       },
       {
         id: 141,
@@ -4441,7 +3486,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 37,
+        order: 38,
         mode: 0,
         inputs: [
           {
@@ -4495,7 +3540,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 40,
+        order: 41,
         mode: 0,
         inputs: [
           {
@@ -4550,7 +3595,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 38,
+        order: 39,
         mode: 0,
         inputs: [
           {
@@ -4604,7 +3649,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 41,
+        order: 42,
         mode: 0,
         inputs: [
           {
@@ -4692,7 +3737,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 42,
+        order: 43,
         mode: 0,
         inputs: [
           {
@@ -4773,7 +3818,8 @@ const defaultGraph: SerializedAppState = {
             type: "number",
             index: 5
           }
-        }
+        },
+        saveUserState: true
       },
       {
         id: 82,
@@ -4789,7 +3835,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 43,
+        order: 44,
         mode: 0,
         inputs: [
           {
@@ -4870,7 +3916,8 @@ const defaultGraph: SerializedAppState = {
             type: "number",
             index: 5
           }
-        }
+        },
+        saveUserState: true
       },
       {
         id: 147,
@@ -4913,7 +3960,8 @@ const defaultGraph: SerializedAppState = {
         title: "Comfy.QueueEvents",
         properties: {
           prompt: null
-        }
+        },
+        saveUserState: true
       },
       {
         id: 104,
@@ -4933,12 +3981,12 @@ const defaultGraph: SerializedAppState = {
           {
             name: "images",
             type: "OUTPUT",
-            link: 144
+            link: null
           },
           {
             name: "store",
             type: -1,
-            link: 145,
+            link: 243,
             shape: 1
           },
           {
@@ -4961,18 +4009,17 @@ const defaultGraph: SerializedAppState = {
         ],
         title: "UI.Gallery",
         properties: {
-          defaultValue: [],
-          index: 3,
-          updateMode: "append"
+          defaultValue: null,
+          index: 0,
+          updateMode: "append",
+          values: []
         },
-        widgets_values: [
-          "Images: 4",
-          "append"
-        ],
+        widgets_values: [],
         color: "#223",
         bgColor: "#335",
         comfyValue: [],
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: false
       },
       {
         id: 103,
@@ -4992,12 +4039,12 @@ const defaultGraph: SerializedAppState = {
           {
             name: "images",
             type: "IMAGE",
-            link: 142
+            link: null
           },
           {
             name: "store",
             type: -1,
-            link: 141,
+            link: 240,
             shape: 1
           },
           {
@@ -5016,18 +4063,17 @@ const defaultGraph: SerializedAppState = {
         ],
         title: "UI.Gallery",
         properties: {
-          defaultValue: [],
+          defaultValue: null,
           index: 0,
-          updateMode: "append"
+          updateMode: "append",
+          values: []
         },
-        widgets_values: [
-          "Images: 1",
-          "append"
-        ],
+        widgets_values: [],
         color: "#223",
         bgColor: "#335",
         comfyValue: [],
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: false
       },
       {
         id: 153,
@@ -5074,7 +4120,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: false,
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 155,
@@ -5090,7 +4137,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 45,
+        order: 46,
         mode: 0,
         inputs: [
           {
@@ -5139,13 +4186,13 @@ const defaultGraph: SerializedAppState = {
           166
         ],
         flags: {},
-        order: 56,
+        order: 55,
         mode: 0,
         inputs: [
           {
             name: "images",
             type: "OUTPUT",
-            link: 162,
+            link: null,
             slot_index: 0
           },
           {
@@ -5156,7 +4203,7 @@ const defaultGraph: SerializedAppState = {
           {
             name: "store",
             type: -1,
-            link: 163,
+            link: 242,
             shape: 1,
             slot_index: 2
           },
@@ -5190,49 +4237,38 @@ const defaultGraph: SerializedAppState = {
           images: {
             images: [
               {
-                filename: "ComfyUI_01224_.png",
+                filename: "ComfyUI_01333_.png",
                 subfolder: "",
                 type: "output"
               },
               {
-                filename: "ComfyUI_01225_.png",
+                filename: "ComfyUI_01334_.png",
                 subfolder: "",
                 type: "output"
               },
               {
-                filename: "ComfyUI_01226_.png",
+                filename: "ComfyUI_01335_.png",
                 subfolder: "",
                 type: "output"
               },
               {
-                filename: "ComfyUI_01227_.png",
+                filename: "ComfyUI_01336_.png",
                 subfolder: "",
                 type: "output"
               }
             ]
           },
-          index: 3,
+          index: 0,
           filenames: {
             0: {
-              filename: "ComfyUI_01224_.png",
-              status: "cached"
-            },
-            1: {
-              filename: "ComfyUI_01225_.png",
-              status: "cached"
-            },
-            2: {
-              filename: "ComfyUI_01226_.png",
-              status: "cached"
-            },
-            3: {
-              filename: "ComfyUI_01227_.png",
+              filename: "ComfyUI_01333_.png",
               status: "cached"
             }
           },
-          genNumber: 66,
+          genNumber: 68,
           updateMode: "append"
-        }
+        },
+        saveUserState: true
       },
       {
         id: 100,
@@ -5246,18 +4282,20 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 49,
+        order: 50,
         mode: 0,
         inputs: [
           {
             name: "samples",
             type: "LATENT",
-            link: 179
+            link: 179,
+            config: {}
           },
           {
             name: "vae",
             type: "VAE",
-            link: 234
+            link: 234,
+            config: {}
           }
         ],
         outputs: [
@@ -5265,7 +4303,7 @@ const defaultGraph: SerializedAppState = {
             name: "IMAGE",
             type: "IMAGE",
             links: [
-              189
+              239
             ],
             slot_index: 0
           }
@@ -5274,6 +4312,7 @@ const defaultGraph: SerializedAppState = {
         properties: {},
         color: "#432",
         bgColor: "#653",
+        saveUserState: true,
         tags: [
           "hr"
         ]
@@ -5292,7 +4331,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 44,
+        order: 45,
         mode: 0,
         inputs: [
           {
@@ -5371,7 +4410,8 @@ const defaultGraph: SerializedAppState = {
         color: "#223",
         bgColor: "#335",
         comfyValue: false,
-        shownOutputProperties: {}
+        shownOutputProperties: {},
+        saveUserState: true
       },
       {
         id: 151,
@@ -5387,7 +4427,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 39,
+        order: 40,
         mode: 0,
         inputs: [
           {
@@ -5417,7 +4457,305 @@ const defaultGraph: SerializedAppState = {
         title: "Comfy.CopyAction",
         properties: {
           value: 0
-        }
+        },
+        saveUserState: true
+      },
+      {
+        id: 159,
+        type: "SaveImage",
+        pos: [
+          1831,
+          -8
+        ],
+        size: [
+          220,
+          46
+        ],
+        flags: {},
+        order: 68,
+        mode: 0,
+        inputs: [
+          {
+            name: "images",
+            type: "IMAGE",
+            link: 239,
+            config: {}
+          },
+          {
+            name: "filename_prefix",
+            type: "string",
+            link: 238,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/text",
+            serialize: true
+          }
+        ],
+        outputs: [
+          {
+            name: "onExecuted",
+            type: -2,
+            links: [
+              240,
+              241
+            ],
+            color_off: "rebeccapurple",
+            color_on: "rebeccapurple",
+            shape: 1,
+            slot_index: 0
+          }
+        ],
+        title: "SaveImage",
+        properties: {},
+        color: "#432",
+        bgColor: "#653",
+        saveUserState: true,
+        tags: [
+          "hr"
+        ]
+      },
+      {
+        id: 122,
+        type: "actions/notify",
+        pos: [
+          2046,
+          251
+        ],
+        size: [
+          151.2,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 58,
+        mode: 0,
+        inputs: [
+          {
+            name: "message",
+            type: "string",
+            link: 185
+          },
+          {
+            name: "trigger",
+            type: -1,
+            link: 241,
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.NotifyAction",
+        properties: {
+          message: "Nya."
+        },
+        saveUserState: true
+      },
+      {
+        id: 77,
+        type: "actions/notify",
+        pos: [
+          674,
+          665
+        ],
+        size: [
+          151.2,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 33,
+        mode: 0,
+        inputs: [
+          {
+            name: "message",
+            type: "string",
+            link: 104
+          },
+          {
+            name: "trigger",
+            type: -1,
+            link: null,
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.NotifyAction",
+        properties: {
+          message: "Nya."
+        },
+        saveUserState: true
+      },
+      {
+        id: 157,
+        type: "SaveImage",
+        pos: [
+          375,
+          236
+        ],
+        size: [
+          220,
+          46
+        ],
+        flags: {},
+        order: 67,
+        mode: 0,
+        inputs: [
+          {
+            name: "images",
+            type: "IMAGE",
+            link: 245,
+            config: {}
+          },
+          {
+            name: "filename_prefix",
+            type: "string",
+            link: 244,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/text",
+            serialize: true
+          }
+        ],
+        outputs: [
+          {
+            name: "onExecuted",
+            type: -2,
+            links: [
+              242,
+              243
+            ],
+            color_off: "rebeccapurple",
+            color_on: "rebeccapurple",
+            shape: 1,
+            slot_index: 0
+          }
+        ],
+        title: "SaveImage",
+        properties: {},
+        color: "#432",
+        bgColor: "#653",
+        saveUserState: true,
+        tags: [
+          "default"
+        ]
+      },
+      {
+        id: 119,
+        type: "KSampler",
+        pos: [
+          1569,
+          -90
+        ],
+        size: [
+          241.79999999999998,
+          206
+        ],
+        flags: {},
+        order: 57,
+        mode: 0,
+        inputs: [
+          {
+            name: "model",
+            type: "MODEL",
+            link: 183,
+            config: {}
+          },
+          {
+            name: "seed",
+            type: "number",
+            link: 175,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/slider",
+            serialize: true
+          },
+          {
+            name: "steps",
+            type: "number",
+            link: 180,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/slider",
+            serialize: true
+          },
+          {
+            name: "cfg",
+            type: "number",
+            link: 177,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/slider",
+            serialize: true
+          },
+          {
+            name: "sampler_name",
+            type: "string",
+            link: 173,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/combo",
+            serialize: true
+          },
+          {
+            name: "scheduler",
+            type: "string",
+            link: 174,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/combo",
+            serialize: true
+          },
+          {
+            name: "positive",
+            type: "CONDITIONING",
+            link: 182,
+            slot_index: 6,
+            config: {}
+          },
+          {
+            name: "negative",
+            type: "CONDITIONING",
+            link: 172,
+            slot_index: 7,
+            config: {}
+          },
+          {
+            name: "latent_image",
+            type: "LATENT",
+            link: 170,
+            config: {}
+          },
+          {
+            name: "denoise",
+            type: "number",
+            link: 169,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/slider",
+            serialize: true
+          }
+        ],
+        outputs: [
+          {
+            name: "LATENT",
+            type: "LATENT",
+            links: [
+              179
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "KSampler",
+        properties: {},
+        color: "#432",
+        bgColor: "#653",
+        saveUserState: true,
+        tags: [
+          "hr"
+        ]
       }
     ],
     links: [
@@ -5774,22 +5112,6 @@ const defaultGraph: SerializedAppState = {
         "MODEL"
       ],
       [
-        113,
-        45,
-        0,
-        83,
-        1,
-        "string"
-      ],
-      [
-        120,
-        40,
-        0,
-        83,
-        0,
-        "IMAGE"
-      ],
-      [
         126,
         91,
         0,
@@ -5822,54 +5144,6 @@ const defaultGraph: SerializedAppState = {
         "LATENT"
       ],
       [
-        141,
-        102,
-        1,
-        103,
-        1,
-        -1
-      ],
-      [
-        142,
-        102,
-        0,
-        103,
-        0,
-        "IMAGE"
-      ],
-      [
-        143,
-        83,
-        0,
-        105,
-        0,
-        "IMAGE"
-      ],
-      [
-        144,
-        105,
-        0,
-        104,
-        0,
-        "OUTPUT"
-      ],
-      [
-        145,
-        105,
-        1,
-        104,
-        1,
-        -1
-      ],
-      [
-        146,
-        105,
-        1,
-        77,
-        1,
-        -1
-      ],
-      [
         149,
         107,
         0,
@@ -5900,22 +5174,6 @@ const defaultGraph: SerializedAppState = {
         99,
         0,
         "IMAGE"
-      ],
-      [
-        162,
-        105,
-        0,
-        116,
-        0,
-        "OUTPUT"
-      ],
-      [
-        163,
-        105,
-        1,
-        116,
-        2,
-        -1
       ],
       [
         164,
@@ -6052,38 +5310,6 @@ const defaultGraph: SerializedAppState = {
         122,
         0,
         "string"
-      ],
-      [
-        186,
-        102,
-        1,
-        122,
-        1,
-        -1
-      ],
-      [
-        188,
-        45,
-        0,
-        124,
-        1,
-        "string"
-      ],
-      [
-        189,
-        100,
-        0,
-        124,
-        0,
-        "IMAGE"
-      ],
-      [
-        190,
-        124,
-        0,
-        102,
-        0,
-        "IMAGE"
       ],
       [
         191,
@@ -6324,6 +5550,70 @@ const defaultGraph: SerializedAppState = {
         100,
         1,
         "VAE"
+      ],
+      [
+        238,
+        45,
+        0,
+        159,
+        1,
+        "string"
+      ],
+      [
+        239,
+        100,
+        0,
+        159,
+        0,
+        "IMAGE"
+      ],
+      [
+        240,
+        159,
+        0,
+        103,
+        1,
+        -1
+      ],
+      [
+        241,
+        159,
+        0,
+        122,
+        1,
+        -1
+      ],
+      [
+        242,
+        157,
+        0,
+        116,
+        2,
+        -1
+      ],
+      [
+        243,
+        157,
+        0,
+        104,
+        1,
+        -1
+      ],
+      [
+        244,
+        45,
+        0,
+        157,
+        1,
+        "string"
+      ],
+      [
+        245,
+        40,
+        0,
+        157,
+        0,
+        "IMAGE"
       ]
     ],
     groups: [
@@ -6653,7 +5943,9 @@ const defaultGraph: SerializedAppState = {
             classes: "",
             hidden: false,
             flexGrow: 100,
-            disabled: false
+            disabled: false,
+            buttonVariant: "primary",
+            buttonSize: "large"
           }
         },
         children: [],
@@ -6671,7 +5963,9 @@ const defaultGraph: SerializedAppState = {
             classes: "",
             hidden: false,
             flexGrow: 100,
-            disabled: false
+            disabled: false,
+            buttonVariant: "primary",
+            buttonSize: "large"
           }
         },
         children: [],
@@ -6919,7 +6213,9 @@ const defaultGraph: SerializedAppState = {
             classes: "",
             flexGrow: 100,
             disabled: false,
-            hidden: false
+            hidden: false,
+            buttonVariant: "primary",
+            buttonSize: "large"
           }
         },
         children: [],
@@ -7159,7 +6455,10 @@ const defaultGraph: SerializedAppState = {
             direction: "horizontal",
             classes: "",
             flexGrow: 100,
-            disabled: true
+            disabled: true,
+            hidden: false,
+            buttonVariant: "primary",
+            buttonSize: "large"
           }
         },
         children: [],
@@ -7464,17 +6763,19 @@ const defaultGraph: SerializedAppState = {
         parent: "2"
       }
     },
-    currentId: 96,
+    currentId: 100,
     attrs: {
       defaultSubgraph: "default"
     }
   },
   canvas: {
-    offset: [0, 0],
-    scale: 1
+    offset: [
+      396.6035503358165,
+      -20.538133861234147
+    ],
+    scale: 0.6830134553650707
   }
 }
-
 const blankGraph: SerializedAppState = {
     createdBy: "ComfyBox",
     version: 1,
