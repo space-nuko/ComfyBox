@@ -123,35 +123,46 @@
      padding: 2px;
      width: 100%;
 
-     // Prevent swiping on the slider track from accidentally changing the value
-     &.mobile :global(input[type="range"]) {
-         pointer-events: none;
-         -webkit-appearance: none;
-         appearance: none;
-         cursor: default;
-         height: 0.6rem;
-         padding: initial;
-         border: initial;
-         margin: 0.8rem 0;
-         width: 100%;
+     :global(input[type=number]) {
+         text-overflow: ellipsis;
+     }
 
-         background: linear-gradient(to right, var(--color-blue-600), var(--color-blue-600)), #D7D7D7;
-         background-size: var(--background-size, 0%) 100%;
-         background-repeat: no-repeat;
-         border-radius: 1rem;
-         border: 1px solid var(--neutral-400);
-
-         &::-webkit-slider-thumb {
+     &.mobile {
+         // Prevent swiping on the slider track from accidentally changing the value
+         :global(input[type="range"]) {
+             pointer-events: none;
              -webkit-appearance: none;
              appearance: none;
-             pointer-events: all;
-             width: 1.75rem;
-             height: 1.75rem;
-             border-radius: 50%;
-             background: var(--color-blue-600);
-             cursor: pointer;
-             border: 2px solid var(--neutral-100);
-             box-shadow: 0px 0px 0px 1px var(--neutral-400);
+             cursor: default;
+             height: 0.6rem;
+             padding: initial;
+             border: initial;
+             margin: 0.8rem 0;
+             width: 100%;
+
+             background: linear-gradient(to right, var(--color-blue-600), var(--color-blue-600)), #D7D7D7;
+             background-size: var(--background-size, 0%) 100%;
+             background-repeat: no-repeat;
+             border-radius: 1rem;
+             border: 1px solid var(--neutral-400);
+
+             &::-webkit-slider-thumb {
+                 -webkit-appearance: none;
+                 appearance: none;
+                 pointer-events: all;
+                 width: 1.75rem;
+                 height: 1.75rem;
+                 border-radius: 50%;
+                 background: var(--color-blue-600);
+                 cursor: pointer;
+                 border: 2px solid var(--neutral-100);
+                 box-shadow: 0px 0px 0px 1px var(--neutral-400);
+             }
+
+             :global(input[type=number]) {
+                 font-size: 16px;
+                 height: var(--size-6);
+             }
          }
      }
  }
