@@ -11,6 +11,10 @@ export function clamp(n: number, min: number, max: number): number {
     return Math.min(Math.max(n, min), max)
 }
 
+export function range(size: number, startAt: number = 0): ReadonlyArray<number> {
+    return [...Array(size).keys()].map(i => i + startAt);
+}
+
 export function download(filename: string, text: string, type: string = "text/plain") {
     const blob = new Blob([text], { type: type });
     const url = URL.createObjectURL(blob);
