@@ -404,7 +404,7 @@ export default class ComfyApp {
         }
     }
 
-    reset() {
+    clear() {
         this.clean();
 
         const blankGraph: SerializedLGraph = {
@@ -634,16 +634,21 @@ export default class ComfyApp {
         if (file.type === "image/png") {
             const pngInfo = await getPngMetadata(file);
             if (pngInfo) {
-                if (pngInfo.workflow) {
-                    this.loadGraphData(JSON.parse(pngInfo.workflow));
+                if (pngInfo.comfyBoxConfig) {
+                    this.deserialize(JSON.parse(pngInfo.comfyBoxConfig));
                 } else if (pngInfo.parameters) {
-                    importA1111(this.lGraph, pngInfo.parameters, this.api);
+                    throw "TODO import A111 import!"
+                    // importA1111(this.lGraph, pngInfo.parameters, this.api);
+                }
+                else {
+                    console.error("No metadata found in image file.", pngInfo)
+                    toast.push("No metadata found in image file.")
                 }
             }
         } else if (file.type === "application/json" || file.name.endsWith(".json")) {
             const reader = new FileReader();
             reader.onload = () => {
-                this.loadGraphData(JSON.parse(reader.result as string));
+                this.deserialize(JSON.parse(reader.result as string));
             };
             reader.readAsText(file);
         }

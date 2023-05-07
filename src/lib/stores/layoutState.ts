@@ -790,7 +790,10 @@ function initDefaultLayout() {
         currentSelection: [],
         currentSelectionNodes: [],
         isMenuOpen: false,
-        isConfiguring: false
+        isConfiguring: false,
+        attrs: {
+            defaultSubgraph: ""
+        }
     })
 
     const root = addContainer(null, { direction: "horizontal", title: "" });

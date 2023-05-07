@@ -21,6 +21,7 @@
  import queueState from "$lib/stores/queueState";
  import ComfyUnlockUIButton from "./ComfyUnlockUIButton.svelte";
 	import ComfyGraphView from "./ComfyGraphView.svelte";
+	import { download } from "$lib/utils";
 
  export let app: ComfyApp = undefined;
  let imageViewer: ImageViewer;
@@ -32,6 +33,7 @@
  let resizeTimeout: NodeJS.Timeout | null;
  let hasShownUIHelpToast: boolean = false;
  let uiTheme: string = "";
+ let fileInput: HTMLInputElement = undefined;
 
  let debugLayout: boolean = false;
 
@@ -100,6 +102,43 @@
      if (!app?.lGraph)
          return;
 
+     const promptFilename = false; // TODO
+
+     let filename = "workflow.json";
+     if (promptFilename) {
+         filename = prompt("Save workflow as:", filename);
+         if (!filename) return;
+         if (!filename.toLowerCase().endsWith(".json")) {
+             filename += ".json";
+         }
+     }
+     else {
+         const date = new Date();
+         const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
+         filename = `workflow-${formattedDate}.json`
+     }
+
+     const indent = 2
+     const json = JSON.stringify(app.serialize(), null, indent)
+
+     download(filename, json, "application/json")
+ }
+
+ function doLoad(): void {
+     if (!app?.lGraph || !fileInput)
+         return;
+
+     fileInput.click();
+ }
+
+ function loadWorkflow(): void {
+     app.handleFile(fileInput.files[0]);
+}
+
+ function doSaveLocal(): void {
+     if (!app?.lGraph)
+         return;
+
      app.saveStateToLocalStorage();
      toast.push("Saved to local storage.")
      //
@@ -109,17 +148,17 @@
      //      download(`workflow-${formattedDate}.json`, JSON.stringify(app.serialize()), "application/json")
  }
 
- function doReset(): void {
-     var confirmed = confirm("Are you sure you want to clear the current workflow?");
-     if (confirmed) {
-         app.reset();
-     }
- }
-
  async function doLoadDefault(): void {
      var confirmed = confirm("Are you sure you want to clear the current workflow and load the default graph?");
      if (confirmed) {
          await app.deserialize(defaultGraph)
+     }
+ }
+
+ function doClear(): void {
+     var confirmed = confirm("Are you sure you want to clear the current workflow?");
+     if (confirmed) {
+         app.clear();
      }
  }
 
@@ -222,8 +261,14 @@
             <Button variant="secondary" on:click={doSave}>
                 Save
             </Button>
-            <Button variant="secondary" on:click={doReset}>
-                Reset
+            <Button variant="secondary" on:click={doSaveLocal}>
+                Save Local
+            </Button>
+            <Button variant="secondary" on:click={doLoad}>
+                Load
+            </Button>
+            <Button variant="secondary" on:click={doClear}>
+                Clear
             </Button>
             <Button variant="secondary" on:click={doLoadDefault}>
                 Load Default
@@ -255,6 +300,7 @@
         </div>
     </div>
     <LightboxModal />
+    <input bind:this={fileInput} id="comfy-file-input" type="file" accept=".json" on:change={loadWorkflow} />
 </div>
 
 <SvelteToast options={toastOptions} />
@@ -357,5 +403,9 @@
 
  span.left {
      right: 0px;
+ }
+
+ #comfy-file-input {
+     display: none;
  }
 </style>

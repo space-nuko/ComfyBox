@@ -33,7 +33,8 @@ export default class ComfyValueControl extends ComfyGraphNode {
             { name: "step", type: "number" }
         ],
         outputs: [
-            { name: "value", type: "*" }
+            { name: "value", type: "*" },
+            { name: "changed", type: BuiltInSlotType.EVENT }
         ],
     }
 
@@ -93,6 +94,7 @@ export default class ComfyValueControl extends ComfyGraphNode {
 
         v = clamp(v, min, max)
         this.setProperty("value", v)
+        this.triggerSlot(1, v)
         this.setOutputData(0, v)
 
         console.debug("ValueControl", v, this.properties)

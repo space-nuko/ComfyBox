@@ -101,7 +101,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         if (this.changedIndex !== null && this.outputs.length >= this.changedIndex) {
             const changedOutput = this.outputs[this.changedIndex]
             if (changedOutput.type === BuiltInSlotType.EVENT)
-                this.triggerSlot(this.changedIndex, "changed")
+                this.triggerSlot(this.changedIndex, get(this.value))
         }
     }
 
