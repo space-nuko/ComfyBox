@@ -14,22 +14,7 @@
  import queueState from "$lib/stores/queueState";
  import { Page, Navbar, Link, BlockTitle, Block, List, ListItem } from "framework7-svelte"
 
- let app: ComfyApp | null = null;
-
- onMount(async () => {
-     if (app)
-         return
-
-     app = $uiState.app = new ComfyApp();
-
-     app.api.addEventListener("status", (ev: CustomEvent) => {
-         queueState.statusUpdated(ev.detail as ComfyAPIStatus);
-     });
-
-     await app.setup();
-     (window as any).app = app;
-
- });
+ export let app: ComfyApp | null = null;
 
 </script>
 
@@ -52,8 +37,4 @@
             <i class="icon icon-f7" slot="media" />
         </ListItem>
     </List>
-
-    <div class="canvas-wrapper pane-wrapper" style="display: none">
-        <canvas id="graph-canvas" />
-    </div>
 </Page>

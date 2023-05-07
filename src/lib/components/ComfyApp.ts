@@ -1,6 +1,6 @@
 import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
-import ComfyAPI from "$lib/api"
+import ComfyAPI, { type ComfyAPIQueueStatus } from "$lib/api"
 import defaultGraph from "$lib/defaultGraph"
 import { getPngMetadata, importA1111 } from "$lib/pnginfo";
 import EventEmitter from "events";
@@ -291,6 +291,10 @@ export default class ComfyApp {
         this.api.addEventListener("executing", ({ detail }: CustomEvent) => {
             queueState.executingUpdated(detail.node);
             this.lGraph.setDirtyCanvas(true, false);
+        });
+
+        this.api.addEventListener("status", (ev: CustomEvent) => {
+            queueState.statusUpdated(ev.detail as ComfyAPIQueueStatus);
         });
 
         this.api.addEventListener("executed", ({ detail }: CustomEvent) => {

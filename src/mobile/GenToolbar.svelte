@@ -7,13 +7,12 @@
 
  import { Link, Toolbar } from "framework7-svelte"
  import ProgressBar from "$lib/components/ProgressBar.svelte";
+	import Indicator from "./Indicator.svelte";
+	import interfaceState from "$lib/stores/interfaceState";
 
  export let subworkflowID: number = -1;
- let app: ComfyApp = undefined;
+ export let app: ComfyApp = undefined;
  let fileInput: HTMLInputElement = undefined;
-
- $: if (!app)
-     app = $uiState.app
 
  function queuePrompt() {
      app.queuePrompt(0, 1);
@@ -56,6 +55,9 @@
     <Link on:click={doLoad}>Load</Link>
     <input bind:this={fileInput} id="comfy-file-input" type="file" accept=".json" on:change={loadWorkflow} />
 </Toolbar>
+{#if $interfaceState.showIndicator}
+    <Indicator value={$interfaceState.indicatorValue} />
+{/if}
 
 <style lang="scss">
  #comfy-file-input {

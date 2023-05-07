@@ -74,6 +74,9 @@
 	{step}
 	{disabled}
 	on:mouseup={handle_release}
+    on:pointerdown
+    on:pointerup
+    on:pointermove
 />
 
 <style lang="scss">

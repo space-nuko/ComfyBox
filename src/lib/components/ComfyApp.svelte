@@ -175,10 +175,6 @@
      })
  }
 
- app.api.addEventListener("status", (ev: CustomEvent) => {
-     queueState.statusUpdated(ev.detail as ComfyAPIStatus);
- });
-
  $: if (app.rootEl && !imageViewer) {
      imageViewer = new ImageViewer(app.rootEl);
  }

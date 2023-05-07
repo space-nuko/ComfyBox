@@ -3,8 +3,10 @@
 
  import { Page, Navbar, Link, BlockTitle, Block, List, ListItem, Toolbar } from "framework7-svelte"
  import WidgetContainer from "$lib/components/WidgetContainer.svelte";
+ import type ComfyApp from "$lib/components/ComfyApp";
 
  export let subworkflowID: number = -1;
+ export let app: ComfyApp
 
 </script>
 
