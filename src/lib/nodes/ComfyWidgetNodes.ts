@@ -10,7 +10,7 @@ import type { SvelteComponentDev } from "svelte/internal";
 import { Watch } from "@litegraph-ts/nodes-basic";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import { writable, type Unsubscriber, type Writable, get } from "svelte/store";
-import { clamp } from "$lib/utils"
+import { clamp, range } from "$lib/utils"
 import layoutState from "$lib/stores/layoutState";
 import type { FileData as GradioFileData } from "@gradio/upload";
 import queueState from "$lib/stores/queueState";
@@ -143,7 +143,9 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         inputNode: LGraphNode,
         inputIndex: number
     ): boolean {
-        if (this.autoConfig && "config" in input && this.outputs.length === 0) {
+        const anyConnected = range(this.outputs.length).some(i => this.getOutputLinks(i).length > 0);
+
+        if (this.autoConfig && "config" in input && !anyConnected) {
             this.doAutoConfig(input as IComfyInputSlot)
         }
 
