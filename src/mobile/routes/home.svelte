@@ -19,8 +19,8 @@
  onMount(async () => {
      if (app)
          return
-     app = $uiState.app = new ComfyApp();
 
+     app = $uiState.app = new ComfyApp();
 
      app.api.addEventListener("status", (ev: CustomEvent) => {
          queueState.statusUpdated(ev.detail as ComfyAPIStatus);
@@ -46,6 +46,9 @@
             <i class="icon icon-f7" slot="media" />
         </ListItem>
         <ListItem link="/graph/" title="Show Node Graph">
+            <i class="icon icon-f7" slot="media" />
+        </ListItem>
+        <ListItem link="/hell/" title="🔥 HELL 🔥">
             <i class="icon icon-f7" slot="media" />
         </ListItem>
     </List>

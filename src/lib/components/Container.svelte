@@ -19,6 +19,7 @@
  export let zIndex: number = 0;
  export let classes: string[] = [];
  export let showHandles: boolean = false;
+ export let isMobile: boolean = false
  let attrsChanged: Writable<boolean> | null = null;
 
  $: if (container) {
@@ -34,11 +35,11 @@
     {@const dragDisabled = zIndex === 0 || $layoutState.currentSelection.length > 2 || !$uiState.uiUnlocked}
     {#key $attrsChanged}
         {#if container.attrs.variant === "tabs"}
-            <TabsContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} />
+            <TabsContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
         {:else if container.attrs.variant === "accordion"}
-            <AccordionContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} />
+            <AccordionContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
         {:else}
-            <BlockContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} />
+            <BlockContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
         {/if}
     {/key}
 {/if}

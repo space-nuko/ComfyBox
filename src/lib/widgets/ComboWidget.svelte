@@ -5,6 +5,7 @@
  import { type WidgetLayout } from "$lib/stores/layoutState";
  import { get, type Writable } from "svelte/store";
  export let widget: WidgetLayout | null = null;
+ export let isMobile: boolean = false;
  let node: ComfyComboNode | null = null;
  let nodeValue: Writable<string> | null = null;
  let propsChanged: Writable<number> | null = null;

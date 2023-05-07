@@ -20,6 +20,7 @@
  export let showHandles: boolean = false;
  export let edit: boolean = false;
  export let dragDisabled: boolean = false;
+ export let isMobile: boolean = false;
 
  let attrsChanged: Writable<boolean> | null = null;
  let children: IDragItem[] | null = null;
@@ -95,7 +96,7 @@
                                 <label for={String(item.id)}>
                                     <BlockTitle><strong>Tab {i+1}:</strong> {tabName}</BlockTitle>
                                 </label>
-                                <WidgetContainer dragItem={item} zIndex={zIndex+1} />
+                                <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
                                 {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
                                     <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
                                 {/if}
@@ -115,7 +116,7 @@
                 {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item, i(item.id)}
                     {@const tabName = getTabName(container, i)}
                     <TabItem name={tabName} on:select={() => console.log("tab " + i)}>
-                        <WidgetContainer dragItem={item} zIndex={zIndex+1} />
+                        <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
                     </TabItem>
                 {/each}
             </Tabs>

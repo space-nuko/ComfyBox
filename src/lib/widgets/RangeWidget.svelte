@@ -1,9 +1,10 @@
 <script lang="ts">
  import type { ComfySliderNode } from "$lib/nodes/index";
  import { type WidgetLayout } from "$lib/stores/layoutState";
- import { Range } from "@gradio/form";
+ import { Range } from "$lib/components/gradio/form";
  import { get, type Writable } from "svelte/store";
  export let widget: WidgetLayout | null = null;
+ export let isMobile: boolean = false;
  let node: ComfySliderNode | null = null;
  let nodeValue: Writable<number> | null = null;
  let propsChanged: Writable<number> | null = null;
@@ -39,7 +40,6 @@
      }
  }
 
- let gradient: string = ""
  let elem: HTMLDivElement = null;
 
  $: if (elem && node !== null && option !== null && (!$propsChanged || $propsChanged)) {
@@ -53,7 +53,7 @@
  }
 </script>
 
-<div class="wrapper gradio-slider" bind:this={elem}>
+<div class="wrapper gradio-slider" class:mobile={isMobile} bind:this={elem}>
     {#if node !== null && option !== null}
         <Range
             bind:value={option}
@@ -69,9 +69,18 @@
     {/if}
 </div>
 
-<style>
+<style lang="scss">
  .wrapper {
      padding: 2px;
      width: 100%;
+
+     // Prevent swiping on the slider track from accidentally changing the value
+     &.mobile :global(input[type="range"]) {
+         pointer-events: none;
+
+         &::-webkit-slider-thumb {
+             pointer-events: all;
+         }
+     }
  }
 </style>

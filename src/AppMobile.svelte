@@ -26,6 +26,7 @@
  import GraphPage from './mobile/routes/graph.svelte';
  import ListSubWorkflowsPage from './mobile/routes/list-subworkflows.svelte';
  import SubWorkflowPage from './mobile/routes/subworkflow.svelte';
+ import HellPage from './mobile/routes/hell.svelte';
 
  function onBackKeyDown(e) {
      if(f7.view.current.router.currentRoute.path == '/'){
@@ -73,6 +74,10 @@
          {
              path: '/subworkflows/:subworkflowID/',
              component: SubWorkflowPage,
+         },
+         {
+             path: '/hell/',
+             component: HellPage,
          },
      ],
      popup: {

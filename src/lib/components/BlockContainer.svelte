@@ -19,6 +19,7 @@
  export let showHandles: boolean = false;
  export let edit: boolean = false;
  export let dragDisabled: boolean = false;
+ export let isMobile: boolean = false;
 
  let attrsChanged: Writable<boolean> | null = null;
  let children: IDragItem[] | null = null;
@@ -80,7 +81,7 @@
                          animate:flip={{duration:flipDurationMs}}
                          style={item?.attrs?.flexGrow ? `flex-grow: ${item.attrs.flexGrow}` : ""}
                     >
-                        <WidgetContainer dragItem={item} zIndex={zIndex+1} />
+                        <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
                         {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
                             <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
                         {/if}

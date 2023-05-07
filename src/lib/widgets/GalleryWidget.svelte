@@ -11,6 +11,7 @@
 	import { clamp } from "$lib/utils";
 
  export let widget: WidgetLayout | null = null;
+ export let isMobile: boolean = false;
  let node: ComfyGalleryNode | null = null;
  let nodeValue: Writable<GradioFileData[]> | null = null;
  let propsChanged: Writable<number> | null = null;

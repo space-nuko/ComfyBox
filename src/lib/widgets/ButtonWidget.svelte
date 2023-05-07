@@ -5,6 +5,7 @@
  import { Button } from "@gradio/button";
  import { get, type Writable, writable } from "svelte/store";
  export let widget: WidgetLayout | null = null;
+ export let isMobile: boolean = false;
  let node: ComfyButtonNode | null = null;
  let nodeValue: Writable<boolean> | null = null;
  let attrsChanged: Writable<boolean> | null = null;

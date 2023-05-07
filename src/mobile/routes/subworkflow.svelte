@@ -11,10 +11,16 @@
 <Page name="subworkflow">
     <Navbar title="Workflow {subworkflowID}" backLink="Back" />
 
-    <WidgetContainer bind:dragItem={$layoutState.root} classes={["root-container", "mobile"]} />
+    <div class="container">
+        <WidgetContainer bind:dragItem={$layoutState.root} isMobile={true} classes={["root-container", "mobile"]} />
+    </div>
 </Page>
 
 <style lang="scss">
+ .container {
+     overflow-x: hidden;
+ }
+
  // TODO generalize this to all properties!
  :global(.root-container.mobile > .block > .v-pane) {
      flex-direction: column !important;

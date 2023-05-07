@@ -11,6 +11,7 @@
  export let dragItem: IDragItem | null = null;
  export let zIndex: number = 0;
  export let classes: string[] = [];
+ export let isMobile: boolean = false;
  let container: ContainerLayout | null = null;
  let attrsChanged: Writable<boolean> | null = null;
  let propsChanged: Writable<number> | null = null;
@@ -59,7 +60,7 @@
 
 {#if container}
     {#key $attrsChanged}
-        <Container {container} {classes} {zIndex} {showHandles} />
+        <Container {container} {classes} {zIndex} {showHandles} {isMobile} />
     {/key}
 {:else if widget && widget.node}
     {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets" && zIndex > 1}
@@ -71,7 +72,7 @@
                 class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.node.id}
                 class:hidden={widget.attrs.hidden}
                 >
-                <svelte:component this={widget.node.svelteComponentType} {widget} />
+                <svelte:component this={widget.node.svelteComponentType} {widget} {isMobile} />
             </div>
             {#if widget.attrs.hidden && edit}
                 <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>

@@ -20,6 +20,7 @@
  export let showHandles: boolean = false;
  export let edit: boolean = false;
  export let dragDisabled: boolean = false;
+ export let isMobile: boolean = false;
 
  let attrsChanged: Writable<boolean> | null = null;
  let children: IDragItem[] | null = null;
@@ -78,7 +79,7 @@
                                  animate:flip={{duration:flipDurationMs}}
                                  style={item?.attrs?.flexGrow ? `flex-grow: ${item.attrs.flexGrow}` : ""}
                             >
-                                <WidgetContainer dragItem={item} zIndex={zIndex+1} />
+                                <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
                                 {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
                                     <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
                                 {/if}
@@ -97,7 +98,7 @@
             <Block elem_classes={["gradio-accordion"]}>
                 <Accordion label={container.attrs.title} open={container.attrs.openOnStartup}>
                     {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
-                        <WidgetContainer dragItem={item} zIndex={zIndex+1} />
+                        <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
                     {/each}
                 </Accordion>
             </Block>
