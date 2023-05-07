@@ -50,7 +50,7 @@
 
  function ungroup() {
      const item = layoutState.getCurrentSelection()[0]
-     if (item.type !== "container")
+     if (!item || item.type !== "container")
          return;
 
      $layoutState.currentSelection = []
@@ -69,7 +69,7 @@
  }
 
  async function onRightClick(e) {
-     if ($uiState.uiEditMode === "disabled")
+     if (!$uiState.uiUnlocked)
          return;
 
      e.preventDefault();

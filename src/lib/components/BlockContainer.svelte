@@ -11,11 +11,15 @@
  import { flip } from 'svelte/animate';
  import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
  import { startDrag, stopDrag } from "$lib/utils"
+ import type { Writable } from "svelte/store";
 
  export let container: ContainerLayout | null = null;
  export let zIndex: number = 0;
  export let classes: string[] = [];
  export let showHandles: boolean = false;
+ export let edit: boolean = false;
+ export let dragDisabled: boolean = false;
+
  let attrsChanged: Writable<boolean> | null = null;
  let children: IDragItem[] | null = null;
  const flipDurationMs = 100;
@@ -38,60 +42,59 @@
      children = layoutState.updateChildren(container, evt.detail.items)
      // Ensure dragging is stopped on drag finish
  };
+
+ const tt = "asd\nasdlkj"
 </script>
 
 {#if container && children}
-    {@const edit = $uiState.uiEditMode === "widgets" && zIndex > 1}
-    {#key $attrsChanged}
-        <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')} z-index{zIndex}"
-             class:hide-block={container.attrs.blockVariant === "hidden"}
-             class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(container.id)}
-             class:root-container={zIndex === 0}
-             class:is-executing={container.isNodeExecuting}
-             class:edit={edit}>
-            <Block>
-                {#if container.attrs.title !== ""}
-                    <label for={String(container.id)} class={$uiState.uiEditMode === "widgets" ? "edit-title-label" : ""}>
-                        <BlockTitle>{container.attrs.title}</BlockTitle>
-                    </label>
-                {/if}
-                <div class="v-pane"
-                     class:empty={children.length === 0}
-                     class:edit={edit}
-                    use:dndzone="{{
-                                 items: children,
-                                 flipDurationMs,
-                                 centreDraggedOnCursor: true,
-                                 morphDisabled: true,
-                                 dropFromOthersDisabled: zIndex === 0,
-                                 dragDisabled: zIndex === 0 || $layoutState.currentSelection.length > 2 || $uiState.uiEditMode === "disabled"
-                                 }}"
-                    on:consider="{handleConsider}"
-                    on:finalize="{handleFinalize}"
+    <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')} z-index{zIndex}"
+         class:hide-block={container.attrs.containerVariant === "hidden"}
+         class:selected={$uiState.uiUnlocked && $layoutState.currentSelection.includes(container.id)}
+         class:root-container={zIndex === 0}
+         class:is-executing={container.isNodeExecuting}
+         class:edit={edit}>
+        <Block>
+            {#if container.attrs.title && container.attrs.title !== ""}
+                <label for={String(container.id)} class={($uiState.uiUnlocked && $uiState.uiEditMode === "widgets") ? "edit-title-label" : ""}>
+                    <BlockTitle>{container.attrs.title}</BlockTitle>
+                </label>
+            {/if}
+            <div class="v-pane"
+                 class:empty={children.length === 0}
+                 class:edit={edit}
+                 use:dndzone="{{
+                     items: children,
+                     flipDurationMs,
+                     centreDraggedOnCursor: true,
+                     morphDisabled: true,
+                     dropFromOthersDisabled: zIndex === 0,
+                     dragDisabled
+                              }}"
+                 on:consider="{handleConsider}"
+                 on:finalize="{handleFinalize}"
+            >
+                {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
+                    {@const hidden = item?.attrs?.hidden}
+                    <div class="animation-wrapper"
+                         class:hidden={hidden}
+                         animate:flip={{duration:flipDurationMs}}
+                         style={item?.attrs?.flexGrow ? `flex-grow: ${item.attrs.flexGrow}` : ""}
                     >
-                    {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
-                        {@const hidden = item?.attrs?.hidden}
-                        <div class="animation-wrapper"
-                             class:hidden={hidden}
-                             animate:flip={{duration:flipDurationMs}}
-                             style={item?.attrs?.flexGrow ? `flex-grow: ${item.attrs.flexGrow}` : ""}
-                        >
-                            <WidgetContainer dragItem={item} zIndex={zIndex+1} />
-                            {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
-                                <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
-                            {/if}
-                        </div>
-                    {/each}
-                </div>
-                {#if container.attrs.hidden && edit}
-                    <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>
-                {/if}
-                {#if showHandles}
-                    <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
-                {/if}
-            </Block>
-        </div>
-    {/key}
+                        <WidgetContainer dragItem={item} zIndex={zIndex+1} />
+                        {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
+                            <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
+                        {/if}
+                    </div>
+                {/each}
+            </div>
+            {#if container.attrs.hidden && edit}
+                <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>
+            {/if}
+            {#if showHandles}
+                <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+            {/if}
+        </Block>
+    </div>
 {/if}
 
 <style lang="scss">
@@ -158,7 +161,7 @@
          }
      }
 
-     :global(.block) {
+     > :global(.block) {
          height: fit-content;
      }
 
@@ -170,7 +173,7 @@
          padding: 1.4em;
      }
 
-     :global(.hide-block > .block) {
+     > :global(.hide-block > .block) {
          padding: 0.5em 0.25em;
          box-shadow: unset;
          border-width: 0;
@@ -287,12 +290,6 @@
 
  .edit-title::placeholder {
      color: var(--input-placeholder-color);
- }
-
- .widget-edit-outline {
-     border: 2px dashed var(--color-blue-400);
-     margin: 0.2em;
-     padding: 0.2em;
  }
 
  .root-container > :global(.block) {

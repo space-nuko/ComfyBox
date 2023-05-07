@@ -4,7 +4,7 @@
 
  import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
  import { startDrag, stopDrag } from "$lib/utils"
- import BlockContainer from "./BlockContainer.svelte"
+ import Container from "./Container.svelte"
  import { type Writable } from "svelte/store"
  import type { ComfyWidgetNode } from "$lib/nodes";
 
@@ -40,7 +40,8 @@
          propsChanged = null;
  }
 
- $: showHandles = $uiState.uiEditMode === "widgets" // TODO
+ $: showHandles = $uiState.uiUnlocked
+               && $uiState.uiEditMode === "widgets" // TODO
                && zIndex > 1
                && !$layoutState.isMenuOpen
 
@@ -58,15 +59,15 @@
 
 {#if container}
     {#key $attrsChanged}
-        <BlockContainer {container} {classes} {zIndex} {showHandles} />
+        <Container {container} {classes} {zIndex} {showHandles} />
     {/key}
 {:else if widget && widget.node}
-    {@const edit = $uiState.uiEditMode === "widgets" && zIndex > 1}
+    {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets" && zIndex > 1}
     {#key $attrsChanged}
         {#key $propsChanged}
             <div class="widget {widget.attrs.classes} {getWidgetClass()}"
                  class:edit={edit}
-                class:selected={$uiState.uiEditMode !== "disabled" && $layoutState.currentSelection.includes(widget.id)}
+                class:selected={$uiState.uiUnlocked && $layoutState.currentSelection.includes(widget.id)}
                 class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.node.id}
                 class:hidden={widget.attrs.hidden}
                 >
@@ -83,8 +84,12 @@
 {/if}
 
 <style lang="scss">
- .widget.selected {
-     background: var(--color-yellow-200);
+ .widget {
+     height: 100%;
+
+     &.selected {
+         background: var(--color-yellow-200);
+     }
  }
  .container.selected {
      background: var(--color-yellow-400);

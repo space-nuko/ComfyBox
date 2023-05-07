@@ -114,6 +114,11 @@
      }
  }
 
+ :global(.svelte-select) {
+     width: auto;
+     max-width: 30rem;
+ }
+
  :global(.svelte-select-list) {
      z-index: var(--layer-top) !important;
  }

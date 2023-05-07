@@ -20,8 +20,8 @@ export type DefaultWidgetLayout = {
 export default class ComfyGraphNode extends LGraphNode {
     isBackendNode?: boolean;
 
-    beforeQueued?(): void;
-    afterQueued?(prompt: SerializedPrompt): void;
+    beforeQueued?(subgraph: string | null): void;
+    afterQueued?(prompt: SerializedPrompt, subgraph: string | null): void;
     onExecuted?(output: any): void;
 
     defaultWidgets?: DefaultWidgetLayout

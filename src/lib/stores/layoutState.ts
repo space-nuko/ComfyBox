@@ -6,52 +6,249 @@ import { dndzone, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 import type { ComfyWidgetNode } from '$lib/nodes';
 
 type DragItemEntry = {
+    /*
+     * Drag item.
+     */
     dragItem: IDragItem,
+
+    /*
+     * Children of this drag item.
+     * Only applies if the drag item's type is "container"
+     */
     children: IDragItem[] | null,
+
+    /*
+     * Parent of this drag item.
+     */
     parent: IDragItem | null
 }
 
+/*
+ * Global workflow attributes
+ */
 export type LayoutAttributes = {
+    /*
+     * Default subgraph to run when the "Queue Prompt" button in the bottom bar
+     * is pressed.
+     *
+     * If it's an empty string, all backend nodes will be included in the prompt
+     * instead.
+     */
     defaultSubgraph: string
 }
 
+/*
+ * Keeps track of the tree of UI components - widgets and the containers that
+ * group them together.
+ */
 export type LayoutState = {
+    /*
+     * Root of the UI tree
+     */
     root: IDragItem | null,
+
+    /*
+     * All items indexed by their own ID
+     */
     allItems: Record<DragItemID, DragItemEntry>,
+
+    /*
+     * Items indexed by the litegraph node they're bound to
+     * Only contains drag items of type "widget"
+     */
     allItemsByNode: Record<number, DragItemEntry>,
+
+    /*
+     * Next ID to use for instantiating a new drag item
+     */
     currentId: number,
+
+    /*
+     * Selected drag items.
+     */
     currentSelection: DragItemID[],
+
+    /*
+     * Selected LGraphNodes inside the litegraph canvas.
+     */
     currentSelectionNodes: LGraphNode[],
+
+    /*
+     * If true, a saved workflow is being deserialized, so ignore any
+     * nodeAdded/nodeRemoved events.
+     *
+     * TODO: instead use LGraphAddNodeOptions.addedByDeserialize
+     */
     isConfiguring: boolean,
+
+    /*
+     * If true, the right-click context menu is open
+     */
     isMenuOpen: boolean,
+
+    /*
+     * Global workflow attributes
+     */
     attrs: LayoutAttributes
 }
 
+/**
+ * Attributes for both containers and nodes.
+ **/
 export type Attributes = {
+    /*
+     * Flex direction for containers.
+     */
     direction: "horizontal" | "vertical",
+
+    /*
+     * Display name of this item.
+     */
     title: string,
-    showTitle: boolean,
+
+    /*
+     * List of classes to apply to the component.
+     */
     classes: string,
-    blockVariant?: "block" | "hidden",
+
+    /*
+     * Variant for containers. "hidden" hides margin/borders.
+     */
+    containerVariant?: "block" | "hidden",
+
+    /*
+     * If true, don't show this component in the UI
+     */
     hidden?: boolean,
+
+    /*
+     * If true, grey out this component in the UI
+     */
     disabled?: boolean,
-    flexGrow?: number
+
+    /*
+     * CSS height
+     */
+    height?: string,
+
+    /*
+     * CSS Flex grow
+     */
+    flexGrow?: number,
+
+    /**
+     * Display variant for widgets/containers (e.g. number widget can act as slider/knob/dial)
+     * Valid values depend on the widget in question.
+     */
+    variant?: string,
+
+    /*********************************************/
+    /* Special attributes for widgets/containers */
+    /*********************************************/
+
+    // Accordion
+    openOnStartup?: boolean
+
+    // Button
+    buttonVariant?: "primary" | "secondary",
+    buttonSize?: "large" | "small"
 }
 
 export type AttributesSpec = {
+    /*
+     * ID necessary for svelte's keyed each, autoset at the top level in this source file.
+     */
+    id?: number,
+
+    /*
+     * Attribute name. Corresponds to the name of the instance variable in the
+     * hashmap/class instance, which depends on `location`.
+     */
     name: string,
-    type: string,
+
+    /*
+     * Type of this attribute.
+     * If you want to support a custom type, use "string" combined with
+     * `serialize` and `deserialize`.
+     */
+    type: "string" | "enum" | "number" | "boolean",
+
+    /*
+     * Location of this attribute.
+     * - "widget":    inside IDragNode.attrs
+     * - "nodeProps": inside LGraphNode.properties
+     * - "nodeVars":  an instance variable directly on an LGraphNode
+     * - "workflow":  inside $layoutState.attrs
+     */
     location: "widget" | "nodeProps" | "nodeVars" | "workflow"
+
+    /*
+     * Can this attribute be edited in the properties pane.
+     */
     editable: boolean,
 
+    /*
+     * Default value to supply to this attribute if it is null when the properties pane is opened.
+     * NOTE: This means that any attribute can't have a default null value!
+     */
+    defaultValue: any,
+
+    /*
+     * If `type` is "enum", the valid values for the combo widget.
+     */
     values?: string[],
-    hidden?: boolean,
+
+    /*
+     * If `type` is "number", step for the slider
+     */
+    step?: number,
+
+    /*
+     * If `type` is "number", min for the slider
+     */
+    min?: number,
+
+    /*
+     * If `type` is "number", max for the slider
+     */
+    max?: number,
+
+    /*
+     * Valid `LGraphNode.type`s this property applies to if it's located in a node.
+     * These are like "ui/button", "ui/slider".
+     */
     validNodeTypes?: string[],
 
+    /*
+     * Callback: if false, don't show the property in the pane.
+     * Useful if you need to show the property based on another property.
+     * Example: If the IDragItem is a container (not a widget), show its flex `direction`.
+     */
+    canShow?: (arg: IDragItem | LGraphNode) => boolean,
+
+    /*
+     * If the type of this spec is "string", but the underlying type is something else,
+     * convert the value to a string here so it can be edited in the textbox.
+     */
     serialize?: (arg: any) => string,
+
+    /*
+     * If the type of this spec is "string", but the underlying type is something else,
+     * convert the textbox value into the underlying value.
+     */
     deserialize?: (arg: string) => any,
+
+    /*
+     * If true, when this property is changed the properties pane will be rebuilt.
+     * This should be used if there's a canShow dependent on this property so
+     * the pane can be updated with the new list of valid properties.
+     */
+    refreshPanelOnChange?: boolean
 }
 
+/*
+ * A list of `AttributesSpec`s grouped under a category.
+ */
 export type AttributesCategorySpec = {
     categoryName: string,
     specs: AttributesSpec[]
@@ -59,6 +256,17 @@ export type AttributesCategorySpec = {
 
 export type AttributesSpecList = AttributesCategorySpec[]
 
+const serializeStringArray = (arg: string[]) => arg.join(",")
+const deserializeStringArray = (arg: string) => {
+    if (arg === "")
+        return []
+    return arg.split(",").map(s => s.trim())
+}
+
+/*
+ * Attributes that will show up in the properties panel.
+ * Their order in the list is the order they'll appear in the panel.
+ */
 const ALL_ATTRIBUTES: AttributesSpecList = [
     {
         categoryName: "appearance",
@@ -67,18 +275,21 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 name: "title",
                 type: "string",
                 location: "widget",
+                defaultValue: "",
                 editable: true,
             },
             {
                 name: "hidden",
                 type: "boolean",
                 location: "widget",
+                defaultValue: false,
                 editable: true
             },
             {
                 name: "disabled",
                 type: "boolean",
                 location: "widget",
+                defaultValue: false,
                 editable: true
             },
             {
@@ -86,26 +297,74 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 type: "enum",
                 location: "widget",
                 editable: true,
-                values: ["horizontal", "vertical"]
+                values: ["horizontal", "vertical"],
+                defaultValue: "vertical",
+                canShow: (di: IDragItem) => di.type === "container"
             },
             {
                 name: "flexGrow",
                 type: "number",
                 location: "widget",
+                defaultValue: 100,
                 editable: true
             },
             {
                 name: "classes",
                 type: "string",
                 location: "widget",
+                defaultValue: "",
                 editable: true,
             },
+
+            // Container variants
             {
-                name: "blockVariant",
+                name: "variant",
                 type: "enum",
                 location: "widget",
                 editable: true,
-                values: ["block", "hidden"]
+                values: ["block", "accordion", "tabs"],
+                defaultValue: "block",
+                canShow: (di: IDragItem) => di.type === "container",
+                refreshPanelOnChange: true
+            },
+            {
+                name: "containerVariant",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                values: ["block", "hidden"],
+                defaultValue: "block",
+                canShow: (di: IDragItem) => di.type === "container"
+            },
+
+            // Accordion
+            {
+                name: "openOnStartup",
+                type: "boolean",
+                location: "widget",
+                editable: true,
+                defaultValue: false,
+                canShow: (di: IDragItem) => di.type === "container" && di.attrs.variant === "accordion"
+            },
+
+            // Button
+            {
+                name: "buttonVariant",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                validNodeTypes: ["ui/button"],
+                values: ["primary", "secondary"],
+                defaultValue: "primary"
+            },
+            {
+                name: "buttonSize",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                validNodeTypes: ["ui/button"],
+                values: ["large", "small"],
+                defaultValue: "large"
             },
         ]
     },
@@ -118,12 +377,9 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 type: "string",
                 location: "nodeVars",
                 editable: true,
-                serialize: (arg: string[]) => arg.join(","),
-                deserialize: (arg: string) => {
-                    if (arg === "")
-                        return []
-                    return arg.split(",").map(s => s.trim())
-                }
+                defaultValue: [],
+                serialize: serializeStringArray,
+                deserialize: deserializeStringArray
             },
 
             // Range
@@ -132,6 +388,9 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 type: "number",
                 location: "nodeProps",
                 editable: true,
+                defaultValue: 0,
+                min: -2 ^ 16,
+                max: 2 ^ 16,
                 validNodeTypes: ["ui/slider"],
             },
             {
@@ -139,6 +398,9 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 type: "number",
                 location: "nodeProps",
                 editable: true,
+                defaultValue: 10,
+                min: -2 ^ 16,
+                max: 2 ^ 16,
                 validNodeTypes: ["ui/slider"],
             },
             {
@@ -146,16 +408,31 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 type: "number",
                 location: "nodeProps",
                 editable: true,
+                defaultValue: 1,
+                min: -2 ^ 16,
+                max: 2 ^ 16,
                 validNodeTypes: ["ui/slider"],
             },
 
             // Button
             {
-                name: "message",
+                name: "param",
                 type: "string",
                 location: "nodeProps",
                 editable: true,
                 validNodeTypes: ["ui/button"],
+                defaultValue: "bang"
+            },
+
+            // gallery
+            {
+                name: "updateMode",
+                type: "enum",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/gallery"],
+                values: ["replace", "append"],
+                defaultValue: "replace"
             },
 
             // Workflow
@@ -163,35 +440,80 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 name: "defaultSubgraph",
                 type: "string",
                 location: "workflow",
-                editable: true
+                editable: true,
+                defaultValue: ""
             }
         ]
     }
 ];
+
+// This is needed so the specs can be iterated with svelte's keyed #each.
+let i = 0;
+for (const cat of Object.values(ALL_ATTRIBUTES)) {
+    for (const val of Object.values(cat.specs)) {
+        val.id = i;
+        i += 1;
+    }
+}
+
 export { ALL_ATTRIBUTES };
 
+/*
+ * Something that can be dragged around in the frontend - a widget or a container.
+ */
 export interface IDragItem {
-    type: string,
+    /*
+     * Type of the item.
+     */
+    type: "container" | "widget",
+
+    /*
+     * Unique ID of the item.
+     */
     id: DragItemID,
+
+    /*
+     * If true, the node associated with this drag item is executing.
+     * Used to show an indicator on the widget/container.
+     */
     isNodeExecuting?: boolean,
+
+    /*
+     * Attributes for this drag item.
+     */
     attrs: Attributes,
+
+    /*
+     * Hackish thing to indicate to Svelte that an attribute changed.
+     * TODO Use Writeable<Attributes> instead!
+     */
     attrsChanged: Writable<boolean>
 }
 
+/*
+ * A container (block, accordion, tabs). Has child drag items.
+ */
 export interface ContainerLayout extends IDragItem {
     type: "container",
 }
 
+/*
+ * A widget (slider, dropdown, textbox...)
+ */
 export interface WidgetLayout extends IDragItem {
     type: "widget",
+
+    /*
+     * litegraph node this widget is bound to.
+     */
     node: ComfyWidgetNode
 }
 
 type DragItemID = string;
 
 type LayoutStateOps = {
-    addContainer: (parent: ContainerLayout | null, attrs: Partial<Attributes>, index: number) => ContainerLayout,
-    addWidget: (parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes>, index: number) => WidgetLayout,
+    addContainer: (parent: ContainerLayout | null, attrs: Partial<Attributes>, index?: number) => ContainerLayout,
+    addWidget: (parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes>, index?: number) => WidgetLayout,
     findDefaultContainerForInsertion: () => ContainerLayout | null,
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode) => void,
@@ -241,7 +563,7 @@ function findDefaultContainerForInsertion(): ContainerLayout | null {
     return null
 }
 
-function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes> = {}, index: number = -1): ContainerLayout {
+function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes> = {}, index?: number): ContainerLayout {
     const state = get(store);
     const dragItem: ContainerLayout = {
         type: "container",
@@ -249,10 +571,9 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
         attrsChanged: writable(false),
         attrs: {
             title: "Container",
-            showTitle: true,
             direction: "vertical",
             classes: "",
-            blockVariant: "block",
+            containerVariant: "block",
             flexGrow: 100,
             ...attrs
         }
@@ -260,14 +581,14 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
     const entry: DragItemEntry = { dragItem, children: [], parent: null };
     state.allItems[dragItem.id] = entry;
     if (parent) {
-        moveItem(dragItem, parent)
+        moveItem(dragItem, parent, index)
     }
     console.debug("[layoutState] addContainer", state)
     store.set(state)
     return dragItem;
 }
 
-function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes> = {}, index: number = -1): WidgetLayout {
+function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes> = {}, index?: number): WidgetLayout {
     const state = get(store);
     const widgetName = "Widget"
     const dragItem: WidgetLayout = {
@@ -277,7 +598,6 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
         attrsChanged: writable(false),
         attrs: {
             title: widgetName,
-            showTitle: true,
             direction: "horizontal",
             classes: "",
             flexGrow: 100,
@@ -289,7 +609,7 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
     state.allItems[dragItem.id] = entry;
     state.allItemsByNode[node.id] = entry;
     console.debug("[layoutState] addWidget", state)
-    moveItem(dragItem, parent)
+    moveItem(dragItem, parent, index)
     return dragItem;
 }
 
@@ -313,23 +633,10 @@ function nodeAdded(node: LGraphNode) {
 
     const parent = findDefaultContainerForInsertion();
 
-    // Two cases where we want to add nodes:
-    // 1. User adds a new UI node, so we should instantiate its widget in the frontend.
-    // 2. User adds a node with inputs that can be filled by frontend widgets.
-    // Depending on config, this means we should instantiate default UI nodes connected to those inputs.
-
-    console.debug(node)
+    console.debug("[layoutState] nodeAdded", node)
     if ("svelteComponentType" in node) {
         addWidget(parent, node as ComfyWidgetNode);
     }
-
-    // Add default node panel with all widgets autoinstantiated
-    // if (node.widgets && node.widgets.length > 0) {
-    //     const container = addContainer(parent.id, { title: node.title, direction: "vertical", associatedNode: node.id });
-    //     for (const widget of node.widgets) {
-    //         addWidget(container.id, node, widget, { associatedNode: node.id });
-    //     }
-    // }
 }
 
 function removeEntry(state: LayoutState, id: DragItemID) {
@@ -367,7 +674,7 @@ function nodeRemoved(node: LGraphNode) {
     store.set(state)
 }
 
-function moveItem(target: IDragItem, to: ContainerLayout, index: number = -1) {
+function moveItem(target: IDragItem, to: ContainerLayout, index?: number) {
     const state = get(store)
     const entry = state.allItems[target.id]
     if (entry.parent && entry.parent.id === to.id)
@@ -375,9 +682,9 @@ function moveItem(target: IDragItem, to: ContainerLayout, index: number = -1) {
 
     if (entry.parent) {
         const parentEntry = state.allItems[entry.parent.id];
-        const index = parentEntry.children.findIndex(c => c.id === target.id)
-        if (index !== -1) {
-            parentEntry.children.splice(index, 1)
+        const parentIndex = parentEntry.children.findIndex(c => c.id === target.id)
+        if (parentIndex !== -1) {
+            parentEntry.children.splice(parentIndex, 1)
         }
         else {
             console.error(parentEntry)
@@ -387,7 +694,7 @@ function moveItem(target: IDragItem, to: ContainerLayout, index: number = -1) {
     }
 
     const toEntry = state.allItems[to.id];
-    if (index !== -1)
+    if (index != null && index >= 0)
         toEntry.children.splice(index, 0, target)
     else
         toEntry.children.push(target)

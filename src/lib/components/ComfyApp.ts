@@ -106,6 +106,8 @@ export default class ComfyApp {
         LiteGraph.release_link_on_empty_shows_menu = true;
         LiteGraph.alt_drag_do_clone_nodes = true;
 
+        (window as any).LiteGraph = LiteGraph;
+
         // await this.#invokeExtensionsAsync("init");
         await this.registerNodes();
 
@@ -230,17 +232,17 @@ export default class ComfyApp {
     }
 
     private addDropHandler() {
-        this.dropZone = document.getElementById("dropzone");
+        // this.dropZone = document.getElementById("dropzone");
 
-        if (this.dropZone) {
-            window.addEventListener('dragenter', this.allowDrag.bind(this));
-            this.dropZone.addEventListener('dragover', this.allowDrag.bind(this));
-            this.dropZone.addEventListener('dragleave', this.hideDropZone.bind(this));
-            this.dropZone.addEventListener('drop', this.handleDrop.bind(this));
-        }
-        else {
-            console.warn("No dropzone detected (probably on mobile).")
-        }
+        // if (this.dropZone) {
+        //     window.addEventListener('dragenter', this.allowDrag.bind(this));
+        //     this.dropZone.addEventListener('dragover', this.allowDrag.bind(this));
+        //     this.dropZone.addEventListener('dragleave', this.hideDropZone.bind(this));
+        //     this.dropZone.addEventListener('drop', this.handleDrop.bind(this));
+        // }
+        // else {
+        //     console.warn("No dropzone detected (probably on mobile).")
+        // }
     }
 
     /**
@@ -437,7 +439,7 @@ export default class ComfyApp {
             const n = workflow.nodes.find((n) => n.id === node_.id);
 
             if (!node_.isBackendNode) {
-                console.debug("Not serializing node: ", node_.type)
+                // console.debug("Not serializing node: ", node_.type)
                 continue;
             }
 
@@ -562,8 +564,8 @@ export default class ComfyApp {
             }
         }
 
-        console.warn({ workflow, output })
-        console.warn(promptToGraphVis({ workflow, output }))
+        // console.debug({ workflow, output })
+        // console.debug(promptToGraphVis({ workflow, output }))
 
         return { workflow, output };
     }
@@ -588,7 +590,7 @@ export default class ComfyApp {
                 for (let i = 0; i < batchCount; i++) {
                     for (const node of this.lGraph._nodes_in_order) {
                         if ("beforeQueued" in node) {
-                            (node as ComfyGraphNode).beforeQueued();
+                            (node as ComfyGraphNode).beforeQueued(tag);
                         }
                     }
 
@@ -611,7 +613,7 @@ export default class ComfyApp {
                     for (const n of p.workflow.nodes) {
                         const node = this.lGraph.getNodeById(n.id);
                         if ("afterQueued" in node) {
-                            (node as ComfyGraphNode).afterQueued(p);
+                            (node as ComfyGraphNode).afterQueued(p, tag);
                         }
                     }
 

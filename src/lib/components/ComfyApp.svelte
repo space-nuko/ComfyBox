@@ -19,6 +19,8 @@
  import ComfyQueue from "./ComfyQueue.svelte";
  import ComfyProperties from "./ComfyProperties.svelte";
  import queueState from "$lib/stores/queueState";
+ import ComfyUnlockUIButton from "./ComfyUnlockUIButton.svelte";
+	import ComfyGraphView from "./ComfyGraphView.svelte";
 
  export let app: ComfyApp = undefined;
  let imageViewer: ImageViewer;
@@ -29,7 +31,7 @@
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
  let hasShownUIHelpToast: boolean = false;
- let uiTheme: string = "anapnoe";
+ let uiTheme: string = "";
 
  let debugLayout: boolean = false;
 
@@ -58,6 +60,7 @@
      $layoutState.currentSelection = []
 
  let graphSize = 0;
+ let graphTransitioning = false;
 
  function toggleGraph() {
      if (graphSize == 0) {
@@ -69,7 +72,7 @@
      }
  }
 
- let propsSidebarSize = 0; //15;
+ let propsSidebarSize = 15; //15;
 
  function toggleProps() {
      if (propsSidebarSize == 0) {
@@ -120,11 +123,7 @@
      }
  }
 
- function doRecenter(): void {
-     app.lCanvas.recenter();
- }
-
- $: if ($uiState.uiEditMode !== "disabled" && !hasShownUIHelpToast) {
+ $: if ($uiState.uiUnlocked && !hasShownUIHelpToast) {
      hasShownUIHelpToast = true;
      toast.push("Right-click to open context menu.")
  }
@@ -144,11 +143,17 @@
  }
 
  $: if (containerElem) {
-     let wrappers = containerElem.querySelectorAll<HTMLDivElement>(".pane-wrapper")
-     for (const wrapper of wrappers) {
-         const paneNode = wrapper.parentNode as HTMLElement; // get the node inside the <Pane/>
-         paneNode.ontransitionend = () => {
-             app.resizeCanvas()
+     const canvas = containerElem.querySelector<HTMLDivElement>("#graph-canvas")
+     if (canvas) {
+         const paneNode = canvas.closest(".splitpanes__pane")
+         if (paneNode) {
+             (paneNode as HTMLElement).ontransitionstart = () => {
+                 graphTransitioning = true
+             }
+             (paneNode as HTMLElement).ontransitionend = () => {
+                 graphTransitioning = false
+                 app.resizeCanvas()
+             }
          }
      }
  }
@@ -158,7 +163,7 @@
      (window as any).app = app;
      (window as any).appPane = uiPane;
 
-     await import('../../scss/ux.scss');
+     // await import('../../scss/ux.scss');
 
      refreshView();
  })
@@ -189,9 +194,7 @@
                         <ComfyUIPane bind:this={uiPane} {app} />
                     </Pane>
                     <Pane bind:size={graphSize}>
-                        <div class="canvas-wrapper pane-wrapper">
-                            <canvas id="graph-canvas" />
-                        </div>
+                        <ComfyGraphView {app} transitioning={graphTransitioning} />
                     </Pane>
                 </Splitpanes>
             </Pane>
@@ -203,50 +206,53 @@
         </Splitpanes>
     </div>
     <div id="bottombar">
-        <Button variant="primary" on:click={queuePrompt}>
-            Queue Prompt
-        </Button>
-        <Button variant="secondary" on:click={toggleGraph}>
-            Toggle Graph
-        </Button>
-        <Button variant="secondary" on:click={toggleProps}>
-            Toggle Props
-        </Button>
-        <Button variant="secondary" on:click={toggleQueue}>
-            Toggle Queue
-        </Button>
-        <Button variant="secondary" on:click={doSave}>
-            Save
-        </Button>
-        <Button variant="secondary" on:click={doReset}>
-            Reset
-        </Button>
-        <Button variant="secondary" on:click={doLoadDefault}>
-            Load Default
-        </Button>
-        <Button variant="secondary" on:click={doRecenter}>
-            Recenter
-        </Button>
-        <Button variant="secondary" on:click={doRefreshCombos}>
-            🔄
-        </Button>
-        <!-- <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
-             <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/> -->
-        <Checkbox label="Auto-Add UI" bind:value={$uiState.autoAddUI}/>
-        <label class="label" for="enable-ui-editing">
-            <BlockTitle>Enable UI Editing</BlockTitle>
-            <select id="enable-ui-editing" name="enable-ui-editing" bind:value={$uiState.uiEditMode}>
-                <option value="disabled">Disabled</option>
-                <option value="widgets">Widgets</option>
-            </select>
-        </label>
-        <label class="label" for="ui-theme">
-            <BlockTitle>Theme</BlockTitle>
-            <select id="ui-theme" name="ui-theme" bind:value={uiTheme}>
-                <option value="">None</option>
-                <option value="anapnoe">Anapnoe</option>
-            </select>
-        </label>
+        <div class="left">
+            <Button variant="primary" on:click={queuePrompt}>
+                Queue Prompt
+            </Button>
+            <Button variant="secondary" on:click={toggleGraph}>
+                Toggle Graph
+            </Button>
+            <Button variant="secondary" on:click={toggleProps}>
+                Toggle Props
+            </Button>
+            <Button variant="secondary" on:click={toggleQueue}>
+                Toggle Queue
+            </Button>
+            <Button variant="secondary" on:click={doSave}>
+                Save
+            </Button>
+            <Button variant="secondary" on:click={doReset}>
+                Reset
+            </Button>
+            <Button variant="secondary" on:click={doLoadDefault}>
+                Load Default
+            </Button>
+            <Button variant="secondary" on:click={doRefreshCombos}>
+                🔄
+            </Button>
+            <!-- <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
+                 <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/> -->
+            <span style="display: inline-flex !important">
+                <Checkbox label="Auto-Add UI" bind:value={$uiState.autoAddUI}/>
+            </span>
+            <span class="label" for="ui-edit-mode">
+                <BlockTitle>UI Edit mode</BlockTitle>
+                <select id="ui-edit-mode" name="ui-edit-mode" bind:value={$uiState.uiEditMode}>
+                    <option value="widgets">Widgets</option>
+                </select>
+            </span>
+            <span class="label" for="ui-theme">
+                <BlockTitle>Theme</BlockTitle>
+                <select id="ui-theme" name="ui-theme" bind:value={uiTheme}>
+                    <option value="">None</option>
+                    <option value="anapnoe">Anapnoe</option>
+                </select>
+            </span>
+        </div>
+        <div class="right">
+            <ComfyUnlockUIButton bind:toggled={$uiState.uiUnlocked} />
+        </div>
     </div>
     <LightboxModal />
 </div>
@@ -266,26 +272,24 @@
      height: 100vh;
  }
 
- #comfy-ui {
- }
-
- #comfy-graph {
- }
-
- #graph-canvas {
- }
-
  #bottombar {
+     padding-top: 0.5em;
      display: flex;
-     flex-wrap: wrap;
-     gap: var(--layout-gap);
-     margin: 10px;
- }
-
- .canvas-wrapper {
+     align-items: center;
      width: 100%;
-     height: 100%;
-     background-color: #333;
+     gap: var(--layout-gap);
+     padding-left: 1em;
+     padding-right: 1em;
+     margin-top: auto;
+     overflow-x: auto;
+
+     > .left {
+         flex-shrink: 0;
+     }
+
+     > .right {
+         margin-left: auto
+     }
  }
 
  .sidebar-wrapper {
@@ -349,5 +353,9 @@
 
  label.label > :global(span) {
      top: 20%;
+ }
+
+ span.left {
+     right: 0px;
  }
 </style>

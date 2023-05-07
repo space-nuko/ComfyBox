@@ -1,4 +1,4 @@
-import { BuiltInSlotType, LiteGraph, type ITextWidget, type SlotLayout, clamp } from "@litegraph-ts/core";
+import { BuiltInSlotType, LiteGraph, type ITextWidget, type SlotLayout, clamp, type PropertyLayout, type IComboWidget } from "@litegraph-ts/core";
 import ComfyGraphNode from "./ComfyGraphNode";
 import type { GalleryOutput } from "./ComfyWidgetNodes";
 
@@ -6,7 +6,8 @@ export interface ComfyImageCacheNodeProperties extends Record<any, any> {
     images: GalleryOutput | null,
     index: number,
     filenames: Record<number, { filename: string | null, status: ImageCacheState }>,
-    genNumber: number
+    genNumber: number,
+    updateMode: "replace" | "append"
 }
 
 type ImageCacheState = "none" | "uploading" | "failed" | "cached"
@@ -20,7 +21,8 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
         images: null,
         index: 0,
         filenames: {},
-        genNumber: 0
+        genNumber: 0,
+        updateMode: "replace"
     }
 
     static slotLayout: SlotLayout = {
@@ -36,11 +38,15 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
         ]
     }
 
+    static propertyLayout: PropertyLayout = [
+        { name: "updateMode", defaultValue: "replace", type: "enum", options: { values: ["replace", "append"] } }
+    ]
+
     private _uploadPromise: Promise<void> | null = null;
-    private _state: ImageCacheState = "none"
 
     stateWidget: ITextWidget;
     filenameWidget: ITextWidget;
+    modeWidget: IComboWidget;
 
     constructor(name?: string) {
         super(name)
@@ -57,6 +63,14 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
             ""
         );
         this.filenameWidget.disabled = true;
+
+        this.modeWidget = this.addWidget<IComboWidget>(
+            "combo",
+            "Mode",
+            this.properties.updateMode,
+            null,
+            { property: "updateMode", values: ["replace", "append"] }
+        );
     }
 
     override onPropertyChanged(property: string, value: any, prevValue?: any) {
@@ -66,12 +80,22 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
             else
                 this.properties.index = 0
         }
+        else if (property === "updateMode") {
+            this.modeWidget.value = value;
+        }
 
+        this.updateWidgets()
+    }
+
+    private updateWidgets() {
         if (this.properties.filenames && this.properties.images) {
             const fileCount = this.properties.images.images.length;
             const cachedCount = Object.keys(this.properties.filenames).length
             console.warn(cachedCount, this.properties.filenames)
             this.filenameWidget.value = `${fileCount} files, ${cachedCount} cached`
+        }
+        else {
+            this.filenameWidget.value = `No files cached`
         }
     }
 
@@ -185,6 +209,7 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
             this.setProperty("images", null)
             this.setProperty("filenames", {})
             this.setProperty("index", 0)
+            this.updateWidgets();
             return
         }
 
@@ -192,11 +217,24 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
 
         if (link.data && "images" in link.data) {
             this.setProperty("genNumber", this.properties.genNumber + 1)
-            this.setProperty("images", link.data as GalleryOutput)
-            this.setProperty("filenames", {})
-            console.debug("[ComfyImageCacheNode] Received output!", link.data)
+
+            const output = link.data as GalleryOutput;
+
+            if (this.properties.updateMode === "append" && this.properties.images != null) {
+                const newImages = this.properties.images.images.concat(output.images)
+                this.properties.images.images = newImages
+                this.setProperty("images", this.properties.images)
+            }
+            else {
+                this.setProperty("images", link.data as GalleryOutput)
+                this.setProperty("filenames", {})
+            }
+
+            console.debug("[ComfyImageCacheNode] Received output!", output, this.properties.updateMode, this.properties.images)
             this.setIndex(0, true)
         }
+
+        this.updateWidgets();
     }
 }
 

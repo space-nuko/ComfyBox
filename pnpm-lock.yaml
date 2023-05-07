@@ -4,6 +4,9 @@ importers:
 
   .:
     dependencies:
+      '@gradio/accordion':
+        specifier: workspace:*
+        version: link:gradio/js/accordion
       '@gradio/atoms':
         specifier: workspace:*
         version: link:gradio/js/atoms
@@ -22,6 +25,9 @@ importers:
       '@gradio/icons':
         specifier: workspace:*
         version: link:gradio/js/icons
+      '@gradio/tabs':
+        specifier: workspace:*
+        version: link:gradio/js/tabs
       '@gradio/theme':
         specifier: workspace:*
         version: link:gradio/js/theme

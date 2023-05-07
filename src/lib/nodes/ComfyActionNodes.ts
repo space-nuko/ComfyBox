@@ -4,14 +4,14 @@ import { Watch } from "@litegraph-ts/nodes-basic";
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
 import { toast } from '@zerodevx/svelte-toast'
 import type { GalleryOutput } from "./ComfyWidgetNodes";
+import { get } from "svelte/store";
+import queueState from "$lib/stores/queueState";
 
 export interface ComfyQueueEventsProperties extends Record<any, any> {
-    prompt: SerializedPrompt | null
 }
 
 export class ComfyQueueEvents extends ComfyGraphNode {
     override properties: ComfyQueueEventsProperties = {
-        prompt: null
     }
 
     static slotLayout: SlotLayout = {
@@ -22,29 +22,29 @@ export class ComfyQueueEvents extends ComfyGraphNode {
         ],
     }
 
-    override onPropertyChanged(property: string, value: any, prevValue?: any) {
-        if (property === "value") {
-            this.setOutputData(2, this.properties.prompt)
+    private getActionParams(subgraph: string | null): any {
+        let queue = get(queueState)
+        let remaining = 0;
+
+        if (typeof queue.queueRemaining === "number")
+            remaining = queue.queueRemaining
+
+        return {
+            queueRemaining: remaining,
+            subgraph
         }
     }
 
-    override onExecute() {
-        this.setOutputData(2, this.properties.prompt)
+    override beforeQueued(subgraph: string | null) {
+        this.triggerSlot(0, this.getActionParams(subgraph))
     }
 
-    override beforeQueued() {
-        this.setProperty("value", null)
-        this.triggerSlot(0, "bang")
-    }
-
-    override afterQueued(p: SerializedPrompt) {
-        this.setProperty("value", p)
-        this.triggerSlot(1, "bang")
+    override afterQueued(p: SerializedPrompt, subgraph: string | null) {
+        this.triggerSlot(1, this.getActionParams(subgraph))
     }
 
     override onSerialize(o: SerializedLGraphNode) {
         super.onSerialize(o)
-        o.properties = { prompt: null }
     }
 }
 
@@ -112,7 +112,7 @@ export class ComfyCopyAction extends ComfyGraphNode {
             { name: "copy", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
-            { name: "out", type: "*" }
+            { name: "out", type: BuiltInSlotType.EVENT }
         ],
     }
 
@@ -130,13 +130,15 @@ export class ComfyCopyAction extends ComfyGraphNode {
     }
 
     override onExecute() {
-        this.setProperty("value", this.getInputData(0))
+        if (this.getInputLink(0))
+            this.setProperty("value", this.getInputData(0))
     }
 
     override onAction(action: any, param: any) {
-        this.setProperty("value", this.getInputData(0))
-        this.setOutputData(0, this.properties.value)
-        console.log("setData", this.properties.value)
+        if (action === "copy") {
+            this.setProperty("value", this.getInputData(0))
+            this.triggerSlot(0, this.properties.value)
+        }
     };
 }
 
