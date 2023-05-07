@@ -39,6 +39,8 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
 
     copyFromInputLink: boolean = true;
 
+    abstract defaultValue: T;
+
     /** Names of properties to add as inputs */
     // shownInputProperties: string[] = []
 
@@ -204,14 +206,20 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     clampOneConfig(input: IComfyInputSlot) { }
 
     override onSerialize(o: SerializedLGraphNode) {
-        super.onSerialize(o);
         (o as any).comfyValue = get(this.value);
         (o as any).shownOutputProperties = this.shownOutputProperties
+        super.onSerialize(o);
     }
 
     override onConfigure(o: SerializedLGraphNode) {
         this.value.set((o as any).comfyValue);
         this.shownOutputProperties = (o as any).shownOutputProperties;
+    }
+
+    override stripUserState(o: SerializedLGraphNode) {
+        super.stripUserState(o);
+        (o as any).comfyValue = this.defaultValue;
+        o.properties.defaultValue = null;
     }
 }
 
@@ -232,6 +240,7 @@ export class ComfySliderNode extends ComfyWidgetNode<number> {
     }
 
     override svelteComponentType = RangeWidget
+    override defaultValue = 0;
 
     static slotLayout: SlotLayout = {
         inputs: [
@@ -303,6 +312,7 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
     }
 
     override svelteComponentType = ComboWidget
+    override defaultValue = "A";
 
     constructor(name?: string) {
         super(name, "A")
@@ -346,12 +356,19 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
     }
 
     override clampOneConfig(input: IComfyInputSlot) {
-        if (input.config.values.indexOf(this.properties.value) === -1) {
+        if (!input.config.values)
+            this.setValue("")
+        else if (input.config.values.indexOf(this.properties.value) === -1) {
             if (input.config.values.length === 0)
                 this.setValue("")
             else
                 this.setValue(input.config.defaultValue || input.config.values[0])
         }
+    }
+
+    override stripUserState(o: SerializedLGraphNode) {
+        super.stripUserState(o);
+        o.properties.values = []
     }
 }
 
@@ -384,6 +401,7 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
     }
 
     override svelteComponentType = TextWidget
+    override defaultValue = "";
 
     constructor(name?: string) {
         super(name, "")
@@ -433,7 +451,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     static slotLayout: SlotLayout = {
         inputs: [
             { name: "images", type: "OUTPUT" },
-            { name: "store", type: BuiltInSlotType.ACTION },
+            { name: "store", type: BuiltInSlotType.ACTION, options: { color_off: "rebeccapurple", color_on: "rebeccapurple" } },
             { name: "clear", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
@@ -446,6 +464,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     ]
 
     override svelteComponentType = GalleryWidget
+    override defaultValue = []
     override copyFromInputLink = false;
     override outputIndex = null;
     override changedIndex = null;
@@ -472,12 +491,11 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
             this.setValue([])
         }
         else if (action === "store") {
-            const link = this.getInputLink(0)
-            if (link.data && "images" in link.data) {
-                const data = link.data as GalleryOutput
+            if (param && "images" in param) {
+                const data = param as GalleryOutput
                 console.debug("[ComfyGalleryNode] Received output!", data)
 
-                const galleryItems: GradioFileData[] = this.convertItems(link.data)
+                const galleryItems: GradioFileData[] = this.convertItems(data)
 
                 if (this.properties.updateMode === "append") {
                     const currentValue = get(this.value)
@@ -546,8 +564,13 @@ export class ComfyButtonNode extends ComfyWidgetNode<boolean> {
         ]
     }
 
-    override outputIndex = 1;
     override svelteComponentType = ButtonWidget;
+    override defaultValue = false;
+    override outputIndex = 1;
+
+    constructor(name?: string) {
+        super(name, false)
+    }
 
     override setValue(value: any) {
         super.setValue(Boolean(value))
@@ -557,10 +580,6 @@ export class ComfyButtonNode extends ComfyWidgetNode<boolean> {
         this.setValue(true)
         this.triggerSlot(0, this.properties.param);
         this.setValue(false) // TODO onRelease
-    }
-
-    constructor(name?: string) {
-        super(name, false)
     }
 }
 
@@ -587,6 +606,7 @@ export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
     }
 
     override svelteComponentType = CheckboxWidget;
+    override defaultValue = false;
 
     override setValue(value: any) {
         value = Boolean(value)

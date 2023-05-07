@@ -26,8 +26,17 @@ export default class ComfyGraphNode extends LGraphNode {
 
     defaultWidgets?: DefaultWidgetLayout
 
-    /** Called when a backend node sends a ComfyUI output over a link */
-    receiveOutput(output: any) {
+    /*
+     * If false, don't serialize user-set properties into the workflow.
+     * Useful for removing personal information from shared workflows.
+     */
+    saveUserState: boolean = true;
+
+    /*
+     * Called to remove user-set properties from this node.
+     */
+    stripUserState(o: SerializedLGraphNode) {
+        o.widgets_values = []
     }
 
     override onResize(size: Vector2) {
@@ -56,6 +65,11 @@ export default class ComfyGraphNode extends LGraphNode {
                 (serInput as any).defaultWidgetNode = null
             }
         }
+        (o as any).saveUserState = this.saveUserState
+        if (!this.saveUserState) {
+            this.stripUserState(o)
+            console.warn("[ComfyGraphNode] stripUserState", this, o)
+        }
     }
 
     override onConfigure(o: SerializedLGraphNode) {
@@ -71,5 +85,8 @@ export default class ComfyGraphNode extends LGraphNode {
                     comfyInput.defaultWidgetNode = widgetNode.class as any
             }
         }
+        this.saveUserState = (o as any).saveUserState;
+        if (this.saveUserState == null)
+            this.saveUserState = true
     }
 }

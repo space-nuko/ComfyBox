@@ -27,7 +27,7 @@ import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import { get } from "svelte/store";
 import uiState from "$lib/stores/uiState";
-import { promptToGraphVis } from "$lib/utils";
+import { promptToGraphVis, workflowToGraphVis } from "$lib/utils";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -144,9 +144,6 @@ export default class ComfyApp {
         // Ensure the canvas fills the window
         this.resizeCanvas();
         window.addEventListener("resize", this.resizeCanvas.bind(this));
-
-        this.lGraph.start();
-        this.lGraph.eventBus.on("afterExecute", () => this.lCanvas.draw(true))
 
         this.alreadySetup = true;
 
@@ -374,6 +371,9 @@ export default class ComfyApp {
         this.lCanvas.deserialize(data.canvas)
 
         await this.refreshComboInNodes();
+
+        this.lGraph.start();
+        this.lGraph.eventBus.on("afterExecute", () => this.lCanvas.draw(true))
     }
 
     async initDefaultGraph() {
@@ -606,6 +606,7 @@ export default class ComfyApp {
                                 '--toastBackground': 'var(--color-red-500)',
                             }
                         })
+                        console.error(promptToGraphVis(p))
                         console.error("Error queuing prompt", mes, num, p)
                         break;
                     }

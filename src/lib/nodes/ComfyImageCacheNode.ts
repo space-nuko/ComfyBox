@@ -29,7 +29,7 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
         inputs: [
             { name: "images", type: "OUTPUT" },
             { name: "index", type: "number" },
-            { name: "store", type: BuiltInSlotType.ACTION },
+            { name: "store", type: BuiltInSlotType.ACTION, options: { color_off: "rebeccapurple", color_on: "rebeccapurple" } },
             { name: "clear", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
@@ -204,7 +204,7 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
         }
     }
 
-    override onAction(action: any) {
+    override onAction(action: any, param: any) {
         if (action === "clear") {
             this.setProperty("images", null)
             this.setProperty("filenames", {})
@@ -213,12 +213,10 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
             return
         }
 
-        const link = this.getInputLink(0)
-
-        if (link.data && "images" in link.data) {
+        if (param && "images" in param) {
             this.setProperty("genNumber", this.properties.genNumber + 1)
 
-            const output = link.data as GalleryOutput;
+            const output = param as GalleryOutput;
 
             if (this.properties.updateMode === "append" && this.properties.images != null) {
                 const newImages = this.properties.images.images.concat(output.images)
@@ -226,7 +224,7 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
                 this.setProperty("images", this.properties.images)
             }
             else {
-                this.setProperty("images", link.data as GalleryOutput)
+                this.setProperty("images", param as GalleryOutput)
                 this.setProperty("filenames", {})
             }
 

@@ -102,7 +102,7 @@
      if (!app?.lGraph)
          return;
 
-     const promptFilename = false; // TODO
+     const promptFilename = true; // TODO
 
      let filename = "workflow.json";
      if (promptFilename) {
@@ -133,6 +133,7 @@
 
  function loadWorkflow(): void {
      app.handleFile(fileInput.files[0]);
+     fileInput.files = null;
 }
 
  function doSaveLocal(): void {

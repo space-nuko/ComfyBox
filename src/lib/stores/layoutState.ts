@@ -381,6 +381,13 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 serialize: serializeStringArray,
                 deserialize: deserializeStringArray
             },
+            {
+                name: "saveUserState",
+                type: "boolean",
+                location: "nodeVars",
+                editable: true,
+                defaultValue: true,
+            },
 
             // Range
             {

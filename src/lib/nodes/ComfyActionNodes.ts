@@ -55,24 +55,21 @@ LiteGraph.registerNodeType({
     type: "actions/queue_events"
 })
 
-export interface ComfyOnExecutedEventProperties extends Record<any, any> {
-    images: GalleryOutput | null,
-    filename: string | null
+export interface ComfyStoreImagesActionProperties extends Record<any, any> {
+    images: GalleryOutput | null
 }
 
-export class ComfyOnExecutedEvent extends ComfyGraphNode {
-    override properties: ComfyOnExecutedEventProperties = {
-        images: null,
-        filename: null
+export class ComfyStoreImagesAction extends ComfyGraphNode {
+    override properties: ComfyStoreImagesActionProperties = {
+        images: null
     }
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "images", type: "IMAGE" }
+            { name: "output", type: BuiltInSlotType.ACTION, options: { color_off: "rebeccapurple", color_on: "rebeccapurple" } }
         ],
         outputs: [
             { name: "images", type: "OUTPUT" },
-            { name: "onExecuted", type: BuiltInSlotType.EVENT },
         ],
     }
 
@@ -81,20 +78,20 @@ export class ComfyOnExecutedEvent extends ComfyGraphNode {
             this.setOutputData(0, this.properties.images)
     }
 
-    override receiveOutput(output: any) {
-        if (output && "images" in output) {
-            this.setProperty("images", output as GalleryOutput)
-            this.setOutputData(0, this.properties.images)
-            this.triggerSlot(1, "bang")
-        }
+    override onAction(action: any, param: any) {
+        if (action !== "store" || !param || !("images" in param))
+            return;
+
+        this.setProperty("images", param as GalleryOutput)
+        this.setOutputData(0, this.properties.images)
     }
 }
 
 LiteGraph.registerNodeType({
-    class: ComfyOnExecutedEvent,
-    title: "Comfy.OnExecutedEvent",
-    desc: "Triggers a 'bang' event when a prompt output is received.",
-    type: "actions/on_executed"
+    class: ComfyStoreImagesAction,
+    title: "Comfy.StoreImagesAction",
+    desc: "Stores images from an onExecuted callback",
+    type: "actions/store_images"
 })
 
 export interface ComfyCopyActionProperties extends Record<any, any> {

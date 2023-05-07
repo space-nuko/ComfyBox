@@ -2,7 +2,9 @@ import LGraphCanvas from "@litegraph-ts/core/src/LGraphCanvas";
 import ComfyGraphNode from "./ComfyGraphNode";
 import ComfyWidgets from "$lib/widgets"
 import type { ComfyWidgetNode } from "./ComfyWidgetNodes";
-import type { SerializedLGraphNode } from "@litegraph-ts/core";
+import { BuiltInSlotType, type SerializedLGraphNode } from "@litegraph-ts/core";
+import type IComfyInputSlot from "$lib/IComfyInputSlot";
+import type { ComfyInputConfig } from "$lib/IComfyInputSlot";
 
 /*
  * Base class for any node with configuration sent by the backend.
@@ -26,7 +28,7 @@ export class ComfyBackendNode extends ComfyGraphNode {
         // It just returns a hash like { "ui": { "images": results } } internally.
         // So this will need to be hardcoded for now.
         if (["PreviewImage", "SaveImage"].indexOf(comfyClass) !== -1) {
-            this.addOutput("output", "IMAGE");
+            this.addOutput("onExecuted", BuiltInSlotType.EVENT, { color_off: "rebeccapurple", color_on: "rebeccapurple" });
         }
     }
 
@@ -36,14 +38,19 @@ export class ComfyBackendNode extends ComfyGraphNode {
      */
     tags: string[] = []
 
+    private static defaultInputConfigs: Record<string, Record<string, ComfyInputConfig>> = {}
+
     private setup(nodeData: any) {
         var inputs = nodeData["input"]["required"];
         if (nodeData["input"]["optional"] != undefined) {
             inputs = Object.assign({}, nodeData["input"]["required"], nodeData["input"]["optional"])
         }
 
-        const config = { minWidth: 1, minHeight: 1 };
+        ComfyBackendNode.defaultInputConfigs[this.type] = {}
+
         for (const inputName in inputs) {
+            const config = { minWidth: 1, minHeight: 1 };
+
             const inputData = inputs[inputName];
             const type = inputData[0];
 
@@ -64,6 +71,9 @@ export class ComfyBackendNode extends ComfyGraphNode {
                     this.addInput(inputName, type);
                 }
             }
+
+            if ("widgetNodeType" in config)
+                ComfyBackendNode.defaultInputConfigs[this.type][config.name] = config.config
         }
 
         for (const o in nodeData["output"]) {
@@ -72,39 +82,44 @@ export class ComfyBackendNode extends ComfyGraphNode {
             this.addOutput(outputName, output);
         }
 
-        const s = this.computeSize();
-        s[0] = Math.max(config.minWidth, s[0] * 1.5);
-        s[1] = Math.max(config.minHeight, s[1]);
-        this.size = s;
         this.serialize_widgets = false;
-
         // app.#invokeExtensionsAsync("nodeCreated", this);
     }
 
     override onSerialize(o: SerializedLGraphNode) {
         super.onSerialize(o);
         (o as any).tags = this.tags
+        for (const input of o.inputs) {
+            // strip user-identifying data, it will be reinstantiated later
+            if ((input as any).config != null) {
+                (input as any).config = {};
+            }
+        }
     }
 
     override onConfigure(o: SerializedLGraphNode) {
         super.onConfigure(o);
+
         this.tags = (o as any).tags || []
+
+        const configs = ComfyBackendNode.defaultInputConfigs[o.type]
+        for (let index = 0; index < this.inputs.length; index++) {
+            const input = this.inputs[index] as IComfyInputSlot
+            const config = configs[input.name]
+            if (config != null && index >= 0 && index < this.inputs.length) {
+                if (input.config == null || Object.keys(input.config).length !== Object.keys(config).length) {
+                    console.error("SET", input, config)
+                    input.config = config
+                }
+            }
+            else {
+                input.config = {}
+            }
+        }
     }
 
     override onExecuted(outputData: any) {
         console.warn("onExecuted outputs", outputData)
-        for (let index = 0; index < this.outputs.length; index++) {
-            const output = this.outputs[index]
-            if (output.type === "IMAGE") {
-                this.setOutputData(index, outputData)
-                for (const node of this.getOutputNodes(index)) {
-                    console.warn(node)
-                    if ("receiveOutput" in node) {
-                        const widgetNode = node as ComfyGraphNode;
-                        widgetNode.receiveOutput(outputData);
-                    }
-                }
-            }
-        }
+        this.triggerSlot(0, outputData)
     }
 }
