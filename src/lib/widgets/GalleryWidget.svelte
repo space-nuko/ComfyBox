@@ -73,10 +73,13 @@
     {/if}
 </div>
 
-<style>
+<style lang="scss">
  .wrapper {
-     padding: 2px;
      width: 100%;
+
+     :global(> .block) {
+         border-radius: 0px !important;
+     }
  }
 
  .padding {

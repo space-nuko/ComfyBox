@@ -1,10 +1,11 @@
-import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot, type SerializedLGraphNode, BuiltInSlotType, type PropertyLayout } from "@litegraph-ts/core";
+import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot, type SerializedLGraphNode, BuiltInSlotType, type PropertyLayout, type IComboWidget } from "@litegraph-ts/core";
 import ComfyGraphNode from "./ComfyGraphNode";
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import RangeWidget from "$lib/widgets/RangeWidget.svelte";
 import TextWidget from "$lib/widgets/TextWidget.svelte";
 import GalleryWidget from "$lib/widgets/GalleryWidget.svelte";
 import ButtonWidget from "$lib/widgets/ButtonWidget.svelte";
+import CheckboxWidget from "$lib/widgets/CheckboxWidget.svelte";
 import type { SvelteComponentDev } from "svelte/internal";
 import { Watch } from "@litegraph-ts/nodes-basic";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
@@ -48,8 +49,11 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     override isBackendNode = false;
     override serialize_widgets = true;
 
-    outputIndex: number | null = 0;
+    // input slots
     inputIndex: number = 0;
+
+    // output slots
+    outputIndex: number | null = 0;
     changedIndex: number | null = 1;
 
     displayWidget: ITextWidget;
@@ -94,7 +98,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         if (this.outputIndex !== null && this.outputs.length >= this.outputIndex) {
             this.setOutputData(this.outputIndex, get(this.value))
         }
-        if (this.changedIndex !== null & this.outputs.length >= this.changedIndex) {
+        if (this.changedIndex !== null && this.outputs.length >= this.changedIndex) {
             const changedOutput = this.outputs[this.changedIndex]
             if (changedOutput.type === BuiltInSlotType.EVENT)
                 this.triggerSlot(this.changedIndex, "changed")
@@ -118,10 +122,8 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         if (this.copyFromInputLink) {
             if (this.inputs.length >= this.inputIndex) {
                 const data = this.getInputData(this.inputIndex)
-                if (data) { // TODO can "null" be a legitimate value here?
+                if (data != null) { // TODO can "null" be a legitimate value here?
                     this.setValue(data)
-                    const input = this.getInputLink(this.inputIndex)
-                    input.data = null;
                 }
             }
         }
@@ -231,7 +233,8 @@ export class ComfySliderNode extends ComfyWidgetNode<number> {
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "value", type: "number" }
+            { name: "value", type: "number" },
+            { name: "store", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
             { name: "value", type: "number" },
@@ -248,6 +251,11 @@ export class ComfySliderNode extends ComfyWidgetNode<number> {
 
     constructor(name?: string) {
         super(name, 0)
+    }
+
+    override onAction(action: any, param: any) {
+        if (action === "store" && typeof param === "number")
+            this.setValue(param)
     }
 
     override setValue(value: any) {
@@ -283,7 +291,8 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "value", type: "string" }
+            { name: "value", type: "string" },
+            { name: "store", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
             { name: "value", type: "string" },
@@ -323,6 +332,11 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
         return true;
     }
 
+    override onAction(action: any, param: any) {
+        if (action === "store" && typeof param === "string")
+            this.setValue(param)
+    }
+
     override setValue(value: any) {
         if (typeof value !== "string" || this.properties.values.indexOf(value) === -1)
             return;
@@ -358,7 +372,8 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "value", type: "string" }
+            { name: "value", type: "string" },
+            { name: "store", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
             { name: "value", type: "string" },
@@ -370,6 +385,11 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
 
     constructor(name?: string) {
         super(name, "")
+    }
+
+    override onAction(action: any, param: any) {
+        if (action === "store")
+            this.setValue(param)
     }
 
     override setValue(value: any) {
@@ -428,15 +448,24 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     override outputIndex = null;
     override changedIndex = null;
 
+    modeWidget: IComboWidget;
+
     constructor(name?: string) {
         super(name, [])
+        this.modeWidget = this.addWidget("combo", "Mode", this.properties.updateMode, null, { property: "updateMode", values: ["replace", "append"] })
+    }
+
+    override onPropertyChanged(property: any, value: any) {
+        if (property === "updateMode") {
+            this.modeWidget.value = value;
+        }
     }
 
     override onExecute() {
         this.setOutputData(0, this.properties.index)
     }
 
-    override onAction(action: any) {
+    override onAction(action: any, param: any, options: { action_call?: string }) {
         if (action === "clear") {
             this.setValue([])
         }
@@ -538,4 +567,41 @@ LiteGraph.registerNodeType({
     title: "UI.Button",
     desc: "Button that triggers an event when clicked",
     type: "ui/button"
+})
+
+export interface ComfyCheckboxProperties extends ComfyWidgetProperties {
+}
+
+export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
+    override properties: ComfyCheckboxProperties = {
+        defaultValue: false,
+    }
+
+    static slotLayout: SlotLayout = {
+        outputs: [
+            { name: "value", type: "boolean" },
+            { name: "changed", type: BuiltInSlotType.EVENT },
+        ]
+    }
+
+    override svelteComponentType = CheckboxWidget;
+
+    override setValue(value: any) {
+        value = Boolean(value)
+        const changed = value != get(this.value);
+        super.setValue(Boolean(value))
+        if (changed)
+            this.triggerSlot(1)
+    }
+
+    constructor(name?: string) {
+        super(name, false)
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyCheckboxNode,
+    title: "UI.Checkbox",
+    desc: "Checkbox that stores a boolean value",
+    type: "ui/checkbox"
 })

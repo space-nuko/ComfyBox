@@ -439,7 +439,7 @@ export default class ComfyApp {
             const n = workflow.nodes.find((n) => n.id === node_.id);
 
             if (!node_.isBackendNode) {
-                console.debug("Not serializing node: ", node_.type)
+                // console.debug("Not serializing node: ", node_.type)
                 continue;
             }
 
@@ -564,8 +564,8 @@ export default class ComfyApp {
             }
         }
 
-        console.warn({ workflow, output })
-        console.warn(promptToGraphVis({ workflow, output }))
+        // console.debug({ workflow, output })
+        // console.debug(promptToGraphVis({ workflow, output }))
 
         return { workflow, output };
     }

@@ -99,11 +99,16 @@
      if (spec.canShow)
          return spec.canShow(widget);
 
-     if (widget.type === "widget" && spec.validNodeTypes) {
-         const node = (widget as WidgetLayout).node
-         if (!node)
+     if (spec.validNodeTypes) {
+         if (widget.type === "widget") {
+             const node = (widget as WidgetLayout).node
+             if (!node)
+                 return false;
+             return spec.validNodeTypes.indexOf(node.type) !== -1;
+         }
+         else if (widget.type === "container") {
              return false;
-         return spec.validNodeTypes.indexOf(node.type) !== -1;
+         }
      }
 
      return spec.name in widget.attrs

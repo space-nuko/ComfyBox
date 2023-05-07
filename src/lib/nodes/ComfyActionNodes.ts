@@ -112,7 +112,7 @@ export class ComfyCopyAction extends ComfyGraphNode {
             { name: "copy", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
-            { name: "out", type: "*" }
+            { name: "out", type: BuiltInSlotType.EVENT }
         ],
     }
 
@@ -130,13 +130,15 @@ export class ComfyCopyAction extends ComfyGraphNode {
     }
 
     override onExecute() {
-        this.setProperty("value", this.getInputData(0))
+        if (this.getInputLink(0))
+            this.setProperty("value", this.getInputData(0))
     }
 
     override onAction(action: any, param: any) {
-        this.setProperty("value", this.getInputData(0))
-        this.setOutputData(0, this.properties.value)
-        console.log("setData", this.properties.value)
+        if (action === "copy") {
+            this.setProperty("value", this.getInputData(0))
+            this.triggerSlot(0, this.properties.value)
+        }
     };
 }
 

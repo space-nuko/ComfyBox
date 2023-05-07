@@ -419,6 +419,10 @@ div.gradio-row>.form{
     box-shadow: none !important;
 }
 
+.gradio-checkbox > .inner > .block {
+    background-color: var(--ae-input-bg-color) !important;
+}
+
 .wrapper.gradio-textbox textarea {
     overflow-y: scroll;
     box-sizing: border-box;
