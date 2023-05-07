@@ -158,7 +158,7 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
         else {
             this.properties.filenames[newIndex] = { filename: null, status: "uploading" }
             this.onPropertyChanged("filenames", this.properties.filenames)
-            const url = "http://localhost:8188" // TODO make configurable
+            const url = `http://${location.hostname}:8188` // TODO make configurable
             const params = new URLSearchParams(data)
 
             const promise = fetch(url + "/view?" + params)

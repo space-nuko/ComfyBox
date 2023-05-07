@@ -28,6 +28,7 @@ import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import { get } from "svelte/store";
 import uiState from "$lib/stores/uiState";
 import { promptToGraphVis, workflowToGraphVis } from "$lib/utils";
+import notify from "$lib/notify";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -601,11 +602,7 @@ export default class ComfyApp {
                     } catch (error) {
                         // this.ui.dialog.show(error.response || error.toString());
                         const mes = error.response || error.toString()
-                        toast.push(`Error queuing prompt:\n${mes}`, {
-                            theme: {
-                                '--toastBackground': 'var(--color-red-500)',
-                            }
-                        })
+                        notify(`Error queuing prompt:\n${mes}`, null, "error")
                         console.error(promptToGraphVis(p))
                         console.error("Error queuing prompt", mes, num, p)
                         break;
@@ -643,7 +640,7 @@ export default class ComfyApp {
                 }
                 else {
                     console.error("No metadata found in image file.", pngInfo)
-                    toast.push("No metadata found in image file.")
+                    notify("No metadata found in image file.")
                 }
             }
         } else if (file.type === "application/json" || file.name.endsWith(".json")) {

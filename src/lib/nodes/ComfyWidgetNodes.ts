@@ -516,11 +516,11 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     private convertItems(output: GalleryOutput): GradioFileData[] {
         return output.images.map(r => {
             // TODO configure backend URL
-            const url = "http://localhost:8188/view?"
+            const url = `http://${location.hostname}:8188` // TODO make configurable
             const params = new URLSearchParams(r)
             return {
                 name: null,
-                data: url + params
+                data: url + "/view?" + params
             }
         });
     }

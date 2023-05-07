@@ -11,6 +11,7 @@
  let option: any
 
  export let debug: boolean = false;
+ let input: HTMLInputElement | null = null
 
  $: widget && setNodeValue(widget);
 
@@ -53,6 +54,11 @@
      return links[0].data
  }
 
+ function onSelect() {
+     if (input)
+         input.blur();
+ }
+
  let lastPropsChanged: number = 0;
  let werePropsChanged: boolean = false;
 
@@ -76,8 +82,10 @@
                     disabled={widget.attrs.disabled || node.properties.values.length === 0}
                     clearable={false}
                     showChevron={true}
+                    inputAttributes={{ autocomplete: 'off' }}
+                    bind:input
                     on:change
-                    on:select
+                    on:select={onSelect}
                     on:filter
                     on:blur
                 />

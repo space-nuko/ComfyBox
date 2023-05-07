@@ -7,7 +7,7 @@
  import uiState from "$lib/stores/uiState"
 
  let app: ComfyApp | null = null;
- let lCanvas: LGraphCanvas | null = null;
+ let lCanvas: ComfyGraphCanvas | null = null;
  let canvasEl: HTMLCanvasElement | null = null;
 
  $: if (!app)
@@ -21,13 +21,14 @@
      lCanvas.draw(true, true);
  }
 
- $: if (app && canvasEl) {
+ $: if (app != null && canvasEl != null) {
      if (!lCanvas) {
          lCanvas = new ComfyGraphCanvas(app, canvasEl);
          lCanvas.allow_interaction = false;
          LiteGraph.dialog_close_on_mouse_leave = false;
          LiteGraph.search_hide_on_mouse_leave = false;
          LiteGraph.pointerevents_method = "pointer";
+         app.lGraph.eventBus.on("afterExecute", () => lCanvas.draw(true))
      }
      resizeCanvas();
  }

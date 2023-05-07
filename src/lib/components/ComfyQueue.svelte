@@ -1,15 +1,7 @@
 <script lang="ts">
  import queueState from "$lib/stores/queueState";
  import ProgressBar from "./ProgressBar.svelte";
-
- function getNodeInfo(nodeId: number): string {
-     let app = (window as any).app;
-     if (!app)
-         return String(nodeId);
-
-     const title = app.lGraph.getNodeById(nodeId)?.title || String(nodeId);
-     return title + " (" + nodeId + ")"
- }
+ import { getNodeInfo } from "$lib/utils"
 
  const entries = [
      {

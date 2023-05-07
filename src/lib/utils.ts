@@ -99,3 +99,12 @@ export function promptToGraphVis(prompt: SerializedPrompt): string {
     out += "}"
     return out
 }
+
+export function getNodeInfo(nodeId: number): string {
+    let app = (window as any).app;
+    if (!app)
+        return String(nodeId);
+
+    const title = app.lGraph.getNodeById(nodeId)?.title || String(nodeId);
+    return title + " (" + nodeId + ")"
+}

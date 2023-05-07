@@ -22,6 +22,7 @@
  import ComfyUnlockUIButton from "./ComfyUnlockUIButton.svelte";
 	import ComfyGraphView from "./ComfyGraphView.svelte";
 	import { download } from "$lib/utils";
+	import notify from "$lib/notify";
 
  export let app: ComfyApp = undefined;
  let imageViewer: ImageViewer;
@@ -141,7 +142,7 @@
          return;
 
      app.saveStateToLocalStorage();
-     toast.push("Saved to local storage.")
+     notify("Saved to local storage.")
      //
      //      const date = new Date();
      //      const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
@@ -165,7 +166,7 @@
 
  $: if ($uiState.uiUnlocked && !hasShownUIHelpToast) {
      hasShownUIHelpToast = true;
-     toast.push("Right-click to open context menu.")
+     notify("Right-click to open context menu.")
  }
 
  if (debugLayout) {

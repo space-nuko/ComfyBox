@@ -35,6 +35,7 @@
  function onRelease(e: Event) {
      if (nodeValue && option) {
          $nodeValue = option
+         navigator.vibrate(100)
      }
  }
 

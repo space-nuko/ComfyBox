@@ -6,6 +6,7 @@ import { toast } from '@zerodevx/svelte-toast'
 import type { GalleryOutput } from "./ComfyWidgetNodes";
 import { get } from "svelte/store";
 import queueState from "$lib/stores/queueState";
+import notify from "$lib/notify";
 
 export interface ComfyQueueEventsProperties extends Record<any, any> {
 }
@@ -199,7 +200,7 @@ export class ComfyNotifyAction extends ComfyGraphNode {
     override onAction(action: any, param: any) {
         const message = this.getInputData(0);
         if (message) {
-            toast.push(message);
+            notify(message);
         }
     };
 }

@@ -113,7 +113,7 @@ export class ComfyBackendNode extends ComfyGraphNode {
                 }
             }
             else {
-                console.error("[ComfyBackendNode] Missing input config in onConfigure()!", input, configs)
+                console.debug("[ComfyBackendNode] Missing input config in onConfigure()", input, configs)
                 input.config = {}
             }
         }
