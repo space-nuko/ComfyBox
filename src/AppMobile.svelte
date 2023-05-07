@@ -107,19 +107,19 @@
 </script>
 
 {#if app}
-<App theme="auto" name="ComfyBox" {...f7params}>
-    <View
-        url="/"
-        main={true}
-        class="safe-areas"
-        masterDetailBreakpoint={768},
-        browserHistory=true,
-        browserHistoryRoot="/mobile/"
-    >
-        <GenToolbar {app} />
-    </View>
-</App>
-<div class="canvas-wrapper pane-wrapper" style="display: none">
-    <canvas id="graph-canvas" />
-</div>
+    <App theme="auto" name="ComfyBox" {...f7params}>
+        <View
+            url="/"
+            main={true}
+            class="safe-areas"
+            masterDetailBreakpoint={768},
+            browserHistory=true,
+            browserHistoryRoot="/mobile/"
+        >
+            <GenToolbar {app} />
+        </View>
+    </App>
+    <div class="canvas-wrapper pane-wrapper" style="display: none">
+        <canvas id="graph-canvas" />
+    </div>
 {/if}

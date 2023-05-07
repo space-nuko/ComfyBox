@@ -57,7 +57,6 @@
  function onRelease(e: Event) {
      if (nodeValue && option) {
          $nodeValue = option
-         navigator.vibrate(100)
      }
  }
 
@@ -78,11 +77,26 @@
  }
 
  function onPointerDown(e: PointerEvent) {
+     if (!isMobile)
+         return;
+
      interfaceState.showIndicator(e.clientX, e.clientY, option);
  }
 
+ let canVibrate = true;
+ let lastDisplayValue = null;
+
  function onPointerMove(e: PointerEvent) {
+     if (!isMobile)
+         return;
      interfaceState.showIndicator(e.clientX, e.clientY, option);
+
+     if (canVibrate && lastDisplayValue != option) {
+         lastDisplayValue = option;
+         canVibrate = false;
+         setTimeout(() => { canVibrate = true }, 30)
+         navigator.vibrate(10)
+     }
  }
 </script>
 

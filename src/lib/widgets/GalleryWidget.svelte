@@ -9,6 +9,7 @@
  import type { FileData as GradioFileData } from "@gradio/upload";
  import type { SelectData as GradioSelectData } from "@gradio/utils";
 	import { clamp } from "$lib/utils";
+	import { f7 } from "framework7-svelte";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -39,14 +40,79 @@
  }
  let element: HTMLDivElement;
 
+ let mobileLightbox = null;
+
+ function showMobileLightbox(event: Event) {
+     if (!f7)
+         return
+
+     if (mobileLightbox) {
+         mobileLightbox.destroy();
+         mobileLightbox = null;
+     }
+
+     const source = (event.target || event.srcElement) as HTMLImageElement;
+     const galleryElem = source.closest<HTMLDivElement>("div.block")
+     console.debug("[ImageViewer] showModal", event, source, galleryElem);
+     if (!galleryElem || ImageViewer.all_gallery_buttons(galleryElem).length === 0) {
+         console.error("No buttons found on gallery element!", galleryElem)
+         return;
+     }
+
+     const allGalleryButtons = ImageViewer.all_gallery_buttons(galleryElem);
+     const selectedSource = source.src
+
+     const images = allGalleryButtons.map(button => {
+         return {
+             url: (button.children[0] as HTMLImageElement).src,
+             caption: "Image"
+         }
+     })
+
+
+     mobileLightbox = f7.photoBrowser.create({
+         photos: images,
+         thumbs: images.map(i => i.url),
+         type: 'popup',
+     });
+     mobileLightbox.open()
+
+     event.stopPropagation()
+ }
+
+ function setupImageForMobileLightbox(e: HTMLImageElement) {
+     if (e.dataset.modded === "true")
+         return;
+
+     e.dataset.modded = "true";
+     e.style.cursor = "pointer";
+     e.style.userSelect = "none";
+
+     var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+
+     // For Firefox, listening on click first switched to next image then shows the lightbox.
+     // If you know how to fix this without switching to mousedown event, please.
+     // For other browsers the event is click to make it possiblr to drag picture.
+     var event = isFirefox ? 'mousedown' : 'click'
+
+     e.addEventListener(event, (evt) => {
+         evt.preventDefault()
+         showMobileLightbox(evt)
+     }, true);
+ }
+
  function onSelect(e: CustomEvent<GradioSelectData>) {
      // Setup lightbox
      // Wait for gradio gallery to show the large preview image, if no timeout then
      // the event might fire too early
+
+     const callback = isMobile ? setupImageForMobileLightbox
+                    : ImageViewer.instance.setupImageForLightbox.bind(ImageViewer.instance)
+
      setTimeout(() => {
          const images = element.querySelectorAll<HTMLImageElement>('div.block div > img')
          if (images != null) {
-             images.forEach(ImageViewer.instance.setupImageForLightbox.bind(ImageViewer.instance));
+             images.forEach(callback);
          }
          ImageViewer.instance.updateOnBackgroundChange();
      }, 200)
@@ -54,8 +120,8 @@
      // Update index
      node.setProperty("index", e.detail.index as number)
  }
-
 </script>
+
 <div class="wrapper comfy-gallery-widget gradio-gallery" bind:this={element}>
     {#if widget && node && nodeValue}
         <Block variant="solid" padding={false}>

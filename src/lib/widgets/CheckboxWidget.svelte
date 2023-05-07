@@ -20,6 +20,10 @@
          attrsChanged = widget.attrsChanged;
      }
  };
+
+ function onSelect() {
+     navigator.vibrate(20)
+ }
 </script>
 
 <div class="wrapper gradio-checkbox">
@@ -27,7 +31,7 @@
         {#key $attrsChanged}
             {#if node !== null}
                 <Block>
-                    <Checkbox disabled={widget.attrs.disabled} label={widget.attrs.title} bind:value={$nodeValue} />
+                    <Checkbox disabled={widget.attrs.disabled} label={widget.attrs.title} bind:value={$nodeValue} on:select={onSelect} />
                 </Block>
             {/if}
         {/key}

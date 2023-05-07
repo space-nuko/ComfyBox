@@ -55,9 +55,14 @@
      return links[0].data
  }
 
+ function onFocus() {
+     navigator.vibrate(20)
+ }
+
  function onSelect() {
      if (input)
          input.blur();
+     navigator.vibrate(20)
  }
 
  let lastPropsChanged: number = 0;
@@ -86,6 +91,7 @@
                     inputAttributes={{ autocomplete: 'off' }}
                     bind:input
                     on:change
+                    on:focus={onFocus}
                     on:select={onSelect}
                     on:filter
                     on:blur

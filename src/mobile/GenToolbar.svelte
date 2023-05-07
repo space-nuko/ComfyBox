@@ -9,6 +9,7 @@
  import ProgressBar from "$lib/components/ProgressBar.svelte";
 	import Indicator from "./Indicator.svelte";
 	import interfaceState from "$lib/stores/interfaceState";
+	import LightboxModal from "$lib/components/LightboxModal.svelte";
 
  export let subworkflowID: number = -1;
  export let app: ComfyApp = undefined;

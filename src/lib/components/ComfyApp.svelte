@@ -25,7 +25,6 @@
 	import notify from "$lib/notify";
 
  export let app: ComfyApp = undefined;
- let imageViewer: ImageViewer;
  let queue: ComfyQueue = undefined;
  let mainElem: HTMLDivElement;
  let uiPane: ComfyUIPane = undefined;
@@ -173,10 +172,6 @@
      layoutState.subscribe(s => {
          console.warn("UPDATESTATE", s)
      })
- }
-
- $: if (app.rootEl && !imageViewer) {
-     imageViewer = new ImageViewer(app.rootEl);
  }
 
  $: if (containerElem) {

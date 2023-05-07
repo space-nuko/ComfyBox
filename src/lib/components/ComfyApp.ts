@@ -98,7 +98,7 @@ export default class ComfyApp {
             return;
         }
 
-        this.rootEl = document.getElementById("main") as HTMLDivElement;
+        this.rootEl = document.getElementById("app") as HTMLDivElement;
         this.canvasEl = document.getElementById("graph-canvas") as HTMLCanvasElement;
         this.lGraph = new ComfyGraph();
         this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl);

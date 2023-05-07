@@ -22,6 +22,7 @@
 
  function onClick(e: MouseEvent) {
      node.onClick();
+     navigator.vibrate(20)
  }
 
  const style = {
