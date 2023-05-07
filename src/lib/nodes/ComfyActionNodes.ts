@@ -161,16 +161,16 @@ export class ComfySwapAction extends ComfyGraphNode {
             { name: "swap", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
-            { name: "B", type: "*" },
-            { name: "A", type: "*" }
+            { name: "B", type: BuiltInSlotType.EVENT },
+            { name: "A", type: BuiltInSlotType.EVENT }
         ],
     }
 
     override onAction(action: any, param: any) {
         const a = this.getInputData(0)
         const b = this.getInputData(1)
-        this.setOutputData(0, a)
-        this.setOutputData(1, b)
+        this.triggerSlot(0, a)
+        this.triggerSlot(1, b)
     };
 }
 

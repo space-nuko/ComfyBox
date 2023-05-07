@@ -5,6 +5,9 @@ import { f7 } from "framework7-svelte"
 let notification;
 
 function notifyf7(text: string, title?: string) {
+    if (!f7)
+        return;
+
     if (!notification) {
         notification = f7.notification.create({
             title: title,

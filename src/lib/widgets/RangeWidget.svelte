@@ -37,6 +37,12 @@
      option = value;
  }
 
+ function onRelease(e: Event) {
+     if (nodeValue && option != null) {
+         $nodeValue = option
+     }
+ }
+
  function setBackgroundSize(input: HTMLInputElement) {
      input.style.setProperty("--background-size", `${getBackgroundSize(input)}%`);
  }
@@ -52,12 +58,6 @@
  function updateSliderForMobile() {
      const target = elem.querySelector<HTMLInputElement>("input[type=range]");
      setBackgroundSize(target);
- }
-
- function onRelease(e: Event) {
-     if (nodeValue && option) {
-         $nodeValue = option
-     }
  }
 
  let elem: HTMLDivElement = null;
