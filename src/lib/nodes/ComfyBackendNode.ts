@@ -108,11 +108,12 @@ export class ComfyBackendNode extends ComfyGraphNode {
             const config = configs[input.name]
             if (config != null && index >= 0 && index < this.inputs.length) {
                 if (input.config == null || Object.keys(input.config).length !== Object.keys(config).length) {
-                    console.error("SET", input, config)
+                    console.debug("[ComfyBackendNode] restore input config", input, config)
                     input.config = config
                 }
             }
             else {
+                console.error("[ComfyBackendNode] Missing input config in onConfigure()!", input, configs)
                 input.config = {}
             }
         }
