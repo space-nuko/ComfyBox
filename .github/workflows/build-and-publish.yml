@@ -1,6 +1,7 @@
 name: Build and Publish
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
