@@ -13,6 +13,7 @@
  import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
  import { startDrag, stopDrag } from "$lib/utils"
  import type { Writable } from "svelte/store";
+ import { isHidden } from "$lib/widgets/utils";
 
  export let container: ContainerLayout | null = null;
  export let zIndex: number = 0;
@@ -86,7 +87,7 @@
                      on:finalize="{handleFinalize}"
                 >
                     {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item, i(item.id)}
-                        {@const hidden = item?.attrs?.hidden}
+                        {@const hidden = isHidden(item)}
                         {@const tabName = getTabName(container, i)}
                         <div class="animation-wrapper"
                              class:hidden={hidden}
@@ -104,7 +105,7 @@
                         </div>
                     {/each}
                 </div>
-                {#if container.attrs.hidden && edit}
+                {#if isHidden(container) && edit}
                     <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>
                 {/if}
                 {#if showHandles}

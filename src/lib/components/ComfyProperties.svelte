@@ -142,7 +142,7 @@
          value = spec.deserialize(value)
 
      target.attrs[name] = value
-     target.attrsChanged.set(!get(target.attrsChanged))
+     target.attrsChanged.set(get(target.attrsChanged) + 1)
 
      if (node && "propsChanged" in node) {
          const comfyNode = node as ComfyWidgetNode
@@ -151,9 +151,18 @@
 
      console.warn(spec)
      if (spec.refreshPanelOnChange) {
-         console.error("A! refresh")
-         $refreshPanel += 1;
+         doRefreshPanel()
      }
+ }
+
+ function getProperty(node: LGraphNode, spec: AttributesSpec) {
+     let value = node.properties[spec.name]
+     if (value == null)
+         value = spec.defaultValue
+     else if (spec.serialize)
+         value = spec.serialize(value)
+     console.debug("[ComfyProperties] getProperty", spec, value, node)
+     return value
  }
 
  function updateProperty(spec: AttributesSpec, value: any) {
@@ -161,17 +170,20 @@
          return
 
      const name = spec.name
-     console.warn("updateProperty", name, value)
+     console.warn("[ComfyProperties] updateProperty", name, value)
+
+     if (spec.deserialize)
+         value = spec.deserialize(value)
 
      node.properties[name] = value;
 
      if ("propsChanged" in node) {
          const comfyNode = node as ComfyWidgetNode
-         comfyNode.propsChanged.set(get(comfyNode.propsChanged) + 1)
+         comfyNode.notifyPropsChanged();
      }
 
      if (spec.refreshPanelOnChange)
-         $refreshPanel += 1;
+         doRefreshPanel()
  }
 
  function getVar(node: LGraphNode, spec: AttributesSpec) {
@@ -201,8 +213,14 @@
          comfyNode.propsChanged.set(get(comfyNode.propsChanged) + 1)
      }
 
-     if (spec.refreshPanelOnChange)
-         $refreshPanel += 1;
+     if (spec.refreshPanelOnChange) {
+         doRefreshPanel()
+     }
+ }
+
+ function doRefreshPanel() {
+     console.warn("[ComfyProperties] doRefreshPanel")
+     $refreshPanel += 1;
  }
 
  function updateWorkflowAttribute(spec: AttributesSpec, value: any) {
@@ -214,6 +232,9 @@
 
      $layoutState.attrs[name] = value
      $layoutState = $layoutState
+
+     if (spec.refreshPanelOnChange)
+         doRefreshPanel()
  }
 </script>
 
@@ -281,7 +302,7 @@
                             <div class="props-entry">
                                 {#if spec.type === "string"}
                                     <TextBox
-                                        value={node.properties[spec.name] || spec.defaultValue}
+                                        value={getProperty(node, spec)}
                                         on:change={(e) => updateProperty(spec, e.detail)}
                                         on:input={(e) => updateProperty(spec, e.detail)}
                                         label={spec.name}
@@ -290,7 +311,7 @@
                                         />
                                 {:else if spec.type === "boolean"}
                                         <Checkbox
-                                            value={node.properties[spec.name] || spec.defaultValue}
+                                            value={getProperty(node, spec)}
                                             label={spec.name}
                                             disabled={!$uiState.uiUnlocked || !spec.editable}
                                             on:change={(e) => updateProperty(spec, e.detail)}
@@ -298,7 +319,7 @@
                                 {:else if spec.type === "number"}
                                             <ComfyNumberProperty
                                                 name={spec.name}
-                                                value={node.properties[spec.name] || spec.defaultValue}
+                                                value={getProperty(node, spec)}
                                                 step={spec.step || 1}
                                                 min={spec.min || -1024}
                                                 max={spec.max || 1024}
@@ -308,7 +329,7 @@
                                 {:else if spec.type === "enum"}
                                                 <ComfyComboProperty
                                                     name={spec.name}
-                                                    value={node.properties[spec.name] || spec.defaultValue}
+                                                    value={getProperty(node, spec)}
                                                     values={spec.values}
                                                     disabled={!$uiState.uiUnlocked || !spec.editable}
                                                     on:change={(e) => updateProperty(spec, e.detail)}

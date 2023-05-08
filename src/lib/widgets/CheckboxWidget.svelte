@@ -1,9 +1,10 @@
 <script lang="ts">
  import type { ComfyCheckboxNode } from "$lib/nodes/ComfyWidgetNodes";
  import { type WidgetLayout } from "$lib/stores/layoutState";
-	import { Block } from "@gradio/atoms";
+ import { Block } from "@gradio/atoms";
  import { Checkbox } from "@gradio/form";
  import { get, type Writable, writable } from "svelte/store";
+ import { isDisabled } from "./utils"
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -31,7 +32,7 @@
         {#key $attrsChanged}
             {#if node !== null}
                 <Block>
-                    <Checkbox disabled={widget.attrs.disabled} label={widget.attrs.title} bind:value={$nodeValue} on:select={onSelect} />
+                    <Checkbox disabled={isDisabled(widget)} label={widget.attrs.title} bind:value={$nodeValue} on:select={onSelect} />
                 </Block>
             {/if}
         {/key}

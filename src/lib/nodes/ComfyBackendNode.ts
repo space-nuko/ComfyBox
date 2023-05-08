@@ -32,12 +32,6 @@ export class ComfyBackendNode extends ComfyGraphNode {
         }
     }
 
-    /*
-     * Tags this node belongs to
-     * Allows you to run subsections of the graph
-     */
-    tags: string[] = []
-
     private static defaultInputConfigs: Record<string, Record<string, ComfyInputConfig>> = {}
 
     private setup(nodeData: any) {
@@ -88,7 +82,6 @@ export class ComfyBackendNode extends ComfyGraphNode {
 
     override onSerialize(o: SerializedLGraphNode) {
         super.onSerialize(o);
-        (o as any).tags = this.tags
         for (const input of o.inputs) {
             // strip user-identifying data, it will be reinstantiated later
             if ((input as any).config != null) {
@@ -99,8 +92,6 @@ export class ComfyBackendNode extends ComfyGraphNode {
 
     override onConfigure(o: SerializedLGraphNode) {
         super.onConfigure(o);
-
-        this.tags = (o as any).tags || []
 
         const configs = ComfyBackendNode.defaultInputConfigs[o.type]
         for (let index = 0; index < this.inputs.length; index++) {

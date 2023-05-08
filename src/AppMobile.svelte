@@ -17,8 +17,7 @@
  import GraphPage from './mobile/routes/graph.svelte';
  import ListSubWorkflowsPage from './mobile/routes/list-subworkflows.svelte';
  import SubWorkflowPage from './mobile/routes/subworkflow.svelte';
- import HellPage from './mobile/routes/hell.svelte';
-	import type { Framework7Parameters } from "framework7/types";
+ import type { Framework7Parameters } from "framework7/types";
 
  export let app: ComfyApp;
 
@@ -79,13 +78,6 @@
          {
              path: '/subworkflows/:subworkflowID/',
              component: SubWorkflowPage,
-             options: {
-                 props: { app }
-             }
-         },
-         {
-             path: '/hell/',
-             component: HellPage,
              options: {
                  props: { app }
              }

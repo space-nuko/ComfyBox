@@ -33,8 +33,5 @@
         <ListItem link="/graph/" title="Show Node Graph">
             <i class="icon icon-f7" slot="media" />
         </ListItem>
-        <ListItem link="/hell/" title="🔥 HELL 🔥">
-            <i class="icon icon-f7" slot="media" />
-        </ListItem>
     </List>
 </Page>

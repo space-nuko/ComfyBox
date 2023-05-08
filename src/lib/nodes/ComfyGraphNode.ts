@@ -1,7 +1,7 @@
 import type { ComfyInputConfig } from "$lib/IComfyInputSlot";
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
 import type ComfyWidget from "$lib/components/widgets/ComfyWidget";
-import { LGraph, LGraphNode, LiteGraph, type SerializedLGraphNode, type Vector2 } from "@litegraph-ts/core";
+import { LGraph, LGraphNode, LiteGraph, NodeMode, type SerializedLGraphNode, type Vector2 } from "@litegraph-ts/core";
 import type { SvelteComponentDev } from "svelte/internal";
 import type { ComfyWidgetNode } from "./ComfyWidgetNodes";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";

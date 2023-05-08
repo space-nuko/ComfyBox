@@ -201,7 +201,7 @@
  })
 
  async function doRefreshCombos() {
-     await app.refreshComboInNodes()
+     await app.refreshComboInNodes(true)
  }
 </script>
 

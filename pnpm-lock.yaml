@@ -46,6 +46,9 @@ importers:
       '@litegraph-ts/nodes-events':
         specifier: workspace:*
         version: link:litegraph/packages/nodes-events
+      '@litegraph-ts/nodes-logic':
+        specifier: workspace:*
+        version: link:litegraph/packages/nodes-logic
       '@litegraph-ts/nodes-math':
         specifier: workspace:*
         version: link:litegraph/packages/nodes-math
@@ -791,6 +794,22 @@ importers:
         version: 4.2.1
 
   litegraph/packages/nodes-events:
+    dependencies:
+      '@litegraph-ts/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@litegraph-ts/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: ^5.0.3
+        version: 5.0.3
+      vite:
+        specifier: ^4.2.1
+        version: 4.3.1
+
+  litegraph/packages/nodes-logic:
     dependencies:
       '@litegraph-ts/core':
         specifier: workspace:*

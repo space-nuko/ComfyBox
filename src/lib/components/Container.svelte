@@ -14,6 +14,8 @@
  import { flip } from 'svelte/animate';
  import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
  import { startDrag, stopDrag } from "$lib/utils"
+	import type { Writable } from "svelte/store";
+	import { isHidden } from "$lib/widgets/utils";
 
  export let container: ContainerLayout | null = null;
  export let zIndex: number = 0;
@@ -34,12 +36,14 @@
     {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets" && zIndex > 1}
     {@const dragDisabled = zIndex === 0 || $layoutState.currentSelection.length > 2 || !$uiState.uiUnlocked}
     {#key $attrsChanged}
-        {#if container.attrs.variant === "tabs"}
-            <TabsContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
-        {:else if container.attrs.variant === "accordion"}
-            <AccordionContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
-        {:else}
-            <BlockContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
+        {#if edit || !isHidden(container)}
+            {#if container.attrs.variant === "tabs"}
+                <TabsContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
+            {:else if container.attrs.variant === "accordion"}
+                <AccordionContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
+            {:else}
+                <BlockContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
+            {/if}
         {/if}
     {/key}
 {/if}

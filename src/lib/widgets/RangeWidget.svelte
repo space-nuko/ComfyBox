@@ -5,6 +5,7 @@
  import { get, type Writable } from "svelte/store";
 	import { debounce } from "$lib/utils";
 	import interfaceState from "$lib/stores/interfaceState";
+ import { isDisabled } from "./utils"
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfySliderNode | null = null;
@@ -104,7 +105,7 @@
     {#if node !== null && option !== null}
         <Range
             bind:value={option}
-            disabled={widget.attrs.disabled}
+            disabled={isDisabled(widget)}
             minimum={node.properties.min}
             maximum={node.properties.max}
             step={node.properties.step}

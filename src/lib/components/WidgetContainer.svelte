@@ -7,6 +7,8 @@
  import Container from "./Container.svelte"
  import { type Writable } from "svelte/store"
  import type { ComfyWidgetNode } from "$lib/nodes";
+	import { NodeMode } from "@litegraph-ts/core";
+ import { isHidden } from "$lib/widgets/utils";
 
  export let dragItem: IDragItem | null = null;
  export let zIndex: number = 0;
@@ -64,17 +66,18 @@
     {/key}
 {:else if widget && widget.node}
     {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets" && zIndex > 1}
+    {@const hidden = isHidden(widget)}
     {#key $attrsChanged}
         {#key $propsChanged}
             <div class="widget {widget.attrs.classes} {getWidgetClass()}"
                  class:edit={edit}
                 class:selected={$uiState.uiUnlocked && $layoutState.currentSelection.includes(widget.id)}
                 class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.node.id}
-                class:hidden={widget.attrs.hidden}
+                class:hidden={hidden}
                 >
                 <svelte:component this={widget.node.svelteComponentType} {widget} {isMobile} />
             </div>
-            {#if widget.attrs.hidden && edit}
+            {#if hidden && edit}
                 <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>
             {/if}
             {#if showHandles}

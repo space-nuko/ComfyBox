@@ -9,6 +9,7 @@ import type TypedEmitter from "typed-emitter";
 // Import nodes
 import "@litegraph-ts/nodes-basic"
 import "@litegraph-ts/nodes-events"
+import "@litegraph-ts/nodes-logic"
 import "@litegraph-ts/nodes-math"
 import "@litegraph-ts/nodes-strings"
 import "$lib/nodes/index"
@@ -68,6 +69,27 @@ export type SerializedPrompt = {
 export type Progress = {
     value: number,
     max: number
+}
+
+function isActiveBackendNode(node: ComfyGraphNode, tag: string | null): boolean {
+    if (!node.isBackendNode)
+        return false;
+
+    if (tag && !hasTag(node, tag)) {
+        console.debug("Skipping tagged node", tag, node.properties.tags, node)
+        return false;
+    }
+
+    if (node.mode === NodeMode.NEVER) {
+        // Don't serialize muted nodes
+        return false;
+    }
+
+    return true;
+}
+
+function hasTag(node: LGraphNode, tag: string): boolean {
+    return "tags" in node.properties && node.properties.tags.indexOf(tag) !== -1
 }
 
 export default class ComfyApp {
@@ -443,22 +465,11 @@ export default class ComfyApp {
         for (const node_ of this.lGraph.computeExecutionOrder<ComfyGraphNode>(false, null)) {
             const n = workflow.nodes.find((n) => n.id === node_.id);
 
-            if (!node_.isBackendNode) {
-                // console.debug("Not serializing node: ", node_.type)
+            if (!isActiveBackendNode(node_, tag)) {
                 continue;
             }
 
             const node = node_ as ComfyBackendNode;
-
-            if (tag && node.tags.indexOf(tag) === -1) {
-                console.debug("Skipping tagged node", tag, node.tags)
-                continue;
-            }
-
-            if (node.mode === NodeMode.NEVER) {
-                // Don't serialize muted nodes
-                continue;
-            }
 
             const inputs = {};
 
@@ -469,7 +480,11 @@ export default class ComfyApp {
                     const inputLink = node.getInputLink(i)
                     const inputNode = node.getInputNode(i)
 
-                    if (inputNode && tag && "tags" in inputNode && (inputNode.tags as string[]).indexOf(tag) === -1) {
+                    // We don't check tags for non-backend nodes.
+                    // Just check for node inactivity (so you can toggle groups of
+                    // tagged frontend nodes on/off)
+                    if (inputNode && inputNode.mode === NodeMode.NEVER) {
+                        console.debug("Skipping inactive node", inputNode)
                         continue;
                     }
 
@@ -515,7 +530,7 @@ export default class ComfyApp {
                     const isValidParent = (parent: ComfyGraphNode) => {
                         if (!parent || parent.isBackendNode)
                             return false;
-                        if ("tags" in parent && (parent.tags as string[]).indexOf(tag) === -1)
+                        if (tag && !hasTag(parent, tag))
                             return false;
                         return true;
                     }
@@ -525,8 +540,8 @@ export default class ComfyApp {
                         if (link && !seen[link.id]) {
                             seen[link.id] = true
                             const inputNode = parent.getInputNode(link.origin_slot) as ComfyGraphNode;
-                            if (inputNode && "tags" in inputNode && tag && (inputNode.tags as string[]).indexOf(tag) === -1) {
-                                console.debug("Skipping tagged parent node", tag, node.tags)
+                            if (inputNode && tag && !hasTag(inputNode, tag)) {
+                                console.debug("Skipping tagged parent node", tag, node.properties.tags)
                                 parent = null;
                             }
                             else {
@@ -538,7 +553,7 @@ export default class ComfyApp {
                     }
 
                     if (link && parent && parent.isBackendNode) {
-                        if ("tags" in parent && tag && (parent.tags as string[]).indexOf(tag) === -1)
+                        if (tag && !hasTag(parent, tag))
                             continue;
 
                         const input = node.inputs[i]
@@ -669,7 +684,7 @@ export default class ComfyApp {
     /**
      * Refresh combo list on whole nodes
      */
-    async refreshComboInNodes() {
+    async refreshComboInNodes(flashUI: boolean = false) {
         const defs = await this.api.getNodeDefs();
 
         for (let nodeNum in this.lGraph._nodes) {
@@ -687,11 +702,13 @@ export default class ComfyApp {
                         const inputNode = node.getInputNode(index)
 
                         if (inputNode && "doAutoConfig" in inputNode) {
-                            const comfyInputNode = inputNode as nodes.ComfyWidgetNode;
-                            comfyInputNode.doAutoConfig(comfyInput)
-                            if (!comfyInput.config.values.includes(get(comfyInputNode.value))) {
-                                comfyInputNode.setValue(comfyInput.config.defaultValue || comfyInput.config.values[0])
+                            const comfyComboNode = inputNode as nodes.ComfyComboNode;
+                            comfyComboNode.doAutoConfig(comfyInput)
+                            if (!comfyInput.config.values.includes(get(comfyComboNode.value))) {
+                                comfyComboNode.setValue(comfyInput.config.defaultValue || comfyInput.config.values[0])
                             }
+                            if (flashUI)
+                                comfyComboNode.comboRefreshed.set(true)
                         }
                     }
                 }

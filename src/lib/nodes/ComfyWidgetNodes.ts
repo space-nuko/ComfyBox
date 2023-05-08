@@ -1,4 +1,4 @@
-import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot, type SerializedLGraphNode, BuiltInSlotType, type PropertyLayout, type IComboWidget } from "@litegraph-ts/core";
+import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot, type SerializedLGraphNode, BuiltInSlotType, type PropertyLayout, type IComboWidget, NodeMode } from "@litegraph-ts/core";
 import ComfyGraphNode from "./ComfyGraphNode";
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import RangeWidget from "$lib/widgets/RangeWidget.svelte";
@@ -93,6 +93,17 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         return Watch.toString(value)
     }
 
+    override changeMode(modeTo: NodeMode): boolean {
+        const result = super.changeMode(modeTo);
+        this.notifyPropsChanged();
+        // Also need to notify the parent container since it's what controls the
+        // hidden state of the widget
+        const layoutEntry = layoutState.findLayoutEntryForNode(this.id)
+        if (layoutEntry && layoutEntry.parent)
+            layoutEntry.parent.attrsChanged.set(get(layoutEntry.parent.attrsChanged) + 1)
+        return result;
+    }
+
     private onValueUpdated(value: any) {
         console.debug("[Widget] valueUpdated", this, value)
         this.displayWidget.value = this.formatValue(value)
@@ -171,6 +182,10 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         console.debug("Property copy", input, this.properties)
 
         this.setValue(get(this.value))
+        this.notifyPropsChanged();
+    }
+
+    notifyPropsChanged() {
         this.propsChanged.set(get(this.propsChanged) + 1)
     }
 
@@ -200,7 +215,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         }
 
         // Force reactivity change so the frontend can be updated with the new props
-        this.propsChanged.set(get(this.propsChanged) + 1)
+        this.notifyPropsChanged();
     }
 
     clampOneConfig(input: IComfyInputSlot) { }
@@ -314,8 +329,11 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
     override svelteComponentType = ComboWidget
     override defaultValue = "A";
 
+    comboRefreshed: Writable<boolean>;
+
     constructor(name?: string) {
         super(name, "A")
+        this.comboRefreshed = writable(false)
     }
 
     onConnectOutput(
@@ -613,7 +631,7 @@ export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
         const changed = value != get(this.value);
         super.setValue(Boolean(value))
         if (changed)
-            this.triggerSlot(1)
+            this.triggerSlot(1, value)
     }
 
     constructor(name?: string) {

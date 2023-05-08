@@ -81,7 +81,7 @@
                 <span>Node: {getNodeInfo($queueState.runningNodeId)}</span>
             </div>
             <div>
-                <ProgressBar value={$queueState.progress?.value} max={$queueState.progress?.max} />
+                <ProgressBar value={$queueState.progress?.value} max={$queueState.progress?.max} styles="height: 30px;" />
             </div>
         {/if}
         {#if typeof $queueState.queueRemaining === "number" && $queueState.queueRemaining > 0}

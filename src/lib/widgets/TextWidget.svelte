@@ -3,6 +3,7 @@
  import type { ComfyComboNode } from "$lib/nodes/index";
  import { type WidgetLayout } from "$lib/stores/layoutState";
  import { get, type Writable } from "svelte/store";
+ import { isDisabled } from "./utils"
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfyComboNode | null = null;
@@ -33,7 +34,7 @@
         <TextBox
             bind:value={$nodeValue}
             label={widget.attrs.title}
-            disabled={widget.attrs.disabled}
+            disabled={isDisabled(widget)}
             lines={node.properties.multiline ? 5 : 1}
             max_lines={node.properties.multiline ? 5 : 1}
             show_label={widget.attrs.title !== ""}

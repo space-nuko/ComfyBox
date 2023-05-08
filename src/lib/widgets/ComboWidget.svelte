@@ -4,11 +4,14 @@
  import type { ComfyComboNode } from "$lib/nodes/index";
  import { type WidgetLayout } from "$lib/stores/layoutState";
  import { get, type Writable } from "svelte/store";
+ import { isDisabled } from "./utils"
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfyComboNode | null = null;
  let nodeValue: Writable<string> | null = null;
  let propsChanged: Writable<number> | null = null;
+ let comboRefreshed: Writable<boolean> | null = null;
+ let wasComboRefreshed: boolean = false;
  let option: any
 
  export let debug: boolean = false;
@@ -34,6 +37,9 @@
          node = widget.node as ComfyComboNode
          nodeValue = node.value;
          propsChanged = node.propsChanged;
+         comboRefreshed = node.comboRefreshed;
+         if ($comboRefreshed)
+             flashOnRefreshed();
          setOption($nodeValue) // don't react on option
      }
  }
@@ -44,6 +50,12 @@
 
  $: if (nodeValue && option && option.value) {
      $nodeValue = option.value;
+ }
+
+ $: $comboRefreshed && flashOnRefreshed();
+
+ function flashOnRefreshed() {
+     setTimeout(() => ($comboRefreshed = false), 1000);
  }
 
  function getLinkValue() {
@@ -64,46 +76,39 @@
          input.blur();
      navigator.vibrate(20)
  }
-
- let lastPropsChanged: number = 0;
- let werePropsChanged: boolean = false;
-
- $: if ($propsChanged !== lastPropsChanged) {
-     werePropsChanged = true;
-     lastPropsChanged = $propsChanged;
-     setTimeout(() => (werePropsChanged = false), 2000);
- }
 </script>
 
-<div class="wrapper comfy-combo" class:updated={werePropsChanged}>
+<div class="wrapper comfy-combo" class:updated={$comboRefreshed}>
     {#key $propsChanged}
-        {#if node !== null && nodeValue !== null}
-            <label>
-                {#if widget.attrs.title !== ""}
-                    <BlockTitle show_label={true}>{widget.attrs.title}</BlockTitle>
-                {/if}
-                <Select
-                    bind:value={option}
-                    items={node.properties.values}
-                    disabled={widget.attrs.disabled || node.properties.values.length === 0}
-                    clearable={false}
-                    showChevron={true}
-                    inputAttributes={{ autocomplete: 'off' }}
-                    bind:input
-                    on:change
-                    on:focus={onFocus}
-                    on:select={onSelect}
-                    on:filter
-                    on:blur
-                />
-                {#if debug}
-                    <div>Value: {option?.value}</div>
-                    <div>Items: {node.properties.values}</div>
-                    <div>NodeValue: {$nodeValue}</div>
-                    <div>LinkValue: {getLinkValue()}</div>
-                {/if}
-            </label>
-        {/if}
+        {#key $comboRefreshed}
+            {#if node !== null && nodeValue !== null}
+                <label>
+                    {#if widget.attrs.title !== ""}
+                        <BlockTitle show_label={true}>{widget.attrs.title}</BlockTitle>
+                    {/if}
+                    <Select
+                        bind:value={option}
+                        items={node.properties.values}
+                        disabled={isDisabled(widget) || node.properties.values.length === 0}
+                        clearable={false}
+                        showChevron={true}
+                        inputAttributes={{ autocomplete: 'off' }}
+                        bind:input
+                        on:change
+                        on:focus={onFocus}
+                        on:select={onSelect}
+                        on:filter
+                        on:blur
+                    />
+                    {#if debug}
+                        <div>Value: {option?.value}</div>
+                        <div>Items: {node.properties.values}</div>
+                        <div>NodeValue: {$nodeValue}</div>
+                        <div>LinkValue: {getLinkValue()}</div>
+                    {/if}
+                </label>
+            {/if}
+        {/key}
     {/key}
 </div>
 
