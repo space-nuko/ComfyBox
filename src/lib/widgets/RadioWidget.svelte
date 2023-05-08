@@ -32,8 +32,7 @@
  }
 
  function onSelect(e: CustomEvent<SelectData>) {
-     $nodeValue = e.detail.value
-     node.setValue($nodeValue)
+     node.setValue(e.detail.value)
      node.index = e.detail.index as number
      navigator.vibrate(20)
  }
@@ -50,6 +49,7 @@
                             choices={node.properties.choices}
                             disabled={isDisabled(widget)}
                             label={widget.attrs.title}
+                            show_label={widget.attrs.title && widget.attrs.title !== ""}
                             value={$nodeValue}
                             on:select={onSelect}
                         />

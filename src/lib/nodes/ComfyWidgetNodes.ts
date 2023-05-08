@@ -52,6 +52,16 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
 
     copyFromInputLink: boolean = true;
 
+    /**
+     * If true wait until next frame update to trigger the changed event.
+     * Reason is, if the event is triggered immediately then other stuff that wants to run
+     * their own onExecute on the output value won't have completed yet.
+     */
+    delayChangedEvent: boolean = true;
+
+    private _aboutToChange: number = 0;
+    private _aboutToChangeValue: any = null;
+
     abstract defaultValue: T;
 
     /** Names of properties to add as inputs */
@@ -109,11 +119,6 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     override changeMode(modeTo: NodeMode): boolean {
         const result = super.changeMode(modeTo);
         this.notifyPropsChanged();
-        // Also need to notify the parent container since it's what controls the
-        // hidden state of the widget
-        // const layoutEntry = layoutState.findLayoutEntryForNode(this.id)
-        // if (layoutEntry && layoutEntry.parent)
-        //     layoutEntry.parent.attrsChanged.set(get(layoutEntry.parent.attrsChanged) + 1)
         return result;
     }
 
@@ -124,11 +129,21 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         if (this.outputIndex !== null && this.outputs.length >= this.outputIndex) {
             this.setOutputData(this.outputIndex, get(this.value))
         }
+
         if (this.changedIndex !== null && this.outputs.length >= this.changedIndex) {
-            const changedOutput = this.outputs[this.changedIndex]
-            if (changedOutput.type === BuiltInSlotType.EVENT)
-                this.triggerSlot(this.changedIndex, get(this.value))
+            if (!this.delayChangedEvent)
+                this.triggerChangeEvent(get(this.value))
+            else {
+                this._aboutToChange = 2; // wait 1.5-2 frames, in case we're already in the middle of one
+                this._aboutToChangeValue = get(this.value);
+            }
         }
+    }
+
+    private triggerChangeEvent(value: any) {
+        const changedOutput = this.outputs[this.changedIndex]
+        if (changedOutput.type === BuiltInSlotType.EVENT)
+            this.triggerSlot(this.changedIndex, value)
     }
 
     setValue(value: any) {
@@ -159,6 +174,18 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         for (const propName in this.shownOutputProperties) {
             const data = this.shownOutputProperties[propName]
             this.setOutputData(data.index, this.properties[propName])
+        }
+
+        // Fire a pending change event after one full step of the graph has
+        // finished processing
+        if (this._aboutToChange > 0) {
+            this._aboutToChange -= 1
+            if (this._aboutToChange <= 0) {
+                const value = this._aboutToChangeValue;
+                this._aboutToChange = 0;
+                this._aboutToChangeValue = null;
+                this.triggerChangeEvent(value);
+            }
         }
     }
 
@@ -199,8 +226,13 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     notifyPropsChanged() {
+        const layoutEntry = layoutState.findLayoutEntryForNode(this.id)
+        if (layoutEntry && layoutEntry.parent) {
+            layoutEntry.parent.attrsChanged.set(get(layoutEntry.parent.attrsChanged) + 1)
+        }
         console.debug("propsChanged", this)
         this.propsChanged.set(get(this.propsChanged) + 1)
+
     }
 
     override onConnectionsChange(
@@ -700,11 +732,9 @@ export class ComfyRadioNode extends ComfyWidgetNode<string> {
 
         this.index = index;
         this.indexWidget.value = index;
+        this.setOutputData(1, this.index)
 
-        const changed = value != get(this.value);
         super.setValue(value)
-        if (changed)
-            this.triggerSlot(2, { value: value, index: index })
     }
 }
 

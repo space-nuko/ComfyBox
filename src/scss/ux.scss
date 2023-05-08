@@ -173,14 +173,17 @@ body {
     background: var(--ae-panel-bg-color) !important;
 }
 
-.container {
-    .z-index0, .z-index1, .z-index2  {
-        > .block > .v-pane > .animation-wrapper > .widget:not(.edit) {
-            padding: var(--ae-inside-padding-size) !important;
-            border: 1px solid var(--ae-panel-border-color) !important;
-        }
-    }
-}
+// Add blocks for components not located in a physical container
+// TODO make it work with accordions/tabs
+// .container {
+//     .z-index0, .z-index1, .z-index2  {
+//         > .block > .v-pane > .animation-wrapper > .widget:not(.edit) {
+//             padding: var(--ae-inside-padding-size) !important;
+//             border: 1px solid var(--ae-panel-border-color) !important;
+//         }
+//     }
+// }
+
 .widget:has(> .gradio-button) {
     height: 100%;
 

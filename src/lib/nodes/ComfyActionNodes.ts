@@ -5,7 +5,7 @@ import queueState from "$lib/stores/queueState";
 import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWidget, type SerializedLGraphNode, type SlotLayout } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
-import type { GalleryOutput } from "./ComfyWidgetNodes";
+import type { ComfyWidgetNode, GalleryOutput } from "./ComfyWidgetNodes";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
@@ -272,7 +272,6 @@ export class ComfySetNodeModeAction extends ComfyGraphNode {
     constructor(title?: string) {
         super(title)
         this.displayWidget = this.addWidget("text", "Tags", this.properties.targetTags, "targetTags")
-        this.enableWidget = this.addWidget("toggle", "Enable", this.properties.enable, "enable")
     }
 
     override onPropertyChanged(property: any, value: any) {
@@ -281,14 +280,9 @@ export class ComfySetNodeModeAction extends ComfyGraphNode {
         }
     }
 
-    override onExecute() {
-        const enabled = this.getInputData(0)
-        if (typeof enabled === "boolean")
-            this.setProperty("enabled", enabled)
-    }
-
     override onAction(action: any, param: any) {
-        let enabled = this.properties.enabled
+        let enabled = this.getInputData(0)
+
         if (typeof param === "object" && "enabled" in param)
             enabled = param["enabled"]
 
@@ -305,7 +299,10 @@ export class ComfySetNodeModeAction extends ComfyGraphNode {
                     } else {
                         newMode = NodeMode.NEVER;
                     }
+                    console.warn("CHANGEMODE", newMode == NodeMode.ALWAYS ? "ALWAYS" : "NEVER", tags, node)
                     node.changeMode(newMode);
+                    if ("notifyPropsChanged" in node)
+                        (node as ComfyWidgetNode).notifyPropsChanged();
                 }
             }
         }
@@ -316,7 +313,6 @@ export class ComfySetNodeModeAction extends ComfyGraphNode {
                 const hasTag = tags.some(t => container.attrs.tags.indexOf(t) != -1);
                 if (hasTag) {
                     container.attrs.hidden = !enabled;
-                    console.warn("Cont", container.attrs.tags, tags, hasTag, container.attrs, enabled)
                 }
                 container.attrsChanged.set(get(container.attrsChanged) + 1)
             }
