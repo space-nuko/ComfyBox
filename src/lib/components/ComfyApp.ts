@@ -473,7 +473,7 @@ export default class ComfyApp {
 
             const inputs = {};
 
-            // Store all link values
+            // Store input values passed by frontend-only nodes
             if (node.inputs) {
                 for (let i = 0; i < node.inputs.length; i++) {
                     const inp = node.inputs[i];
@@ -520,14 +520,14 @@ export default class ComfyApp {
                 }
             }
 
-            // Store all links between nodes
+            // Store links between backend-only and hybrid nodes
             for (let i = 0; i < node.inputs.length; i++) {
                 let parent: ComfyGraphNode = node.getInputNode(i) as ComfyGraphNode;
                 if (parent) {
                     const seen = {}
                     let link = node.getInputLink(i);
 
-                    const isValidParent = (parent: ComfyGraphNode) => {
+                    const isFrontendParent = (parent: ComfyGraphNode) => {
                         if (!parent || parent.isBackendNode)
                             return false;
                         if (tag && !hasTag(parent, tag))
@@ -535,16 +535,31 @@ export default class ComfyApp {
                         return true;
                     }
 
-                    while (isValidParent(parent)) {
-                        link = parent.getInputLink(link.origin_slot);
-                        if (link && !seen[link.id]) {
-                            seen[link.id] = true
-                            const inputNode = parent.getInputNode(link.origin_slot) as ComfyGraphNode;
+                    // If there are frontend-only nodes between us and another
+                    // backend node, we have to traverse them first. This
+                    // behavior is dependent on the type of node. Reroute nodes
+                    // will simply follow their single input, while branching
+                    // nodes have conditional logic that determines which link
+                    // to follow backwards.
+                    while (isFrontendParent(parent)) {
+                        const nextLink = parent.getUpstreamLink()
+                        if (nextLink == null) {
+                            console.warn("[graphToPrompt] No upstream link found in frontend node", parent)
+                            break;
+                        }
+
+                        console.debug("[graphToPrompt] consider link", JSON.stringify(link), parent.id)
+
+                        if (nextLink && !seen[nextLink.id]) {
+                            seen[nextLink.id] = true
+                            const inputNode = parent.graph.getNodeById(nextLink.origin_id) as ComfyGraphNode;
                             if (inputNode && tag && !hasTag(inputNode, tag)) {
-                                console.debug("Skipping tagged parent node", tag, node.properties.tags)
+                                console.debug("[graphToPrompt] Skipping tagged intermediate frontend node", tag, node.properties.tags)
                                 parent = null;
                             }
                             else {
+                                console.debug("[graphToPrompt] Traverse upstream link", JSON.stringify(link), parent.id, inputNode?.id, inputNode?.isBackendNode)
+                                link = nextLink;
                                 parent = inputNode;
                             }
                         } else {
@@ -556,6 +571,7 @@ export default class ComfyApp {
                         if (tag && !hasTag(parent, tag))
                             continue;
 
+                        console.debug("[graphToPrompt] final link", JSON.stringify(link), parent.id, node.id)
                         const input = node.inputs[i]
                         // TODO can null be a legitimate value in some cases?
                         // Nodes like CLIPLoader will never have a value in the frontend, hence "null".
@@ -572,18 +588,19 @@ export default class ComfyApp {
         }
 
         // Remove inputs connected to removed nodes
-
-        for (const o in output) {
-            for (const i in output[o].inputs) {
-                if (Array.isArray(output[o].inputs[i])
-                    && output[o].inputs[i].length === 2
-                    && !output[output[o].inputs[i][0]]) {
-                    console.debug("Prune removed node link", o, i, output[o].inputs[i])
-                    delete output[o].inputs[i];
+        console.debug("[graphToPrompt] before prune", JSON.stringify(output))
+        for (const nodeId in output) {
+            for (const inputName in output[nodeId].inputs) {
+                if (Array.isArray(output[nodeId].inputs[inputName])
+                    && output[nodeId].inputs[inputName].length === 2
+                    && !output[output[nodeId].inputs[inputName][0]]) {
+                    console.debug("Prune removed node link", nodeId, inputName, output[nodeId].inputs[inputName])
+                    delete output[nodeId].inputs[inputName];
                 }
             }
         }
 
+        console.debug("[graphToPrompt] after prune", JSON.stringify(output))
         // console.debug({ workflow, output })
         // console.debug(promptToGraphVis({ workflow, output }))
 
@@ -615,6 +632,7 @@ export default class ComfyApp {
                     }
 
                     const p = await this.graphToPrompt(tag);
+                    console.debug(promptToGraphVis(p))
 
                     try {
                         await this.api.queuePrompt(num, p);

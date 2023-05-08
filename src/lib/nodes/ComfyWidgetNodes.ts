@@ -189,13 +189,14 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         this.propsChanged.set(get(this.propsChanged) + 1)
     }
 
-    onConnectionsChange(
+    override onConnectionsChange(
         type: LConnectionKind,
         slotIndex: number,
         isConnected: boolean,
         link: LLink,
         ioSlot: (INodeOutputSlot | INodeInputSlot)
     ): void {
+        super.onConnectionsChange(type, slotIndex, isConnected, link, ioSlot);
         this.clampConfig();
     }
 

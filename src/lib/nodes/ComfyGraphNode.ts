@@ -1,7 +1,7 @@
 import type { ComfyInputConfig } from "$lib/IComfyInputSlot";
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
 import type ComfyWidget from "$lib/components/widgets/ComfyWidget";
-import { LGraph, LGraphNode, LiteGraph, NodeMode, type SerializedLGraphNode, type Vector2 } from "@litegraph-ts/core";
+import { LGraph, LGraphNode, LLink, LiteGraph, NodeMode, type INodeInputSlot, type SerializedLGraphNode, type Vector2, type INodeOutputSlot, LConnectionKind, type SlotType, LGraphCanvas, getStaticPropertyOnInstance, type PropertyLayout, type SlotLayout } from "@litegraph-ts/core";
 import type { SvelteComponentDev } from "svelte/internal";
 import type { ComfyWidgetNode } from "./ComfyWidgetNodes";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
@@ -27,6 +27,15 @@ export default class ComfyGraphNode extends LGraphNode {
     defaultWidgets?: DefaultWidgetLayout
 
     /*
+     * If true, attempt to reconcile wildcard types in slots ("*")
+     * when a new input/output is connected
+     *
+     * Only set this to true if all output slots are wildcard typed in the
+     * static slotLayout property by default!
+     */
+    canInheritSlotTypes: boolean = false;
+
+    /*
      * If false, don't serialize user-set properties into the workflow.
      * Useful for removing personal information from shared workflows.
      */
@@ -37,6 +46,173 @@ export default class ComfyGraphNode extends LGraphNode {
      */
     stripUserState(o: SerializedLGraphNode) {
         o.widgets_values = []
+    }
+
+    /*
+     * Traverses this node backwards in the graph in order to reach a connecting
+     * backend node, if any. For example, reroute nodes will simply follow their
+     * single input, while branching nodes have conditional logic that
+     * determines which link to follow backwards.
+     */
+    getUpstreamLink(): LLink | null {
+        return null;
+    }
+
+    private inheritSlotTypes(type: LConnectionKind, isConnected: boolean) {
+        // Prevent multiple connections to different types when we have no input
+        if (isConnected && type === LConnectionKind.OUTPUT) {
+            // Ignore wildcard nodes as these will be updated to real types
+            const types = new Set(this.outputs.flatMap(o => o.links.map((l) => this.graph.links[l].type).filter((t) => t !== "*")));
+            if (types.size > 1) {
+                for (let j = 0; j < this.outputs.length; j++) {
+                    for (let i = 0; i < this.outputs[j].links.length - 1; i++) {
+                        const linkId = this.outputs[j].links[i];
+                        const link = this.graph.links[linkId];
+                        const node = this.graph.getNodeById(link.target_id);
+                        node.disconnectInput(link.target_slot);
+                    }
+                }
+            }
+        }
+
+        // Find root input
+        let currentNode: ComfyGraphNode = this;
+        let updateNodes: ComfyGraphNode[] = [];
+        let inputType: SlotType | null = null;
+        let inputNode = null;
+
+        while (currentNode) {
+            updateNodes.unshift(currentNode);
+            const link = currentNode.getUpstreamLink();
+            if (link !== null) {
+                const node = this.graph.getNodeById(link.origin_id) as ComfyGraphNode;
+                console.warn(node.type)
+                if (node.canInheritSlotTypes) {
+                    console.log("REROUTE2", node)
+                    if (node === this) {
+                        // We've found a circle
+                        currentNode.disconnectInput(link.target_slot);
+                        currentNode = null;
+                    }
+                    else {
+                        // Move the previous node
+                        currentNode = node;
+                    }
+                } else {
+                    // We've found the end
+                    inputNode = currentNode;
+                    inputType = node.outputs[link.origin_slot]?.type ?? null;
+                    break;
+                }
+            } else {
+                // This path has no input node
+                currentNode = null;
+                break;
+            }
+        }
+
+        // Find all outputs
+        const nodes: ComfyGraphNode[] = [this];
+        let outputType: SlotType | null = null;
+        while (nodes.length) {
+            currentNode = nodes.pop();
+            if (currentNode.outputs) {
+                for (let i = 0; i < currentNode.outputs.length; i++) {
+                    const outputs = currentNode.outputs[i].links || [];
+                    if (outputs.length) {
+                        for (const linkId of outputs) {
+                            const link = this.graph.links[linkId];
+
+                            // When disconnecting sometimes the link is still registered
+                            if (!link) continue;
+
+                            const node = this.graph.getNodeById(link.target_id) as ComfyGraphNode;
+
+                            if (node.canInheritSlotTypes) {
+                                console.log("REROUTE", node)
+                                // Follow reroute nodes
+                                nodes.push(node);
+                                updateNodes.push(node);
+                            } else {
+                                // We've found an output
+                                const nodeOutType = node.inputs && node.inputs[link?.target_slot] && node.inputs[link.target_slot].type ? node.inputs[link.target_slot].type : null;
+                                if (inputType && nodeOutType !== inputType) {
+                                    // The output doesnt match our input so disconnect it
+                                    node.disconnectInput(link.target_slot);
+                                } else {
+                                    outputType = nodeOutType;
+                                }
+                            }
+                        }
+                    } else {
+                        // No more outputs for this path
+                    }
+                }
+            }
+        }
+
+        const displayType = inputType || outputType || "*";
+        const color = LGraphCanvas.DEFAULT_LINK_TYPE_COLORS[displayType];
+
+        // Update the types of each node
+        for (const node of updateNodes) {
+            // in lieu of static abstract properties
+            const slotLayout = getStaticPropertyOnInstance<SlotLayout>(node, "slotLayout");
+            if (!slotLayout)
+                continue
+
+            const layoutOutputs = slotLayout.outputs || []
+
+            for (let i = 0; i < node.outputs.length; i++) {
+                // Check if this output was defined as starting off as a
+                // wildcard. If for example it was something else like a string,
+                // it wouldn't make sense to change its type dynamically.
+                const isWildcardOutput = layoutOutputs.length > i && layoutOutputs[i].type === "*";
+                if (!isWildcardOutput) {
+                    console.error("not wildcard", node.outputs[i], layoutOutputs[i])
+                    continue;
+                }
+
+                // If we dont have an input type we are always wildcard but we'll show the output type
+                // This lets you change the output link to a different type and all nodes will update
+                node.outputs[i].type = inputType || "*";
+                (node as any).__outputType = displayType;
+                node.outputs[i].name = node.properties.showOutputText ? String(displayType) : "";
+                node.size = node.computeSize();
+
+                // TODO from ComfyReroute
+                if ("applyOrientation" in node && typeof node.applyOrientation === "function")
+                    node.applyOrientation();
+
+                for (const l of node.outputs[i].links || []) {
+                    const link = this.graph.links[l];
+                    if (link) {
+                        link.color = color;
+                    }
+                }
+            }
+        }
+
+        if (inputNode) {
+            for (let i = 0; i < inputNode.inputs.length; i++) {
+                const link = this.graph.links[inputNode.inputs[i].link];
+                if (link) {
+                    link.color = color;
+                }
+            }
+        }
+    }
+
+    override onConnectionsChange(
+        type: LConnectionKind,
+        slotIndex: number,
+        isConnected: boolean,
+        link: LLink,
+        ioSlot: (INodeInputSlot | INodeOutputSlot)
+    ) {
+        if (this.canInheritSlotTypes) {
+            this.inheritSlotTypes(type, isConnected);
+        }
     }
 
     override onResize(size: Vector2) {

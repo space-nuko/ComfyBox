@@ -32,6 +32,8 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
         ],
     }
 
+    override canInheritSlotTypes = true;
+
     private selected: number = -1;
 
     displayWidget: ITextWidget;
@@ -63,6 +65,8 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
         link: LLink,
         ioSlot: (INodeInputSlot | INodeOutputSlot)
     ) {
+        super.onConnectionsChange(type, slotIndex, isConnected, link, ioSlot);
+
         if (type !== LConnectionKind.INPUT)
             return;
 
@@ -71,7 +75,7 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
                 // Add a new input
                 const lastInputName = this.inputs[this.inputs.length - 1].name
                 const inputName = nextLetter(lastInputName);
-                this.addInput(inputName, "*")
+                this.addInput(inputName, this.inputs[0].type)
             }
         }
         else {
@@ -95,6 +99,19 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
                 name = nextLetter(name);
             }
         }
+    }
+
+    override getUpstreamLink(): LLink | null {
+        for (let index = 0; index < this.inputs.length; index++) {
+            const link = this.getInputLink(index);
+            if (link != null && (link.data != null || this.properties.acceptNullLinkData)) {
+                const node = this.getInputNode(index);
+                if (node != null && node.mode === NodeMode.ALWAYS) {
+                    return link;
+                }
+            }
+        }
+        return null;
     }
 
     override onExecute() {

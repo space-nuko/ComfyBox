@@ -26,9 +26,10 @@
          nodeValue = node.value;
          propsChanged = node.propsChanged;
 
-         const len = $nodeValue.length
-         if (node.properties.index < 0 || node.properties.index >= len) {
-             node.setProperty("index", clamp(node.properties.index, 0, len))
+         if ($nodeValue != null) {
+             if (node.properties.index < 0 || node.properties.index >= $nodeValue.length) {
+                 node.setProperty("index", clamp(node.properties.index, 0, $nodeValue))
+             }
          }
      }
  };
@@ -123,7 +124,7 @@
 </script>
 
 <div class="wrapper comfy-gallery-widget gradio-gallery" bind:this={element}>
-    {#if widget && node && nodeValue}
+    {#if widget && node && nodeValue && $nodeValue != null}
         <Block variant="solid" padding={false}>
             <div class="padding">
                 <Gallery
