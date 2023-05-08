@@ -21,7 +21,7 @@
  import queueState from "$lib/stores/queueState";
  import ComfyUnlockUIButton from "./ComfyUnlockUIButton.svelte";
 	import ComfyGraphView from "./ComfyGraphView.svelte";
-	import { download } from "$lib/utils";
+	import { download, jsonToJsObject } from "$lib/utils";
 	import notify from "$lib/notify";
 
  export let app: ComfyApp = undefined;
@@ -142,6 +142,7 @@
 
      app.saveStateToLocalStorage();
      notify("Saved to local storage.")
+     console.debug(jsonToJsObject(JSON.stringify(app.serialize(), null, 2)))
      //
      //      const date = new Date();
      //      const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");

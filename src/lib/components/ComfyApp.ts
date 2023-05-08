@@ -586,7 +586,6 @@ export default class ComfyApp {
         }
 
         // Remove inputs connected to removed nodes
-        console.debug("[graphToPrompt] before prune", JSON.stringify(output))
         for (const nodeId in output) {
             for (const inputName in output[nodeId].inputs) {
                 if (Array.isArray(output[nodeId].inputs[inputName])
@@ -598,7 +597,6 @@ export default class ComfyApp {
             }
         }
 
-        console.debug("[graphToPrompt] after prune", JSON.stringify(output))
         // console.debug({ workflow, output })
         // console.debug(promptToGraphVis({ workflow, output }))
 

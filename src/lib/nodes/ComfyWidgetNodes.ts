@@ -382,6 +382,7 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
 
     override svelteComponentType = ComboWidget
     override defaultValue = "A";
+    override saveUserState = false;
 
     comboRefreshed: Writable<boolean>;
 
@@ -540,6 +541,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     override svelteComponentType = GalleryWidget
     override defaultValue = []
     override copyFromInputLink = false;
+    override saveUserState = false;
     override outputIndex = null;
     override changedIndex = null;
 

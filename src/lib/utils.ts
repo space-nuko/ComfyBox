@@ -131,3 +131,17 @@ export function convertComfyOutputToGradio(output: GalleryOutput): GradioFileDat
         }
     });
 }
+
+export function jsonToJsObject(json: string): string {
+    // Try to parse, to see if it's real JSON
+    JSON.parse(json);
+
+    const regex = /\"([^"]+)\":/g;
+    const hyphenRegex = /-([a-z])/g;
+
+    return json.replace(regex, match => {
+        return match
+            .replace(hyphenRegex, g => g[1].toUpperCase())
+            .replace(regex, "$1:");
+    });
+}

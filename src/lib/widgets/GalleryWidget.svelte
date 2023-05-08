@@ -9,8 +9,8 @@
  import type { ComfyGalleryNode } from "$lib/nodes/ComfyWidgetNodes";
  import type { FileData as GradioFileData } from "@gradio/upload";
  import type { SelectData as GradioSelectData } from "@gradio/utils";
-	import { clamp } from "$lib/utils";
-	import { f7 } from "framework7-svelte";
+ import { clamp } from "$lib/utils";
+ import { f7 } from "framework7-svelte";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
