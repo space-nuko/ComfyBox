@@ -10,7 +10,7 @@ This project is *still under construction* and many features are missing, be awa
 
 ## Installation
 
-1. Download the latest release [here](https://nightly.link/space-nuko/ComfyBox/workflows/build-and-publish/master/ComfyBox-dist.zip) and extract it somewhere
+1. Download the latest release [here](https://nightly.link/space-nuko/ComfyBox/workflows/build-and-publish/master/ComfyBox-dist) and extract it somewhere
 2. Start the ComfyUI backend with `python main.py --enable-cors-header`
 3. In the folder you extracted open the `run.bat`/`run.sh` script (requires Python 3 to be on your PATH). Alternatively you can serve the contents of the folder with a web server.
 
