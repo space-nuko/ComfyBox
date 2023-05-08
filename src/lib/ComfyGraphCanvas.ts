@@ -11,7 +11,7 @@ export type SerializedGraphCanvasState = {
 }
 
 export default class ComfyGraphCanvas extends LGraphCanvas {
-    app: ComfyApp
+    app: ComfyApp | null;
 
     constructor(
         app: ComfyApp,
@@ -60,7 +60,8 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         let color = null;
         if (node.id === +state.runningNodeId) {
             color = "#0f0";
-        } else if (this.app.dragOverNode && node.id === this.app.dragOverNode.id) {
+            // this.app can be null inside the constructor if rendering is taking place already
+        } else if (this.app && this.app.dragOverNode && node.id === this.app.dragOverNode.id) {
             color = "dodgerblue";
         }
 

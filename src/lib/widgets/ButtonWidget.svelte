@@ -4,7 +4,9 @@
  import { type WidgetLayout } from "$lib/stores/layoutState";
  import { Button } from "@gradio/button";
  import { get, type Writable, writable } from "svelte/store";
+ import { isDisabled } from "./utils"
  export let widget: WidgetLayout | null = null;
+ export let isMobile: boolean = false;
  let node: ComfyButtonNode | null = null;
  let nodeValue: Writable<boolean> | null = null;
  let attrsChanged: Writable<boolean> | null = null;
@@ -21,6 +23,7 @@
 
  function onClick(e: MouseEvent) {
      node.onClick();
+     navigator.vibrate(20)
  }
 
  const style = {
@@ -30,9 +33,9 @@
 
 <div class="wrapper gradio-button">
     {#key $attrsChanged}
-        {#if node !== null}
+        {#if widget !== null && node !== null}
             <Button
-                disabled={widget.attrs.disabled}
+                disabled={isDisabled(widget)}
                 on:click={onClick}
                 variant={widget.attrs.buttonVariant || "primary"}
                 size={widget.attrs.buttonSize === "small" ? "sm" : "lg"}

@@ -1,6 +1,6 @@
 import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
-import ComfyAPI from "$lib/api"
+import ComfyAPI, { type ComfyAPIQueueStatus } from "$lib/api"
 import defaultGraph from "$lib/defaultGraph"
 import { getPngMetadata, importA1111 } from "$lib/pnginfo";
 import EventEmitter from "events";
@@ -9,6 +9,7 @@ import type TypedEmitter from "typed-emitter";
 // Import nodes
 import "@litegraph-ts/nodes-basic"
 import "@litegraph-ts/nodes-events"
+import "@litegraph-ts/nodes-logic"
 import "@litegraph-ts/nodes-math"
 import "@litegraph-ts/nodes-strings"
 import "$lib/nodes/index"
@@ -27,7 +28,8 @@ import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import { get } from "svelte/store";
 import uiState from "$lib/stores/uiState";
-import { promptToGraphVis } from "$lib/utils";
+import { promptToGraphVis, workflowToGraphVis } from "$lib/utils";
+import notify from "$lib/notify";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -69,6 +71,27 @@ export type Progress = {
     max: number
 }
 
+function isActiveBackendNode(node: ComfyGraphNode, tag: string | null): boolean {
+    if (!node.isBackendNode)
+        return false;
+
+    if (tag && !hasTag(node, tag)) {
+        console.debug("Skipping tagged node", tag, node.properties.tags, node)
+        return false;
+    }
+
+    if (node.mode === NodeMode.NEVER) {
+        // Don't serialize muted nodes
+        return false;
+    }
+
+    return true;
+}
+
+function hasTag(node: LGraphNode, tag: string): boolean {
+    return "tags" in node.properties && node.properties.tags.indexOf(tag) !== -1
+}
+
 export default class ComfyApp {
     api: ComfyAPI;
     rootEl: HTMLDivElement | null = null;
@@ -97,7 +120,9 @@ export default class ComfyApp {
             return;
         }
 
-        this.rootEl = document.getElementById("main") as HTMLDivElement;
+        this.setupColorScheme()
+
+        this.rootEl = document.getElementById("app") as HTMLDivElement;
         this.canvasEl = document.getElementById("graph-canvas") as HTMLCanvasElement;
         this.lGraph = new ComfyGraph();
         this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl);
@@ -137,16 +162,11 @@ export default class ComfyApp {
         this.addPasteHandler();
         this.addKeyboardHandler();
 
-        this.setupColorScheme()
-
         // await this.#invokeExtensionsAsync("setup");
 
         // Ensure the canvas fills the window
         this.resizeCanvas();
         window.addEventListener("resize", this.resizeCanvas.bind(this));
-
-        this.lGraph.start();
-        this.lGraph.eventBus.on("afterExecute", () => this.lCanvas.draw(true))
 
         this.alreadySetup = true;
 
@@ -295,6 +315,10 @@ export default class ComfyApp {
             this.lGraph.setDirtyCanvas(true, false);
         });
 
+        this.api.addEventListener("status", (ev: CustomEvent) => {
+            queueState.statusUpdated(ev.detail as ComfyAPIQueueStatus);
+        });
+
         this.api.addEventListener("executed", ({ detail }: CustomEvent) => {
             this.nodeOutputs[detail.node] = detail.output;
             const node = this.lGraph.getNodeById(detail.node) as ComfyGraphNode;
@@ -322,8 +346,8 @@ export default class ComfyApp {
 
     private setupColorScheme() {
         const setColor = (type: any, color: string) => {
-            this.lCanvas.link_type_colors[type] = color
-            this.lCanvas.default_connection_color_byType[type] = color
+            LGraphCanvas.DEFAULT_LINK_TYPE_COLORS[type] = color
+            LGraphCanvas.DEFAULT_CONNECTION_COLORS_BY_TYPE[type] = color
         }
 
         // Distinguish frontend/backend connections
@@ -374,6 +398,9 @@ export default class ComfyApp {
         this.lCanvas.deserialize(data.canvas)
 
         await this.refreshComboInNodes();
+
+        this.lGraph.start();
+        this.lGraph.eventBus.on("afterExecute", () => this.lCanvas.draw(true))
     }
 
     async initDefaultGraph() {
@@ -404,7 +431,7 @@ export default class ComfyApp {
         }
     }
 
-    reset() {
+    clear() {
         this.clean();
 
         const blankGraph: SerializedLGraph = {
@@ -438,33 +465,26 @@ export default class ComfyApp {
         for (const node_ of this.lGraph.computeExecutionOrder<ComfyGraphNode>(false, null)) {
             const n = workflow.nodes.find((n) => n.id === node_.id);
 
-            if (!node_.isBackendNode) {
-                // console.debug("Not serializing node: ", node_.type)
+            if (!isActiveBackendNode(node_, tag)) {
                 continue;
             }
 
             const node = node_ as ComfyBackendNode;
 
-            if (tag && node.tags.indexOf(tag) === -1) {
-                console.debug("Skipping tagged node", tag, node.tags)
-                continue;
-            }
-
-            if (node.mode === NodeMode.NEVER) {
-                // Don't serialize muted nodes
-                continue;
-            }
-
             const inputs = {};
 
-            // Store all link values
+            // Store input values passed by frontend-only nodes
             if (node.inputs) {
                 for (let i = 0; i < node.inputs.length; i++) {
                     const inp = node.inputs[i];
                     const inputLink = node.getInputLink(i)
                     const inputNode = node.getInputNode(i)
 
-                    if (inputNode && tag && "tags" in inputNode && (inputNode.tags as string[]).indexOf(tag) === -1) {
+                    // We don't check tags for non-backend nodes.
+                    // Just check for node inactivity (so you can toggle groups of
+                    // tagged frontend nodes on/off)
+                    if (inputNode && inputNode.mode === NodeMode.NEVER) {
+                        console.debug("Skipping inactive node", inputNode)
                         continue;
                     }
 
@@ -500,31 +520,44 @@ export default class ComfyApp {
                 }
             }
 
-            // Store all links between nodes
+            // Store links between backend-only and hybrid nodes
             for (let i = 0; i < node.inputs.length; i++) {
                 let parent: ComfyGraphNode = node.getInputNode(i) as ComfyGraphNode;
                 if (parent) {
                     const seen = {}
                     let link = node.getInputLink(i);
 
-                    const isValidParent = (parent: ComfyGraphNode) => {
+                    const isFrontendParent = (parent: ComfyGraphNode) => {
                         if (!parent || parent.isBackendNode)
                             return false;
-                        if ("tags" in parent && (parent.tags as string[]).indexOf(tag) === -1)
+                        if (tag && !hasTag(parent, tag))
                             return false;
                         return true;
                     }
 
-                    while (isValidParent(parent)) {
-                        link = parent.getInputLink(link.origin_slot);
-                        if (link && !seen[link.id]) {
-                            seen[link.id] = true
-                            const inputNode = parent.getInputNode(link.origin_slot) as ComfyGraphNode;
-                            if (inputNode && "tags" in inputNode && tag && (inputNode.tags as string[]).indexOf(tag) === -1) {
-                                console.debug("Skipping tagged parent node", tag, node.tags)
+                    // If there are frontend-only nodes between us and another
+                    // backend node, we have to traverse them first. This
+                    // behavior is dependent on the type of node. Reroute nodes
+                    // will simply follow their single input, while branching
+                    // nodes have conditional logic that determines which link
+                    // to follow backwards.
+                    while (isFrontendParent(parent)) {
+                        const nextLink = parent.getUpstreamLink()
+                        if (nextLink == null) {
+                            console.warn("[graphToPrompt] No upstream link found in frontend node", parent)
+                            break;
+                        }
+
+                        if (nextLink && !seen[nextLink.id]) {
+                            seen[nextLink.id] = true
+                            const inputNode = parent.graph.getNodeById(nextLink.origin_id) as ComfyGraphNode;
+                            if (inputNode && tag && !hasTag(inputNode, tag)) {
+                                console.debug("[graphToPrompt] Skipping tagged intermediate frontend node", tag, node.properties.tags)
                                 parent = null;
                             }
                             else {
+                                console.debug("[graphToPrompt] Traverse upstream link", parent.id, inputNode?.id, inputNode?.isBackendNode)
+                                link = nextLink;
                                 parent = inputNode;
                             }
                         } else {
@@ -533,9 +566,10 @@ export default class ComfyApp {
                     }
 
                     if (link && parent && parent.isBackendNode) {
-                        if ("tags" in parent && tag && (parent.tags as string[]).indexOf(tag) === -1)
+                        if (tag && !hasTag(parent, tag))
                             continue;
 
+                        console.debug("[graphToPrompt] final link", parent.id, node.id)
                         const input = node.inputs[i]
                         // TODO can null be a legitimate value in some cases?
                         // Nodes like CLIPLoader will never have a value in the frontend, hence "null".
@@ -552,14 +586,13 @@ export default class ComfyApp {
         }
 
         // Remove inputs connected to removed nodes
-
-        for (const o in output) {
-            for (const i in output[o].inputs) {
-                if (Array.isArray(output[o].inputs[i])
-                    && output[o].inputs[i].length === 2
-                    && !output[output[o].inputs[i][0]]) {
-                    console.debug("Prune removed node link", o, i, output[o].inputs[i])
-                    delete output[o].inputs[i];
+        for (const nodeId in output) {
+            for (const inputName in output[nodeId].inputs) {
+                if (Array.isArray(output[nodeId].inputs[inputName])
+                    && output[nodeId].inputs[inputName].length === 2
+                    && !output[output[nodeId].inputs[inputName][0]]) {
+                    console.debug("Prune removed node link", nodeId, inputName, output[nodeId].inputs[inputName])
+                    delete output[nodeId].inputs[inputName];
                 }
             }
         }
@@ -595,17 +628,15 @@ export default class ComfyApp {
                     }
 
                     const p = await this.graphToPrompt(tag);
+                    console.debug(promptToGraphVis(p))
 
                     try {
                         await this.api.queuePrompt(num, p);
                     } catch (error) {
                         // this.ui.dialog.show(error.response || error.toString());
                         const mes = error.response || error.toString()
-                        toast.push(`Error queuing prompt:\n${mes}`, {
-                            theme: {
-                                '--toastBackground': 'var(--color-red-500)',
-                            }
-                        })
+                        notify(`Error queuing prompt:\n${mes}`, null, "error")
+                        console.error(promptToGraphVis(p))
                         console.error("Error queuing prompt", mes, num, p)
                         break;
                     }
@@ -634,16 +665,21 @@ export default class ComfyApp {
         if (file.type === "image/png") {
             const pngInfo = await getPngMetadata(file);
             if (pngInfo) {
-                if (pngInfo.workflow) {
-                    this.loadGraphData(JSON.parse(pngInfo.workflow));
+                if (pngInfo.comfyBoxConfig) {
+                    this.deserialize(JSON.parse(pngInfo.comfyBoxConfig));
                 } else if (pngInfo.parameters) {
-                    importA1111(this.lGraph, pngInfo.parameters, this.api);
+                    throw "TODO import A111 import!"
+                    // importA1111(this.lGraph, pngInfo.parameters, this.api);
+                }
+                else {
+                    console.error("No metadata found in image file.", pngInfo)
+                    notify("No metadata found in image file.")
                 }
             }
         } else if (file.type === "application/json" || file.name.endsWith(".json")) {
             const reader = new FileReader();
             reader.onload = () => {
-                this.loadGraphData(JSON.parse(reader.result as string));
+                this.deserialize(JSON.parse(reader.result as string));
             };
             reader.readAsText(file);
         }
@@ -662,7 +698,7 @@ export default class ComfyApp {
     /**
      * Refresh combo list on whole nodes
      */
-    async refreshComboInNodes() {
+    async refreshComboInNodes(flashUI: boolean = false) {
         const defs = await this.api.getNodeDefs();
 
         for (let nodeNum in this.lGraph._nodes) {
@@ -680,11 +716,13 @@ export default class ComfyApp {
                         const inputNode = node.getInputNode(index)
 
                         if (inputNode && "doAutoConfig" in inputNode) {
-                            const comfyInputNode = inputNode as nodes.ComfyWidgetNode;
-                            comfyInputNode.doAutoConfig(comfyInput)
-                            if (!comfyInput.config.values.includes(get(comfyInputNode.value))) {
-                                comfyInputNode.setValue(comfyInput.config.defaultValue || comfyInput.config.values[0])
+                            const comfyComboNode = inputNode as nodes.ComfyComboNode;
+                            comfyComboNode.doAutoConfig(comfyInput)
+                            if (!comfyInput.config.values.includes(get(comfyComboNode.value))) {
+                                comfyComboNode.setValue(comfyInput.config.defaultValue || comfyInput.config.values[0])
                             }
+                            if (flashUI)
+                                comfyComboNode.comboRefreshed.set(true)
                         }
                     }
                 }

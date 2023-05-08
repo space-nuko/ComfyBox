@@ -1,12 +1,13 @@
-import { BuiltInSlotType, LiteGraph, type SlotLayout } from "@litegraph-ts/core";
-import ComfyGraphNode from "./ComfyGraphNode";
+import { BuiltInSlotType, LConnectionKind, LLink, LiteGraph, NodeMode, type INodeInputSlot, type SlotLayout, type INodeOutputSlot } from "@litegraph-ts/core";
+import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 
-export interface ComfySelectorProperties extends Record<any, any> {
+export interface ComfySelectorProperties extends ComfyGraphNodeProperties {
     value: any
 }
 
 export default class ComfySelector extends ComfyGraphNode {
     override properties: ComfySelectorProperties = {
+        tags: [],
         value: null
     }
 
@@ -23,10 +24,27 @@ export default class ComfySelector extends ComfyGraphNode {
         ],
     }
 
+    override canInheritSlotTypes = true;
+
     private selected: number = 0;
 
     constructor(title?: string) {
         super(title);
+    }
+
+    override getUpstreamLink(): LLink | null {
+        var sel = this.getInputData(0);
+        if (sel == null || sel.constructor !== Number)
+            sel = 0;
+
+        this.selected = sel = Math.round(sel) % (this.inputs.length - 1);
+
+        var link = this.getInputLink(sel + 1);
+        var node = this.getInputNode(sel + 1);
+        if (link != null && node != null && node.mode === NodeMode.ALWAYS)
+            return link;
+
+        return null
     }
 
     override onDrawBackground(ctx: CanvasRenderingContext2D) {
@@ -61,12 +79,13 @@ LiteGraph.registerNodeType({
     type: "utils/selector"
 })
 
-export interface ComfySelectorTwoProperties extends Record<any, any> {
+export interface ComfySelectorTwoProperties extends ComfyGraphNodeProperties {
     value: any
 }
 
 export class ComfySelectorTwo extends ComfyGraphNode {
     override properties: ComfySelectorTwoProperties = {
+        tags: [],
         value: null
     }
 
@@ -81,10 +100,39 @@ export class ComfySelectorTwo extends ComfyGraphNode {
         ],
     }
 
+    override canInheritSlotTypes = true;
+
     private selected: number = 0;
 
     constructor(title?: string) {
         super(title);
+    }
+
+    override getUpstreamLink(): LLink | null {
+        var sel = this.getInputData(0);
+        if (sel == null || sel.constructor !== Boolean)
+            sel = 0;
+
+        this.selected = sel ? 0 : 1;
+
+        var link = this.getInputLink(this.selected + 1);
+        var node = this.getInputNode(this.selected + 1);
+        if (link != null && node != null && node.mode === NodeMode.ALWAYS)
+            return link
+
+        return null;
+    }
+
+    override onConnectionsChange(
+        type: LConnectionKind,
+        slotIndex: number,
+        isConnected: boolean,
+        link: LLink,
+        ioSlot: (INodeInputSlot | INodeOutputSlot)
+    ) {
+        if (type === LConnectionKind.INPUT) {
+
+        }
     }
 
     override onDrawBackground(ctx: CanvasRenderingContext2D) {
@@ -107,6 +155,8 @@ export class ComfySelectorTwo extends ComfyGraphNode {
         this.selected = sel ? 0 : 1;
         var v = this.getInputData(this.selected + 1);
         if (v !== undefined) {
+            const link = this.getInputLink(this.selected + 1);
+            const node = this.getInputNode(this.selected + 1);
             this.setOutputData(0, v);
         }
     }

@@ -13,6 +13,7 @@
  import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
  import { startDrag, stopDrag } from "$lib/utils"
  import type { Writable } from "svelte/store";
+ import { isHidden } from "$lib/widgets/utils";
 
  export let container: ContainerLayout | null = null;
  export let zIndex: number = 0;
@@ -20,6 +21,7 @@
  export let showHandles: boolean = false;
  export let edit: boolean = false;
  export let dragDisabled: boolean = false;
+ export let isMobile: boolean = false;
 
  let attrsChanged: Writable<boolean> | null = null;
  let children: IDragItem[] | null = null;
@@ -72,20 +74,20 @@
                          on:finalize="{handleFinalize}"
                     >
                         {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
-                            {@const hidden = item?.attrs?.hidden}
+                            {@const hidden = isHidden(item)}
                             <div class="animation-wrapper"
                                  class:hidden={hidden}
                                  animate:flip={{duration:flipDurationMs}}
                                  style={item?.attrs?.flexGrow ? `flex-grow: ${item.attrs.flexGrow}` : ""}
                             >
-                                <WidgetContainer dragItem={item} zIndex={zIndex+1} />
+                                <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
                                 {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
                                     <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
                                 {/if}
                             </div>
                         {/each}
                     </div>
-                    {#if container.attrs.hidden && edit}
+                    {#if isHidden(container) && edit}
                         <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>
                     {/if}
                     {#if showHandles}
@@ -97,7 +99,7 @@
             <Block elem_classes={["gradio-accordion"]}>
                 <Accordion label={container.attrs.title} open={container.attrs.openOnStartup}>
                     {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
-                        <WidgetContainer dragItem={item} zIndex={zIndex+1} />
+                        <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
                     {/each}
                 </Accordion>
             </Block>
@@ -164,7 +166,8 @@
  }
 
  :global(.label-wrap > span:not(.icon)) {
-     color: var(--block-title-text-color);
+     /* color: var(--block-title-text-color); */
+     font-size: 16px;
  }
 
  .handle {

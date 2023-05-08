@@ -1,11 +1,13 @@
 <script lang="ts">
  import type { ComfyCheckboxNode } from "$lib/nodes/ComfyWidgetNodes";
  import { type WidgetLayout } from "$lib/stores/layoutState";
-	import { Block } from "@gradio/atoms";
+ import { Block } from "@gradio/atoms";
  import { Checkbox } from "@gradio/form";
  import { get, type Writable, writable } from "svelte/store";
+ import { isDisabled } from "./utils"
 
  export let widget: WidgetLayout | null = null;
+ export let isMobile: boolean = false;
  let node: ComfyCheckboxNode | null = null;
  let nodeValue: Writable<boolean> | null = null;
  let attrsChanged: Writable<boolean> | null = null;
@@ -19,6 +21,10 @@
          attrsChanged = widget.attrsChanged;
      }
  };
+
+ function onSelect() {
+     navigator.vibrate(20)
+ }
 </script>
 
 <div class="wrapper gradio-checkbox">
@@ -26,7 +32,12 @@
         {#key $attrsChanged}
             {#if node !== null}
                 <Block>
-                    <Checkbox disabled={widget.attrs.disabled} label={widget.attrs.title} bind:value={$nodeValue} />
+                    <Checkbox
+                        disabled={isDisabled(widget)}
+                        label={widget.attrs.title}
+                        bind:value={$nodeValue}
+                        on:select={onSelect}
+                    />
                 </Block>
             {/if}
         {/key}

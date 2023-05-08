@@ -6,12 +6,9 @@
  import { onMount } from 'svelte';
  import uiState from "$lib/stores/uiState"
 
- let app: ComfyApp | null = null;
- let lCanvas: LGraphCanvas | null = null;
+ export let app: ComfyApp | null = null;
+ let lCanvas: ComfyGraphCanvas | null = null;
  let canvasEl: HTMLCanvasElement | null = null;
-
- $: if (!app)
-     app = $uiState.app
 
  function resizeCanvas() {
      canvasEl.width = canvasEl.parentElement.offsetWidth;
@@ -21,13 +18,11 @@
      lCanvas.draw(true, true);
  }
 
- $: if (app && canvasEl) {
+ $: if (app != null && app.lGraph && canvasEl != null) {
      if (!lCanvas) {
          lCanvas = new ComfyGraphCanvas(app, canvasEl);
          lCanvas.allow_interaction = false;
-         LiteGraph.dialog_close_on_mouse_leave = false;
-         LiteGraph.search_hide_on_mouse_leave = false;
-         LiteGraph.pointerevents_method = "pointer";
+         app.lGraph.eventBus.on("afterExecute", () => lCanvas.draw(true))
      }
      resizeCanvas();
  }
@@ -46,5 +41,10 @@
      width: 100%;
      height: 100%;
      background-color: #333;
+
+     > canvas {
+         // Don't try to scroll the page when scrolling on canvas
+         touch-action: none;
+     }
  }
 </style>

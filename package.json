@@ -47,6 +47,7 @@
     "@litegraph-ts/core": "workspace:*",
     "@litegraph-ts/nodes-basic": "workspace:*",
     "@litegraph-ts/nodes-events": "workspace:*",
+    "@litegraph-ts/nodes-logic": "workspace:*",
     "@litegraph-ts/nodes-math": "workspace:*",
     "@litegraph-ts/nodes-strings": "workspace:*",
     "@litegraph-ts/tsconfig": "workspace:*",

@@ -6,6 +6,7 @@ import { get } from "svelte/store"
 import layoutState from "$lib/stores/layoutState"
 import type { SvelteComponentDev } from "svelte/internal";
 import type { SerializedLGraph } from "@litegraph-ts/core";
+import type { GalleryOutput } from "./nodes/ComfyWidgetNodes";
 
 export function clamp(n: number, min: number, max: number): number {
     return Math.min(Math.max(n, min), max)
@@ -91,11 +92,56 @@ export function promptToGraphVis(prompt: SerializedPrompt): string {
             }
             else {
                 // Value
-                out += `"${id}-${inpName}-${typeof i}" -> "${outNode.title}"\n`
+                out += `"${id}-${inpName}-${i}" -> "${outNode.title}"\n`
             }
         }
     }
 
     out += "}"
     return out
+}
+
+export function getNodeInfo(nodeId: number): string {
+    let app = (window as any).app;
+    if (!app)
+        return String(nodeId);
+
+    const title = app.lGraph.getNodeById(nodeId)?.title || String(nodeId);
+    return title + " (" + nodeId + ")"
+}
+
+export const debounce = (callback: Function, wait = 250) => {
+    let timeout: NodeJS.Timeout | null = null;
+    return (...args: Array<unknown>) => {
+        const next = () => callback(...args);
+        if (timeout) clearTimeout(timeout);
+
+        timeout = setTimeout(next, wait);
+    };
+};
+
+export function convertComfyOutputToGradio(output: GalleryOutput): GradioFileData[] {
+    return output.images.map(r => {
+        // TODO configure backend URL
+        const url = `http://${location.hostname}:8188` // TODO make configurable
+        const params = new URLSearchParams(r)
+        return {
+            name: null,
+            data: url + "/view?" + params
+        }
+    });
+}
+
+export function jsonToJsObject(json: string): string {
+    // Try to parse, to see if it's real JSON
+    JSON.parse(json);
+
+    const regex = /\"([^"]+)\":/g;
+    const hyphenRegex = /-([a-z])/g;
+
+    return json.replace(regex, match => {
+        return match
+            .replace(hyphenRegex, g => g[1].toUpperCase())
+            .replace(regex, "$1:");
+    });
 }

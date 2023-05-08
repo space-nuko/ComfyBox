@@ -1,8 +1,8 @@
 import { BuiltInSlotType, LiteGraph, type ITextWidget, type SlotLayout, clamp, type PropertyLayout, type IComboWidget } from "@litegraph-ts/core";
-import ComfyGraphNode from "./ComfyGraphNode";
+import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 import type { GalleryOutput } from "./ComfyWidgetNodes";
 
-export interface ComfyImageCacheNodeProperties extends Record<any, any> {
+export interface ComfyImageCacheNodeProperties extends ComfyGraphNodeProperties {
     images: GalleryOutput | null,
     index: number,
     filenames: Record<number, { filename: string | null, status: ImageCacheState }>,
@@ -18,6 +18,7 @@ type ImageCacheState = "none" | "uploading" | "failed" | "cached"
  */
 export default class ComfyImageCacheNode extends ComfyGraphNode {
     override properties: ComfyImageCacheNodeProperties = {
+        tags: [],
         images: null,
         index: 0,
         filenames: {},
@@ -29,7 +30,7 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
         inputs: [
             { name: "images", type: "OUTPUT" },
             { name: "index", type: "number" },
-            { name: "store", type: BuiltInSlotType.ACTION },
+            { name: "store", type: BuiltInSlotType.ACTION, options: { color_off: "rebeccapurple", color_on: "rebeccapurple" } },
             { name: "clear", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
@@ -158,7 +159,7 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
         else {
             this.properties.filenames[newIndex] = { filename: null, status: "uploading" }
             this.onPropertyChanged("filenames", this.properties.filenames)
-            const url = "http://localhost:8188" // TODO make configurable
+            const url = `http://${location.hostname}:8188` // TODO make configurable
             const params = new URLSearchParams(data)
 
             const promise = fetch(url + "/view?" + params)
@@ -204,7 +205,7 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
         }
     }
 
-    override onAction(action: any) {
+    override onAction(action: any, param: any) {
         if (action === "clear") {
             this.setProperty("images", null)
             this.setProperty("filenames", {})
@@ -213,12 +214,10 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
             return
         }
 
-        const link = this.getInputLink(0)
-
-        if (link.data && "images" in link.data) {
+        if (param && "images" in param) {
             this.setProperty("genNumber", this.properties.genNumber + 1)
 
-            const output = link.data as GalleryOutput;
+            const output = param as GalleryOutput;
 
             if (this.properties.updateMode === "append" && this.properties.images != null) {
                 const newImages = this.properties.images.images.concat(output.images)
@@ -226,7 +225,7 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
                 this.setProperty("images", this.properties.images)
             }
             else {
-                this.setProperty("images", link.data as GalleryOutput)
+                this.setProperty("images", param as GalleryOutput)
                 this.setProperty("filenames", {})
             }
 

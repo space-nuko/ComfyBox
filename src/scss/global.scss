@@ -2,4 +2,7 @@
 
 body {
     overflow: hidden;
+
+    // Disable pull to refresh
+    overscroll-behavior-y: contain;
 }

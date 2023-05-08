@@ -21,9 +21,10 @@
  import queueState from "$lib/stores/queueState";
  import ComfyUnlockUIButton from "./ComfyUnlockUIButton.svelte";
 	import ComfyGraphView from "./ComfyGraphView.svelte";
+	import { download, jsonToJsObject } from "$lib/utils";
+	import notify from "$lib/notify";
 
  export let app: ComfyApp = undefined;
- let imageViewer: ImageViewer;
  let queue: ComfyQueue = undefined;
  let mainElem: HTMLDivElement;
  let uiPane: ComfyUIPane = undefined;
@@ -32,6 +33,7 @@
  let resizeTimeout: NodeJS.Timeout | null;
  let hasShownUIHelpToast: boolean = false;
  let uiTheme: string = "";
+ let fileInput: HTMLInputElement = undefined;
 
  let debugLayout: boolean = false;
 
@@ -100,20 +102,52 @@
      if (!app?.lGraph)
          return;
 
+     const promptFilename = true; // TODO
+
+     let filename = "workflow.json";
+     if (promptFilename) {
+         filename = prompt("Save workflow as:", filename);
+         if (!filename) return;
+         if (!filename.toLowerCase().endsWith(".json")) {
+             filename += ".json";
+         }
+     }
+     else {
+         const date = new Date();
+         const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
+         filename = `workflow-${formattedDate}.json`
+     }
+
+     const indent = 2
+     const json = JSON.stringify(app.serialize(), null, indent)
+
+     download(filename, json, "application/json")
+ }
+
+ function doLoad(): void {
+     if (!app?.lGraph || !fileInput)
+         return;
+
+     fileInput.click();
+ }
+
+ function loadWorkflow(): void {
+     app.handleFile(fileInput.files[0]);
+     fileInput.files = null;
+}
+
+ function doSaveLocal(): void {
+     if (!app?.lGraph)
+         return;
+
      app.saveStateToLocalStorage();
-     toast.push("Saved to local storage.")
+     notify("Saved to local storage.")
+     console.debug(jsonToJsObject(JSON.stringify(app.serialize(), null, 2)))
      //
      //      const date = new Date();
      //      const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
      //
      //      download(`workflow-${formattedDate}.json`, JSON.stringify(app.serialize()), "application/json")
- }
-
- function doReset(): void {
-     var confirmed = confirm("Are you sure you want to clear the current workflow?");
-     if (confirmed) {
-         app.reset();
-     }
  }
 
  async function doLoadDefault(): void {
@@ -123,23 +157,22 @@
      }
  }
 
+ function doClear(): void {
+     var confirmed = confirm("Are you sure you want to clear the current workflow?");
+     if (confirmed) {
+         app.clear();
+     }
+ }
+
  $: if ($uiState.uiUnlocked && !hasShownUIHelpToast) {
      hasShownUIHelpToast = true;
-     toast.push("Right-click to open context menu.")
+     notify("Right-click to open context menu.")
  }
 
  if (debugLayout) {
      layoutState.subscribe(s => {
          console.warn("UPDATESTATE", s)
      })
- }
-
- app.api.addEventListener("status", (ev: CustomEvent) => {
-     queueState.statusUpdated(ev.detail as ComfyAPIStatus);
- });
-
- $: if (app.rootEl && !imageViewer) {
-     imageViewer = new ImageViewer(app.rootEl);
  }
 
  $: if (containerElem) {
@@ -169,7 +202,7 @@
  })
 
  async function doRefreshCombos() {
-     await app.refreshComboInNodes()
+     await app.refreshComboInNodes(true)
  }
 </script>
 
@@ -222,8 +255,14 @@
             <Button variant="secondary" on:click={doSave}>
                 Save
             </Button>
-            <Button variant="secondary" on:click={doReset}>
-                Reset
+            <Button variant="secondary" on:click={doSaveLocal}>
+                Save Local
+            </Button>
+            <Button variant="secondary" on:click={doLoad}>
+                Load
+            </Button>
+            <Button variant="secondary" on:click={doClear}>
+                Clear
             </Button>
             <Button variant="secondary" on:click={doLoadDefault}>
                 Load Default
@@ -255,6 +294,7 @@
         </div>
     </div>
     <LightboxModal />
+    <input bind:this={fileInput} id="comfy-file-input" type="file" accept=".json" on:change={loadWorkflow} />
 </div>
 
 <SvelteToast options={toastOptions} />
@@ -357,5 +397,9 @@
 
  span.left {
      right: 0px;
+ }
+
+ #comfy-file-input {
+     display: none;
  }
 </style>

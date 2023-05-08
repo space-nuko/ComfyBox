@@ -1,17 +1,8 @@
 <script lang="ts">
  import { onMount } from "svelte";
- import { get } from "svelte/store";
- import { Button } from "@gradio/button";
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
- import { Checkbox } from "@gradio/form"
- import uiState from "$lib/stores/uiState";
- import { ImageViewer } from "$lib/ImageViewer";
- import { download } from "$lib/utils"
 
- import { LGraph, LGraphNode } from "@litegraph-ts/core";
- import type { ComfyAPIStatus } from "$lib/api";
- import queueState from "$lib/stores/queueState";
- import { App, View, Toolbar, Page, Navbar, Link, BlockTitle, Block, List, ListItem } from "framework7-svelte"
+ import { App, View } from "framework7-svelte"
 
  import { f7, f7ready } from 'framework7-svelte';
 
@@ -26,6 +17,9 @@
  import GraphPage from './mobile/routes/graph.svelte';
  import ListSubWorkflowsPage from './mobile/routes/list-subworkflows.svelte';
  import SubWorkflowPage from './mobile/routes/subworkflow.svelte';
+ import type { Framework7Parameters } from "framework7/types";
+
+ export let app: ComfyApp;
 
  function onBackKeyDown(e) {
      if(f7.view.current.router.currentRoute.path == '/'){
@@ -39,6 +33,8 @@
  }
 
  onMount(async () => {
+     await app.setup();
+     (window as any).app = app;
      window.addEventListener("backbutton", onBackKeyDown, false);
      window.addEventListener("popstate", onBackKeyDown, false);
  });
@@ -48,11 +44,14 @@
     We need to pass them along with the F7 app parameters to <App> component
   */
 
- let f7params = {
+ let f7params: Framework7Parameters = {
      routes: [
          {
              path: '/',
              component: HomePage,
+             options: {
+                 props: { app }
+             }
          },
          {
              path: '/about/',
@@ -65,14 +64,23 @@
          {
              path: '/graph/',
              component: GraphPage,
+             options: {
+                 props: { app }
+             }
          },
          {
              path: '/subworkflows/',
              component: ListSubWorkflowsPage,
+             options: {
+                 props: { app }
+             }
          },
          {
              path: '/subworkflows/:subworkflowID/',
              component: SubWorkflowPage,
+             options: {
+                 props: { app }
+             }
          },
      ],
      popup: {
@@ -91,16 +99,19 @@
 </script>
 
 {#if app}
-<App theme="auto" name="ComfyBox" {...f7params}>
-    <View
-        url="/"
-        main={true}
-        class="safe-areas"
-        masterDetailBreakpoint={768},
-        browserHistory=true,
-        browserHistoryRoot="/mobile/"
-    >
-        <GenToolbar/>
-    </View>
-</App>
+    <App theme="auto" name="ComfyBox" {...f7params}>
+        <View
+            url="/"
+            main={true}
+            class="safe-areas"
+            masterDetailBreakpoint={768},
+            browserHistory=true,
+            browserHistoryRoot="/mobile/"
+        >
+            <GenToolbar {app} />
+        </View>
+    </App>
+    <div class="canvas-wrapper pane-wrapper" style="display: none">
+        <canvas id="graph-canvas" />
+    </div>
 {/if}

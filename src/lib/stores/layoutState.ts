@@ -1,7 +1,7 @@
 import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
 import type ComfyApp from "$lib/components/ComfyApp"
-import type { LGraphNode, IWidget, LGraph } from "@litegraph-ts/core"
+import { type LGraphNode, type IWidget, type LGraph, NodeMode } from "@litegraph-ts/core"
 import { dndzone, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 import type { ComfyWidgetNode } from '$lib/nodes';
 
@@ -117,6 +117,12 @@ export type Attributes = {
     containerVariant?: "block" | "hidden",
 
     /*
+     * Tags for hiding containers with
+     * For WidgetLayouts this will be ignored, it will use node.properties.tags instead
+     */
+    tags: string[],
+
+    /*
      * If true, don't show this component in the UI
      */
     hidden?: boolean,
@@ -142,6 +148,12 @@ export type Attributes = {
      */
     variant?: string,
 
+    /*
+     * What state to set this widget to in the frontend if its corresponding
+     * node is disabled in the graph.
+     */
+    nodeDisabledState: "visible" | "disabled" | "hidden",
+
     /*********************************************/
     /* Special attributes for widgets/containers */
     /*********************************************/
@@ -154,6 +166,9 @@ export type Attributes = {
     buttonSize?: "large" | "small"
 }
 
+/*
+ * Defines something that can be edited in the properties side panel.
+ */
 export type AttributesSpec = {
     /*
      * ID necessary for svelte's keyed each, autoset at the top level in this source file.
@@ -256,9 +271,13 @@ export type AttributesCategorySpec = {
 
 export type AttributesSpecList = AttributesCategorySpec[]
 
-const serializeStringArray = (arg: string[]) => arg.join(",")
+const serializeStringArray = (arg: string[]) => {
+    if (arg == null)
+        arg = []
+    return arg.join(",")
+}
 const deserializeStringArray = (arg: string) => {
-    if (arg === "")
+    if (arg === "" || arg == null)
         return []
     return arg.split(",").map(s => s.trim())
 }
@@ -309,11 +328,27 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 editable: true
             },
             {
+                name: "height",
+                type: "string",
+                location: "widget",
+                defaultValue: "auto",
+                editable: true
+            },
+            {
                 name: "classes",
                 type: "string",
                 location: "widget",
                 defaultValue: "",
                 editable: true,
+            },
+            {
+                name: "nodeDisabledState",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                values: ["visible", "disabled", "hidden"],
+                defaultValue: "disabled",
+                canShow: (di: IDragItem) => di.type === "widget"
             },
 
             // Container variants
@@ -366,6 +401,18 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 values: ["large", "small"],
                 defaultValue: "large"
             },
+
+            // Gallery
+            {
+                name: "variant",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                validNodeTypes: ["ui/gallery"],
+                values: ["gallery", "image"],
+                defaultValue: "gallery",
+                refreshPanelOnChange: true
+            },
         ]
     },
     {
@@ -373,13 +420,44 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
         specs: [
             // Node variables
             {
+                name: "saveUserState",
+                type: "boolean",
+                location: "nodeVars",
+                editable: true,
+                defaultValue: true,
+            },
+            {
+                name: "mode",
+                type: "enum",
+                location: "nodeVars",
+                editable: true,
+                values: ["ALWAYS", "NEVER"],
+                defaultValue: "ALWAYS",
+                serialize: (s) => s === NodeMode.ALWAYS ? "ALWAYS" : "NEVER",
+                deserialize: (m) => m === "ALWAYS" ? NodeMode.ALWAYS : NodeMode.NEVER
+            },
+
+            // Node properties
+            {
                 name: "tags",
                 type: "string",
-                location: "nodeVars",
+                location: "nodeProps",
                 editable: true,
                 defaultValue: [],
                 serialize: serializeStringArray,
                 deserialize: deserializeStringArray
+            },
+
+            // Container tags are contained in the widget attributes
+            {
+                name: "tags",
+                type: "string",
+                location: "widget",
+                editable: true,
+                defaultValue: [],
+                serialize: serializeStringArray,
+                deserialize: deserializeStringArray,
+                canShow: (di: IDragItem) => di.type === "container"
             },
 
             // Range
@@ -424,7 +502,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: "bang"
             },
 
-            // gallery
+            // Gallery
             {
                 name: "updateMode",
                 type: "enum",
@@ -433,6 +511,18 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 validNodeTypes: ["ui/gallery"],
                 values: ["replace", "append"],
                 defaultValue: "replace"
+            },
+
+            // Radio
+            {
+                name: "choices",
+                type: "string",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/radio"],
+                defaultValue: ["Choice A", "Choice B", "Choice C"],
+                serialize: serializeStringArray,
+                deserialize: deserializeStringArray,
             },
 
             // Workflow
@@ -450,13 +540,22 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
 // This is needed so the specs can be iterated with svelte's keyed #each.
 let i = 0;
 for (const cat of Object.values(ALL_ATTRIBUTES)) {
-    for (const val of Object.values(cat.specs)) {
-        val.id = i;
+    for (const spec of Object.values(cat.specs)) {
+        spec.id = i;
         i += 1;
     }
 }
 
 export { ALL_ATTRIBUTES };
+
+const defaultWidgetAttributes: Attributes = {} as any
+for (const cat of Object.values(ALL_ATTRIBUTES)) {
+    for (const spec of Object.values(cat.specs)) {
+        if (spec.location === "widget" && spec.defaultValue != null) {
+            defaultWidgetAttributes[spec.name] = spec.defaultValue;
+        }
+    }
+}
 
 /*
  * Something that can be dragged around in the frontend - a widget or a container.
@@ -487,7 +586,7 @@ export interface IDragItem {
      * Hackish thing to indicate to Svelte that an attribute changed.
      * TODO Use Writeable<Attributes> instead!
      */
-    attrsChanged: Writable<boolean>
+    attrsChanged: Writable<number>
 }
 
 /*
@@ -521,7 +620,8 @@ type LayoutStateOps = {
     groupItems: (dragItems: IDragItem[], attrs?: Partial<Attributes>) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
     getCurrentSelection: () => IDragItem[],
-    findLayoutForNode: (nodeId: number) => IDragItem | null;
+    findLayoutEntryForNode: (nodeId: number) => DragItemEntry | null,
+    findLayoutForNode: (nodeId: number) => IDragItem | null,
     serialize: () => SerializedLayoutState,
     deserialize: (data: SerializedLayoutState, graph: LGraph) => void,
     initDefaultLayout: () => void,
@@ -568,13 +668,10 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
     const dragItem: ContainerLayout = {
         type: "container",
         id: `${state.currentId++}`,
-        attrsChanged: writable(false),
+        attrsChanged: writable(0),
         attrs: {
+            ...defaultWidgetAttributes,
             title: "Container",
-            direction: "vertical",
-            classes: "",
-            containerVariant: "block",
-            flexGrow: 100,
             ...attrs
         }
     }
@@ -595,12 +692,11 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
         type: "widget",
         id: `${state.currentId++}`,
         node: node,
-        attrsChanged: writable(false),
+        attrsChanged: writable(0),
         attrs: {
+            ...defaultWidgetAttributes,
             title: widgetName,
-            direction: "horizontal",
-            classes: "",
-            flexGrow: 100,
+            nodeDisabledState: "disabled",
             ...attrs
         }
     }
@@ -771,14 +867,21 @@ function ungroup(container: ContainerLayout) {
     store.set(state)
 }
 
-function findLayoutForNode(nodeId: number): WidgetLayout | null {
+function findLayoutEntryForNode(nodeId: number): DragItemEntry | null {
     const state = get(store)
     const found = Object.entries(state.allItems).find(pair =>
         pair[1].dragItem.type === "widget"
         && (pair[1].dragItem as WidgetLayout).node.id === nodeId)
     if (found)
-        return found[1].dragItem as WidgetLayout
+        return found[1]
     return null;
+}
+
+function findLayoutForNode(nodeId: number): WidgetLayout | null {
+    const found = findLayoutEntryForNode(nodeId);
+    if (!found)
+        return null;
+    return found.dragItem as WidgetLayout
 }
 
 function initDefaultLayout() {
@@ -790,7 +893,10 @@ function initDefaultLayout() {
         currentSelection: [],
         currentSelectionNodes: [],
         isMenuOpen: false,
-        isConfiguring: false
+        isConfiguring: false,
+        attrs: {
+            defaultSubgraph: ""
+        }
     })
 
     const root = addContainer(null, { direction: "horizontal", title: "" });
@@ -859,8 +965,8 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
         const dragItem: IDragItem = {
             type: entry.dragItem.type,
             id: entry.dragItem.id,
-            attrs: entry.dragItem.attrs,
-            attrsChanged: writable(false)
+            attrs: { ...defaultWidgetAttributes, ...entry.dragItem.attrs },
+            attrsChanged: writable(0)
         };
 
         const dragEntry: DragItemEntry = {
@@ -929,6 +1035,7 @@ const layoutStateStore: WritableLayoutStateStore =
     nodeRemoved,
     getCurrentSelection,
     groupItems,
+    findLayoutEntryForNode,
     findLayoutForNode,
     ungroup,
     initDefaultLayout,

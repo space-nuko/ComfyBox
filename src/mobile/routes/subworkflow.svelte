@@ -1,26 +1,30 @@
 <script lang="ts">
- import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
- import uiState from "$lib/stores/uiState";
+ import layoutState, { type IDragItem } from "$lib/stores/layoutState";
 
- import queueState from "$lib/stores/queueState";
  import { Page, Navbar, Link, BlockTitle, Block, List, ListItem, Toolbar } from "framework7-svelte"
+ import WidgetContainer from "$lib/components/WidgetContainer.svelte";
+ import type ComfyApp from "$lib/components/ComfyApp";
 
  export let subworkflowID: number = -1;
- let app: ComfyApp = undefined;
-
- $: if (!app)
-     app = $uiState.app
+ export let app: ComfyApp
 
 </script>
 
 <Page name="subworkflow">
     <Navbar title="Workflow {subworkflowID}" backLink="Back" />
 
-    <div>Workflow!</div>
+    <div class="container">
+        <WidgetContainer bind:dragItem={$layoutState.root} isMobile={true} classes={["root-container", "mobile"]} />
+    </div>
 </Page>
 
-<style>
- .is-executing {
-     border: 5px dashed var(--color-green-600) !important;
+<style lang="scss">
+ .container {
+     overflow-x: hidden;
+ }
+
+ // TODO generalize this to all properties!
+ :global(.root-container.mobile > .block > .v-pane) {
+     flex-direction: column !important;
  }
 </style>

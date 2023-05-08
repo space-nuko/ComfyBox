@@ -1,24 +1,17 @@
-import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, BuiltInSlotType, type ITextWidget, type SerializedLGraphNode } from "@litegraph-ts/core";
-import ComfyGraphNode from "./ComfyGraphNode";
-import { Watch } from "@litegraph-ts/nodes-basic";
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
-import { toast } from '@zerodevx/svelte-toast'
-import type { GalleryOutput } from "./ComfyWidgetNodes";
-import { get } from "svelte/store";
+import notify from "$lib/notify";
+import layoutState from "$lib/stores/layoutState";
 import queueState from "$lib/stores/queueState";
-
-export interface ComfyQueueEventsProperties extends Record<any, any> {
-}
+import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWidget, type SerializedLGraphNode, type SlotLayout } from "@litegraph-ts/core";
+import { get } from "svelte/store";
+import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
+import type { ComfyWidgetNode, GalleryOutput } from "./ComfyWidgetNodes";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
-    override properties: ComfyQueueEventsProperties = {
-    }
-
     static slotLayout: SlotLayout = {
         outputs: [
             { name: "beforeQueued", type: BuiltInSlotType.EVENT },
-            { name: "afterQueued", type: BuiltInSlotType.EVENT },
-            { name: "prompt", type: "*" }
+            { name: "afterQueued", type: BuiltInSlotType.EVENT }
         ],
     }
 
@@ -55,24 +48,21 @@ LiteGraph.registerNodeType({
     type: "actions/queue_events"
 })
 
-export interface ComfyOnExecutedEventProperties extends Record<any, any> {
-    images: GalleryOutput | null,
-    filename: string | null
+export interface ComfyStoreImagesActionProperties extends ComfyGraphNodeProperties {
+    images: GalleryOutput | null
 }
 
-export class ComfyOnExecutedEvent extends ComfyGraphNode {
-    override properties: ComfyOnExecutedEventProperties = {
-        images: null,
-        filename: null
+export class ComfyStoreImagesAction extends ComfyGraphNode {
+    override properties: ComfyStoreImagesActionProperties = {
+        images: null
     }
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "images", type: "IMAGE" }
+            { name: "output", type: BuiltInSlotType.ACTION, options: { color_off: "rebeccapurple", color_on: "rebeccapurple" } }
         ],
         outputs: [
             { name: "images", type: "OUTPUT" },
-            { name: "onExecuted", type: BuiltInSlotType.EVENT },
         ],
     }
 
@@ -81,29 +71,30 @@ export class ComfyOnExecutedEvent extends ComfyGraphNode {
             this.setOutputData(0, this.properties.images)
     }
 
-    override receiveOutput(output: any) {
-        if (output && "images" in output) {
-            this.setProperty("images", output as GalleryOutput)
-            this.setOutputData(0, this.properties.images)
-            this.triggerSlot(1, "bang")
-        }
+    override onAction(action: any, param: any) {
+        if (action !== "store" || !param || !("images" in param))
+            return;
+
+        this.setProperty("images", param as GalleryOutput)
+        this.setOutputData(0, this.properties.images)
     }
 }
 
 LiteGraph.registerNodeType({
-    class: ComfyOnExecutedEvent,
-    title: "Comfy.OnExecutedEvent",
-    desc: "Triggers a 'bang' event when a prompt output is received.",
-    type: "actions/on_executed"
+    class: ComfyStoreImagesAction,
+    title: "Comfy.StoreImagesAction",
+    desc: "Stores images from an onExecuted callback",
+    type: "actions/store_images"
 })
 
-export interface ComfyCopyActionProperties extends Record<any, any> {
+export interface ComfyCopyActionProperties extends ComfyGraphNodeProperties {
     value: any
 }
 
 export class ComfyCopyAction extends ComfyGraphNode {
     override properties: ComfyCopyActionProperties = {
-        value: null
+        value: null,
+        tags: []
     }
 
     static slotLayout: SlotLayout = {
@@ -149,7 +140,7 @@ LiteGraph.registerNodeType({
     type: "actions/copy"
 })
 
-export interface ComfySwapActionProperties extends Record<any, any> {
+export interface ComfySwapActionProperties extends ComfyGraphNodeProperties {
 }
 
 export class ComfySwapAction extends ComfyGraphNode {
@@ -163,16 +154,16 @@ export class ComfySwapAction extends ComfyGraphNode {
             { name: "swap", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
-            { name: "B", type: "*" },
-            { name: "A", type: "*" }
+            { name: "B", type: BuiltInSlotType.EVENT },
+            { name: "A", type: BuiltInSlotType.EVENT }
         ],
     }
 
     override onAction(action: any, param: any) {
         const a = this.getInputData(0)
         const b = this.getInputData(1)
-        this.setOutputData(0, a)
-        this.setOutputData(1, b)
+        this.triggerSlot(0, a)
+        this.triggerSlot(1, b)
     };
 }
 
@@ -183,13 +174,14 @@ LiteGraph.registerNodeType({
     type: "actions/swap"
 })
 
-export interface ComfyNotifyActionProperties extends Record<any, any> {
+export interface ComfyNotifyActionProperties extends ComfyGraphNodeProperties {
     message: string
 }
 
 export class ComfyNotifyAction extends ComfyGraphNode {
     override properties: ComfyNotifyActionProperties = {
-        message: "Nya."
+        message: "Nya.",
+        tags: []
     }
 
     static slotLayout: SlotLayout = {
@@ -202,7 +194,7 @@ export class ComfyNotifyAction extends ComfyGraphNode {
     override onAction(action: any, param: any) {
         const message = this.getInputData(0);
         if (message) {
-            toast.push(message);
+            notify(message);
         }
     };
 }
@@ -214,7 +206,7 @@ LiteGraph.registerNodeType({
     type: "actions/notify"
 })
 
-export interface ComfyExecuteSubgraphActionProperties extends Record<any, any> {
+export interface ComfyExecuteSubgraphActionProperties extends ComfyGraphNodeProperties {
     tag: string | null,
 }
 
@@ -252,4 +244,84 @@ LiteGraph.registerNodeType({
     title: "Comfy.ExecuteSubgraphAction",
     desc: "Runs a part of the graph based on a tag",
     type: "actions/execute_subgraph"
+})
+
+export interface ComfySetNodeModeActionProperties extends ComfyGraphNodeProperties {
+    targetTags: string,
+    enable: boolean,
+}
+
+export class ComfySetNodeModeAction extends ComfyGraphNode {
+    override properties: ComfySetNodeModeActionProperties = {
+        targetTags: "",
+        enable: false,
+        tags: []
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "enabled", type: "boolean" },
+            { name: "set", type: BuiltInSlotType.ACTION },
+        ],
+    }
+
+    displayWidget: ITextWidget;
+    enableWidget: IToggleWidget;
+
+    constructor(title?: string) {
+        super(title)
+        this.displayWidget = this.addWidget("text", "Tags", this.properties.targetTags, "targetTags")
+    }
+
+    override onPropertyChanged(property: any, value: any) {
+        if (property === "enabled") {
+            this.enableWidget.value = value
+        }
+    }
+
+    override onAction(action: any, param: any) {
+        let enabled = this.getInputData(0)
+
+        if (typeof param === "object" && "enabled" in param)
+            enabled = param["enabled"]
+
+        const tags = this.properties.targetTags.split(",").map(s => s.trim());
+
+        for (const node of this.graph._nodes) {
+            if ("tags" in node.properties) {
+                const comfyNode = node as ComfyGraphNode;
+                const hasTag = tags.some(t => comfyNode.properties.tags.indexOf(t) != -1);
+                if (hasTag) {
+                    let newMode: NodeMode;
+                    if (enabled) {
+                        newMode = NodeMode.ALWAYS;
+                    } else {
+                        newMode = NodeMode.NEVER;
+                    }
+                    console.warn("CHANGEMODE", newMode == NodeMode.ALWAYS ? "ALWAYS" : "NEVER", tags, node)
+                    node.changeMode(newMode);
+                    if ("notifyPropsChanged" in node)
+                        (node as ComfyWidgetNode).notifyPropsChanged();
+                }
+            }
+        }
+
+        for (const entry of Object.values(get(layoutState).allItems)) {
+            if (entry.dragItem.type === "container") {
+                const container = entry.dragItem;
+                const hasTag = tags.some(t => container.attrs.tags.indexOf(t) != -1);
+                if (hasTag) {
+                    container.attrs.hidden = !enabled;
+                }
+                container.attrsChanged.set(get(container.attrsChanged) + 1)
+            }
+        }
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfySetNodeModeAction,
+    title: "Comfy.SetNodeModeAction",
+    desc: "Sets a group of nodes/UI containers as enabled/disabled based on their tags (comma-separated)",
+    type: "actions/set_node_mode"
 })
