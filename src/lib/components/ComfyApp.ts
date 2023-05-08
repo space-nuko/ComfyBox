@@ -715,7 +715,8 @@ export default class ComfyApp {
                         comfyInput.config.values = def["input"]["required"][comfyInput.name][0];
                         const inputNode = node.getInputNode(index)
 
-                        if (inputNode && "doAutoConfig" in inputNode) {
+                        if (inputNode && "doAutoConfig" in inputNode && comfyInput.widgetNodeType === inputNode.type) {
+                            console.debug("[ComfyApp] Reconfiguring combo widget", inputNode.type, comfyInput.config.values)
                             const comfyComboNode = inputNode as nodes.ComfyComboNode;
                             comfyComboNode.doAutoConfig(comfyInput)
                             if (!comfyInput.config.values.includes(get(comfyComboNode.value))) {

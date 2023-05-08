@@ -207,19 +207,27 @@ LiteGraph.registerNodeType({
 })
 
 export interface ComfyExecuteSubgraphActionProperties extends ComfyGraphNodeProperties {
-    tag: string | null,
+    targetTag: string
 }
 
 export class ComfyExecuteSubgraphAction extends ComfyGraphNode {
     override properties: ComfyExecuteSubgraphActionProperties = {
-        tag: null
+        tags: [],
+        targetTag: ""
     }
 
     static slotLayout: SlotLayout = {
         inputs: [
             { name: "execute", type: BuiltInSlotType.ACTION },
-            { name: "tag", type: "string" }
+            { name: "targetTag", type: "string" }
         ],
+    }
+
+    displayWidget: ITextWidget;
+
+    constructor(title?: string) {
+        super(title)
+        this.displayWidget = this.addWidget("text", "targetTag", this.properties.targetTag, "targetTag")
     }
 
     override onExecute() {
@@ -229,7 +237,7 @@ export class ComfyExecuteSubgraphAction extends ComfyGraphNode {
     }
 
     override onAction(action: any, param: any) {
-        const tag = this.getInputData(1) || this.properties.tag;
+        const tag = this.getInputData(1) || this.properties.targetTag;
 
         const app = (window as any)?.app;
         if (!app)

@@ -16,6 +16,7 @@ import GalleryWidget from "$lib/widgets/GalleryWidget.svelte";
 import ButtonWidget from "$lib/widgets/ButtonWidget.svelte";
 import CheckboxWidget from "$lib/widgets/CheckboxWidget.svelte";
 import RadioWidget from "$lib/widgets/RadioWidget.svelte";
+import ImageUploadWidget from "$lib/widgets/ImageUploadWidget.svelte";
 
 /*
  * NOTE: If you want to add a new widget but it has the same input/output type
@@ -79,12 +80,15 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     override isBackendNode = false;
     override serialize_widgets = true;
 
+
+    // TODO these are bad, create override methods instead
     // input slots
     inputIndex: number = 0;
 
     // output slots
     outputIndex: number | null = 0;
     changedIndex: number | null = 1;
+
 
     displayWidget: ITextWidget;
 
@@ -203,7 +207,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     ): boolean {
         const anyConnected = range(this.outputs.length).some(i => this.getOutputLinks(i).length > 0);
 
-        if (this.autoConfig && "config" in input && !anyConnected) {
+        if (this.autoConfig && "config" in input && !anyConnected && (input as IComfyInputSlot).widgetNodeType === this.type) {
             this.doAutoConfig(input as IComfyInputSlot)
         }
 
@@ -750,4 +754,53 @@ LiteGraph.registerNodeType({
     title: "UI.Radio",
     desc: "Radio that outputs a string and index",
     type: "ui/radio"
+})
+
+export interface ComfyImageUploadProperties extends ComfyWidgetProperties {
+    fileCount: "single" | "multiple" // gradio File component format
+}
+
+export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>> {
+    override properties: ComfyImageUploadProperties = {
+        defaultValue: [],
+        tags: [],
+        fileCount: "single",
+    }
+
+    static slotLayout: SlotLayout = {
+        outputs: [
+            { name: "filename", type: "string" }, // TODO support batches
+            { name: "changed", type: BuiltInSlotType.EVENT },
+        ]
+    }
+
+    override svelteComponentType = ImageUploadWidget;
+    override defaultValue = null;
+    override outputIndex = null;
+    override changedIndex = 1;
+
+    constructor(name?: string) {
+        super(name, [])
+    }
+
+    override onExecute(param: any, options: object) {
+        super.onExecute(param, options);
+
+        const value = get(this.value)
+        if (value.length > 0 && value[0].name)
+            this.setOutputData(0, value[0].name) // TODO when ComfyUI LoadImage supports loading an image batch
+        else
+            this.setOutputData(0, "")
+    }
+
+    override formatValue(value: GradioFileData[]): string {
+        return `Images: ${value.length}`
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyImageUploadNode,
+    title: "UI.ImageUpload",
+    desc: "Widget that lets you upload images into ComfyUI's input folder",
+    type: "ui/image_upload"
 })

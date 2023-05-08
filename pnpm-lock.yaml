@@ -16,6 +16,9 @@ importers:
       '@gradio/client':
         specifier: workspace:*
         version: link:gradio/client/js
+      '@gradio/file':
+        specifier: workspace:*
+        version: link:gradio/js/file
       '@gradio/form':
         specifier: workspace:*
         version: link:gradio/js/form
@@ -25,6 +28,9 @@ importers:
       '@gradio/icons':
         specifier: workspace:*
         version: link:gradio/js/icons
+      '@gradio/image':
+        specifier: workspace:*
+        version: link:gradio/js/image
       '@gradio/tabs':
         specifier: workspace:*
         version: link:gradio/js/tabs

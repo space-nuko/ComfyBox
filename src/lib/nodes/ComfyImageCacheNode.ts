@@ -12,6 +12,10 @@ export interface ComfyImageCacheNodeProperties extends ComfyGraphNodeProperties 
 
 type ImageCacheState = "none" | "uploading" | "failed" | "cached"
 
+interface ComfyUploadImageAPIResponse {
+    name: string
+}
+
 /*
  * A node that can act as both an input and output image node by uploading
  * the output file into ComfyUI's input folder.
@@ -159,6 +163,7 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
         else {
             this.properties.filenames[newIndex] = { filename: null, status: "uploading" }
             this.onPropertyChanged("filenames", this.properties.filenames)
+
             const url = `http://${location.hostname}:8188` // TODO make configurable
             const params = new URLSearchParams(data)
 
@@ -176,10 +181,10 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
                     )
                 })
                 .then((r) => r.json())
-                .then((json) => {
+                .then((json: ComfyUploadImageAPIResponse) => {
                     console.debug("Gottem", json)
                     if (lastGenNumber === this.properties.genNumber) {
-                        this.properties.filenames[newIndex] = { filename: data.filename, status: "cached" }
+                        this.properties.filenames[newIndex] = { filename: json.name, status: "cached" }
                         this.onPropertyChanged("filenames", this.properties.filenames)
                     }
                     else {

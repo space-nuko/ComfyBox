@@ -92,7 +92,7 @@
                         <div class="animation-wrapper"
                              class:hidden={hidden}
                              animate:flip={{duration:flipDurationMs}}
-                             style={item?.attrs?.flexGrow ? `flex-grow: ${item.attrs.flexGrow}` : ""}>
+                             style={item?.attrs?.style || ""}>
                             <Block>
                                 <label for={String(item.id)}>
                                     <BlockTitle><strong>Tab {i+1}:</strong> {tabName}</BlockTitle>
@@ -198,6 +198,7 @@
  .animation-wrapper {
      position: relative;
      flex-grow: 100;
+     flex-basis: 0;
  }
 
  .handle-widget:hover {
