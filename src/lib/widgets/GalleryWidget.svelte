@@ -36,8 +36,8 @@
  };
 
  let style: Styles = {
-     // grid_cols: [2],
-     grid: [3],
+     grid_cols: [4],
+     grid_rows: [4],
      // object_fit: "cover",
  }
  let element: HTMLDivElement;
@@ -126,7 +126,7 @@
 
 {#if widget && node && nodeValue && $nodeValue != null}
     {#if widget.attrs.variant === "image"}
-        <div class="wrapper comfy-image-widget" bind:this={element}>
+        <div class="wrapper comfy-image-widget" style="height: {widget.attrs.height || 'auto'}" bind:this={element}>
             <Block variant="solid" padding={false}>
                 {#if widget.attrs.title}
                     <BlockLabel

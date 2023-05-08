@@ -328,6 +328,13 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 editable: true
             },
             {
+                name: "height",
+                type: "string",
+                location: "widget",
+                defaultValue: "auto",
+                editable: true
+            },
+            {
                 name: "classes",
                 type: "string",
                 location: "widget",

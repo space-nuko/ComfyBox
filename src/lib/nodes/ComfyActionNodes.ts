@@ -11,8 +11,7 @@ export class ComfyQueueEvents extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
         outputs: [
             { name: "beforeQueued", type: BuiltInSlotType.EVENT },
-            { name: "afterQueued", type: BuiltInSlotType.EVENT },
-            { name: "prompt", type: "*" }
+            { name: "afterQueued", type: BuiltInSlotType.EVENT }
         ],
     }
 

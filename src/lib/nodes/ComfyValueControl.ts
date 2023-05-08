@@ -51,6 +51,11 @@ export default class ComfyValueControl extends ComfyGraphNode {
         }
     }
 
+    delayChangeEvent: boolean = true;
+
+    private _aboutToChange: number = 0;
+    private _aboutToChangeValue: any = null;
+
     constructor(title?: string) {
         super(title);
     }
@@ -60,6 +65,16 @@ export default class ComfyValueControl extends ComfyGraphNode {
         this.setProperty("min", this.getInputData(3))
         this.setProperty("max", this.getInputData(4))
         this.setProperty("step", this.getInputData(5) || 1)
+
+        if (this._aboutToChange > 0) {
+            this._aboutToChange -= 1;
+            if (this._aboutToChange <= 0) {
+                const value = this._aboutToChangeValue;
+                this._aboutToChange = 0;
+                this._aboutToChangeValue = null;
+                this.triggerSlot(1, value)
+            }
+        }
     }
 
     override onAction(action: any, param: any) {
@@ -95,8 +110,15 @@ export default class ComfyValueControl extends ComfyGraphNode {
 
         v = clamp(v, min, max)
         this.setProperty("value", v)
-        this.triggerSlot(1, v)
         this.setOutputData(0, v)
+
+        if (this.delayChangeEvent) {
+            this._aboutToChange = 2;
+            this._aboutToChangeValue = v;
+        }
+        else {
+            this.triggerSlot(1, v)
+        }
 
         console.debug("ValueControl", v, this.properties)
     };

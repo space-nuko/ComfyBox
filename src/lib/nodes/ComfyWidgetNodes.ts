@@ -26,6 +26,11 @@ import RadioWidget from "$lib/widgets/RadioWidget.svelte";
  *   attribute and set `validNodeTypes` to the type of the litegraph node
  * - Add a new entry in the `values` array, like "knob" or "dial" for ComfySliderWidget
  * - Add an {#if widget.attrs.variant === <...>} statement in the corresponding Svelte component
+ *
+ * Also, BEWARE of calling setOutputData() and triggerSlot() on the same frame!
+ * You will have to either implement an internal delay on the event triggering
+ * or use an Event Delay node to ensure the output slot data can propagate to
+ * the rest of the graph first (see `delayChangedEvent` for details)
  */
 
 export interface ComfyWidgetProperties extends ComfyGraphNodeProperties {
