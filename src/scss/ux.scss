@@ -498,6 +498,7 @@ button.secondary{
     white-space: break-spaces !important;
 }
 
+.gradio-radio fieldset > .wrap > label,
 [type=text],
 [type=email],
 [type=url],
@@ -513,8 +514,8 @@ button.secondary{
 [multiple],
 textarea,
 select {
-    line-height: 1.5rem;
-    padding: 4px 8px;
+    line-height: 1.5rem !important;
+    padding: 4px 8px !important;
 }
 
 button.tool.secondary,
@@ -572,12 +573,6 @@ input[type=email] {
 }
 .gradio-slider input[type=range] {
 	align-self: flex-start;
-}
-
-.gradio-radio span:not(.has-info) {
-    margin-top: 1px;
-    margin-left: 1px;
-	margin-bottom: var(--ae-inside-padding-size);
 }
 
 /* input column alignment */
