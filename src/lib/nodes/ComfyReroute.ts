@@ -137,7 +137,7 @@ export default class ComfyReroute extends ComfyGraphNode {
         }
 
         const displayType = inputType || outputType || "*";
-        const color = LGraphCanvas.link_type_colors[displayType];
+        const color = LGraphCanvas.DEFAULT_LINK_TYPE_COLORS[displayType];
 
         // Update the types of each node
         for (const node of updateNodes) {

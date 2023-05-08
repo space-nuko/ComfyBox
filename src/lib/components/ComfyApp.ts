@@ -120,6 +120,8 @@ export default class ComfyApp {
             return;
         }
 
+        this.setupColorScheme()
+
         this.rootEl = document.getElementById("app") as HTMLDivElement;
         this.canvasEl = document.getElementById("graph-canvas") as HTMLCanvasElement;
         this.lGraph = new ComfyGraph();
@@ -159,8 +161,6 @@ export default class ComfyApp {
         this.addDropHandler();
         this.addPasteHandler();
         this.addKeyboardHandler();
-
-        this.setupColorScheme()
 
         // await this.#invokeExtensionsAsync("setup");
 
@@ -346,8 +346,8 @@ export default class ComfyApp {
 
     private setupColorScheme() {
         const setColor = (type: any, color: string) => {
-            this.lCanvas.link_type_colors[type] = color
-            this.lCanvas.default_connection_color_byType[type] = color
+            LGraphCanvas.DEFAULT_LINK_TYPE_COLORS[type] = color
+            LGraphCanvas.DEFAULT_CONNECTION_COLORS_BY_TYPE[type] = color
         }
 
         // Distinguish frontend/backend connections
