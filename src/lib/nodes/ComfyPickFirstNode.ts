@@ -101,14 +101,30 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
         }
     }
 
+    private isValidLink(link: LLink | null): boolean {
+        if (!link)
+            return false;
+
+        const node = this.graph.getNodeById(link.origin_id);
+
+        // Links to deactivated nodes won't count.
+        if (!node || node.mode !== NodeMode.ALWAYS)
+            return false;
+
+        if ((node as ComfyGraphNode).isBackendNode) {
+            // Backend nodes won't set data, we can safely assume they're valid.
+            return true;
+        }
+        else {
+            return link.data != null || this.properties.acceptNullLinkData;
+        }
+    }
+
     override getUpstreamLink(): LLink | null {
         for (let index = 0; index < this.inputs.length; index++) {
             const link = this.getInputLink(index);
-            if (link != null && (link.data != null || this.properties.acceptNullLinkData)) {
-                const node = this.getInputNode(index);
-                if (node != null && node.mode === NodeMode.ALWAYS) {
-                    return link;
-                }
+            if (this.isValidLink(link)) {
+                return link;
             }
         }
         return null;
@@ -117,9 +133,10 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
     override onExecute() {
         for (let index = 0; index < this.inputs.length; index++) {
             const link = this.getInputLink(index);
-            if (link != null && (link.data != null || this.properties.acceptNullLinkData)) {
+            if (this.isValidLink(link)) {
+                // Copy frontend-only inputs.
                 const node = this.getInputNode(index);
-                if (node != null && node.mode === NodeMode.ALWAYS) {
+                if (node != null && !(node as any).isBackendNode) {
                     this.selected = index;
                     this.displayWidget.value = Watch.toString(link.data)
                     this.setOutputData(0, link.data)
