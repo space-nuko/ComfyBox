@@ -39,12 +39,12 @@
  }
 </script>
 
-<div class="wrapper gradio-checkbox">
+<div class="wrapper gradio-radio">
     <div class="inner">
         {#key $propsChanged}
             {#key $attrsChanged}
                 {#if node !== null && node.properties.choices}
-                    <Block>
+                    <Block type="fieldset">
                         <Radio
                             elem_id="radio"
                             choices={node.properties.choices}

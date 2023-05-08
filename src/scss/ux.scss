@@ -390,8 +390,8 @@ div.block.padded {
 fieldset.block.padded
 {
     background-color: var(--ae-panel-bg-color) !important;
-	/*border-width: var(--ae-border-width) !important;*/
-    /*border-color: var(--ae-panel-border-color) !important;*/
+	border-width: var(--ae-border-width) !important;
+    border-color: var(--ae-panel-border-color) !important;
     border-radius: var(--ae-panel-border-radius) !important;
 }
 
@@ -440,7 +440,7 @@ div.gradio-row>.form{
 }
 
 .wrap.svelte-1p9xokt.svelte-1p9xokt.svelte-1p9xokt label,
-.wrap.svelte-1qxcj04.svelte-1qxcj04.svelte-1qxcj04 label,
+.gradio-radio label,
 button.tool.secondary,
 button.secondary,
 .gradio-dropdown label .wrap,
@@ -571,7 +571,7 @@ input[type=email] {
 	align-self: flex-start;
 }
 
-span.svelte-1gfkn6j:not(.has-info) {
+.gradio-radio span:not(.has-info) {
     margin-top: 1px;
     margin-left: 1px;
 	margin-bottom: var(--ae-inside-padding-size);
@@ -871,6 +871,11 @@ input[type=range]::-ms-fill-upper {
     .icon.chevron {
         color: var(--ae-input-color) !important;
     }
+}
+
+.comfy-image-widget > .block {
+	background: var(--ae-main-bg-color);
+	border-color: var(--ae-panel-border-color);
 }
 
 .comfy-toggle-button {
