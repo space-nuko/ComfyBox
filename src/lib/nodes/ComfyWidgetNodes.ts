@@ -1,21 +1,34 @@
-import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot, type SerializedLGraphNode, BuiltInSlotType, type PropertyLayout, type IComboWidget, NodeMode } from "@litegraph-ts/core";
-import ComfyGraphNode from "./ComfyGraphNode";
+import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot, type SerializedLGraphNode, BuiltInSlotType, type PropertyLayout, type IComboWidget, NodeMode, type INumberWidget } from "@litegraph-ts/core";
+import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
+import type { SvelteComponentDev } from "svelte/internal";
+import { Watch } from "@litegraph-ts/nodes-basic";
+import type IComfyInputSlot from "$lib/IComfyInputSlot";
+import { writable, type Unsubscriber, type Writable, get } from "svelte/store";
+import { clamp, convertComfyOutputToGradio, range } from "$lib/utils"
+import layoutState from "$lib/stores/layoutState";
+import type { FileData as GradioFileData } from "@gradio/upload";
+import queueState from "$lib/stores/queueState";
+
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import RangeWidget from "$lib/widgets/RangeWidget.svelte";
 import TextWidget from "$lib/widgets/TextWidget.svelte";
 import GalleryWidget from "$lib/widgets/GalleryWidget.svelte";
 import ButtonWidget from "$lib/widgets/ButtonWidget.svelte";
 import CheckboxWidget from "$lib/widgets/CheckboxWidget.svelte";
-import type { SvelteComponentDev } from "svelte/internal";
-import { Watch } from "@litegraph-ts/nodes-basic";
-import type IComfyInputSlot from "$lib/IComfyInputSlot";
-import { writable, type Unsubscriber, type Writable, get } from "svelte/store";
-import { clamp, range } from "$lib/utils"
-import layoutState from "$lib/stores/layoutState";
-import type { FileData as GradioFileData } from "@gradio/upload";
-import queueState from "$lib/stores/queueState";
+import RadioWidget from "$lib/widgets/RadioWidget.svelte";
 
-export interface ComfyWidgetProperties extends Record<string, any> {
+/*
+ * NOTE: If you want to add a new widget but it has the same input/output type
+ * as another one of the existing widgets, best to create a new "variant" of
+ * that widget instead.
+ *
+ * - Go to layoutState, look for `ALL_ATTRIBUTES,` insert or find a "variant"
+ *   attribute and set `validNodeTypes` to the type of the litegraph node
+ * - Add a new entry in the `values` array, like "knob" or "dial" for ComfySliderWidget
+ * - Add an {#if widget.attrs.variant === <...>} statement in the corresponding Svelte component
+ */
+
+export interface ComfyWidgetProperties extends ComfyGraphNodeProperties {
     defaultValue: any
 }
 
@@ -98,9 +111,9 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         this.notifyPropsChanged();
         // Also need to notify the parent container since it's what controls the
         // hidden state of the widget
-        const layoutEntry = layoutState.findLayoutEntryForNode(this.id)
-        if (layoutEntry && layoutEntry.parent)
-            layoutEntry.parent.attrsChanged.set(get(layoutEntry.parent.attrsChanged) + 1)
+        // const layoutEntry = layoutState.findLayoutEntryForNode(this.id)
+        // if (layoutEntry && layoutEntry.parent)
+        //     layoutEntry.parent.attrsChanged.set(get(layoutEntry.parent.attrsChanged) + 1)
         return result;
     }
 
@@ -131,7 +144,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     /*
      * Logic to run if this widget can be treated as output (slider, combo, text)
      */
-    override onExecute() {
+    override onExecute(param: any, options: object) {
         if (this.copyFromInputLink) {
             if (this.inputs.length >= this.inputIndex) {
                 const data = this.getInputData(this.inputIndex)
@@ -186,6 +199,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     notifyPropsChanged() {
+        console.debug("propsChanged", this)
         this.propsChanged.set(get(this.propsChanged) + 1)
     }
 
@@ -248,6 +262,7 @@ export interface ComfySliderProperties extends ComfyWidgetProperties {
 
 export class ComfySliderNode extends ComfyWidgetNode<number> {
     override properties: ComfySliderProperties = {
+        tags: [],
         defaultValue: 0,
         min: 0,
         max: 10,
@@ -312,6 +327,7 @@ export interface ComfyComboProperties extends ComfyWidgetProperties {
 
 export class ComfyComboNode extends ComfyWidgetNode<string> {
     override properties: ComfyComboProperties = {
+        tags: [],
         defaultValue: "A",
         values: ["A", "B", "C", "D"]
     }
@@ -404,6 +420,7 @@ export interface ComfyTextProperties extends ComfyWidgetProperties {
 
 export class ComfyTextNode extends ComfyWidgetNode<string> {
     override properties: ComfyTextProperties = {
+        tags: [],
         defaultValue: "",
         multiline: false
     }
@@ -462,6 +479,7 @@ export interface ComfyGalleryProperties extends ComfyWidgetProperties {
 
 export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     override properties: ComfyGalleryProperties = {
+        tags: [],
         defaultValue: [],
         index: 0,
         updateMode: "replace"
@@ -514,7 +532,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
                 const data = param as GalleryOutput
                 console.debug("[ComfyGalleryNode] Received output!", data)
 
-                const galleryItems: GradioFileData[] = this.convertItems(data)
+                const galleryItems: GradioFileData[] = convertComfyOutputToGradio(data)
 
                 if (this.properties.updateMode === "append") {
                     const currentValue = get(this.value)
@@ -530,18 +548,6 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
 
     override formatValue(value: GradioFileData[] | null): string {
         return `Images: ${value?.length || 0}`
-    }
-
-    private convertItems(output: GalleryOutput): GradioFileData[] {
-        return output.images.map(r => {
-            // TODO configure backend URL
-            const url = `http://${location.hostname}:8188` // TODO make configurable
-            const params = new URLSearchParams(r)
-            return {
-                name: null,
-                data: url + "/view?" + params
-            }
-        });
     }
 
     override setValue(value: any) {
@@ -572,6 +578,7 @@ export interface ComfyButtonProperties extends ComfyWidgetProperties {
 
 export class ComfyButtonNode extends ComfyWidgetNode<boolean> {
     override properties: ComfyButtonProperties = {
+        tags: [],
         defaultValue: false,
         param: "bang"
     }
@@ -614,6 +621,7 @@ export interface ComfyCheckboxProperties extends ComfyWidgetProperties {
 
 export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
     override properties: ComfyCheckboxProperties = {
+        tags: [],
         defaultValue: false,
     }
 
@@ -645,4 +653,64 @@ LiteGraph.registerNodeType({
     title: "UI.Checkbox",
     desc: "Checkbox that stores a boolean value",
     type: "ui/checkbox"
+})
+
+export interface ComfyRadioProperties extends ComfyWidgetProperties {
+    choices: string[]
+}
+
+export class ComfyRadioNode extends ComfyWidgetNode<string> {
+    override properties: ComfyRadioProperties = {
+        tags: [],
+        choices: ["Choice A", "Choice B", "Choice C"],
+        defaultValue: "Choice A",
+    }
+
+    static slotLayout: SlotLayout = {
+        outputs: [
+            { name: "value", type: "string" },
+            { name: "index", type: "number" },
+            { name: "changed", type: BuiltInSlotType.EVENT },
+        ]
+    }
+
+    override svelteComponentType = RadioWidget;
+    override defaultValue = "";
+    override changedIndex = 2;
+
+    indexWidget: INumberWidget;
+
+    index = 0;
+
+    constructor(name?: string) {
+        super(name, "Choice A")
+        this.indexWidget = this.addWidget("number", "Index", this.index)
+        this.indexWidget.disabled = true;
+    }
+
+    override onExecute(param: any, options: object) {
+        super.onExecute(param, options);
+        this.setOutputData(1, this.index)
+    }
+
+    override setValue(value: string) {
+        const index = this.properties.choices.indexOf(value)
+        if (index == -1)
+            return;
+
+        this.index = index;
+        this.indexWidget.value = index;
+
+        const changed = value != get(this.value);
+        super.setValue(value)
+        if (changed)
+            this.triggerSlot(2, { value: value, index: index })
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyRadioNode,
+    title: "UI.Radio",
+    desc: "Radio that outputs a string and index",
+    type: "ui/radio"
 })

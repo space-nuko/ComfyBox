@@ -1,10 +1,10 @@
 import { BuiltInSlotType, LiteGraph, type SlotLayout } from "@litegraph-ts/core";
-import ComfyGraphNode, { type DefaultWidgetLayout } from "./ComfyGraphNode";
+import ComfyGraphNode, { type ComfyGraphNodeProperties, type DefaultWidgetLayout } from "./ComfyGraphNode";
 import { clamp } from "$lib/utils";
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import { ComfyComboNode } from "./ComfyWidgetNodes";
 
-export interface ComfyValueControlProperties extends Record<any, any> {
+export interface ComfyValueControlProperties extends ComfyGraphNodeProperties {
     value: any,
     action: "fixed" | "increment" | "decrement" | "randomize",
     min: number,
@@ -16,6 +16,7 @@ const INT_MAX = 1125899906842624;
 
 export default class ComfyValueControl extends ComfyGraphNode {
     override properties: ComfyValueControlProperties = {
+        tags: [],
         value: null,
         action: "fixed",
         min: -INT_MAX,

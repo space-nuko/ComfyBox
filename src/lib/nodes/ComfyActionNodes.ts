@@ -1,21 +1,13 @@
-import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, BuiltInSlotType, type ITextWidget, type SerializedLGraphNode, NodeMode, type IToggleWidget } from "@litegraph-ts/core";
-import ComfyGraphNode from "./ComfyGraphNode";
-import { Watch } from "@litegraph-ts/nodes-basic";
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
-import { toast } from '@zerodevx/svelte-toast'
-import type { GalleryOutput } from "./ComfyWidgetNodes";
-import { get } from "svelte/store";
-import queueState from "$lib/stores/queueState";
 import notify from "$lib/notify";
 import layoutState from "$lib/stores/layoutState";
-
-export interface ComfyQueueEventsProperties extends Record<any, any> {
-}
+import queueState from "$lib/stores/queueState";
+import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWidget, type SerializedLGraphNode, type SlotLayout } from "@litegraph-ts/core";
+import { get } from "svelte/store";
+import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
+import type { GalleryOutput } from "./ComfyWidgetNodes";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
-    override properties: ComfyQueueEventsProperties = {
-    }
-
     static slotLayout: SlotLayout = {
         outputs: [
             { name: "beforeQueued", type: BuiltInSlotType.EVENT },
@@ -57,7 +49,7 @@ LiteGraph.registerNodeType({
     type: "actions/queue_events"
 })
 
-export interface ComfyStoreImagesActionProperties extends Record<any, any> {
+export interface ComfyStoreImagesActionProperties extends ComfyGraphNodeProperties {
     images: GalleryOutput | null
 }
 
@@ -96,13 +88,14 @@ LiteGraph.registerNodeType({
     type: "actions/store_images"
 })
 
-export interface ComfyCopyActionProperties extends Record<any, any> {
+export interface ComfyCopyActionProperties extends ComfyGraphNodeProperties {
     value: any
 }
 
 export class ComfyCopyAction extends ComfyGraphNode {
     override properties: ComfyCopyActionProperties = {
-        value: null
+        value: null,
+        tags: []
     }
 
     static slotLayout: SlotLayout = {
@@ -148,7 +141,7 @@ LiteGraph.registerNodeType({
     type: "actions/copy"
 })
 
-export interface ComfySwapActionProperties extends Record<any, any> {
+export interface ComfySwapActionProperties extends ComfyGraphNodeProperties {
 }
 
 export class ComfySwapAction extends ComfyGraphNode {
@@ -182,13 +175,14 @@ LiteGraph.registerNodeType({
     type: "actions/swap"
 })
 
-export interface ComfyNotifyActionProperties extends Record<any, any> {
+export interface ComfyNotifyActionProperties extends ComfyGraphNodeProperties {
     message: string
 }
 
 export class ComfyNotifyAction extends ComfyGraphNode {
     override properties: ComfyNotifyActionProperties = {
-        message: "Nya."
+        message: "Nya.",
+        tags: []
     }
 
     static slotLayout: SlotLayout = {
@@ -213,7 +207,7 @@ LiteGraph.registerNodeType({
     type: "actions/notify"
 })
 
-export interface ComfyExecuteSubgraphActionProperties extends Record<any, any> {
+export interface ComfyExecuteSubgraphActionProperties extends ComfyGraphNodeProperties {
     tag: string | null,
 }
 
@@ -253,7 +247,7 @@ LiteGraph.registerNodeType({
     type: "actions/execute_subgraph"
 })
 
-export interface ComfySetNodeModeActionProperties extends Record<any, any> {
+export interface ComfySetNodeModeActionProperties extends ComfyGraphNodeProperties {
     targetTags: string,
     enable: boolean,
 }
@@ -261,7 +255,8 @@ export interface ComfySetNodeModeActionProperties extends Record<any, any> {
 export class ComfySetNodeModeAction extends ComfyGraphNode {
     override properties: ComfySetNodeModeActionProperties = {
         targetTags: "",
-        enable: false
+        enable: false,
+        tags: []
     }
 
     static slotLayout: SlotLayout = {

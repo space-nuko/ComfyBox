@@ -1,7 +1,7 @@
 import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, NodeMode } from "@litegraph-ts/core";
-import ComfyGraphNode from "./ComfyGraphNode";
+import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 
-export interface ComfyRerouteProperties extends Record<any, any> {
+export interface ComfyRerouteProperties extends ComfyGraphNodeProperties {
     showOutputText: boolean;
     horizontal: boolean;
 }
@@ -22,6 +22,7 @@ export default class ComfyReroute extends ComfyGraphNode {
     override collapsable: boolean = false;
 
     override properties: ComfyRerouteProperties = {
+        tags: [],
         showOutputText: ComfyReroute.defaultVisibility,
         horizontal: false
     }

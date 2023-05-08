@@ -1,8 +1,8 @@
 import { BuiltInSlotType, LiteGraph, type ITextWidget, type SlotLayout, clamp, type PropertyLayout, type IComboWidget } from "@litegraph-ts/core";
-import ComfyGraphNode from "./ComfyGraphNode";
+import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 import type { GalleryOutput } from "./ComfyWidgetNodes";
 
-export interface ComfyImageCacheNodeProperties extends Record<any, any> {
+export interface ComfyImageCacheNodeProperties extends ComfyGraphNodeProperties {
     images: GalleryOutput | null,
     index: number,
     filenames: Record<number, { filename: string | null, status: ImageCacheState }>,
@@ -18,6 +18,7 @@ type ImageCacheState = "none" | "uploading" | "failed" | "cached"
  */
 export default class ComfyImageCacheNode extends ComfyGraphNode {
     override properties: ComfyImageCacheNodeProperties = {
+        tags: [],
         images: null,
         index: 0,
         filenames: {},

@@ -1,12 +1,13 @@
 import { BuiltInSlotType, LConnectionKind, LLink, LiteGraph, NodeMode, type INodeInputSlot, type SlotLayout, type INodeOutputSlot } from "@litegraph-ts/core";
-import ComfyGraphNode from "./ComfyGraphNode";
+import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 
-export interface ComfySelectorProperties extends Record<any, any> {
+export interface ComfySelectorProperties extends ComfyGraphNodeProperties {
     value: any
 }
 
 export default class ComfySelector extends ComfyGraphNode {
     override properties: ComfySelectorProperties = {
+        tags: [],
         value: null
     }
 
@@ -78,12 +79,13 @@ LiteGraph.registerNodeType({
     type: "utils/selector"
 })
 
-export interface ComfySelectorTwoProperties extends Record<any, any> {
+export interface ComfySelectorTwoProperties extends ComfyGraphNodeProperties {
     value: any
 }
 
 export class ComfySelectorTwo extends ComfyGraphNode {
     override properties: ComfySelectorTwoProperties = {
+        tags: [],
         value: null
     }
 

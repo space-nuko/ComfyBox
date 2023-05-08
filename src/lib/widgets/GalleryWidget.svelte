@@ -1,7 +1,8 @@
 <script lang="ts">
  import { ImageViewer } from "$lib/ImageViewer";
- import { Block } from "@gradio/atoms";
+ import { Block, BlockLabel, Empty } from "@gradio/atoms";
  import { Gallery } from "@gradio/gallery";
+ import { Image } from "@gradio/icons";
  import type { Styles } from "@gradio/utils";
  import type { WidgetLayout } from "$lib/stores/layoutState";
  import type { Writable } from "svelte/store";
@@ -123,23 +124,42 @@
  }
 </script>
 
-<div class="wrapper comfy-gallery-widget gradio-gallery" bind:this={element}>
-    {#if widget && node && nodeValue && $nodeValue != null}
-        <Block variant="solid" padding={false}>
-            <div class="padding">
-                <Gallery
-                    bind:value={$nodeValue}
-                    label={widget.attrs.title}
-                    show_label={widget.attrs.title !== ""}
-                    {style}
-                    root={""}
-                    root_url={""}
-                    on:select={onSelect}
-                />
-            </div>
-        </Block>
+{#if widget && node && nodeValue && $nodeValue != null}
+    {#if widget.attrs.variant === "image"}
+        <div class="wrapper comfy-image-widget" bind:this={element}>
+            <Block variant="solid" padding={false}>
+                {#if widget.attrs.title}
+                    <BlockLabel
+                        show_label={true}
+                        Icon={Image}
+                        label={widget.attrs.title || "Image"}
+                    />
+                {/if}
+                {#if $nodeValue.length > 0}
+                    <img src={$nodeValue[$nodeValue.length-1].data}/>
+                {:else}
+                    <Empty size="large" unpadded_box={true}><Image /></Empty>
+                {/if}
+            </Block>
+        </div>
+    {:else}
+        <div class="wrapper comfy-gallery-widget gradio-gallery" bind:this={element}>
+            <Block variant="solid" padding={false}>
+                <div class="padding">
+                    <Gallery
+                        bind:value={$nodeValue}
+                        label={widget.attrs.title}
+                        show_label={widget.attrs.title !== ""}
+                        {style}
+                        root={""}
+                        root_url={""}
+                        on:select={onSelect}
+                    />
+                </div>
+            </Block>
+        </div>
     {/if}
-</div>
+{/if}
 
 <style lang="scss">
  .wrapper {
@@ -148,13 +168,28 @@
      :global(> .block) {
          border-radius: 0px !important;
      }
+
+     :global(button.thumbnail-lg) {
+         width: var(--size-32);
+     }
+
+     &.comfy-image-widget {
+         aspect-ratio: 1/1;
+
+         :global(> .block) {
+             height: 100%;
+
+             :global(img) {
+                 width: 100%;
+                 height: 100%;
+                 object-fit: contain;
+             }
+         }
+     }
  }
 
  .padding {
      height: 30rem;
  }
 
- .wrapper :global(button.thumbnail-lg) {
-     width: var(--size-32);
- }
 </style>

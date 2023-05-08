@@ -17,7 +17,15 @@ export type DefaultWidgetLayout = {
     inputs?: Record<number, DefaultWidgetSpec>,
 }
 
+export interface ComfyGraphNodeProperties extends Record<string, any> {
+    tags: string[]
+}
+
 export default class ComfyGraphNode extends LGraphNode {
+    override properties: ComfyGraphNodeProperties = {
+        tags: []
+    }
+
     isBackendNode?: boolean;
 
     beforeQueued?(subgraph: string | null): void;
@@ -56,6 +64,11 @@ export default class ComfyGraphNode extends LGraphNode {
      */
     getUpstreamLink(): LLink | null {
         return null;
+    }
+
+    constructor(title?: string) {
+        super(title)
+        this.addProperty("tags", [], "array")
     }
 
     private inheritSlotTypes(type: LConnectionKind, isConnected: boolean) {
@@ -261,6 +274,7 @@ export default class ComfyGraphNode extends LGraphNode {
                     comfyInput.defaultWidgetNode = widgetNode.class as any
             }
         }
+
         this.saveUserState = (o as any).saveUserState;
         if (this.saveUserState == null)
             this.saveUserState = true

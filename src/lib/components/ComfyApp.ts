@@ -548,8 +548,6 @@ export default class ComfyApp {
                             break;
                         }
 
-                        console.debug("[graphToPrompt] consider link", JSON.stringify(link), parent.id)
-
                         if (nextLink && !seen[nextLink.id]) {
                             seen[nextLink.id] = true
                             const inputNode = parent.graph.getNodeById(nextLink.origin_id) as ComfyGraphNode;
@@ -558,7 +556,7 @@ export default class ComfyApp {
                                 parent = null;
                             }
                             else {
-                                console.debug("[graphToPrompt] Traverse upstream link", JSON.stringify(link), parent.id, inputNode?.id, inputNode?.isBackendNode)
+                                console.debug("[graphToPrompt] Traverse upstream link", parent.id, inputNode?.id, inputNode?.isBackendNode)
                                 link = nextLink;
                                 parent = inputNode;
                             }
@@ -571,7 +569,7 @@ export default class ComfyApp {
                         if (tag && !hasTag(parent, tag))
                             continue;
 
-                        console.debug("[graphToPrompt] final link", JSON.stringify(link), parent.id, node.id)
+                        console.debug("[graphToPrompt] final link", parent.id, node.id)
                         const input = node.inputs[i]
                         // TODO can null be a legitimate value in some cases?
                         // Nodes like CLIPLoader will never have a value in the frontend, hence "null".

@@ -32,7 +32,12 @@
         {#key $attrsChanged}
             {#if node !== null}
                 <Block>
-                    <Checkbox disabled={isDisabled(widget)} label={widget.attrs.title} bind:value={$nodeValue} on:select={onSelect} />
+                    <Checkbox
+                        disabled={isDisabled(widget)}
+                        label={widget.attrs.title}
+                        bind:value={$nodeValue}
+                        on:select={onSelect}
+                    />
                 </Block>
             {/if}
         {/key}

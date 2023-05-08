@@ -1,8 +1,8 @@
 import { BuiltInSlotType, LiteGraph, NodeMode, type INodeInputSlot, type SlotLayout, type INodeOutputSlot, LLink, LConnectionKind, type ITextWidget } from "@litegraph-ts/core";
-import ComfyGraphNode from "./ComfyGraphNode";
+import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 import { Watch } from "@litegraph-ts/nodes-basic";
 
-export interface ComfyPickFirstNodeProperties extends Record<any, any> {
+export interface ComfyPickFirstNodeProperties extends ComfyGraphNodeProperties {
     acceptNullLinkData: boolean
 }
 
@@ -19,6 +19,7 @@ function nextLetter(s: string): string {
 
 export default class ComfyPickFirstNode extends ComfyGraphNode {
     override properties: ComfyPickFirstNodeProperties = {
+        tags: [],
         acceptNullLinkData: false
     }
 
@@ -136,10 +137,12 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
             if (this.isValidLink(link)) {
                 // Copy frontend-only inputs.
                 const node = this.getInputNode(index);
-                if (node != null && !(node as any).isBackendNode) {
+                if (node != null) {
                     this.selected = index;
-                    this.displayWidget.value = Watch.toString(link.data)
-                    this.setOutputData(0, link.data)
+                    if (!(node as any).isBackendNode) {
+                        this.displayWidget.value = Watch.toString(link.data)
+                        this.setOutputData(0, link.data)
+                    }
                     return
                 }
             }

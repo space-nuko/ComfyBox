@@ -1,4 +1,4 @@
-import { LConnectionKind, LGraph, LGraphNode, type INodeSlot, type SlotIndex, LiteGraph, getStaticProperty, type LGraphAddNodeOptions } from "@litegraph-ts/core";
+import { LConnectionKind, LGraph, LGraphNode, type INodeSlot, type SlotIndex, LiteGraph, getStaticProperty, type LGraphAddNodeOptions, LGraphCanvas } from "@litegraph-ts/core";
 import GraphSync from "./GraphSync";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
@@ -52,6 +52,17 @@ export default class ComfyGraph extends LGraph {
     override onNodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
         layoutState.nodeAdded(node)
         this.graphSync.onNodeAdded(node);
+
+        // All nodes whether they come from base litegraph or ComfyBox should
+        // have tags added to them. Can't override serialization for existing
+        // node types to add `tags` as anew field so putting it in properties is better.
+        if (node.properties.tags == null)
+            node.properties.tags = []
+
+        if ((node as any).canInheritSlotTypes && node.inputs.length > 1) {
+            node.color ||= LGraphCanvas.node_colors["green"].color;
+            node.bgColor ||= LGraphCanvas.node_colors["green"].bgColor;
+        }
 
         if ("outputProperties" in node) {
             const widgetNode = node as ComfyWidgetNode;

@@ -394,6 +394,18 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 values: ["large", "small"],
                 defaultValue: "large"
             },
+
+            // Gallery
+            {
+                name: "variant",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                validNodeTypes: ["ui/gallery"],
+                values: ["gallery", "image"],
+                defaultValue: "gallery",
+                refreshPanelOnChange: true
+            },
         ]
     },
     {
@@ -483,7 +495,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: "bang"
             },
 
-            // gallery
+            // Gallery
             {
                 name: "updateMode",
                 type: "enum",
@@ -492,6 +504,18 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 validNodeTypes: ["ui/gallery"],
                 values: ["replace", "append"],
                 defaultValue: "replace"
+            },
+
+            // Radio
+            {
+                name: "choices",
+                type: "string",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/radio"],
+                defaultValue: ["Choice A", "Choice B", "Choice C"],
+                serialize: serializeStringArray,
+                deserialize: deserializeStringArray,
             },
 
             // Workflow

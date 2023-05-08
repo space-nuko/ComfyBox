@@ -136,7 +136,9 @@
 
  :global(.svelte-select) {
      width: auto;
-     max-width: 30rem;
+     max-width: 16rem;
+     --font-size: 13px;
+     --height: 32px;
  }
 
  :global(.svelte-select-list) {

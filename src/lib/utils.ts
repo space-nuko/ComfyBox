@@ -6,6 +6,7 @@ import { get } from "svelte/store"
 import layoutState from "$lib/stores/layoutState"
 import type { SvelteComponentDev } from "svelte/internal";
 import type { SerializedLGraph } from "@litegraph-ts/core";
+import type { GalleryOutput } from "./nodes/ComfyWidgetNodes";
 
 export function clamp(n: number, min: number, max: number): number {
     return Math.min(Math.max(n, min), max)
@@ -91,7 +92,7 @@ export function promptToGraphVis(prompt: SerializedPrompt): string {
             }
             else {
                 // Value
-                out += `"${id}-${inpName}-${typeof i}" -> "${outNode.title}"\n`
+                out += `"${id}-${inpName}-${i}" -> "${outNode.title}"\n`
             }
         }
     }
@@ -118,3 +119,15 @@ export const debounce = (callback: Function, wait = 250) => {
         timeout = setTimeout(next, wait);
     };
 };
+
+export function convertComfyOutputToGradio(output: GalleryOutput): GradioFileData[] {
+    return output.images.map(r => {
+        // TODO configure backend URL
+        const url = `http://${location.hostname}:8188` // TODO make configurable
+        const params = new URLSearchParams(r)
+        return {
+            name: null,
+            data: url + "/view?" + params
+        }
+    });
+}
