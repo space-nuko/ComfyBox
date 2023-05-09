@@ -28,6 +28,7 @@
     "typescript": "^5.0.3",
     "vite": "^4.3.1",
     "vite-plugin-static-copy": "^0.14.0",
+    "vite-plugin-svelte-console-remover": "^1.0.10",
     "vite-tsconfig-paths": "^4.0.8",
     "vitest": "^0.25.8"
   },

@@ -4,6 +4,10 @@ import { resolve } from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import FullReload from 'vite-plugin-full-reload';
 import { viteStaticCopy } from 'vite-plugin-static-copy'
+import removeConsole from 'vite-plugin-svelte-console-remover';
+
+const isProduction = process.env.NODE_ENV === "production";
+console.log("Production build: " + isProduction)
 
 export default defineConfig({
     clearScreen: false,
@@ -14,6 +18,7 @@ export default defineConfig({
         //     "src/lib/stores/*.*",
         //     "src/**/ComfyApp.{ts,svelte}"
         // ]),
+        isProduction && removeConsole(),
         svelte(),
         viteStaticCopy({
             targets: [
