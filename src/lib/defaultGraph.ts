@@ -4,8 +4,8 @@ const defaultGraph: SerializedAppState = {
   createdBy: "ComfyBox",
   version: 1,
   workflow: {
-    last_node_id: 191,
-    last_link_id: 306,
+    last_node_id: 243,
+    last_link_id: 384,
     nodes: [
       {
         id: 33,
@@ -119,11 +119,11 @@ const defaultGraph: SerializedAppState = {
           hidden: false
         },
         widgets_values: [
-          "worst quality, bad anatomy"
+          "worst quality"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: "worst quality, bad anatomy",
+        comfyValue: "worst quality",
         shownOutputProperties: {},
         saveUserState: true
       },
@@ -368,55 +368,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 109,
-        type: "ui/button",
-        pos: [
-          1424.334787004682,
-          341.46389906416016
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 6,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "clicked",
-            type: -2,
-            links: [
-              151
-            ],
-            shape: 1,
-            slot_index: 0
-          },
-          {
-            name: "isClicked",
-            type: "boolean",
-            links: null
-          }
-        ],
-        title: "UI.Button",
-        properties: {
-          tags: [],
-          defaultValue: false,
-          param: "bang",
-          message: "bang"
-        },
-        widgets_values: [
-          "false"
-        ],
-        color: "#223",
-        bgColor: "#335",
-        comfyValue: false,
-        shownOutputProperties: {},
-        saveUserState: true
-      },
-      {
         id: 21,
         type: "ui/combo",
         pos: [
@@ -430,7 +381,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 7,
+        order: 6,
         mode: 0,
         inputs: [
           {
@@ -497,7 +448,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 8,
+        order: 7,
         mode: 0,
         inputs: [
           {
@@ -599,7 +550,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 9,
+        order: 8,
         mode: 0,
         inputs: [
           {
@@ -676,7 +627,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 10,
+        order: 9,
         mode: 0,
         inputs: [
           {
@@ -738,11 +689,11 @@ const defaultGraph: SerializedAppState = {
           hidden: true
         },
         widgets_values: [
-          "0.500"
+          "0.650"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: 0.5,
+        comfyValue: 0.65,
         shownOutputProperties: {
           min: {
             type: "number",
@@ -777,7 +728,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 11,
+        order: 10,
         mode: 0,
         inputs: [
           {
@@ -864,72 +815,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 110,
-        type: "actions/execute_subgraph",
-        pos: [
-          1557.9857870046837,
-          312.6158990641602
-        ],
-        size: [
-          226.79999999999998,
-          46
-        ],
-        flags: {},
-        order: 43,
-        mode: 0,
-        inputs: [
-          {
-            name: "execute",
-            type: -1,
-            link: 151,
-            shape: 1
-          },
-          {
-            name: "tag",
-            type: "string",
-            link: 152
-          }
-        ],
-        outputs: [],
-        title: "Comfy.ExecuteSubgraphAction",
-        properties: {
-          tag: "hr",
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
-        id: 118,
-        type: "basic/watch",
-        pos: [
-          1102.2486933619957,
-          667.4778575549991
-        ],
-        size: [
-          140,
-          26
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 81,
-        mode: 0,
-        inputs: [
-          {
-            name: "value",
-            type: 0,
-            link: 184,
-            label: "0.000"
-          }
-        ],
-        outputs: [],
-        title: "Watch",
-        properties: {
-          value: 1,
-          tags: []
-        }
-      },
-      {
         id: 70,
         type: "basic/watch",
         pos: [
@@ -943,7 +828,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 105,
+        order: 140,
         mode: 0,
         inputs: [
           {
@@ -974,7 +859,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 12,
+        order: 11,
         mode: 0,
         inputs: [
           {
@@ -1041,7 +926,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 13,
+        order: 12,
         mode: 0,
         inputs: [],
         outputs: [
@@ -1061,72 +946,6 @@ const defaultGraph: SerializedAppState = {
         }
       },
       {
-        id: 123,
-        type: "basic/string",
-        pos: [
-          2045.9857870046853,
-          221.61589906416032
-        ],
-        size: [
-          210,
-          38
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 14,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "string",
-            type: "string",
-            links: [
-              185
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Const String",
-        properties: {
-          value: "Upscale complete!",
-          tags: []
-        }
-      },
-      {
-        id: 111,
-        type: "basic/string",
-        pos: [
-          1460.985787004684,
-          363.61589906416043
-        ],
-        size: [
-          210,
-          38
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 15,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "string",
-            type: "string",
-            links: [
-              152
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Const String",
-        properties: {
-          value: "hr",
-          tags: []
-        }
-      },
-      {
         id: 108,
         type: "ui/text",
         pos: [
@@ -1140,7 +959,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 78,
+        order: 105,
         mode: 0,
         inputs: [
           {
@@ -1175,11 +994,11 @@ const defaultGraph: SerializedAppState = {
           multiline: false
         },
         widgets_values: [
-          "cached"
+          "none"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: "cached",
+        comfyValue: "none",
         shownOutputProperties: {},
         saveUserState: true
       },
@@ -1197,7 +1016,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 16,
+        order: 13,
         mode: 0,
         inputs: [],
         outputs: [
@@ -1231,7 +1050,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 17,
+        order: 14,
         mode: 0,
         inputs: [
           {
@@ -1330,7 +1149,7 @@ const defaultGraph: SerializedAppState = {
           66
         ],
         flags: {},
-        order: 104,
+        order: 139,
         mode: 0,
         inputs: [
           {
@@ -1384,7 +1203,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 18,
+        order: 15,
         mode: 0,
         inputs: [],
         outputs: [
@@ -1430,7 +1249,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 52,
+        order: 55,
         mode: 0,
         inputs: [
           {
@@ -1476,7 +1295,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 44,
+        order: 51,
         mode: 0,
         inputs: [
           {
@@ -1528,7 +1347,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 19,
+        order: 16,
         mode: 0,
         inputs: [],
         outputs: [
@@ -1548,152 +1367,6 @@ const defaultGraph: SerializedAppState = {
         }
       },
       {
-        id: 45,
-        type: "ui/text",
-        pos: [
-          395,
-          331
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 20,
-        mode: 0,
-        inputs: [
-          {
-            name: "value",
-            type: "string",
-            link: null
-          },
-          {
-            name: "store",
-            type: -1,
-            link: null,
-            shape: 1
-          }
-        ],
-        outputs: [
-          {
-            name: "value",
-            type: "string",
-            links: [
-              238,
-              244
-            ],
-            slot_index: 0
-          },
-          {
-            name: "changed",
-            type: -2,
-            links: null,
-            shape: 1
-          }
-        ],
-        title: "UI.Text",
-        properties: {
-          tags: [],
-          defaultValue: "ComfyUI",
-          multiline: false,
-          hidden: false
-        },
-        widgets_values: [
-          "ComfyUI"
-        ],
-        color: "#223",
-        bgColor: "#335",
-        comfyValue: "ComfyUI",
-        shownOutputProperties: {},
-        saveUserState: true
-      },
-      {
-        id: 127,
-        type: "actions/execute_subgraph",
-        pos: [
-          297,
-          -73
-        ],
-        size: [
-          226.79999999999998,
-          46
-        ],
-        flags: {},
-        order: 55,
-        mode: 0,
-        inputs: [
-          {
-            name: "execute",
-            type: -1,
-            link: 191,
-            shape: 1
-          },
-          {
-            name: "tag",
-            type: "string",
-            link: 192
-          }
-        ],
-        outputs: [],
-        title: "Comfy.ExecuteSubgraphAction",
-        properties: {
-          tag: "txt2img",
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
-        id: 126,
-        type: "ui/button",
-        pos: [
-          178,
-          -57
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 21,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "clicked",
-            type: -2,
-            links: [
-              191
-            ],
-            shape: 1,
-            slot_index: 0
-          },
-          {
-            name: "isClicked",
-            type: "boolean",
-            links: null
-          }
-        ],
-        title: "UI.Button",
-        properties: {
-          tags: [],
-          defaultValue: false,
-          param: "bang",
-          message: "bang"
-        },
-        widgets_values: [
-          "false"
-        ],
-        color: "#223",
-        bgColor: "#335",
-        comfyValue: false,
-        shownOutputProperties: {},
-        saveUserState: true
-      },
-      {
         id: 136,
         type: "string/toString",
         pos: [
@@ -1707,7 +1380,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 88,
+        order: 116,
         mode: 0,
         inputs: [
           {
@@ -1745,7 +1418,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 86,
+        order: 114,
         mode: 0,
         inputs: [
           {
@@ -1780,11 +1453,11 @@ const defaultGraph: SerializedAppState = {
           multiline: false
         },
         widgets_values: [
-          "1024"
+          "2"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: "1024",
+        comfyValue: "2",
         shownOutputProperties: {},
         saveUserState: true
       },
@@ -1802,7 +1475,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 89,
+        order: 117,
         mode: 0,
         inputs: [
           {
@@ -1840,7 +1513,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 87,
+        order: 115,
         mode: 0,
         inputs: [
           {
@@ -1875,11 +1548,11 @@ const defaultGraph: SerializedAppState = {
           multiline: false
         },
         widgets_values: [
-          "1024"
+          "2"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: "1024",
+        comfyValue: "2",
         shownOutputProperties: {},
         saveUserState: true
       },
@@ -1897,7 +1570,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 90,
+        order: 118,
         mode: 0,
         inputs: [
           {
@@ -1923,98 +1596,6 @@ const defaultGraph: SerializedAppState = {
         }
       },
       {
-        id: 133,
-        type: "math/operation",
-        pos: [
-          1225.4379300390613,
-          204.22672754394537
-        ],
-        size: [
-          140,
-          46
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 85,
-        mode: 0,
-        inputs: [
-          {
-            name: "A",
-            type: "number,array,object",
-            link: 199
-          },
-          {
-            name: "B",
-            type: "number",
-            link: 200
-          }
-        ],
-        outputs: [
-          {
-            name: "=",
-            type: "number",
-            links: [
-              206
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Operation",
-        properties: {
-          A: 2,
-          B: 512,
-          OP: "*",
-          tags: []
-        }
-      },
-      {
-        id: 129,
-        type: "math/operation",
-        pos: [
-          1239.4379300390613,
-          274.3267275439454
-        ],
-        size: [
-          140,
-          46
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 84,
-        mode: 0,
-        inputs: [
-          {
-            name: "A",
-            type: "number,array,object",
-            link: 198
-          },
-          {
-            name: "B",
-            type: "number",
-            link: 201
-          }
-        ],
-        outputs: [
-          {
-            name: "=",
-            type: "number",
-            links: [
-              209
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Operation",
-        properties: {
-          A: 2,
-          B: 512,
-          OP: "*",
-          tags: []
-        }
-      },
-      {
         id: 139,
         type: "math/floor",
         pos: [
@@ -2028,7 +1609,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 91,
+        order: 119,
         mode: 0,
         inputs: [
           {
@@ -2067,7 +1648,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 22,
+        order: 17,
         mode: 0,
         inputs: [
           {
@@ -2129,11 +1710,11 @@ const defaultGraph: SerializedAppState = {
           precision: 0
         },
         widgets_values: [
-          "2.000"
+          "2.100"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: 2,
+        comfyValue: 2.1,
         shownOutputProperties: {
           min: {
             type: "number",
@@ -2168,7 +1749,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 23,
+        order: 18,
         mode: 0,
         inputs: [],
         outputs: [
@@ -2213,7 +1794,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 45,
+        order: 52,
         mode: 0,
         inputs: [
           {
@@ -2268,7 +1849,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 24,
+        order: 19,
         mode: 0,
         inputs: [],
         outputs: [
@@ -2302,7 +1883,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 61,
+        order: 71,
         mode: 0,
         inputs: [
           {
@@ -2401,7 +1982,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 62,
+        order: 72,
         mode: 0,
         inputs: [
           {
@@ -2500,7 +2081,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 25,
+        order: 20,
         mode: 0,
         inputs: [],
         outputs: [
@@ -2532,65 +2113,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 104,
-        type: "ui/gallery",
-        pos: [
-          862.248693361997,
-          640.4778575549986
-        ],
-        size: [
-          210,
-          122
-        ],
-        flags: {},
-        order: 77,
-        mode: 0,
-        inputs: [
-          {
-            name: "images",
-            type: "OUTPUT",
-            link: null
-          },
-          {
-            name: "store",
-            type: -1,
-            link: 243,
-            shape: 1
-          },
-          {
-            name: "clear",
-            type: -1,
-            link: 229,
-            shape: 1
-          }
-        ],
-        outputs: [
-          {
-            name: "selected_index",
-            type: "number",
-            links: [
-              168,
-              184
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "UI.Gallery",
-        properties: {
-          tags: [],
-          defaultValue: null,
-          index: 0,
-          updateMode: "append",
-          values: []
-        },
-        widgets_values: [],
-        color: "#223",
-        bgColor: "#335",
-        comfyValue: [],
-        shownOutputProperties: {},
-        saveUserState: false
-      },
-      {
         id: 153,
         type: "ui/checkbox",
         pos: [
@@ -2604,9 +2126,21 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 26,
+        order: 21,
         mode: 0,
-        inputs: [],
+        inputs: [
+          {
+            name: "value",
+            type: "boolean",
+            link: null
+          },
+          {
+            name: "store",
+            type: -1,
+            link: null,
+            shape: 1
+          }
+        ],
         outputs: [
           {
             name: "value",
@@ -2653,7 +2187,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 69,
+        order: 81,
         mode: 0,
         inputs: [
           {
@@ -2706,7 +2240,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 68,
+        order: 80,
         mode: 0,
         inputs: [
           {
@@ -2757,7 +2291,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 27,
+        order: 22,
         mode: 0,
         inputs: [],
         outputs: [
@@ -2805,7 +2339,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 47,
+        order: 54,
         mode: 0,
         inputs: [
           {
@@ -2843,8 +2377,8 @@ const defaultGraph: SerializedAppState = {
         id: 122,
         type: "actions/notify",
         pos: [
-          2046,
-          251
+          2020.6999999999966,
+          278.5
         ],
         size: [
           151.2,
@@ -2853,7 +2387,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 83,
+        order: 111,
         mode: 0,
         inputs: [
           {
@@ -2891,7 +2425,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 42,
+        order: 50,
         mode: 0,
         inputs: [
           {
@@ -2919,8 +2453,8 @@ const defaultGraph: SerializedAppState = {
         id: 168,
         type: "basic/CompareValues",
         pos: [
-          -901.8829785123963,
-          530.3379611570258
+          -1466.1829785123962,
+          531.4379611570262
         ],
         size: [
           210,
@@ -2929,7 +2463,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 48,
+        order: 64,
         mode: 0,
         inputs: [
           {
@@ -2968,44 +2502,11 @@ const defaultGraph: SerializedAppState = {
         }
       },
       {
-        id: 167,
-        type: "basic/string",
-        pos: [
-          -1015.882978512396,
-          647.3379611570261
-        ],
-        size: [
-          210,
-          38
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 28,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "string",
-            type: "string",
-            links: [
-              250
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Const String",
-        properties: {
-          value: "img2img",
-          tags: []
-        }
-      },
-      {
         id: 166,
         type: "basic/string",
         pos: [
-          -1003.8829785123964,
-          529.3379611570258
+          -1568.1829785123962,
+          530.4379611570262
         ],
         size: [
           210,
@@ -3014,7 +2515,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 29,
+        order: 23,
         mode: 0,
         inputs: [],
         outputs: [
@@ -3034,68 +2535,6 @@ const defaultGraph: SerializedAppState = {
         }
       },
       {
-        id: 163,
-        type: "ui/radio",
-        pos: [
-          -950.7590115702478,
-          587.3379611570265
-        ],
-        size: [
-          210,
-          122
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 30,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "value",
-            type: "string",
-            links: [
-              251,
-              252
-            ],
-            slot_index: 0
-          },
-          {
-            name: "index",
-            type: "number",
-            links: null
-          },
-          {
-            name: "changed",
-            type: -2,
-            links: [
-              266,
-              268
-            ],
-            shape: 1,
-            slot_index: 2
-          }
-        ],
-        title: "UI.Radio",
-        properties: {
-          tags: [],
-          choices: [
-            "txt2img",
-            "img2img"
-          ],
-          defaultValue: "Choice A"
-        },
-        widgets_values: [
-          "txt2img",
-          0
-        ],
-        color: "#223",
-        bgColor: "#335",
-        comfyValue: "txt2img",
-        shownOutputProperties: {},
-        saveUserState: true
-      },
-      {
         id: 39,
         type: "ui/slider",
         pos: [
@@ -3109,7 +2548,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 31,
+        order: 24,
         mode: 0,
         inputs: [
           {
@@ -3212,7 +2651,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 32,
+        order: 25,
         mode: 0,
         inputs: [
           {
@@ -3274,7 +2713,7 @@ const defaultGraph: SerializedAppState = {
           78
         ],
         flags: {},
-        order: 66,
+        order: 74,
         mode: 0,
         inputs: [
           {
@@ -3314,7 +2753,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 54,
+        order: 57,
         mode: 0,
         inputs: [
           {
@@ -3350,9 +2789,21 @@ const defaultGraph: SerializedAppState = {
           78
         ],
         flags: {},
-        order: 33,
+        order: 26,
         mode: 0,
-        inputs: [],
+        inputs: [
+          {
+            name: "value",
+            type: "boolean",
+            link: null
+          },
+          {
+            name: "store",
+            type: -1,
+            link: null,
+            shape: 1
+          }
+        ],
         outputs: [
           {
             name: "value",
@@ -3377,10 +2828,11 @@ const defaultGraph: SerializedAppState = {
           defaultValue: false
         },
         widgets_values: [
-          "null"
+          "false"
         ],
         color: "#223",
         bgColor: "#335",
+        comfyValue: false,
         shownOutputProperties: {},
         saveUserState: true
       },
@@ -3398,7 +2850,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 34,
+        order: 27,
         mode: 2,
         inputs: [
           {
@@ -3463,7 +2915,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 35,
+        order: 28,
         mode: 2,
         inputs: [
           {
@@ -3527,7 +2979,7 @@ const defaultGraph: SerializedAppState = {
           66
         ],
         flags: {},
-        order: 99,
+        order: 134,
         mode: 0,
         inputs: [
           {
@@ -3576,61 +3028,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 157,
-        type: "SaveImage",
-        pos: [
-          375,
-          236
-        ],
-        size: [
-          220,
-          46
-        ],
-        flags: {},
-        order: 92,
-        mode: 0,
-        inputs: [
-          {
-            name: "images",
-            type: "IMAGE",
-            link: 245,
-            config: {}
-          },
-          {
-            name: "filename_prefix",
-            type: "string",
-            link: 244,
-            config: {},
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/text",
-            serialize: true
-          }
-        ],
-        outputs: [
-          {
-            name: "onExecuted",
-            type: -2,
-            links: [
-              242,
-              243
-            ],
-            color_off: "rebeccapurple",
-            color_on: "rebeccapurple",
-            shape: 1,
-            slot_index: 0
-          }
-        ],
-        title: "SaveImage",
-        properties: {
-          tags: [
-            "txt2img"
-          ]
-        },
-        color: "#432",
-        bgColor: "#653",
-        saveUserState: true
-      },
-      {
         id: 90,
         type: "LatentUpscale",
         pos: [
@@ -3642,7 +3039,7 @@ const defaultGraph: SerializedAppState = {
           106
         ],
         flags: {},
-        order: 106,
+        order: 141,
         mode: 0,
         inputs: [
           {
@@ -3720,7 +3117,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 107,
+        order: 142,
         mode: 0,
         inputs: [
           {
@@ -3768,7 +3165,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 79,
+        order: 107,
         mode: 0,
         inputs: [
           {
@@ -3818,7 +3215,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 75,
+        order: 102,
         mode: 0,
         inputs: [
           {
@@ -3855,61 +3252,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 159,
-        type: "SaveImage",
-        pos: [
-          1831,
-          -8
-        ],
-        size: [
-          220,
-          46
-        ],
-        flags: {},
-        order: 93,
-        mode: 0,
-        inputs: [
-          {
-            name: "images",
-            type: "IMAGE",
-            link: 239,
-            config: {}
-          },
-          {
-            name: "filename_prefix",
-            type: "string",
-            link: 238,
-            config: {},
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/text",
-            serialize: true
-          }
-        ],
-        outputs: [
-          {
-            name: "onExecuted",
-            type: -2,
-            links: [
-              240,
-              241
-            ],
-            color_off: "rebeccapurple",
-            color_on: "rebeccapurple",
-            shape: 1,
-            slot_index: 0
-          }
-        ],
-        title: "SaveImage",
-        properties: {
-          tags: [
-            "hr"
-          ]
-        },
-        color: "#432",
-        bgColor: "#653",
-        saveUserState: true
-      },
-      {
         id: 40,
         type: "VAEDecode",
         pos: [
@@ -3921,7 +3263,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 102,
+        order: 137,
         mode: 0,
         inputs: [
           {
@@ -3964,39 +3306,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 128,
-        type: "basic/string",
-        pos: [
-          198,
-          -26
-        ],
-        size: [
-          210,
-          38
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 36,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "string",
-            type: "string",
-            links: [
-              192
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Const String",
-        properties: {
-          value: "txt2img",
-          tags: []
-        }
-      },
-      {
         id: 148,
         type: "events/filter",
         pos: [
@@ -4010,7 +3319,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 46,
+        order: 53,
         mode: 0,
         inputs: [
           {
@@ -4065,7 +3374,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 60,
+        order: 70,
         mode: 0,
         inputs: [
           {
@@ -4108,881 +3417,6 @@ const defaultGraph: SerializedAppState = {
         }
       },
       {
-        id: 162,
-        type: "ui/combo",
-        pos: [
-          -403.8113774902353,
-          853.3226320312501
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 37,
-        mode: 2,
-        inputs: [
-          {
-            name: "value",
-            type: "string",
-            link: null
-          },
-          {
-            name: "store",
-            type: -1,
-            link: null,
-            shape: 1
-          }
-        ],
-        outputs: [
-          {
-            name: "value",
-            type: "string",
-            links: [
-              246
-            ]
-          },
-          {
-            name: "changed",
-            type: -2,
-            links: [
-              295
-            ],
-            shape: 1,
-            slot_index: 1
-          }
-        ],
-        title: "UI.Combo",
-        properties: {
-          tags: [
-            "i2i"
-          ],
-          defaultValue: "._00001_ (1).png",
-          values: [
-            "._00001_ (1).png",
-            "._00001_ (10).png",
-            "._00001_ (11).png",
-            "._00001_ (12).png",
-            "._00001_ (13).png",
-            "._00001_ (14).png",
-            "._00001_ (15).png",
-            "._00001_ (16).png",
-            "._00001_ (2).png",
-            "._00001_ (3).png",
-            "._00001_ (4).png",
-            "._00001_ (5).png",
-            "._00001_ (6).png",
-            "._00001_ (7).png",
-            "._00001_ (8).png",
-            "._00001_ (9).png",
-            "._00001_.png",
-            "._00002_ (1).png",
-            "._00002_ (2).png",
-            "._00002_ (3).png",
-            "._00002_ (4).png",
-            "._00002_ (5).png",
-            "._00002_ (6).png",
-            "._00002_ (7).png",
-            "._00002_.png",
-            "._00003_ (1).png",
-            "._00003_ (2).png",
-            "._00003_ (3).png",
-            "._00003_ (4).png",
-            "._00003_ (5).png",
-            "._00003_ (6).png",
-            "._00003_ (7).png",
-            "._00003_.png",
-            "._00004_ (1).png",
-            "._00004_ (2).png",
-            "._00004_ (3).png",
-            "._00004_ (4).png",
-            "._00004_ (5).png",
-            "._00004_ (6).png",
-            "._00004_ (7).png",
-            "._00004_ (8).png",
-            "._00004_.png",
-            "ComfyUI_00527_.png",
-            "ComfyUI_00535_.png",
-            "ComfyUI_00536_.png",
-            "ComfyUI_00537_.png",
-            "ComfyUI_00538_.png",
-            "ComfyUI_00539_.png",
-            "ComfyUI_00540_.png",
-            "ComfyUI_00541_.png",
-            "ComfyUI_00542_.png",
-            "ComfyUI_00543_.png",
-            "ComfyUI_00545_.png",
-            "ComfyUI_00546_.png",
-            "ComfyUI_00547_.png",
-            "ComfyUI_00548_.png",
-            "ComfyUI_00549_.png",
-            "ComfyUI_00550_.png",
-            "ComfyUI_00551_.png",
-            "ComfyUI_00552_.png",
-            "ComfyUI_00553_.png",
-            "ComfyUI_00554_.png",
-            "ComfyUI_00555_.png",
-            "ComfyUI_00556_.png",
-            "ComfyUI_00557_.png",
-            "ComfyUI_00561_.png",
-            "ComfyUI_00577_.png",
-            "ComfyUI_00581_.png",
-            "ComfyUI_00585_.png",
-            "ComfyUI_00586_.png",
-            "ComfyUI_00587_.png",
-            "ComfyUI_00588_.png",
-            "ComfyUI_00589_.png",
-            "ComfyUI_00590_.png",
-            "ComfyUI_00591_.png",
-            "ComfyUI_00592_.png",
-            "ComfyUI_00593_.png",
-            "ComfyUI_00595_.png",
-            "ComfyUI_00596_.png",
-            "ComfyUI_00597_.png",
-            "ComfyUI_00600_.png",
-            "ComfyUI_00605_.png",
-            "ComfyUI_00607_.png",
-            "ComfyUI_00609_.png",
-            "ComfyUI_00613_.png",
-            "ComfyUI_00617_.png",
-            "ComfyUI_00618_.png",
-            "ComfyUI_00619_.png",
-            "ComfyUI_00620_.png",
-            "ComfyUI_00621_.png",
-            "ComfyUI_00622_.png",
-            "ComfyUI_00623_.png",
-            "ComfyUI_00624_.png",
-            "ComfyUI_00625_.png",
-            "ComfyUI_00626_.png",
-            "ComfyUI_00628_.png",
-            "ComfyUI_00629_.png",
-            "ComfyUI_00633_.png",
-            "ComfyUI_00636_.png",
-            "ComfyUI_00637_.png",
-            "ComfyUI_00641_.png",
-            "ComfyUI_00645_.png",
-            "ComfyUI_00649_.png",
-            "ComfyUI_00653_.png",
-            "ComfyUI_00654_.png",
-            "ComfyUI_00655_.png",
-            "ComfyUI_00656_.png",
-            "ComfyUI_00657_.png",
-            "ComfyUI_00658_.png",
-            "ComfyUI_00659_.png",
-            "ComfyUI_00660_.png",
-            "ComfyUI_00661_.png",
-            "ComfyUI_00662_.png",
-            "ComfyUI_00663_.png",
-            "ComfyUI_00664_.png",
-            "ComfyUI_00665_.png",
-            "ComfyUI_00669_.png",
-            "ComfyUI_00670_.png",
-            "ComfyUI_00671_.png",
-            "ComfyUI_00672_.png",
-            "ComfyUI_00673_.png",
-            "ComfyUI_00677_.png",
-            "ComfyUI_00678_.png",
-            "ComfyUI_00679_.png",
-            "ComfyUI_00680_.png",
-            "ComfyUI_00681_.png",
-            "ComfyUI_00682_ (1).png",
-            "ComfyUI_00682_.png",
-            "ComfyUI_00683_ (1).png",
-            "ComfyUI_00683_.png",
-            "ComfyUI_00684_.png",
-            "ComfyUI_00685_.png",
-            "ComfyUI_00686_.png",
-            "ComfyUI_00687_.png",
-            "ComfyUI_00688_.png",
-            "ComfyUI_00689_.png",
-            "ComfyUI_00690_.png",
-            "ComfyUI_00691_.png",
-            "ComfyUI_00692_.png",
-            "ComfyUI_00693_.png",
-            "ComfyUI_00697_.png",
-            "ComfyUI_00698_.png",
-            "ComfyUI_00699_.png",
-            "ComfyUI_00700_.png",
-            "ComfyUI_00701_.png",
-            "ComfyUI_00703_.png",
-            "ComfyUI_00704_.png",
-            "ComfyUI_00705_.png",
-            "ComfyUI_00706_.png",
-            "ComfyUI_00707_.png",
-            "ComfyUI_00708_.png",
-            "ComfyUI_00709_.png",
-            "ComfyUI_00710_.png",
-            "ComfyUI_00711_.png",
-            "ComfyUI_00713_.png",
-            "ComfyUI_00714_.png",
-            "ComfyUI_00715_.png",
-            "ComfyUI_00716_.png",
-            "ComfyUI_00717_.png",
-            "ComfyUI_00718_.png",
-            "ComfyUI_00719_.png",
-            "ComfyUI_00720_.png",
-            "ComfyUI_00721_.png",
-            "ComfyUI_00722_.png",
-            "ComfyUI_00723_.png",
-            "ComfyUI_00724_.png",
-            "ComfyUI_00725_.png",
-            "ComfyUI_00729_.png",
-            "ComfyUI_00730_.png",
-            "ComfyUI_00731_.png",
-            "ComfyUI_00732_.png",
-            "ComfyUI_00733_.png",
-            "ComfyUI_00737_.png",
-            "ComfyUI_00745_.png",
-            "ComfyUI_00749_.png",
-            "ComfyUI_00753_.png",
-            "ComfyUI_00757_.png",
-            "ComfyUI_00761_.png",
-            "ComfyUI_00765_.png",
-            "ComfyUI_00769_.png",
-            "ComfyUI_00777_.png",
-            "ComfyUI_00781_.png",
-            "ComfyUI_00783_.png",
-            "ComfyUI_00784_.png",
-            "ComfyUI_00785_.png",
-            "ComfyUI_00786_.png",
-            "ComfyUI_00787_.png",
-            "ComfyUI_00788_.png",
-            "ComfyUI_00789_.png",
-            "ComfyUI_00792_.png",
-            "ComfyUI_00793_.png",
-            "ComfyUI_00794_.png",
-            "ComfyUI_00795_.png",
-            "ComfyUI_00796_.png",
-            "ComfyUI_00797_.png",
-            "ComfyUI_00798_.png",
-            "ComfyUI_00799_.png",
-            "ComfyUI_00800_.png",
-            "ComfyUI_00801_.png",
-            "ComfyUI_00802_.png",
-            "ComfyUI_00803_.png",
-            "ComfyUI_00804_.png",
-            "ComfyUI_00805_.png",
-            "ComfyUI_00806_.png",
-            "ComfyUI_00807_.png",
-            "ComfyUI_00808_.png",
-            "ComfyUI_00809_.png",
-            "ComfyUI_00810_.png",
-            "ComfyUI_00811_.png",
-            "ComfyUI_00812_.png",
-            "ComfyUI_00813_.png",
-            "ComfyUI_00814_.png",
-            "ComfyUI_00815_.png",
-            "ComfyUI_00816_.png",
-            "ComfyUI_00817_.png",
-            "ComfyUI_00818_.png",
-            "ComfyUI_00819_.png",
-            "ComfyUI_00820_.png",
-            "ComfyUI_00821_.png",
-            "ComfyUI_00822_.png",
-            "ComfyUI_00823_.png",
-            "ComfyUI_00824_.png",
-            "ComfyUI_00825_.png",
-            "ComfyUI_00829_.png",
-            "ComfyUI_00830_.png",
-            "ComfyUI_00831_.png",
-            "ComfyUI_00832_.png",
-            "ComfyUI_00839_.png",
-            "ComfyUI_00842_.png",
-            "ComfyUI_00843_.png",
-            "ComfyUI_00844_.png",
-            "ComfyUI_00846_.png",
-            "ComfyUI_00848_ (1).png",
-            "ComfyUI_00848_.png",
-            "ComfyUI_00849_.png",
-            "ComfyUI_00850_.png",
-            "ComfyUI_00851_.png",
-            "ComfyUI_00854_ (1).png",
-            "ComfyUI_00854_.png",
-            "ComfyUI_00855_.png",
-            "ComfyUI_00856_.png",
-            "ComfyUI_00857_.png",
-            "ComfyUI_00859_ (1).png",
-            "ComfyUI_00859_.png",
-            "ComfyUI_00860_.png",
-            "ComfyUI_00861_.png",
-            "ComfyUI_00862_.png",
-            "ComfyUI_00864_ (1).png",
-            "ComfyUI_00864_.png",
-            "ComfyUI_00865_.png",
-            "ComfyUI_00866_.png",
-            "ComfyUI_00867_.png",
-            "ComfyUI_00869_.png",
-            "ComfyUI_00870_.png",
-            "ComfyUI_00871_.png",
-            "ComfyUI_00872_.png",
-            "ComfyUI_00874_.png",
-            "ComfyUI_00875_.png",
-            "ComfyUI_00876_.png",
-            "ComfyUI_00877_.png",
-            "ComfyUI_00878_.png",
-            "ComfyUI_00879_.png",
-            "ComfyUI_00880_.png",
-            "ComfyUI_00881_.png",
-            "ComfyUI_00883_.png",
-            "ComfyUI_00884_.png",
-            "ComfyUI_00885_.png",
-            "ComfyUI_00889_.png",
-            "ComfyUI_00890_.png",
-            "ComfyUI_00891_.png",
-            "ComfyUI_00892_.png",
-            "ComfyUI_00894_.png",
-            "ComfyUI_00895_.png",
-            "ComfyUI_00896_.png",
-            "ComfyUI_00897_.png",
-            "ComfyUI_00898_.png",
-            "ComfyUI_00899_.png",
-            "ComfyUI_00900_.png",
-            "ComfyUI_00901_.png",
-            "ComfyUI_00904_.png",
-            "ComfyUI_00905_.png",
-            "ComfyUI_00914_.png",
-            "ComfyUI_00915_.png",
-            "ComfyUI_00916_.png",
-            "ComfyUI_00917_.png",
-            "ComfyUI_00920_.png",
-            "ComfyUI_00922_.png",
-            "ComfyUI_00923_.png",
-            "ComfyUI_00926_ (1).png",
-            "ComfyUI_00926_.png",
-            "ComfyUI_00927_.png",
-            "ComfyUI_00928_.png",
-            "ComfyUI_00929_.png",
-            "ComfyUI_00933_.png",
-            "ComfyUI_00934_.png",
-            "ComfyUI_00935_.png",
-            "ComfyUI_00936_.png",
-            "ComfyUI_00943_.png",
-            "ComfyUI_00944_.png",
-            "ComfyUI_00945_.png",
-            "ComfyUI_00946_.png",
-            "ComfyUI_00947_.png",
-            "ComfyUI_00951_.png",
-            "ComfyUI_00955_.png",
-            "ComfyUI_00959_.png",
-            "ComfyUI_00963_.png",
-            "ComfyUI_00967_.png",
-            "ComfyUI_00971_.png",
-            "ComfyUI_00975_.png",
-            "ComfyUI_00976_.png",
-            "ComfyUI_00977_.png",
-            "ComfyUI_00978_ (1).png",
-            "ComfyUI_00978_.png",
-            "ComfyUI_00982_ (1).png",
-            "ComfyUI_00982_.png",
-            "ComfyUI_00986_ (1).png",
-            "ComfyUI_00986_.png",
-            "ComfyUI_00990_ (1).png",
-            "ComfyUI_00990_.png",
-            "ComfyUI_00991_ (1).png",
-            "ComfyUI_00991_.png",
-            "ComfyUI_00995_ (1).png",
-            "ComfyUI_00995_.png",
-            "ComfyUI_00996_.png",
-            "ComfyUI_00997_.png",
-            "ComfyUI_01001_.png",
-            "ComfyUI_01002_.png",
-            "ComfyUI_01003_.png",
-            "ComfyUI_01004_.png",
-            "ComfyUI_01005_.png",
-            "ComfyUI_01006_.png",
-            "ComfyUI_01007_.png",
-            "ComfyUI_01008_.png",
-            "ComfyUI_01009_.png",
-            "ComfyUI_01010_.png",
-            "ComfyUI_01011_.png",
-            "ComfyUI_01012_.png",
-            "ComfyUI_01013_.png",
-            "ComfyUI_01014_.png",
-            "ComfyUI_01028_.png",
-            "ComfyUI_01031_ (1).png",
-            "ComfyUI_01031_.png",
-            "ComfyUI_01032_ (1).png",
-            "ComfyUI_01032_.png",
-            "ComfyUI_01036_.png",
-            "ComfyUI_01037_.png",
-            "ComfyUI_01041_.png",
-            "ComfyUI_01042_.png",
-            "ComfyUI_01043_.png",
-            "ComfyUI_01044_.png",
-            "ComfyUI_01049_.png",
-            "ComfyUI_01050_.png",
-            "ComfyUI_01051_.png",
-            "ComfyUI_01052_.png",
-            "ComfyUI_01053_.png",
-            "ComfyUI_01057_.png",
-            "ComfyUI_01058_.png",
-            "ComfyUI_01059_.png",
-            "ComfyUI_01063_ (1).png",
-            "ComfyUI_01063_.png",
-            "ComfyUI_01064_.png",
-            "ComfyUI_01065_ (1).png",
-            "ComfyUI_01065_.png",
-            "ComfyUI_01069_ (1).png",
-            "ComfyUI_01069_.png",
-            "ComfyUI_01073_.png",
-            "ComfyUI_01074_.png",
-            "ComfyUI_01075_.png",
-            "ComfyUI_01076_.png",
-            "ComfyUI_01077_ (1).png",
-            "ComfyUI_01077_.png",
-            "ComfyUI_01078_.png",
-            "ComfyUI_01079_.png",
-            "ComfyUI_01080_.png",
-            "ComfyUI_01081_.png",
-            "ComfyUI_01085_.png",
-            "ComfyUI_01088_.png",
-            "ComfyUI_01089_.png",
-            "ComfyUI_01091_.png",
-            "ComfyUI_01093_.png",
-            "ComfyUI_01095_.png",
-            "ComfyUI_01096_.png",
-            "ComfyUI_01097_.png",
-            "ComfyUI_01098_.png",
-            "ComfyUI_01099_.png",
-            "ComfyUI_01100_.png",
-            "ComfyUI_01102_.png",
-            "ComfyUI_01103_.png",
-            "ComfyUI_01104_.png",
-            "ComfyUI_01105_.png",
-            "ComfyUI_01107_.png",
-            "ComfyUI_01108_.png",
-            "ComfyUI_01109_.png",
-            "ComfyUI_01110_.png",
-            "ComfyUI_01111_.png",
-            "ComfyUI_01112_.png",
-            "ComfyUI_01113_.png",
-            "ComfyUI_01114_.png",
-            "ComfyUI_01118_.png",
-            "ComfyUI_01122_.png",
-            "ComfyUI_01123_.png",
-            "ComfyUI_01124_.png",
-            "ComfyUI_01125_.png",
-            "ComfyUI_01126_.png",
-            "ComfyUI_01127_.png",
-            "ComfyUI_01128_.png",
-            "ComfyUI_01129_.png",
-            "ComfyUI_01130_.png",
-            "ComfyUI_01131_.png",
-            "ComfyUI_01132_.png",
-            "ComfyUI_01133_.png",
-            "ComfyUI_01134_.png",
-            "ComfyUI_01135_.png",
-            "ComfyUI_01136_.png",
-            "ComfyUI_01137_.png",
-            "ComfyUI_01141_ (1).png",
-            "ComfyUI_01141_.png",
-            "ComfyUI_01145_.png",
-            "ComfyUI_01146_.png",
-            "ComfyUI_01147_.png",
-            "ComfyUI_01148_.png",
-            "ComfyUI_01149_.png",
-            "ComfyUI_01150_.png",
-            "ComfyUI_01151_.png",
-            "ComfyUI_01152_.png",
-            "ComfyUI_01153_.png",
-            "ComfyUI_01157_.png",
-            "ComfyUI_01158_.png",
-            "ComfyUI_01159_.png",
-            "ComfyUI_01160_.png",
-            "ComfyUI_01162_.png",
-            "ComfyUI_01166_.png",
-            "ComfyUI_01168_.png",
-            "ComfyUI_01169_.png",
-            "ComfyUI_01178_.png",
-            "ComfyUI_01179_.png",
-            "ComfyUI_01180_.png",
-            "ComfyUI_01181_ (1).png",
-            "ComfyUI_01181_.png",
-            "ComfyUI_01182_.png",
-            "ComfyUI_01183_ (1).png",
-            "ComfyUI_01183_.png",
-            "ComfyUI_01190_.png",
-            "ComfyUI_01191_.png",
-            "ComfyUI_01196_.png",
-            "ComfyUI_01198_.png",
-            "ComfyUI_01199_.png",
-            "ComfyUI_01203_.png",
-            "ComfyUI_01204_.png",
-            "ComfyUI_01205_.png",
-            "ComfyUI_01206_.png",
-            "ComfyUI_01207_.png",
-            "ComfyUI_01211_.png",
-            "ComfyUI_01212_.png",
-            "ComfyUI_01213_.png",
-            "ComfyUI_01214_.png",
-            "ComfyUI_01215_.png",
-            "ComfyUI_01216_.png",
-            "ComfyUI_01217_.png",
-            "ComfyUI_01218_.png",
-            "ComfyUI_01224_.png",
-            "ComfyUI_01225_.png",
-            "ComfyUI_01226_.png",
-            "ComfyUI_01227_.png",
-            "ComfyUI_01229_.png",
-            "ComfyUI_01233_.png",
-            "ComfyUI_01234_.png",
-            "ComfyUI_01235_.png",
-            "ComfyUI_01236_.png",
-            "ComfyUI_01237_.png",
-            "ComfyUI_01238_.png",
-            "ComfyUI_01239_.png",
-            "ComfyUI_01240_.png",
-            "ComfyUI_01241_.png",
-            "ComfyUI_01242_.png",
-            "ComfyUI_01243_.png",
-            "ComfyUI_01244_.png",
-            "ComfyUI_01245_.png",
-            "ComfyUI_01246_.png",
-            "ComfyUI_01248_.png",
-            "ComfyUI_01249_.png",
-            "ComfyUI_01250_.png",
-            "ComfyUI_01252_.png",
-            "ComfyUI_01253_ (1).png",
-            "ComfyUI_01253_.png",
-            "ComfyUI_01265_.png",
-            "ComfyUI_01268_ (1).png",
-            "ComfyUI_01268_.png",
-            "ComfyUI_01269_ (1).png",
-            "ComfyUI_01269_.png",
-            "ComfyUI_01273_.png",
-            "ComfyUI_01274_.png",
-            "ComfyUI_01275_.png",
-            "ComfyUI_01276_.png",
-            "ComfyUI_01277_.png",
-            "ComfyUI_01278_.png",
-            "ComfyUI_01279_.png",
-            "ComfyUI_01280_.png",
-            "ComfyUI_01281_.png",
-            "ComfyUI_01282_.png",
-            "ComfyUI_01283_.png",
-            "ComfyUI_01284_.png",
-            "ComfyUI_01285_.png",
-            "ComfyUI_01289_.png",
-            "ComfyUI_01291_.png",
-            "ComfyUI_01292_.png",
-            "ComfyUI_01293_.png",
-            "ComfyUI_01294_.png",
-            "ComfyUI_01295_.png",
-            "ComfyUI_01296_.png",
-            "ComfyUI_01297_.png",
-            "ComfyUI_01298_.png",
-            "ComfyUI_01299_.png",
-            "ComfyUI_01300_.png",
-            "ComfyUI_01301_.png",
-            "ComfyUI_01302_.png",
-            "ComfyUI_01303_.png",
-            "ComfyUI_01304_.png",
-            "ComfyUI_01319_.png",
-            "ComfyUI_01320_.png",
-            "ComfyUI_01329_.png",
-            "ComfyUI_01333_.png",
-            "ComfyUI_01334_ (1).png",
-            "ComfyUI_01334_.png",
-            "ComfyUI_01335_ (1).png",
-            "ComfyUI_01335_.png",
-            "ComfyUI_01336_ (1).png",
-            "ComfyUI_01336_.png",
-            "ComfyUI_01337_.png",
-            "ComfyUI_01338_.png",
-            "ComfyUI_01339_.png",
-            "ComfyUI_01340_.png",
-            "ComfyUI_01342_.png",
-            "ComfyUI_01377_.png",
-            "ComfyUI_01381_.png",
-            "ComfyUI_01427_.png",
-            "ComfyUI_01431_.png",
-            "ComfyUI_01435_.png",
-            "ComfyUI_01436_.png",
-            "ComfyUI_01438_.png",
-            "ComfyUI_01441_.png",
-            "ComfyUI_01442_.png",
-            "ComfyUI_01443_.png",
-            "ComfyUI_01444_.png",
-            "ComfyUI_01447_.png",
-            "ComfyUI_01448_.png",
-            "ComfyUI_01449_.png",
-            "ComfyUI_01456_.png",
-            "ComfyUI_01460_.png",
-            "ComfyUI_01461_.png",
-            "ComfyUI_01464_.png",
-            "ComfyUI_01468_.png",
-            "ComfyUI_01477_.png",
-            "ComfyUI_01478_.png",
-            "ComfyUI_01479_.png",
-            "ComfyUI_01480_.png",
-            "ComfyUI_01481_.png",
-            "ComfyUI_01490_.png",
-            "ComfyUI_01494_.png",
-            "ComfyUI_01498_.png",
-            "ComfyUI_01502_.png",
-            "ComfyUI_01506_.png",
-            "ComfyUI_01510_.png",
-            "ComfyUI_01511_.png",
-            "ComfyUI_01512_.png",
-            "ComfyUI_01513_.png",
-            "ComfyUI_01529_.png",
-            "ComfyUI_01536_.png",
-            "ComfyUI_01541_.png",
-            "ComfyUI_01542_.png",
-            "ComfyUI_01547_.png",
-            "ComfyUI_01548_.png",
-            "ComfyUI_01550_.png",
-            "ComfyUI_01552_.png",
-            "ComfyUI_01556_.png",
-            "ComfyUI_01557_.png",
-            "ComfyUI_01558_.png",
-            "ComfyUI_01563_.png",
-            "ComfyUI_01570_.png",
-            "ComfyUI_01588_.png",
-            "ComfyUI_01592_.png",
-            "ComfyUI_01593_.png",
-            "ComfyUI_01594_.png",
-            "ComfyUI_01595_.png",
-            "ComfyUI_01596_.png",
-            "ComfyUI_01597_ (1).png",
-            "ComfyUI_01597_.png",
-            "ComfyUI_01598_.png",
-            "ComfyUI_01599_.png",
-            "ComfyUI_01600_.png",
-            "ComfyUI_01601_.png",
-            "ComfyUI_01602_.png",
-            "ComfyUI_01617_.png",
-            "ComfyUI_01619_.png",
-            "ComfyUI_01620_.png",
-            "ComfyUI_01621_.png",
-            "ComfyUI_01622_.png",
-            "ComfyUI_01628_.png",
-            "ComfyUI_01629_.png",
-            "ComfyUI_01632_.png",
-            "__etna_and_flonne_disgaea_and_1_more__4fa15fd4c0d2233cc02b79bf903897ec.jpg",
-            "__fujiwara_no_mokou_and_houraisan_kaguya_touhou_drawn_by_tsuno_no_hito__3dd87f83b2e0bfb976fd2689598f0fb4.png",
-            "__marona_phantom_brave_drawn_by_yilx__496dbc0b6cc95cf8a00427b2db29ed21.jpg",
-            "blob",
-            "blob (1)",
-            "blob (2)",
-            "blob (3)",
-            "example.png"
-          ]
-        },
-        widgets_values: [
-          "._00001_ (1).png"
-        ],
-        color: "#223",
-        bgColor: "#335",
-        comfyValue: "._00001_ (1).png",
-        shownOutputProperties: {},
-        saveUserState: true
-      },
-      {
-        id: 161,
-        type: "LoadImage",
-        pos: [
-          -237.81137749023495,
-          829.3226320312501
-        ],
-        size: [
-          140,
-          46
-        ],
-        flags: {},
-        order: 56,
-        mode: 2,
-        inputs: [
-          {
-            name: "image",
-            type: "string",
-            link: 246,
-            config: {},
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/combo",
-            serialize: true
-          }
-        ],
-        outputs: [
-          {
-            name: "IMAGE",
-            type: "IMAGE",
-            links: [
-              269,
-              293
-            ],
-            slot_index: 0
-          },
-          {
-            name: "MASK",
-            type: "MASK",
-            links: null
-          }
-        ],
-        title: "LoadImage",
-        properties: {
-          tags: [
-            "txt2img",
-            "i2i",
-            "i2iPreview"
-          ]
-        },
-        color: "#432",
-        bgColor: "#653",
-        saveUserState: true
-      },
-      {
-        id: 188,
-        type: "actions/execute_subgraph",
-        pos: [
-          -349.81137749023526,
-          947.3226320312502
-        ],
-        size: [
-          226.79999999999998,
-          46
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 57,
-        mode: 0,
-        inputs: [
-          {
-            name: "execute",
-            type: -1,
-            link: 295,
-            shape: 1
-          },
-          {
-            name: "tag",
-            type: "string",
-            link: null
-          }
-        ],
-        outputs: [],
-        title: "Comfy.ExecuteSubgraphAction",
-        properties: {
-          tag: "i2iPreview",
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
-        id: 16,
-        type: "KSampler",
-        pos: [
-          188,
-          150
-        ],
-        size: [
-          161.2,
-          206
-        ],
-        flags: {},
-        order: 94,
-        mode: 0,
-        inputs: [
-          {
-            name: "model",
-            type: "MODEL",
-            link: 112,
-            color_off: "orange",
-            color_on: "orange",
-            config: {}
-          },
-          {
-            name: "seed",
-            type: "number",
-            link: 80,
-            config: {},
-            serialize: true
-          },
-          {
-            name: "steps",
-            type: "number",
-            link: 17,
-            config: {},
-            serialize: true
-          },
-          {
-            name: "cfg",
-            type: "number",
-            link: 18,
-            config: {},
-            serialize: true
-          },
-          {
-            name: "sampler_name",
-            type: "string",
-            link: 19,
-            config: {},
-            serialize: true
-          },
-          {
-            name: "scheduler",
-            type: "string",
-            link: 20,
-            config: {},
-            serialize: true
-          },
-          {
-            name: "positive",
-            type: "CONDITIONING",
-            link: 33,
-            color_off: "orange",
-            color_on: "orange",
-            config: {}
-          },
-          {
-            name: "negative",
-            type: "CONDITIONING",
-            link: 32,
-            color_off: "orange",
-            color_on: "orange",
-            config: {}
-          },
-          {
-            name: "latent_image",
-            type: "LATENT",
-            link: 288,
-            color_off: "orange",
-            color_on: "orange",
-            config: {}
-          },
-          {
-            name: "denoise",
-            type: "number",
-            link: 299,
-            config: {},
-            serialize: true
-          }
-        ],
-        outputs: [
-          {
-            name: "LATENT",
-            type: "LATENT",
-            links: [
-              40
-            ],
-            color_off: "orange",
-            color_on: "orange",
-            slot_index: 0
-          }
-        ],
-        title: "KSampler",
-        properties: {
-          tags: [
-            "txt2img"
-          ]
-        },
-        color: "#432",
-        bgColor: "#653",
-        saveUserState: true
-      },
-      {
         id: 120,
         type: "basic/number",
         pos: [
@@ -4996,7 +3430,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 38,
+        order: 29,
         mode: 0,
         inputs: [],
         outputs: [
@@ -5030,7 +3464,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 39,
+        order: 30,
         mode: 2,
         inputs: [
           {
@@ -5093,11 +3527,11 @@ const defaultGraph: SerializedAppState = {
           precision: 1
         },
         widgets_values: [
-          "0.550"
+          "0.650"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: 0.55,
+        comfyValue: 0.65,
         shownOutputProperties: {
           min: {
             type: "number",
@@ -5127,10 +3561,10 @@ const defaultGraph: SerializedAppState = {
         ],
         size: [
           210,
-          98
+          122
         ],
         flags: {},
-        order: 65,
+        order: 73,
         mode: 0,
         inputs: [
           {
@@ -5168,6 +3602,7 @@ const defaultGraph: SerializedAppState = {
             "txt2img",
             "hr"
           ],
+          mode: "dataNonNull",
           acceptNullLinkData: false
         },
         color: "#232",
@@ -5186,7 +3621,7 @@ const defaultGraph: SerializedAppState = {
           26
         ],
         flags: {},
-        order: 53,
+        order: 56,
         mode: 0,
         inputs: [
           {
@@ -5233,7 +3668,7 @@ const defaultGraph: SerializedAppState = {
           66
         ],
         flags: {},
-        order: 41,
+        order: 49,
         mode: 0,
         inputs: [
           {
@@ -5292,10 +3727,10 @@ const defaultGraph: SerializedAppState = {
         ],
         size: [
           210,
-          122
+          142
         ],
         flags: {},
-        order: 76,
+        order: 103,
         mode: 0,
         inputs: [
           {
@@ -5320,6 +3755,21 @@ const defaultGraph: SerializedAppState = {
           {
             name: "selected_index",
             type: "number",
+            links: null
+          },
+          {
+            name: "width",
+            type: "number",
+            links: null
+          },
+          {
+            name: "height",
+            type: "number",
+            links: null
+          },
+          {
+            name: "any_selected",
+            type: "boolean",
             links: null
           }
         ],
@@ -5352,7 +3802,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 59,
+        order: 69,
         mode: 0,
         inputs: [
           {
@@ -5406,7 +3856,7 @@ const defaultGraph: SerializedAppState = {
           206
         ],
         flags: {},
-        order: 82,
+        order: 110,
         mode: 0,
         inputs: [
           {
@@ -5522,7 +3972,7 @@ const defaultGraph: SerializedAppState = {
           106
         ],
         flags: {},
-        order: 70,
+        order: 82,
         mode: 0,
         inputs: [
           {
@@ -5608,7 +4058,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 73,
+        order: 89,
         mode: 0,
         inputs: [
           {
@@ -5663,7 +4113,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 74,
+        order: 90,
         mode: 0,
         inputs: [
           {
@@ -5707,193 +4157,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 189,
-        type: "utils/pick_first",
-        pos: [
-          -218,
-          686
-        ],
-        size: [
-          210,
-          98
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 58,
-        mode: 0,
-        inputs: [
-          {
-            name: "A",
-            type: "*",
-            link: 298
-          },
-          {
-            name: "B",
-            type: "*",
-            link: 296
-          },
-          {
-            name: "C",
-            type: "*",
-            link: null
-          }
-        ],
-        outputs: [
-          {
-            name: "",
-            type: "*",
-            links: [
-              299
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Comfy.PickFirst",
-        properties: {
-          tags: [
-            "txt2img"
-          ],
-          acceptNullLinkData: false
-        },
-        color: "#232",
-        bgColor: "#353",
-        saveUserState: true
-      },
-      {
-        id: 185,
-        type: "utils/pick_first",
-        pos: [
-          96,
-          682
-        ],
-        size: [
-          210,
-          98
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 97,
-        mode: 0,
-        inputs: [
-          {
-            name: "A",
-            type: "*",
-            link: 286
-          },
-          {
-            name: "B",
-            type: "*",
-            link: 287
-          },
-          {
-            name: "C",
-            type: "*",
-            link: null
-          }
-        ],
-        outputs: [
-          {
-            name: "",
-            type: "LATENT",
-            links: [
-              288
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Comfy.PickFirst",
-        properties: {
-          tags: [
-            "txt2img"
-          ],
-          acceptNullLinkData: false
-        },
-        color: "#232",
-        bgColor: "#353",
-        saveUserState: true
-      },
-      {
-        id: 182,
-        type: "LatentUpscale",
-        pos: [
-          225.43002250976568,
-          809.73263203125
-        ],
-        size: [
-          178,
-          106
-        ],
-        flags: {},
-        order: 96,
-        mode: 2,
-        inputs: [
-          {
-            name: "samples",
-            type: "LATENT",
-            link: 281,
-            config: {}
-          },
-          {
-            name: "upscale_method",
-            type: "string",
-            link: 284,
-            config: {},
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/combo",
-            serialize: true
-          },
-          {
-            name: "width",
-            type: "number",
-            link: 282,
-            config: {},
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/slider",
-            serialize: true
-          },
-          {
-            name: "height",
-            type: "number",
-            link: 283,
-            config: {},
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/slider",
-            serialize: true
-          },
-          {
-            name: "crop",
-            type: "string",
-            link: 285,
-            config: {},
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/combo",
-            serialize: true
-          }
-        ],
-        outputs: [
-          {
-            name: "LATENT",
-            type: "LATENT",
-            links: [
-              287
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "LatentUpscale",
-        properties: {
-          tags: [
-            "txt2img",
-            "i2i"
-          ]
-        },
-        color: "#432",
-        bgColor: "#653",
-        saveUserState: true
-      },
-      {
         id: 175,
         type: "VAEEncode",
         pos: [
@@ -5905,7 +4168,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 71,
+        order: 83,
         mode: 2,
         inputs: [
           {
@@ -5943,232 +4206,11 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 187,
-        type: "PreviewImage",
-        pos: [
-          -119.56997749023432,
-          928.73263203125
-        ],
-        size: [
-          144.4,
-          26
-        ],
-        flags: {},
-        order: 67,
-        mode: 0,
-        inputs: [
-          {
-            name: "images",
-            type: "IMAGE",
-            link: 293,
-            config: {}
-          }
-        ],
-        outputs: [
-          {
-            name: "onExecuted",
-            type: -2,
-            links: [
-              294
-            ],
-            color_off: "rebeccapurple",
-            color_on: "rebeccapurple",
-            shape: 1,
-            slot_index: 0
-          }
-        ],
-        title: "PreviewImage",
-        properties: {
-          tags: [
-            "i2iPreview"
-          ]
-        },
-        color: "#432",
-        bgColor: "#653",
-        saveUserState: true
-      },
-      {
-        id: 186,
-        type: "ui/gallery",
-        pos: [
-          49.43002250976564,
-          947.73263203125
-        ],
-        size: [
-          210,
-          122
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 72,
-        mode: 0,
-        inputs: [
-          {
-            name: "images",
-            type: "OUTPUT",
-            link: null
-          },
-          {
-            name: "store",
-            type: -1,
-            link: 294,
-            color_off: "rebeccapurple",
-            color_on: "rebeccapurple",
-            shape: 1
-          },
-          {
-            name: "clear",
-            type: -1,
-            link: null,
-            shape: 1
-          }
-        ],
-        outputs: [
-          {
-            name: "selected_index",
-            type: "number",
-            links: null
-          }
-        ],
-        title: "UI.Gallery",
-        properties: {
-          tags: [],
-          defaultValue: null,
-          index: 0,
-          updateMode: "replace"
-        },
-        widgets_values: [],
-        color: "#223",
-        bgColor: "#335",
-        comfyValue: [],
-        shownOutputProperties: {},
-        saveUserState: false
-      },
-      {
-        id: 164,
-        type: "actions/set_node_mode",
-        pos: [
-          -661,
-          523
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 63,
-        mode: 0,
-        inputs: [
-          {
-            name: "enabled",
-            type: "boolean",
-            link: 253
-          },
-          {
-            name: "set",
-            type: -1,
-            link: 265,
-            shape: 1
-          }
-        ],
-        outputs: [],
-        title: "Comfy.SetNodeModeAction",
-        properties: {
-          targetTags: "t2i",
-          enable: false,
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
-        id: 165,
-        type: "actions/set_node_mode",
-        pos: [
-          -665,
-          651
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 64,
-        mode: 0,
-        inputs: [
-          {
-            name: "enabled",
-            type: "boolean",
-            link: 254
-          },
-          {
-            name: "set",
-            type: -1,
-            link: 267,
-            shape: 1
-          }
-        ],
-        outputs: [],
-        title: "Comfy.SetNodeModeAction",
-        properties: {
-          targetTags: "i2i",
-          enable: false,
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
-        id: 174,
-        type: "events/frame_delay",
-        pos: [
-          -795,
-          654
-        ],
-        size: [
-          140,
-          26
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 51,
-        mode: 0,
-        inputs: [
-          {
-            name: "event",
-            type: -1,
-            link: 268,
-            shape: 1,
-            slot_index: 0
-          }
-        ],
-        outputs: [
-          {
-            name: "on_time",
-            type: -2,
-            links: [
-              267
-            ],
-            shape: 1,
-            slot_index: 0
-          }
-        ],
-        title: "Frame Delay",
-        properties: {
-          timeInFrames: 8,
-          tags: []
-        }
-      },
-      {
         id: 173,
         type: "events/frame_delay",
         pos: [
-          -790,
-          523
+          -1354.2999999999997,
+          524.1000000000004
         ],
         size: [
           140,
@@ -6177,7 +4219,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 50,
+        order: 67,
         mode: 0,
         inputs: [
           {
@@ -6206,461 +4248,6 @@ const defaultGraph: SerializedAppState = {
         }
       },
       {
-        id: 169,
-        type: "basic/CompareValues",
-        pos: [
-          -906,
-          649
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 49,
-        mode: 0,
-        inputs: [
-          {
-            name: "A",
-            type: 0,
-            link: 252
-          },
-          {
-            name: "B",
-            type: 0,
-            link: 250
-          }
-        ],
-        outputs: [
-          {
-            name: "true",
-            type: "boolean",
-            links: [
-              254
-            ],
-            slot_index: 0
-          },
-          {
-            name: "false",
-            type: "boolean",
-            links: null
-          }
-        ],
-        title: "GenericCompare",
-        properties: {
-          A: "txt2img",
-          B: "img2img",
-          OP: "==",
-          enabled: true,
-          tags: []
-        }
-      },
-      {
-        id: 116,
-        type: "image/cache",
-        pos: [
-          868,
-          444
-        ],
-        size: [
-          210,
-          166
-        ],
-        flags: {},
-        order: 80,
-        mode: 0,
-        inputs: [
-          {
-            name: "images",
-            type: "OUTPUT",
-            link: null,
-            slot_index: 0
-          },
-          {
-            name: "index",
-            type: "number",
-            link: 168
-          },
-          {
-            name: "store",
-            type: -1,
-            link: 242,
-            shape: 1,
-            slot_index: 2
-          },
-          {
-            name: "clear",
-            type: -1,
-            link: 233,
-            shape: 1
-          }
-        ],
-        outputs: [
-          {
-            name: "filename",
-            type: "string",
-            links: [
-              164
-            ],
-            slot_index: 0
-          },
-          {
-            name: "state",
-            type: "string",
-            links: [
-              165
-            ],
-            slot_index: 1
-          }
-        ],
-        title: "Comfy.ImageCache",
-        properties: {
-          tags: [],
-          images: {
-            images: [
-              {
-                filename: "ComfyUI_01628_.png",
-                subfolder: "",
-                type: "output"
-              },
-              {
-                filename: "ComfyUI_01629_.png",
-                subfolder: "",
-                type: "output"
-              }
-            ]
-          },
-          index: 0,
-          filenames: {
-            0: {
-              filename: "ComfyUI_01628_.png",
-              status: "cached"
-            }
-          },
-          genNumber: 93,
-          updateMode: "append"
-        },
-        saveUserState: true
-      },
-      {
-        id: 37,
-        type: "ui/slider",
-        pos: [
-          -670,
-          842
-        ],
-        size: [
-          210,
-          158
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 100,
-        mode: 0,
-        inputs: [
-          {
-            name: "value",
-            type: "number",
-            link: null
-          },
-          {
-            name: "store",
-            type: -1,
-            link: 305,
-            shape: 1,
-            slot_index: 1
-          }
-        ],
-        outputs: [
-          {
-            name: "value",
-            type: "number",
-            links: [
-              93,
-              200,
-              282,
-              301
-            ],
-            slot_index: 0
-          },
-          {
-            name: "changed",
-            type: -2,
-            links: null,
-            shape: 1
-          },
-          {
-            name: "min",
-            type: "number",
-            links: null
-          },
-          {
-            name: "max",
-            type: "number",
-            links: null
-          },
-          {
-            name: "step",
-            type: "number",
-            links: null
-          },
-          {
-            name: "precision",
-            type: "number",
-            links: null
-          }
-        ],
-        title: "UI.Slider",
-        properties: {
-          tags: [],
-          defaultValue: 512,
-          min: 64,
-          max: 2048,
-          step: 64,
-          precision: 0,
-          hidden: false
-        },
-        widgets_values: [
-          "512.000"
-        ],
-        color: "#223",
-        bgColor: "#335",
-        comfyValue: 512,
-        shownOutputProperties: {
-          min: {
-            type: "number",
-            index: 2
-          },
-          max: {
-            type: "number",
-            index: 3
-          },
-          step: {
-            type: "number",
-            index: 4
-          },
-          precision: {
-            type: "number",
-            index: 5
-          }
-        },
-        saveUserState: true
-      },
-      {
-        id: 38,
-        type: "ui/slider",
-        pos: [
-          -667,
-          815
-        ],
-        size: [
-          210,
-          158
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 101,
-        mode: 0,
-        inputs: [
-          {
-            name: "value",
-            type: "number",
-            link: null
-          },
-          {
-            name: "store",
-            type: -1,
-            link: 303,
-            shape: 1
-          }
-        ],
-        outputs: [
-          {
-            name: "value",
-            type: "number",
-            links: [
-              94,
-              201,
-              283,
-              302
-            ],
-            slot_index: 0
-          },
-          {
-            name: "changed",
-            type: -2,
-            links: null,
-            shape: 1
-          },
-          {
-            name: "min",
-            type: "number",
-            links: null
-          },
-          {
-            name: "max",
-            type: "number",
-            links: null
-          },
-          {
-            name: "step",
-            type: "number",
-            links: null
-          },
-          {
-            name: "precision",
-            type: "number",
-            links: null
-          }
-        ],
-        title: "UI.Slider",
-        properties: {
-          tags: [],
-          defaultValue: 512,
-          min: 64,
-          max: 2048,
-          step: 64,
-          precision: 0,
-          hidden: false
-        },
-        widgets_values: [
-          "512.000"
-        ],
-        color: "#223",
-        bgColor: "#335",
-        comfyValue: 512,
-        shownOutputProperties: {
-          min: {
-            type: "number",
-            index: 2
-          },
-          max: {
-            type: "number",
-            index: 3
-          },
-          step: {
-            type: "number",
-            index: 4
-          },
-          precision: {
-            type: "number",
-            index: 5
-          }
-        },
-        saveUserState: true
-      },
-      {
-        id: 191,
-        type: "actions/swap",
-        pos: [
-          -847,
-          795
-        ],
-        size: [
-          140,
-          66
-        ],
-        flags: {},
-        order: 98,
-        mode: 0,
-        inputs: [
-          {
-            name: "A",
-            type: "*",
-            link: 301
-          },
-          {
-            name: "B",
-            type: "*",
-            link: 302
-          },
-          {
-            name: "swap",
-            type: -1,
-            link: 300,
-            shape: 1
-          }
-        ],
-        outputs: [
-          {
-            name: "B",
-            type: -2,
-            links: [
-              303
-            ],
-            shape: 1,
-            slot_index: 0
-          },
-          {
-            name: "A",
-            type: -2,
-            links: [
-              305
-            ],
-            shape: 1
-          }
-        ],
-        title: "Comfy.SwapAction",
-        properties: {
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
-        id: 62,
-        type: "ui/button",
-        pos: [
-          -966,
-          857
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 40,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "clicked",
-            type: -2,
-            links: [
-              300
-            ],
-            shape: 1,
-            slot_index: 0
-          },
-          {
-            name: "isClicked",
-            type: "boolean",
-            links: null
-          }
-        ],
-        title: "UI.Button",
-        properties: {
-          tags: [],
-          defaultValue: false,
-          param: "bang",
-          message: "bang",
-          hidden: false
-        },
-        widgets_values: [
-          "false"
-        ],
-        color: "#223",
-        bgColor: "#335",
-        comfyValue: false,
-        shownOutputProperties: {},
-        saveUserState: true
-      },
-      {
         id: 56,
         type: "utils/value_control",
         pos: [
@@ -6672,7 +4259,7 @@ const defaultGraph: SerializedAppState = {
           126
         ],
         flags: {},
-        order: 103,
+        order: 138,
         mode: 0,
         inputs: [
           {
@@ -6736,7 +4323,7 @@ const defaultGraph: SerializedAppState = {
         title: "Comfy.ValueControl",
         properties: {
           tags: [],
-          value: 557222282511734,
+          value: 1089491900447023,
           action: "randomize",
           min: 0,
           max: 18446744073709552000,
@@ -6758,7 +4345,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 95,
+        order: 123,
         mode: 0,
         inputs: [
           {
@@ -6833,11 +4420,11 @@ const defaultGraph: SerializedAppState = {
           hidden: false
         },
         widgets_values: [
-          "0.000"
+          "1089491900447023.000"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: 0,
+        comfyValue: 1089491900447023,
         shownOutputProperties: {
           min: {
             type: "number",
@@ -6855,6 +4442,3613 @@ const defaultGraph: SerializedAppState = {
             type: "number",
             index: 5
           }
+        },
+        saveUserState: true
+      },
+      {
+        id: 161,
+        type: "LoadImage",
+        pos: [
+          -238,
+          829
+        ],
+        size: [
+          140,
+          46
+        ],
+        flags: {},
+        order: 60,
+        mode: 2,
+        inputs: [
+          {
+            name: "image",
+            type: "string",
+            link: 317,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/combo",
+            serialize: true
+          }
+        ],
+        outputs: [
+          {
+            name: "IMAGE",
+            type: "IMAGE",
+            links: [
+              269
+            ],
+            slot_index: 0
+          },
+          {
+            name: "MASK",
+            type: "MASK",
+            links: null
+          }
+        ],
+        title: "LoadImage",
+        properties: {
+          tags: [
+            "txt2img",
+            "i2i"
+          ]
+        },
+        color: "#432",
+        bgColor: "#653",
+        saveUserState: true
+      },
+      {
+        id: 189,
+        type: "utils/pick_first",
+        pos: [
+          -218,
+          686
+        ],
+        size: [
+          210,
+          122
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 58,
+        mode: 0,
+        inputs: [
+          {
+            name: "A",
+            type: "*",
+            link: 298
+          },
+          {
+            name: "B",
+            type: "*",
+            link: 296
+          },
+          {
+            name: "C",
+            type: "*",
+            link: null
+          }
+        ],
+        outputs: [
+          {
+            name: "",
+            type: "*",
+            links: [
+              299
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Comfy.PickFirst",
+        properties: {
+          tags: [
+            "txt2img"
+          ],
+          mode: "dataNonNull",
+          acceptNullLinkData: false
+        },
+        color: "#232",
+        bgColor: "#353",
+        saveUserState: true
+      },
+      {
+        id: 185,
+        type: "utils/pick_first",
+        pos: [
+          96,
+          683
+        ],
+        size: [
+          210,
+          122
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 125,
+        mode: 0,
+        inputs: [
+          {
+            name: "A",
+            type: "*",
+            link: 286
+          },
+          {
+            name: "B",
+            type: "*",
+            link: 287
+          },
+          {
+            name: "C",
+            type: "*",
+            link: null
+          }
+        ],
+        outputs: [
+          {
+            name: "",
+            type: "LATENT",
+            links: [
+              288
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Comfy.PickFirst",
+        properties: {
+          tags: [
+            "txt2img"
+          ],
+          mode: "dataNonNull",
+          acceptNullLinkData: false
+        },
+        color: "#232",
+        bgColor: "#353",
+        saveUserState: true
+      },
+      {
+        id: 45,
+        type: "ui/text",
+        pos: [
+          425,
+          339
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 31,
+        mode: 0,
+        inputs: [
+          {
+            name: "value",
+            type: "string",
+            link: null
+          },
+          {
+            name: "store",
+            type: -1,
+            link: null,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "value",
+            type: "string",
+            links: [
+              308
+            ],
+            slot_index: 0
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: null,
+            shape: 1
+          }
+        ],
+        title: "UI.Text",
+        properties: {
+          tags: [],
+          defaultValue: "ComfyUI",
+          multiline: false,
+          hidden: false
+        },
+        widgets_values: [
+          "ComfyUI"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: "ComfyUI",
+        shownOutputProperties: {},
+        saveUserState: true
+      },
+      {
+        id: 159,
+        type: "SaveImage",
+        pos: [
+          1831,
+          -8
+        ],
+        size: [
+          220,
+          46
+        ],
+        flags: {},
+        order: 121,
+        mode: 0,
+        inputs: [
+          {
+            name: "images",
+            type: "IMAGE",
+            link: 239,
+            config: {}
+          },
+          {
+            name: "filename_prefix",
+            type: "string",
+            link: 311,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/text",
+            serialize: true,
+            slot_index: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "onExecuted",
+            type: -2,
+            links: [
+              240,
+              241
+            ],
+            color_off: "rebeccapurple",
+            color_on: "rebeccapurple",
+            shape: 1,
+            slot_index: 0
+          }
+        ],
+        title: "SaveImage",
+        properties: {
+          tags: [
+            "hr"
+          ]
+        },
+        color: "#432",
+        bgColor: "#653",
+        saveUserState: true
+      },
+      {
+        id: 193,
+        type: "utils/pick_first",
+        pos: [
+          532,
+          339
+        ],
+        size: [
+          210,
+          122
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 59,
+        mode: 0,
+        inputs: [
+          {
+            name: "A",
+            type: "*",
+            link: 308
+          },
+          {
+            name: "B",
+            type: "*",
+            link: 309
+          },
+          {
+            name: "C",
+            type: "*",
+            link: null
+          }
+        ],
+        outputs: [
+          {
+            name: "",
+            type: "string",
+            links: [
+              310,
+              311
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Comfy.PickFirst",
+        properties: {
+          tags: [],
+          mode: "truthy"
+        },
+        color: "#232",
+        bgColor: "#353",
+        saveUserState: true
+      },
+      {
+        id: 194,
+        type: "basic/string",
+        pos: [
+          421,
+          374
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 32,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "string",
+            type: "string",
+            links: [
+              309
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const String",
+        properties: {
+          value: "ComfyUI",
+          tags: []
+        }
+      },
+      {
+        id: 62,
+        type: "ui/button",
+        pos: [
+          -966,
+          857
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 33,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "clicked",
+            type: -2,
+            links: [
+              300
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "isClicked",
+            type: "boolean",
+            links: null
+          }
+        ],
+        title: "UI.Button",
+        properties: {
+          tags: [
+            "t2i"
+          ],
+          defaultValue: false,
+          param: "bang",
+          message: "bang",
+          hidden: false
+        },
+        widgets_values: [
+          "false"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: false,
+        shownOutputProperties: {},
+        saveUserState: true
+      },
+      {
+        id: 191,
+        type: "actions/swap",
+        pos: [
+          -847,
+          795
+        ],
+        size: [
+          140,
+          66
+        ],
+        flags: {},
+        order: 126,
+        mode: 0,
+        inputs: [
+          {
+            name: "A",
+            type: "*",
+            link: 301
+          },
+          {
+            name: "B",
+            type: "*",
+            link: 302
+          },
+          {
+            name: "swap",
+            type: -1,
+            link: 300,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "B",
+            type: -2,
+            links: [
+              303
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "A",
+            type: -2,
+            links: [
+              305
+            ],
+            shape: 1
+          }
+        ],
+        title: "Comfy.SwapAction",
+        properties: {
+          tags: [
+            "t2i"
+          ]
+        },
+        saveUserState: true
+      },
+      {
+        id: 197,
+        type: "ui/button",
+        pos: [
+          -760,
+          1180
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 34,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "clicked",
+            type: -2,
+            links: [
+              312
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "isClicked",
+            type: "boolean",
+            links: null
+          }
+        ],
+        title: "UI.Button",
+        properties: {
+          tags: [
+            "i2i",
+            "i2iPixelSize"
+          ],
+          defaultValue: false,
+          param: "bang",
+          message: "bang",
+          hidden: false
+        },
+        widgets_values: [
+          "false"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: false,
+        shownOutputProperties: {},
+        saveUserState: true
+      },
+      {
+        id: 38,
+        type: "ui/slider",
+        pos: [
+          -667,
+          815
+        ],
+        size: [
+          210,
+          158
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 136,
+        mode: 0,
+        inputs: [
+          {
+            name: "value",
+            type: "number",
+            link: null
+          },
+          {
+            name: "store",
+            type: -1,
+            link: 303,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "value",
+            type: "number",
+            links: [
+              94,
+              302
+            ],
+            slot_index: 0
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: null,
+            shape: 1
+          },
+          {
+            name: "min",
+            type: "number",
+            links: null
+          },
+          {
+            name: "max",
+            type: "number",
+            links: null
+          },
+          {
+            name: "step",
+            type: "number",
+            links: null
+          },
+          {
+            name: "precision",
+            type: "number",
+            links: null
+          }
+        ],
+        title: "UI.Slider",
+        properties: {
+          tags: [
+            "t2i"
+          ],
+          defaultValue: 512,
+          min: 64,
+          max: 2048,
+          step: 64,
+          precision: 0,
+          hidden: false
+        },
+        widgets_values: [
+          "512.000"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: 512,
+        shownOutputProperties: {
+          min: {
+            type: "number",
+            index: 2
+          },
+          max: {
+            type: "number",
+            index: 3
+          },
+          step: {
+            type: "number",
+            index: 4
+          },
+          precision: {
+            type: "number",
+            index: 5
+          }
+        },
+        saveUserState: true
+      },
+      {
+        id: 182,
+        type: "LatentUpscale",
+        pos: [
+          225.43002250976568,
+          809.73263203125
+        ],
+        size: [
+          178,
+          106
+        ],
+        flags: {},
+        order: 124,
+        mode: 2,
+        inputs: [
+          {
+            name: "samples",
+            type: "LATENT",
+            link: 281,
+            config: {}
+          },
+          {
+            name: "upscale_method",
+            type: "string",
+            link: 284,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/combo",
+            serialize: true
+          },
+          {
+            name: "width",
+            type: "number",
+            link: 353,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/slider",
+            serialize: true
+          },
+          {
+            name: "height",
+            type: "number",
+            link: 354,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/slider",
+            serialize: true
+          },
+          {
+            name: "crop",
+            type: "string",
+            link: 285,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/combo",
+            serialize: true
+          }
+        ],
+        outputs: [
+          {
+            name: "LATENT",
+            type: "LATENT",
+            links: [
+              287
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "LatentUpscale",
+        properties: {
+          tags: [
+            "txt2img",
+            "i2i"
+          ]
+        },
+        color: "#432",
+        bgColor: "#653",
+        saveUserState: true
+      },
+      {
+        id: 37,
+        type: "ui/slider",
+        pos: [
+          -670,
+          842
+        ],
+        size: [
+          210,
+          158
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 135,
+        mode: 0,
+        inputs: [
+          {
+            name: "value",
+            type: "number",
+            link: null
+          },
+          {
+            name: "store",
+            type: -1,
+            link: 305,
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "value",
+            type: "number",
+            links: [
+              93,
+              301
+            ],
+            slot_index: 0
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: null,
+            shape: 1
+          },
+          {
+            name: "min",
+            type: "number",
+            links: null
+          },
+          {
+            name: "max",
+            type: "number",
+            links: null
+          },
+          {
+            name: "step",
+            type: "number",
+            links: null
+          },
+          {
+            name: "precision",
+            type: "number",
+            links: null
+          }
+        ],
+        title: "UI.Slider",
+        properties: {
+          tags: [
+            "t2i"
+          ],
+          defaultValue: 512,
+          min: 64,
+          max: 2048,
+          step: 64,
+          precision: 0,
+          hidden: false
+        },
+        widgets_values: [
+          "512.000"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: 512,
+        shownOutputProperties: {
+          min: {
+            type: "number",
+            index: 2
+          },
+          max: {
+            type: "number",
+            index: 3
+          },
+          step: {
+            type: "number",
+            index: 4
+          },
+          precision: {
+            type: "number",
+            index: 5
+          }
+        },
+        saveUserState: true
+      },
+      {
+        id: 206,
+        type: "ui/text",
+        pos: [
+          -254.39999999999998,
+          1079.899999999999
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 91,
+        mode: 2,
+        inputs: [
+          {
+            name: "value",
+            type: "string",
+            link: 322
+          },
+          {
+            name: "store",
+            type: -1,
+            link: null,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "value",
+            type: "string",
+            links: null
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: null,
+            shape: 1
+          }
+        ],
+        title: "UI.Text",
+        properties: {
+          tags: [
+            "i2i",
+            "i2iScaleSize"
+          ],
+          defaultValue: "",
+          multiline: false
+        },
+        widgets_values: [
+          "2"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: "2",
+        shownOutputProperties: {},
+        saveUserState: true
+      },
+      {
+        id: 207,
+        type: "ui/text",
+        pos: [
+          -259.4,
+          1217.899999999999
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 92,
+        mode: 2,
+        inputs: [
+          {
+            name: "value",
+            type: "string",
+            link: 323
+          },
+          {
+            name: "store",
+            type: -1,
+            link: null,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "value",
+            type: "string",
+            links: null
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: null,
+            shape: 1
+          }
+        ],
+        title: "UI.Text",
+        properties: {
+          tags: [
+            "i2i",
+            "i2iScaleSize"
+          ],
+          defaultValue: "",
+          multiline: false
+        },
+        widgets_values: [
+          "2"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: "2",
+        shownOutputProperties: {},
+        saveUserState: true
+      },
+      {
+        id: 204,
+        type: "math/operation",
+        pos: [
+          -330.4,
+          1185.899999999999
+        ],
+        size: [
+          140,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 62,
+        mode: 2,
+        inputs: [
+          {
+            name: "A",
+            type: "number,array,object",
+            link: 320
+          },
+          {
+            name: "B",
+            type: "number",
+            link: 329
+          }
+        ],
+        outputs: [
+          {
+            name: "=",
+            type: "number",
+            links: [
+              327
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Operation",
+        properties: {
+          A: 2,
+          B: 1,
+          OP: "*",
+          tags: [
+            "i2i",
+            "i2iScaleSize"
+          ]
+        }
+      },
+      {
+        id: 209,
+        type: "string/toString",
+        pos: [
+          -354.4,
+          1081.899999999999
+        ],
+        size: [
+          140,
+          26
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 84,
+        mode: 2,
+        inputs: [
+          {
+            name: "in",
+            type: "",
+            link: 325
+          }
+        ],
+        outputs: [
+          {
+            name: "out",
+            type: "string",
+            links: [
+              322
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "ToString",
+        properties: {
+          tags: [
+            "i2i",
+            "i2iScaleSize"
+          ]
+        }
+      },
+      {
+        id: 208,
+        type: "string/toString",
+        pos: [
+          -363.3999999999999,
+          1216.899999999999
+        ],
+        size: [
+          140,
+          26
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 85,
+        mode: 2,
+        inputs: [
+          {
+            name: "in",
+            type: "",
+            link: 324
+          }
+        ],
+        outputs: [
+          {
+            name: "out",
+            type: "string",
+            links: [
+              323
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "ToString",
+        properties: {
+          tags: [
+            "i2i",
+            "i2iScaleSize"
+          ]
+        }
+      },
+      {
+        id: 205,
+        type: "math/operation",
+        pos: [
+          -344,
+          1115
+        ],
+        size: [
+          140,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 61,
+        mode: 2,
+        inputs: [
+          {
+            name: "A",
+            type: "number,array,object",
+            link: 321
+          },
+          {
+            name: "B",
+            type: "number",
+            link: 328
+          }
+        ],
+        outputs: [
+          {
+            name: "=",
+            type: "number",
+            links: [
+              326
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Operation",
+        properties: {
+          A: 2,
+          B: 1,
+          OP: "*",
+          tags: [
+            "i2i",
+            "i2iScaleSize"
+          ]
+        }
+      },
+      {
+        id: 211,
+        type: "math/floor",
+        pos: [
+          -254,
+          1154
+        ],
+        size: [
+          140,
+          26
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 76,
+        mode: 2,
+        inputs: [
+          {
+            name: "in",
+            type: "number",
+            link: 327
+          }
+        ],
+        outputs: [
+          {
+            name: "out",
+            type: "number",
+            links: [
+              324,
+              332
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Floor",
+        properties: {
+          tags: [
+            "i2i",
+            "i2iScaleSize"
+          ]
+        }
+      },
+      {
+        id: 216,
+        type: "logic/NOT",
+        pos: [
+          -942.8879999999998,
+          980.8429999999998
+        ],
+        size: [
+          140,
+          26
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 99,
+        mode: 0,
+        inputs: [
+          {
+            name: "in",
+            type: "boolean",
+            link: 336
+          }
+        ],
+        outputs: [
+          {
+            name: "out",
+            type: "boolean",
+            links: [
+              337
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "NOT",
+        properties: {
+          tags: []
+        }
+      },
+      {
+        id: 167,
+        type: "basic/string",
+        pos: [
+          -2065.2999999999993,
+          687.1000000000004
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 35,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "string",
+            type: "string",
+            links: [
+              250
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const String",
+        properties: {
+          value: "img2img",
+          tags: []
+        }
+      },
+      {
+        id: 169,
+        type: "basic/CompareValues",
+        pos: [
+          -1941.7999999999997,
+          643.2000000000004
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: false
+        },
+        order: 65,
+        mode: 0,
+        inputs: [
+          {
+            name: "A",
+            type: 0,
+            link: 252
+          },
+          {
+            name: "B",
+            type: 0,
+            link: 250
+          }
+        ],
+        outputs: [
+          {
+            name: "true",
+            type: "boolean",
+            links: [
+              343
+            ],
+            slot_index: 0
+          },
+          {
+            name: "false",
+            type: "boolean",
+            links: null
+          }
+        ],
+        title: "GenericCompare",
+        properties: {
+          A: "txt2img",
+          B: "img2img",
+          OP: "==",
+          enabled: true,
+          tags: []
+        }
+      },
+      {
+        id: 219,
+        type: "basic/boolean",
+        pos: [
+          -1288.0000000000007,
+          817.700000000001
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 36,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "bool",
+            type: "boolean",
+            links: [
+              342
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const Boolean",
+        properties: {
+          value: false,
+          tags: []
+        }
+      },
+      {
+        id: 222,
+        type: "basic/boolean",
+        pos: [
+          -1302,
+          691
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 37,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "bool",
+            type: "boolean",
+            links: [
+              344
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const Boolean",
+        properties: {
+          value: 1,
+          tags: []
+        }
+      },
+      {
+        id: 220,
+        type: "actions/set_node_mode",
+        pos: [
+          -1232,
+          668
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: false
+        },
+        order: 87,
+        mode: 0,
+        inputs: [
+          {
+            name: "enabled",
+            type: "boolean",
+            link: 344
+          },
+          {
+            name: "set",
+            type: -1,
+            link: 347,
+            shape: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.SetNodeModeAction",
+        properties: {
+          targetTags: "i2i",
+          enable: false,
+          tags: []
+        },
+        saveUserState: true
+      },
+      {
+        id: 133,
+        type: "math/operation",
+        pos: [
+          1242,
+          214
+        ],
+        size: [
+          140,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 113,
+        mode: 0,
+        inputs: [
+          {
+            name: "A",
+            type: "number,array,object",
+            link: 199
+          },
+          {
+            name: "B",
+            type: "number",
+            link: 356
+          }
+        ],
+        outputs: [
+          {
+            name: "=",
+            type: "number",
+            links: [
+              206
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Operation",
+        properties: {
+          A: 2.1,
+          B: 1,
+          OP: "*",
+          tags: []
+        }
+      },
+      {
+        id: 129,
+        type: "math/operation",
+        pos: [
+          1240,
+          270
+        ],
+        size: [
+          140,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 112,
+        mode: 0,
+        inputs: [
+          {
+            name: "A",
+            type: "number,array,object",
+            link: 198
+          },
+          {
+            name: "B",
+            type: "number",
+            link: 357
+          }
+        ],
+        outputs: [
+          {
+            name: "=",
+            type: "number",
+            links: [
+              209
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Operation",
+        properties: {
+          A: 2.1,
+          B: 1,
+          OP: "*",
+          tags: []
+        }
+      },
+      {
+        id: 116,
+        type: "image/cache",
+        pos: [
+          868,
+          444
+        ],
+        size: [
+          210,
+          166
+        ],
+        flags: {},
+        order: 108,
+        mode: 0,
+        inputs: [
+          {
+            name: "images",
+            type: "OUTPUT",
+            link: null,
+            slot_index: 0
+          },
+          {
+            name: "index",
+            type: "number",
+            link: 168
+          },
+          {
+            name: "store",
+            type: -1,
+            link: 242,
+            shape: 1,
+            slot_index: 2
+          },
+          {
+            name: "clear",
+            type: -1,
+            link: 233,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "filename",
+            type: "string",
+            links: [
+              164
+            ],
+            slot_index: 0
+          },
+          {
+            name: "state",
+            type: "string",
+            links: [
+              165
+            ],
+            slot_index: 1
+          }
+        ],
+        title: "Comfy.ImageCache",
+        properties: {
+          tags: [],
+          images: null,
+          index: 0,
+          filenames: {},
+          genNumber: 0,
+          updateMode: "append"
+        },
+        saveUserState: false,
+        widgets_values: []
+      },
+      {
+        id: 118,
+        type: "basic/watch",
+        pos: [
+          1093,
+          665
+        ],
+        size: [
+          140,
+          26
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 109,
+        mode: 0,
+        inputs: [
+          {
+            name: "value",
+            type: 0,
+            link: 184,
+            label: "0.000"
+          }
+        ],
+        outputs: [],
+        title: "Watch",
+        properties: {
+          value: 1,
+          tags: []
+        }
+      },
+      {
+        id: 198,
+        type: "actions/swap",
+        pos: [
+          -640,
+          1113
+        ],
+        size: [
+          140,
+          66
+        ],
+        flags: {},
+        order: 129,
+        mode: 0,
+        inputs: [
+          {
+            name: "A",
+            type: "*",
+            link: 313
+          },
+          {
+            name: "B",
+            type: "*",
+            link: 316
+          },
+          {
+            name: "swap",
+            type: -1,
+            link: 312,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "B",
+            type: -2,
+            links: [
+              358
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "A",
+            type: -2,
+            links: [
+              359
+            ],
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        title: "Comfy.SwapAction",
+        properties: {
+          tags: [
+            "i2i",
+            "i2iPixelSize"
+          ]
+        },
+        saveUserState: true
+      },
+      {
+        id: 195,
+        type: "ui/slider",
+        pos: [
+          -481,
+          1160
+        ],
+        size: [
+          210,
+          158
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 127,
+        mode: 0,
+        inputs: [
+          {
+            name: "value",
+            type: "number",
+            link: null,
+            slot_index: 0
+          },
+          {
+            name: "store",
+            type: -1,
+            link: 358,
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "value",
+            type: "number",
+            links: [
+              316,
+              333
+            ],
+            slot_index: 0
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: null,
+            shape: 1
+          },
+          {
+            name: "min",
+            type: "number",
+            links: null
+          },
+          {
+            name: "max",
+            type: "number",
+            links: null
+          },
+          {
+            name: "step",
+            type: "number",
+            links: null
+          },
+          {
+            name: "precision",
+            type: "number",
+            links: null
+          }
+        ],
+        title: "UI.Slider",
+        properties: {
+          tags: [
+            "i2i",
+            "i2iPixelSize"
+          ],
+          defaultValue: 512,
+          min: 64,
+          max: 2048,
+          step: 64,
+          precision: 0,
+          hidden: false
+        },
+        widgets_values: [
+          "512.000"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: 512,
+        shownOutputProperties: {
+          min: {
+            type: "number",
+            index: 2
+          },
+          max: {
+            type: "number",
+            index: 3
+          },
+          step: {
+            type: "number",
+            index: 4
+          },
+          precision: {
+            type: "number",
+            index: 5
+          }
+        },
+        saveUserState: true
+      },
+      {
+        id: 196,
+        type: "ui/slider",
+        pos: [
+          -482,
+          1134
+        ],
+        size: [
+          210,
+          158
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 128,
+        mode: 0,
+        inputs: [
+          {
+            name: "value",
+            type: "number",
+            link: null
+          },
+          {
+            name: "store",
+            type: -1,
+            link: 359,
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "value",
+            type: "number",
+            links: [
+              313,
+              334
+            ],
+            slot_index: 0
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: null,
+            shape: 1
+          },
+          {
+            name: "min",
+            type: "number",
+            links: null
+          },
+          {
+            name: "max",
+            type: "number",
+            links: null
+          },
+          {
+            name: "step",
+            type: "number",
+            links: null
+          },
+          {
+            name: "precision",
+            type: "number",
+            links: null
+          }
+        ],
+        title: "UI.Slider",
+        properties: {
+          tags: [
+            "i2i",
+            "i2iPixelSize"
+          ],
+          defaultValue: 512,
+          min: 64,
+          max: 2048,
+          step: 64,
+          precision: 0,
+          hidden: false
+        },
+        widgets_values: [
+          "512.000"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: 512,
+        shownOutputProperties: {
+          min: {
+            type: "number",
+            index: 2
+          },
+          max: {
+            type: "number",
+            index: 3
+          },
+          step: {
+            type: "number",
+            index: 4
+          },
+          precision: {
+            type: "number",
+            index: 5
+          }
+        },
+        saveUserState: true
+      },
+      {
+        id: 210,
+        type: "math/floor",
+        pos: [
+          -254,
+          1130
+        ],
+        size: [
+          140,
+          26
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 75,
+        mode: 2,
+        inputs: [
+          {
+            name: "in",
+            type: "number",
+            link: 326
+          }
+        ],
+        outputs: [
+          {
+            name: "out",
+            type: "number",
+            links: [
+              325,
+              331
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Floor",
+        properties: {
+          tags: [
+            "i2i",
+            "i2iScaleSize"
+          ]
+        }
+      },
+      {
+        id: 203,
+        type: "ui/slider",
+        pos: [
+          -375,
+          1149
+        ],
+        size: [
+          210,
+          158
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 38,
+        mode: 2,
+        inputs: [
+          {
+            name: "value",
+            type: "number",
+            link: null
+          },
+          {
+            name: "store",
+            type: -1,
+            link: null,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "value",
+            type: "number",
+            links: [
+              320,
+              321
+            ],
+            slot_index: 0
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: null,
+            shape: 1
+          },
+          {
+            name: "min",
+            type: "number",
+            links: null
+          },
+          {
+            name: "max",
+            type: "number",
+            links: null
+          },
+          {
+            name: "step",
+            type: "number",
+            links: null
+          },
+          {
+            name: "precision",
+            type: "number",
+            links: null
+          }
+        ],
+        title: "UI.Slider",
+        properties: {
+          tags: [
+            "i2i",
+            "i2iScaleSize"
+          ],
+          defaultValue: 512,
+          min: 0.1,
+          max: 4,
+          step: 0.1,
+          precision: 0
+        },
+        widgets_values: [
+          "2.000"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: 2,
+        shownOutputProperties: {
+          min: {
+            type: "number",
+            index: 2
+          },
+          max: {
+            type: "number",
+            index: 3
+          },
+          step: {
+            type: "number",
+            index: 4
+          },
+          precision: {
+            type: "number",
+            index: 5
+          }
+        },
+        saveUserState: true
+      },
+      {
+        id: 212,
+        type: "utils/pick_first",
+        pos: [
+          -130,
+          1013
+        ],
+        size: [
+          210,
+          122
+        ],
+        flags: {},
+        order: 130,
+        mode: 0,
+        inputs: [
+          {
+            name: "A",
+            type: "*",
+            link: 331
+          },
+          {
+            name: "B",
+            type: "*",
+            link: 334
+          },
+          {
+            name: "C",
+            type: "*",
+            link: null
+          }
+        ],
+        outputs: [
+          {
+            name: "",
+            type: "*",
+            links: [
+              353
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Comfy.PickFirst",
+        properties: {
+          tags: [],
+          mode: "dataNonNull"
+        },
+        color: "#232",
+        bgColor: "#353",
+        saveUserState: true
+      },
+      {
+        id: 213,
+        type: "utils/pick_first",
+        pos: [
+          -129,
+          1168
+        ],
+        size: [
+          210,
+          122
+        ],
+        flags: {},
+        order: 131,
+        mode: 0,
+        inputs: [
+          {
+            name: "A",
+            type: "*",
+            link: 332
+          },
+          {
+            name: "B",
+            type: "*",
+            link: 333
+          },
+          {
+            name: "C",
+            type: "*",
+            link: null
+          }
+        ],
+        outputs: [
+          {
+            name: "",
+            type: "*",
+            links: [
+              354
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Comfy.PickFirst",
+        properties: {
+          tags: [],
+          mode: "dataNonNull"
+        },
+        color: "#232",
+        bgColor: "#353",
+        saveUserState: true
+      },
+      {
+        id: 214,
+        type: "ui/checkbox",
+        pos: [
+          -1087.988,
+          982.2430000000006
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 98,
+        mode: 2,
+        inputs: [
+          {
+            name: "value",
+            type: "boolean",
+            link: null
+          },
+          {
+            name: "store",
+            type: -1,
+            link: 352,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "value",
+            type: "boolean",
+            links: [
+              335,
+              336
+            ],
+            slot_index: 0
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: [
+              338,
+              339
+            ],
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        title: "UI.Checkbox",
+        properties: {
+          tags: [
+            "i2i"
+          ],
+          defaultValue: false
+        },
+        widgets_values: [
+          "null"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        shownOutputProperties: {},
+        saveUserState: true
+      },
+      {
+        id: 164,
+        type: "actions/set_node_mode",
+        pos: [
+          -1225,
+          524
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: false
+        },
+        order: 78,
+        mode: 0,
+        inputs: [
+          {
+            name: "enabled",
+            type: "boolean",
+            link: 253
+          },
+          {
+            name: "set",
+            type: -1,
+            link: 265,
+            shape: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.SetNodeModeAction",
+        properties: {
+          targetTags: "t2i",
+          enable: false,
+          tags: []
+        },
+        saveUserState: true
+      },
+      {
+        id: 109,
+        type: "ui/button",
+        pos: [
+          1380,
+          342
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 39,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "clicked",
+            type: -2,
+            links: [
+              360
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "isClicked",
+            type: "boolean",
+            links: null
+          }
+        ],
+        title: "UI.Button",
+        properties: {
+          tags: [],
+          defaultValue: false,
+          param: "bang",
+          message: "bang"
+        },
+        widgets_values: [
+          "false"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: false,
+        shownOutputProperties: {},
+        saveUserState: true
+      },
+      {
+        id: 104,
+        type: "ui/gallery",
+        pos: [
+          862.248693361997,
+          640.4778575549986
+        ],
+        size: [
+          210,
+          142
+        ],
+        flags: {},
+        order: 104,
+        mode: 0,
+        inputs: [
+          {
+            name: "images",
+            type: "OUTPUT",
+            link: null
+          },
+          {
+            name: "store",
+            type: -1,
+            link: 243,
+            shape: 1
+          },
+          {
+            name: "clear",
+            type: -1,
+            link: 229,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "selected_index",
+            type: "number",
+            links: [
+              168,
+              184
+            ],
+            slot_index: 0
+          },
+          {
+            name: "width",
+            type: "number",
+            links: [
+              356
+            ],
+            slot_index: 1
+          },
+          {
+            name: "height",
+            type: "number",
+            links: [
+              357
+            ],
+            slot_index: 2
+          },
+          {
+            name: "any_selected",
+            type: "boolean",
+            links: [
+              363
+            ],
+            slot_index: 3
+          }
+        ],
+        title: "UI.Gallery",
+        properties: {
+          tags: [],
+          defaultValue: null,
+          index: 0,
+          updateMode: "append",
+          values: []
+        },
+        widgets_values: [],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: [],
+        shownOutputProperties: {},
+        saveUserState: false
+      },
+      {
+        id: 231,
+        type: "basic/string",
+        pos: [
+          1523,
+          444
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 40,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "string",
+            type: "string",
+            links: [
+              365
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const String",
+        properties: {
+          value: "Select an image from the Result gallery to upscale first.",
+          tags: []
+        }
+      },
+      {
+        id: 123,
+        type: "basic/string",
+        pos: [
+          2021,
+          249
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 41,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "string",
+            type: "string",
+            links: [
+              185
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const String",
+        properties: {
+          value: "Upscale complete!",
+          tags: []
+        }
+      },
+      {
+        id: 157,
+        type: "SaveImage",
+        pos: [
+          377,
+          241
+        ],
+        size: [
+          220,
+          46
+        ],
+        flags: {},
+        order: 120,
+        mode: 0,
+        inputs: [
+          {
+            name: "images",
+            type: "IMAGE",
+            link: 245,
+            config: {}
+          },
+          {
+            name: "filename_prefix",
+            type: "string",
+            link: 310,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/text",
+            serialize: true
+          }
+        ],
+        outputs: [
+          {
+            name: "onExecuted",
+            type: -2,
+            links: [
+              242,
+              243
+            ],
+            color_off: "rebeccapurple",
+            color_on: "rebeccapurple",
+            shape: 1,
+            slot_index: 0
+          }
+        ],
+        title: "SaveImage",
+        properties: {
+          tags: [
+            "txt2img"
+          ]
+        },
+        color: "#432",
+        bgColor: "#653",
+        saveUserState: true
+      },
+      {
+        id: 127,
+        type: "actions/execute_subgraph",
+        pos: [
+          712,
+          1076
+        ],
+        size: [
+          226.79999999999998,
+          78
+        ],
+        flags: {},
+        order: 96,
+        mode: 0,
+        inputs: [
+          {
+            name: "execute",
+            type: -1,
+            link: 368,
+            shape: 1
+          },
+          {
+            name: "tag",
+            type: "string",
+            link: null
+          }
+        ],
+        outputs: [],
+        title: "Comfy.ExecuteSubgraphAction",
+        properties: {
+          tags: [],
+          targetTag: "txt2img",
+          tag: "txt2img"
+        },
+        saveUserState: true
+      },
+      {
+        id: 199,
+        type: "ui/image_upload",
+        pos: [
+          -485,
+          894
+        ],
+        size: [
+          210,
+          118
+        ],
+        flags: {},
+        order: 42,
+        mode: 2,
+        inputs: [],
+        outputs: [
+          {
+            name: "filename",
+            type: "string",
+            links: [
+              317,
+              372
+            ],
+            slot_index: 0
+          },
+          {
+            name: "width",
+            type: "number",
+            links: [
+              328
+            ],
+            slot_index: 1
+          },
+          {
+            name: "height",
+            type: "number",
+            links: [
+              329
+            ],
+            slot_index: 2
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: null,
+            shape: 1
+          }
+        ],
+        title: "UI.ImageUpload",
+        properties: {
+          defaultValue: null,
+          tags: [
+            "i2i"
+          ],
+          fileCount: "single"
+        },
+        widgets_values: [],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: [],
+        shownOutputProperties: {},
+        saveUserState: false
+      },
+      {
+        id: 238,
+        type: "basic/string",
+        pos: [
+          184.80000000000013,
+          1195.4999999999986
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 43,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "string",
+            type: "string",
+            links: [
+              373
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const String",
+        properties: {
+          value: "",
+          tags: []
+        }
+      },
+      {
+        id: 237,
+        type: "string/compare",
+        pos: [
+          239.80000000000004,
+          1200.4999999999986
+        ],
+        size: [
+          140,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 63,
+        mode: 0,
+        inputs: [
+          {
+            name: "A",
+            type: "string",
+            link: 372
+          },
+          {
+            name: "B",
+            type: "string",
+            link: 373
+          }
+        ],
+        outputs: [
+          {
+            name: "==",
+            type: "boolean",
+            links: [
+              374
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Compare",
+        properties: {
+          tags: []
+        }
+      },
+      {
+        id: 235,
+        type: "basic/string",
+        pos: [
+          139.80000000000018,
+          1150.4999999999986
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 44,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "string",
+            type: "string",
+            links: [
+              369
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const String",
+        properties: {
+          value: "img2img",
+          tags: []
+        }
+      },
+      {
+        id: 236,
+        type: "logic/AND",
+        pos: [
+          345.80000000000007,
+          1176.4999999999986
+        ],
+        size: [
+          140,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 77,
+        mode: 0,
+        inputs: [
+          {
+            name: "a",
+            type: "boolean",
+            link: 371
+          },
+          {
+            name: "b",
+            type: "boolean",
+            link: 374
+          }
+        ],
+        outputs: [
+          {
+            name: "out",
+            type: "boolean",
+            links: [
+              375
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "AND",
+        properties: {
+          tags: []
+        }
+      },
+      {
+        id: 239,
+        type: "logic/NOT",
+        pos: [
+          437.8,
+          1172.4999999999986
+        ],
+        size: [
+          140,
+          26
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 86,
+        mode: 0,
+        inputs: [
+          {
+            name: "in",
+            type: "boolean",
+            link: 375
+          }
+        ],
+        outputs: [
+          {
+            name: "out",
+            type: "boolean",
+            links: [
+              376
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "NOT",
+        properties: {
+          tags: []
+        }
+      },
+      {
+        id: 126,
+        type: "ui/button",
+        pos: [
+          396,
+          1124
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 45,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "clicked",
+            type: -2,
+            links: [
+              367
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "isClicked",
+            type: "boolean",
+            links: null
+          }
+        ],
+        title: "UI.Button",
+        properties: {
+          tags: [],
+          defaultValue: false,
+          param: "bang",
+          message: "bang"
+        },
+        widgets_values: [
+          "false"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: false,
+        shownOutputProperties: {},
+        saveUserState: true
+      },
+      {
+        id: 233,
+        type: "events/branch",
+        pos: [
+          533,
+          1099
+        ],
+        size: [
+          140,
+          46
+        ],
+        flags: {},
+        order: 93,
+        mode: 0,
+        inputs: [
+          {
+            name: "in",
+            type: -1,
+            link: 367,
+            shape: 1
+          },
+          {
+            name: "cond",
+            type: "boolean",
+            link: 376
+          }
+        ],
+        outputs: [
+          {
+            name: "true",
+            type: -2,
+            links: [
+              368
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "false",
+            type: -2,
+            links: [
+              379
+            ],
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        title: "Branch",
+        properties: {
+          tags: []
+        }
+      },
+      {
+        id: 240,
+        type: "actions/notify",
+        pos: [
+          750,
+          1231
+        ],
+        size: [
+          151.2,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 97,
+        mode: 0,
+        inputs: [
+          {
+            name: "message",
+            type: "string",
+            link: 378
+          },
+          {
+            name: "trigger",
+            type: -1,
+            link: 379,
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.NotifyAction",
+        properties: {
+          message: "Nya.",
+          tags: []
+        },
+        saveUserState: true
+      },
+      {
+        id: 241,
+        type: "basic/string",
+        pos: [
+          724,
+          1198
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 46,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "string",
+            type: "string",
+            links: [
+              378
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const String",
+        properties: {
+          value: "Upload an image to be used with img2img first.",
+          tags: []
+        }
+      },
+      {
+        id: 234,
+        type: "string/compare",
+        pos: [
+          241,
+          1153
+        ],
+        size: [
+          140,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 66,
+        mode: 0,
+        inputs: [
+          {
+            name: "A",
+            type: "string",
+            link: 370
+          },
+          {
+            name: "B",
+            type: "string",
+            link: 369
+          }
+        ],
+        outputs: [
+          {
+            name: "==",
+            type: "boolean",
+            links: [
+              371
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Compare",
+        properties: {
+          tags: []
+        }
+      },
+      {
+        id: 163,
+        type: "ui/radio",
+        pos: [
+          -1969,
+          495
+        ],
+        size: [
+          210,
+          122
+        ],
+        flags: {
+          collapsed: false
+        },
+        order: 47,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "value",
+            type: "string",
+            links: [
+              251,
+              252,
+              370
+            ],
+            slot_index: 0
+          },
+          {
+            name: "index",
+            type: "number",
+            links: null
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: [
+              266,
+              268
+            ],
+            shape: 1,
+            slot_index: 2
+          }
+        ],
+        title: "UI.Radio",
+        properties: {
+          tags: [],
+          choices: [
+            "txt2img",
+            "img2img"
+          ],
+          defaultValue: "Choice A"
+        },
+        widgets_values: [
+          "txt2img",
+          0
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: "txt2img",
+        shownOutputProperties: {},
+        saveUserState: true
+      },
+      {
+        id: 174,
+        type: "events/frame_delay",
+        pos: [
+          -1780,
+          674
+        ],
+        size: [
+          140,
+          26
+        ],
+        flags: {
+          collapsed: false
+        },
+        order: 68,
+        mode: 0,
+        inputs: [
+          {
+            name: "event",
+            type: -1,
+            link: 268,
+            shape: 1,
+            slot_index: 0
+          }
+        ],
+        outputs: [
+          {
+            name: "on_time",
+            type: -2,
+            links: [
+              381
+            ],
+            shape: 1,
+            slot_index: 0
+          }
+        ],
+        title: "Frame Delay",
+        properties: {
+          timeInFrames: 3,
+          tags: []
+        }
+      },
+      {
+        id: 218,
+        type: "events/branch",
+        pos: [
+          -1633,
+          668
+        ],
+        size: [
+          140,
+          46
+        ],
+        flags: {},
+        order: 79,
+        mode: 0,
+        inputs: [
+          {
+            name: "in",
+            type: -1,
+            link: 381,
+            shape: 1
+          },
+          {
+            name: "cond",
+            type: "boolean",
+            link: 343
+          }
+        ],
+        outputs: [
+          {
+            name: "true",
+            type: -2,
+            links: [
+              347
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "false",
+            type: -2,
+            links: [
+              382
+            ],
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        title: "Branch",
+        properties: {
+          tags: []
+        }
+      },
+      {
+        id: 243,
+        type: "events/sequence",
+        pos: [
+          -1452,
+          761
+        ],
+        size: [
+          210,
+          98
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 88,
+        mode: 0,
+        inputs: [
+          {
+            name: "",
+            type: -1,
+            link: 382,
+            shape: 1
+          },
+          {
+            name: "",
+            type: -1,
+            link: null,
+            shape: 1
+          },
+          {
+            name: "",
+            type: -1,
+            link: null,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "",
+            type: -2,
+            links: [
+              383
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "",
+            type: -2,
+            links: [
+              384
+            ],
+            shape: 1,
+            slot_index: 1
+          },
+          {
+            name: "",
+            type: -2,
+            links: null,
+            shape: 1
+          }
+        ],
+        title: "Sequence",
+        properties: {
+          tags: []
+        }
+      },
+      {
+        id: 226,
+        type: "basic/boolean",
+        pos: [
+          -1425.8069999999982,
+          953.7649999999993
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 48,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "bool",
+            type: "boolean",
+            links: [
+              350
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const Boolean",
+        properties: {
+          value: false,
+          tags: []
+        }
+      },
+      {
+        id: 165,
+        type: "actions/set_node_mode",
+        pos: [
+          -1211,
+          797
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: false
+        },
+        order: 94,
+        mode: 0,
+        inputs: [
+          {
+            name: "enabled",
+            type: "boolean",
+            link: 342
+          },
+          {
+            name: "set",
+            type: -1,
+            link: 383,
+            shape: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.SetNodeModeAction",
+        properties: {
+          targetTags: "i2i",
+          enable: false,
+          tags: []
+        },
+        saveUserState: true
+      },
+      {
+        id: 16,
+        type: "KSampler",
+        pos: [
+          188,
+          150
+        ],
+        size: [
+          161.2,
+          206
+        ],
+        flags: {},
+        order: 122,
+        mode: 0,
+        inputs: [
+          {
+            name: "model",
+            type: "MODEL",
+            link: 112,
+            color_off: "orange",
+            color_on: "orange",
+            config: {}
+          },
+          {
+            name: "seed",
+            type: "number",
+            link: 80,
+            config: {},
+            serialize: true
+          },
+          {
+            name: "steps",
+            type: "number",
+            link: 17,
+            config: {},
+            serialize: true
+          },
+          {
+            name: "cfg",
+            type: "number",
+            link: 18,
+            config: {},
+            serialize: true
+          },
+          {
+            name: "sampler_name",
+            type: "string",
+            link: 19,
+            config: {},
+            serialize: true
+          },
+          {
+            name: "scheduler",
+            type: "string",
+            link: 20,
+            config: {},
+            serialize: true
+          },
+          {
+            name: "positive",
+            type: "CONDITIONING",
+            link: 33,
+            color_off: "orange",
+            color_on: "orange",
+            config: {}
+          },
+          {
+            name: "negative",
+            type: "CONDITIONING",
+            link: 32,
+            color_off: "orange",
+            color_on: "orange",
+            config: {}
+          },
+          {
+            name: "latent_image",
+            type: "LATENT",
+            link: 288,
+            color_off: "orange",
+            color_on: "orange",
+            config: {}
+          },
+          {
+            name: "denoise",
+            type: "number",
+            link: 299,
+            config: {},
+            serialize: true
+          }
+        ],
+        outputs: [
+          {
+            name: "LATENT",
+            type: "LATENT",
+            links: [
+              40
+            ],
+            color_off: "orange",
+            color_on: "orange",
+            slot_index: 0
+          }
+        ],
+        title: "KSampler",
+        properties: {
+          tags: [
+            "txt2img"
+          ]
+        },
+        color: "#432",
+        bgColor: "#653",
+        saveUserState: true
+      },
+      {
+        id: 215,
+        type: "actions/set_node_mode",
+        pos: [
+          -862.66,
+          921.2869999999992
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {},
+        order: 100,
+        mode: 0,
+        inputs: [
+          {
+            name: "enabled",
+            type: "boolean",
+            link: 335
+          },
+          {
+            name: "set",
+            type: -1,
+            link: 338,
+            shape: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.SetNodeModeAction",
+        properties: {
+          targetTags: "i2iScaleSize",
+          enable: false,
+          tags: []
+        },
+        saveUserState: true
+      },
+      {
+        id: 225,
+        type: "actions/copy",
+        pos: [
+          -1340,
+          934
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: false
+        },
+        order: 95,
+        mode: 0,
+        inputs: [
+          {
+            name: "in",
+            type: "*",
+            link: 350
+          },
+          {
+            name: "copy",
+            type: -1,
+            link: 384,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "out",
+            type: -2,
+            links: [
+              352
+            ],
+            shape: 1,
+            slot_index: 0
+          }
+        ],
+        title: "Comfy.CopyAction",
+        properties: {
+          value: false,
+          tags: []
+        },
+        saveUserState: true
+      },
+      {
+        id: 217,
+        type: "actions/set_node_mode",
+        pos: [
+          -864,
+          1034
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {},
+        order: 101,
+        mode: 0,
+        inputs: [
+          {
+            name: "enabled",
+            type: "boolean",
+            link: 337
+          },
+          {
+            name: "set",
+            type: -1,
+            link: 339,
+            shape: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.SetNodeModeAction",
+        properties: {
+          targetTags: "i2iPixelSize",
+          enable: false,
+          tags: []
+        },
+        saveUserState: true
+      },
+      {
+        id: 230,
+        type: "actions/notify",
+        pos: [
+          1543,
+          481
+        ],
+        size: [
+          151.2,
+          46
+        ],
+        flags: {},
+        order: 133,
+        mode: 0,
+        inputs: [
+          {
+            name: "message",
+            type: "string",
+            link: 365
+          },
+          {
+            name: "trigger",
+            type: -1,
+            link: 364,
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.NotifyAction",
+        properties: {
+          message: "Nya.",
+          tags: []
+        },
+        saveUserState: true
+      },
+      {
+        id: 228,
+        type: "events/branch",
+        pos: [
+          1307,
+          480
+        ],
+        size: [
+          140,
+          46
+        ],
+        flags: {},
+        order: 132,
+        mode: 0,
+        inputs: [
+          {
+            name: "in",
+            type: -1,
+            link: 360,
+            shape: 1
+          },
+          {
+            name: "cond",
+            type: "boolean",
+            link: 363
+          }
+        ],
+        outputs: [
+          {
+            name: "true",
+            type: -2,
+            links: [
+              361
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "false",
+            type: -2,
+            links: [
+              364
+            ],
+            shape: 1
+          }
+        ],
+        title: "Branch",
+        properties: {
+          tags: []
+        }
+      },
+      {
+        id: 110,
+        type: "actions/execute_subgraph",
+        pos: [
+          1558,
+          313
+        ],
+        size: [
+          226.79999999999998,
+          78
+        ],
+        flags: {},
+        order: 106,
+        mode: 0,
+        inputs: [
+          {
+            name: "execute",
+            type: -1,
+            link: 361,
+            shape: 1
+          },
+          {
+            name: "tag",
+            type: "string",
+            link: null
+          }
+        ],
+        outputs: [],
+        title: "Comfy.ExecuteSubgraphAction",
+        properties: {
+          tags: [],
+          targetTag: "hr",
+          tag: "hr"
         },
         saveUserState: true
       }
@@ -7173,22 +8367,6 @@ const defaultGraph: SerializedAppState = {
         -1
       ],
       [
-        151,
-        109,
-        0,
-        110,
-        0,
-        -1
-      ],
-      [
-        152,
-        111,
-        0,
-        110,
-        1,
-        "string"
-      ],
-      [
         155,
         112,
         0,
@@ -7325,22 +8503,6 @@ const defaultGraph: SerializedAppState = {
         "string"
       ],
       [
-        191,
-        126,
-        0,
-        127,
-        0,
-        -1
-      ],
-      [
-        192,
-        128,
-        0,
-        127,
-        1,
-        "string"
-      ],
-      [
         198,
         93,
         0,
@@ -7355,22 +8517,6 @@ const defaultGraph: SerializedAppState = {
         133,
         0,
         "number,array,object"
-      ],
-      [
-        200,
-        37,
-        0,
-        133,
-        1,
-        "number"
-      ],
-      [
-        201,
-        38,
-        0,
-        129,
-        1,
-        "number"
       ],
       [
         203,
@@ -7557,14 +8703,6 @@ const defaultGraph: SerializedAppState = {
         -1
       ],
       [
-        238,
-        45,
-        0,
-        159,
-        1,
-        "string"
-      ],
-      [
         239,
         100,
         0,
@@ -7605,28 +8743,12 @@ const defaultGraph: SerializedAppState = {
         -1
       ],
       [
-        244,
-        45,
-        0,
-        157,
-        1,
-        "string"
-      ],
-      [
         245,
         40,
         0,
         157,
         0,
         "IMAGE"
-      ],
-      [
-        246,
-        162,
-        0,
-        161,
-        0,
-        "string"
       ],
       [
         249,
@@ -7669,14 +8791,6 @@ const defaultGraph: SerializedAppState = {
         "boolean"
       ],
       [
-        254,
-        169,
-        0,
-        165,
-        0,
-        "boolean"
-      ],
-      [
         265,
         173,
         0,
@@ -7690,14 +8804,6 @@ const defaultGraph: SerializedAppState = {
         2,
         173,
         0,
-        -1
-      ],
-      [
-        267,
-        174,
-        0,
-        165,
-        1,
         -1
       ],
       [
@@ -7805,22 +8911,6 @@ const defaultGraph: SerializedAppState = {
         "LATENT"
       ],
       [
-        282,
-        37,
-        0,
-        182,
-        2,
-        "number"
-      ],
-      [
-        283,
-        38,
-        0,
-        182,
-        3,
-        "number"
-      ],
-      [
         284,
         183,
         0,
@@ -7867,30 +8957,6 @@ const defaultGraph: SerializedAppState = {
         79,
         0,
         "MODEL"
-      ],
-      [
-        293,
-        161,
-        0,
-        187,
-        0,
-        "IMAGE"
-      ],
-      [
-        294,
-        187,
-        0,
-        186,
-        1,
-        -1
-      ],
-      [
-        295,
-        162,
-        1,
-        188,
-        0,
-        -1
       ],
       [
         296,
@@ -7963,6 +9029,486 @@ const defaultGraph: SerializedAppState = {
         17,
         1,
         -1
+      ],
+      [
+        308,
+        45,
+        0,
+        193,
+        0,
+        "*"
+      ],
+      [
+        309,
+        194,
+        0,
+        193,
+        1,
+        "*"
+      ],
+      [
+        310,
+        193,
+        0,
+        157,
+        1,
+        "string"
+      ],
+      [
+        311,
+        193,
+        0,
+        159,
+        1,
+        "string"
+      ],
+      [
+        312,
+        197,
+        0,
+        198,
+        2,
+        -1
+      ],
+      [
+        313,
+        196,
+        0,
+        198,
+        0,
+        "*"
+      ],
+      [
+        316,
+        195,
+        0,
+        198,
+        1,
+        "*"
+      ],
+      [
+        317,
+        199,
+        0,
+        161,
+        0,
+        "string"
+      ],
+      [
+        320,
+        203,
+        0,
+        204,
+        0,
+        "number,array,object"
+      ],
+      [
+        321,
+        203,
+        0,
+        205,
+        0,
+        "number,array,object"
+      ],
+      [
+        322,
+        209,
+        0,
+        206,
+        0,
+        "string"
+      ],
+      [
+        323,
+        208,
+        0,
+        207,
+        0,
+        "string"
+      ],
+      [
+        324,
+        211,
+        0,
+        208,
+        0,
+        "number"
+      ],
+      [
+        325,
+        210,
+        0,
+        209,
+        0,
+        "number"
+      ],
+      [
+        326,
+        205,
+        0,
+        210,
+        0,
+        "number"
+      ],
+      [
+        327,
+        204,
+        0,
+        211,
+        0,
+        "number"
+      ],
+      [
+        328,
+        199,
+        1,
+        205,
+        1,
+        "number"
+      ],
+      [
+        329,
+        199,
+        2,
+        204,
+        1,
+        "number"
+      ],
+      [
+        331,
+        210,
+        0,
+        212,
+        0,
+        "*"
+      ],
+      [
+        332,
+        211,
+        0,
+        213,
+        0,
+        "*"
+      ],
+      [
+        333,
+        195,
+        0,
+        213,
+        1,
+        "*"
+      ],
+      [
+        334,
+        196,
+        0,
+        212,
+        1,
+        "*"
+      ],
+      [
+        335,
+        214,
+        0,
+        215,
+        0,
+        "boolean"
+      ],
+      [
+        336,
+        214,
+        0,
+        216,
+        0,
+        "boolean"
+      ],
+      [
+        337,
+        216,
+        0,
+        217,
+        0,
+        "boolean"
+      ],
+      [
+        338,
+        214,
+        1,
+        215,
+        1,
+        -1
+      ],
+      [
+        339,
+        214,
+        1,
+        217,
+        1,
+        -1
+      ],
+      [
+        342,
+        219,
+        0,
+        165,
+        0,
+        "boolean"
+      ],
+      [
+        343,
+        169,
+        0,
+        218,
+        1,
+        "boolean"
+      ],
+      [
+        344,
+        222,
+        0,
+        220,
+        0,
+        "boolean"
+      ],
+      [
+        347,
+        218,
+        0,
+        220,
+        1,
+        -1
+      ],
+      [
+        350,
+        226,
+        0,
+        225,
+        0,
+        "*"
+      ],
+      [
+        352,
+        225,
+        0,
+        214,
+        1,
+        -1
+      ],
+      [
+        353,
+        212,
+        0,
+        182,
+        2,
+        "number"
+      ],
+      [
+        354,
+        213,
+        0,
+        182,
+        3,
+        "number"
+      ],
+      [
+        356,
+        104,
+        1,
+        133,
+        1,
+        "number"
+      ],
+      [
+        357,
+        104,
+        2,
+        129,
+        1,
+        "number"
+      ],
+      [
+        358,
+        198,
+        0,
+        195,
+        1,
+        -1
+      ],
+      [
+        359,
+        198,
+        1,
+        196,
+        1,
+        -1
+      ],
+      [
+        360,
+        109,
+        0,
+        228,
+        0,
+        -1
+      ],
+      [
+        361,
+        228,
+        0,
+        110,
+        0,
+        -1
+      ],
+      [
+        363,
+        104,
+        3,
+        228,
+        1,
+        "boolean"
+      ],
+      [
+        364,
+        228,
+        1,
+        230,
+        1,
+        -1
+      ],
+      [
+        365,
+        231,
+        0,
+        230,
+        0,
+        "string"
+      ],
+      [
+        367,
+        126,
+        0,
+        233,
+        0,
+        -1
+      ],
+      [
+        368,
+        233,
+        0,
+        127,
+        0,
+        -1
+      ],
+      [
+        369,
+        235,
+        0,
+        234,
+        1,
+        "string"
+      ],
+      [
+        370,
+        163,
+        0,
+        234,
+        0,
+        "string"
+      ],
+      [
+        371,
+        234,
+        0,
+        236,
+        0,
+        "boolean"
+      ],
+      [
+        372,
+        199,
+        0,
+        237,
+        0,
+        "string"
+      ],
+      [
+        373,
+        238,
+        0,
+        237,
+        1,
+        "string"
+      ],
+      [
+        374,
+        237,
+        0,
+        236,
+        1,
+        "boolean"
+      ],
+      [
+        375,
+        236,
+        0,
+        239,
+        0,
+        "boolean"
+      ],
+      [
+        376,
+        239,
+        0,
+        233,
+        1,
+        "boolean"
+      ],
+      [
+        378,
+        241,
+        0,
+        240,
+        0,
+        "string"
+      ],
+      [
+        379,
+        233,
+        1,
+        240,
+        1,
+        -1
+      ],
+      [
+        381,
+        174,
+        0,
+        218,
+        0,
+        -1
+      ],
+      [
+        382,
+        218,
+        1,
+        243,
+        0,
+        -1
+      ],
+      [
+        383,
+        243,
+        0,
+        165,
+        1,
+        -1
+      ],
+      [
+        384,
+        243,
+        1,
+        225,
+        1,
+        -1
       ]
     ],
     groups: [
@@ -8023,9 +9569,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8033,6 +9578,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: false,
             blockVariant: "block"
           }
@@ -8051,9 +9598,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8061,6 +9607,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: false,
             blockVariant: "block"
           }
@@ -8084,9 +9632,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8094,6 +9641,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: false,
             blockVariant: "block"
           }
@@ -8110,13 +9659,12 @@ const defaultGraph: SerializedAppState = {
           id: "10",
           nodeId: 17,
           attrs: {
-            title: "seed",
+            title: "Seed",
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8124,6 +9672,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8136,13 +9686,12 @@ const defaultGraph: SerializedAppState = {
           id: "11",
           nodeId: 18,
           attrs: {
-            title: "steps",
+            title: "Steps",
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8150,6 +9699,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8162,13 +9713,12 @@ const defaultGraph: SerializedAppState = {
           id: "12",
           nodeId: 19,
           attrs: {
-            title: "cfg",
+            title: "CFG Scale",
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8176,6 +9726,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8192,9 +9744,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8202,6 +9753,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: false
           }
         },
@@ -8218,9 +9771,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8228,6 +9780,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: false
           }
         },
@@ -8240,13 +9794,12 @@ const defaultGraph: SerializedAppState = {
           id: "15",
           nodeId: 22,
           attrs: {
-            title: "denoise",
+            title: "Denoise",
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8254,6 +9807,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             max: 2
           }
@@ -8270,9 +9825,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "accordion",
             containerVariant: "block",
@@ -8280,6 +9834,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "block"
           }
@@ -8302,9 +9858,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8312,6 +9867,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8327,9 +9884,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "accordion",
             containerVariant: "hidden",
@@ -8337,6 +9893,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "hidden",
             tabNames: [
@@ -8361,9 +9919,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8371,6 +9928,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8383,13 +9942,12 @@ const defaultGraph: SerializedAppState = {
           id: "30",
           nodeId: 37,
           attrs: {
-            title: "width",
+            title: "Width",
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "hidden",
             variant: "gallery",
             containerVariant: "block",
@@ -8397,6 +9955,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8409,13 +9969,12 @@ const defaultGraph: SerializedAppState = {
           id: "31",
           nodeId: 38,
           attrs: {
-            title: "height",
+            title: "Height",
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "hidden",
             variant: "gallery",
             containerVariant: "block",
@@ -8423,6 +9982,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8435,13 +9996,12 @@ const defaultGraph: SerializedAppState = {
           id: "32",
           nodeId: 39,
           attrs: {
-            title: "batch_size",
+            title: "Batch Size",
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8449,6 +10009,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8464,9 +10026,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "accordion",
             containerVariant: "block",
@@ -8474,14 +10035,18 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "block"
           }
         },
         children: [
-          "102",
+          "129",
           "47",
+          "122",
           "111",
+          "127",
           "109"
         ],
         parent: "1"
@@ -8496,9 +10061,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8506,6 +10070,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8521,9 +10087,8 @@ const defaultGraph: SerializedAppState = {
             hidden: true,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8531,6 +10096,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "block"
           }
@@ -8544,13 +10111,12 @@ const defaultGraph: SerializedAppState = {
           id: "42",
           nodeId: 57,
           attrs: {
-            title: "action",
+            title: "Seed Action",
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "testClas",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8558,6 +10124,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8574,9 +10142,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 1,
-            height: "auto",
             classes: "",
+            style: "flex-grow: 1;",
             nodeDisabledState: "hidden",
             variant: "gallery",
             containerVariant: "block",
@@ -8584,6 +10151,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "secondary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 1,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8599,16 +10168,19 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "hidden",
             openOnStartup: false,
             buttonVariant: "primary",
             buttonSize: "large",
-            tags: [],
+            tags: [
+              "t2i"
+            ],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "hidden"
           }
@@ -8629,9 +10201,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "hidden",
@@ -8639,6 +10210,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "hidden"
           }
@@ -8659,9 +10232,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8669,6 +10241,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8684,9 +10258,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "hidden",
@@ -8694,6 +10267,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: false,
             blockVariant: "hidden"
           }
@@ -8713,9 +10288,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "hidden",
@@ -8723,6 +10297,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "hidden"
           }
@@ -8743,9 +10319,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8753,6 +10328,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8769,9 +10346,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8779,6 +10355,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8795,9 +10373,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8805,6 +10382,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8820,9 +10399,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "accordion",
             containerVariant: "block",
@@ -8830,6 +10408,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "block"
           }
@@ -8849,9 +10429,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "block",
             containerVariant: "block",
@@ -8859,6 +10438,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "block"
           }
@@ -8880,9 +10461,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8890,6 +10470,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8902,13 +10484,12 @@ const defaultGraph: SerializedAppState = {
           id: "66",
           nodeId: 93,
           attrs: {
-            title: "scale",
+            title: "Scale By",
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8916,6 +10497,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8932,9 +10515,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8942,6 +10524,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8958,9 +10542,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -8968,6 +10551,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -8983,9 +10568,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "hidden",
@@ -8993,6 +10577,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "hidden"
           }
@@ -9011,9 +10597,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "hidden",
@@ -9021,6 +10606,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "hidden"
           }
@@ -9041,9 +10628,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -9051,6 +10637,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -9067,9 +10655,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: true,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -9077,6 +10664,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -9093,9 +10682,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -9103,6 +10691,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -9118,9 +10708,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "accordion",
             containerVariant: "block",
@@ -9128,6 +10717,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "block"
           }
@@ -9150,9 +10741,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "block",
             containerVariant: "hidden",
@@ -9160,6 +10750,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "hidden"
           }
@@ -9179,9 +10771,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "hidden",
@@ -9189,6 +10780,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true,
             blockVariant: "hidden"
           }
@@ -9205,13 +10798,12 @@ const defaultGraph: SerializedAppState = {
           id: "84",
           nodeId: 121,
           attrs: {
-            title: "steps",
+            title: "Steps",
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -9219,6 +10811,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -9235,9 +10829,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -9245,6 +10838,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -9260,9 +10855,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -9270,6 +10864,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -9288,9 +10884,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: true,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -9298,6 +10893,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -9314,9 +10911,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: true,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
@@ -9324,6 +10920,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -9339,9 +10937,8 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "block",
             containerVariant: "block",
@@ -9349,6 +10946,8 @@ const defaultGraph: SerializedAppState = {
             buttonVariant: "primary",
             buttonSize: "large",
             tags: [],
+            flexGrow: 100,
+            height: "auto",
             showTitle: true
           }
         },
@@ -9368,16 +10967,17 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 1,
-            height: "auto",
             classes: "",
+            style: "flex-grow: 1;",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
             openOnStartup: false,
             buttonVariant: "secondary",
             buttonSize: "small",
-            tags: []
+            tags: [],
+            flexGrow: 1,
+            height: "auto"
           }
         },
         children: [],
@@ -9393,16 +10993,17 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
             openOnStartup: false,
             buttonVariant: "primary",
             buttonSize: "large",
-            tags: []
+            tags: [],
+            flexGrow: 100,
+            height: "auto"
           }
         },
         children: [],
@@ -9417,16 +11018,17 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "block",
             containerVariant: "hidden",
             openOnStartup: false,
             buttonVariant: "primary",
             buttonSize: "large",
-            tags: []
+            tags: [],
+            flexGrow: 100,
+            height: "auto"
           }
         },
         children: [
@@ -9444,16 +11046,17 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "accordion",
             containerVariant: "hidden",
             openOnStartup: true,
             buttonVariant: "primary",
             buttonSize: "large",
-            tags: []
+            tags: [],
+            flexGrow: 100,
+            height: "auto"
           }
         },
         children: [
@@ -9463,55 +11066,31 @@ const defaultGraph: SerializedAppState = {
         ],
         parent: "2"
       },
-      100: {
-        dragItem: {
-          type: "widget",
-          id: "100",
-          nodeId: 162,
-          attrs: {
-            title: "image",
-            hidden: false,
-            disabled: false,
-            direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
-            classes: "",
-            nodeDisabledState: "hidden",
-            variant: "gallery",
-            containerVariant: "block",
-            openOnStartup: false,
-            buttonVariant: "primary",
-            buttonSize: "large",
-            tags: []
-          }
-        },
-        children: [],
-        parent: "112"
-      },
       102: {
         dragItem: {
           type: "widget",
           id: "102",
           nodeId: 163,
           attrs: {
-            title: "Widget",
+            title: "",
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
             openOnStartup: false,
             buttonVariant: "primary",
             buttonSize: "large",
-            tags: []
+            tags: [],
+            flexGrow: 100,
+            height: "auto"
           }
         },
         children: [],
-        parent: "33"
+        parent: "129"
       },
       103: {
         dragItem: {
@@ -9523,16 +11102,17 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "hidden",
             variant: "gallery",
             containerVariant: "block",
             openOnStartup: false,
             buttonVariant: "primary",
             buttonSize: "large",
-            tags: []
+            tags: [],
+            flexGrow: 100,
+            height: "auto"
           }
         },
         children: [],
@@ -9547,16 +11127,17 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "accordion",
             containerVariant: "block",
             openOnStartup: true,
             buttonVariant: "primary",
             buttonSize: "large",
-            tags: []
+            tags: [],
+            flexGrow: 100,
+            height: "auto"
           }
         },
         children: [
@@ -9575,16 +11156,17 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
             openOnStartup: false,
             buttonVariant: "primary",
             buttonSize: "large",
-            tags: []
+            tags: [],
+            flexGrow: 100,
+            height: "auto"
           }
         },
         children: [],
@@ -9600,16 +11182,17 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
             openOnStartup: false,
             buttonVariant: "primary",
             buttonSize: "large",
-            tags: []
+            tags: [],
+            flexGrow: 100,
+            height: "auto"
           }
         },
         children: [],
@@ -9625,16 +11208,17 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
             openOnStartup: false,
             buttonVariant: "primary",
             buttonSize: "large",
-            tags: []
+            tags: [],
+            flexGrow: 100,
+            height: "auto"
           }
         },
         children: [],
@@ -9649,9 +11233,8 @@ const defaultGraph: SerializedAppState = {
             hidden: true,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "hidden",
@@ -9660,7 +11243,9 @@ const defaultGraph: SerializedAppState = {
             buttonSize: "large",
             tags: [
               "i2i"
-            ]
+            ],
+            flexGrow: 100,
+            height: "auto"
           }
         },
         children: [
@@ -9678,9 +11263,8 @@ const defaultGraph: SerializedAppState = {
             hidden: true,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "accordion",
             containerVariant: "block",
@@ -9689,11 +11273,13 @@ const defaultGraph: SerializedAppState = {
             buttonSize: "large",
             tags: [
               "i2i"
-            ]
+            ],
+            flexGrow: 100,
+            height: "auto"
           }
         },
         children: [
-          "112",
+          "117",
           "108"
         ],
         parent: "33"
@@ -9707,16 +11293,17 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
             variant: "gallery",
             containerVariant: "block",
             openOnStartup: false,
             buttonVariant: "primary",
             buttonSize: "large",
-            tags: []
+            tags: [],
+            flexGrow: 100,
+            height: "auto"
           }
         },
         children: [
@@ -9725,78 +11312,27 @@ const defaultGraph: SerializedAppState = {
         ],
         parent: "33"
       },
-      112: {
-        dragItem: {
-          type: "container",
-          id: "112",
-          attrs: {
-            title: "",
-            hidden: false,
-            disabled: false,
-            direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
-            classes: "",
-            nodeDisabledState: "disabled",
-            variant: "gallery",
-            containerVariant: "block",
-            openOnStartup: false,
-            buttonVariant: "primary",
-            buttonSize: "large",
-            tags: []
-          }
-        },
-        children: [
-          "113",
-          "100"
-        ],
-        parent: "109"
-      },
-      113: {
-        dragItem: {
-          type: "widget",
-          id: "113",
-          nodeId: 186,
-          attrs: {
-            title: "",
-            hidden: false,
-            disabled: false,
-            direction: "vertical",
-            flexGrow: 100,
-            height: "var(--size-96)",
-            classes: "",
-            nodeDisabledState: "disabled",
-            variant: "image",
-            containerVariant: "block",
-            openOnStartup: false,
-            buttonVariant: "primary",
-            buttonSize: "large",
-            tags: []
-          }
-        },
-        children: [],
-        parent: "112"
-      },
       114: {
         dragItem: {
           type: "widget",
           id: "114",
           nodeId: 190,
           attrs: {
-            title: "denoise",
+            title: "Denoise",
             hidden: false,
             disabled: false,
             direction: "vertical",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "hidden",
             variant: "gallery",
             containerVariant: "block",
             openOnStartup: false,
             buttonVariant: "primary",
             buttonSize: "large",
-            tags: []
+            tags: [],
+            flexGrow: 100,
+            height: "auto"
           }
         },
         children: [],
@@ -9811,10 +11347,65 @@ const defaultGraph: SerializedAppState = {
             hidden: false,
             disabled: false,
             direction: "horizontal",
-            flexGrow: 100,
-            height: "auto",
             classes: "",
+            style: "",
             nodeDisabledState: "disabled",
+            variant: "gallery",
+            containerVariant: "block",
+            openOnStartup: false,
+            buttonVariant: "primary",
+            buttonSize: "large",
+            tags: [],
+            flexGrow: 100,
+            height: "auto"
+          }
+        },
+        children: [
+          "51",
+          "103"
+        ],
+        parent: "104"
+      },
+      117: {
+        dragItem: {
+          type: "container",
+          id: "117",
+          attrs: {
+            title: "",
+            hidden: true,
+            disabled: false,
+            direction: "vertical",
+            classes: "",
+            style: "",
+            nodeDisabledState: "disabled",
+            variant: "gallery",
+            containerVariant: "hidden",
+            openOnStartup: false,
+            buttonVariant: "primary",
+            buttonSize: "large",
+            tags: [
+              "i2i"
+            ]
+          }
+        },
+        children: [
+          "121"
+        ],
+        parent: "109"
+      },
+      118: {
+        dragItem: {
+          type: "widget",
+          id: "118",
+          nodeId: 195,
+          attrs: {
+            title: "Height",
+            hidden: false,
+            disabled: false,
+            direction: "vertical",
+            classes: "",
+            style: "",
+            nodeDisabledState: "hidden",
             variant: "gallery",
             containerVariant: "block",
             openOnStartup: false,
@@ -9823,24 +11414,274 @@ const defaultGraph: SerializedAppState = {
             tags: []
           }
         },
+        children: [],
+        parent: "122"
+      },
+      119: {
+        dragItem: {
+          type: "widget",
+          id: "119",
+          nodeId: 196,
+          attrs: {
+            title: "Width",
+            hidden: false,
+            disabled: false,
+            direction: "vertical",
+            classes: "",
+            style: "",
+            nodeDisabledState: "hidden",
+            variant: "gallery",
+            containerVariant: "block",
+            openOnStartup: false,
+            buttonVariant: "primary",
+            buttonSize: "large",
+            tags: []
+          }
+        },
+        children: [],
+        parent: "122"
+      },
+      120: {
+        dragItem: {
+          type: "widget",
+          id: "120",
+          nodeId: 197,
+          attrs: {
+            title: "⮀",
+            hidden: false,
+            disabled: false,
+            direction: "vertical",
+            classes: "",
+            style: "flex-grow: 1;",
+            nodeDisabledState: "hidden",
+            variant: "gallery",
+            containerVariant: "block",
+            openOnStartup: false,
+            buttonVariant: "secondary",
+            buttonSize: "large",
+            tags: []
+          }
+        },
+        children: [],
+        parent: "122"
+      },
+      121: {
+        dragItem: {
+          type: "widget",
+          id: "121",
+          nodeId: 199,
+          attrs: {
+            title: "Image",
+            hidden: false,
+            disabled: false,
+            direction: "vertical",
+            classes: "",
+            style: "",
+            nodeDisabledState: "hidden",
+            variant: "gallery",
+            containerVariant: "block",
+            openOnStartup: false,
+            buttonVariant: "primary",
+            buttonSize: "large",
+            tags: []
+          }
+        },
+        children: [],
+        parent: "117"
+      },
+      122: {
+        dragItem: {
+          type: "container",
+          id: "122",
+          attrs: {
+            title: "",
+            hidden: true,
+            disabled: false,
+            direction: "horizontal",
+            classes: "",
+            style: "",
+            nodeDisabledState: "disabled",
+            variant: "gallery",
+            containerVariant: "block",
+            openOnStartup: false,
+            buttonVariant: "primary",
+            buttonSize: "large",
+            tags: [
+              "i2i"
+            ]
+          }
+        },
         children: [
-          "51",
-          "103"
+          "119",
+          "120",
+          "118",
+          "124"
         ],
-        parent: "104"
+        parent: "33"
+      },
+      124: {
+        dragItem: {
+          type: "widget",
+          id: "124",
+          nodeId: 203,
+          attrs: {
+            title: "Scale By",
+            hidden: false,
+            disabled: false,
+            direction: "vertical",
+            classes: "",
+            style: "",
+            nodeDisabledState: "hidden",
+            variant: "gallery",
+            containerVariant: "block",
+            openOnStartup: false,
+            buttonVariant: "primary",
+            buttonSize: "large",
+            tags: []
+          }
+        },
+        children: [],
+        parent: "122"
+      },
+      125: {
+        dragItem: {
+          type: "widget",
+          id: "125",
+          nodeId: 206,
+          attrs: {
+            title: "Height",
+            hidden: false,
+            disabled: false,
+            direction: "vertical",
+            classes: "",
+            style: "",
+            nodeDisabledState: "hidden",
+            variant: "gallery",
+            containerVariant: "block",
+            openOnStartup: false,
+            buttonVariant: "primary",
+            buttonSize: "large",
+            tags: []
+          }
+        },
+        children: [],
+        parent: "127"
+      },
+      126: {
+        dragItem: {
+          type: "widget",
+          id: "126",
+          nodeId: 207,
+          attrs: {
+            title: "Width",
+            hidden: false,
+            disabled: false,
+            direction: "vertical",
+            classes: "",
+            style: "",
+            nodeDisabledState: "hidden",
+            variant: "gallery",
+            containerVariant: "block",
+            openOnStartup: false,
+            buttonVariant: "primary",
+            buttonSize: "large",
+            tags: []
+          }
+        },
+        children: [],
+        parent: "127"
+      },
+      127: {
+        dragItem: {
+          type: "container",
+          id: "127",
+          attrs: {
+            title: "",
+            hidden: true,
+            disabled: false,
+            direction: "horizontal",
+            classes: "",
+            style: "",
+            nodeDisabledState: "disabled",
+            variant: "gallery",
+            containerVariant: "block",
+            openOnStartup: false,
+            buttonVariant: "primary",
+            buttonSize: "large",
+            tags: [
+              "i2i",
+              "i2iScaleSize"
+            ]
+          }
+        },
+        children: [
+          "126",
+          "125"
+        ],
+        parent: "33"
+      },
+      128: {
+        dragItem: {
+          type: "widget",
+          id: "128",
+          nodeId: 214,
+          attrs: {
+            title: "Scale Image Size",
+            hidden: false,
+            disabled: false,
+            direction: "vertical",
+            classes: "",
+            style: "",
+            nodeDisabledState: "hidden",
+            variant: "gallery",
+            containerVariant: "block",
+            openOnStartup: false,
+            buttonVariant: "primary",
+            buttonSize: "large",
+            tags: []
+          }
+        },
+        children: [],
+        parent: "129"
+      },
+      129: {
+        dragItem: {
+          type: "container",
+          id: "129",
+          attrs: {
+            title: "",
+            hidden: false,
+            disabled: false,
+            direction: "horizontal",
+            classes: "",
+            style: "",
+            nodeDisabledState: "disabled",
+            variant: "gallery",
+            containerVariant: "hidden",
+            openOnStartup: false,
+            buttonVariant: "primary",
+            buttonSize: "large",
+            tags: []
+          }
+        },
+        children: [
+          "102",
+          "128"
+        ],
+        parent: "33"
       }
     },
-    currentId: 116,
+    currentId: 130,
     attrs: {
       defaultSubgraph: "txt2img"
     }
   },
   canvas: {
     offset: [
-      1270.7476082145795,
-      -92.44840246010858
+      949.2317346499664,
+      180.17640279910015
     ],
-    scale: 1
+    scale: 0.7513148009015782
   }
 }
 
