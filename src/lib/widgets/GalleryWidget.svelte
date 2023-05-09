@@ -84,6 +84,7 @@
          }
      })
 
+     history.pushState({ type: "gallery" }, "");
 
      mobileLightbox = f7.photoBrowser.create({
          photos: images,
@@ -152,7 +153,7 @@
  $: node.anyImageSelected = selected_image != null;
 </script>
 
-{#if widget && node && nodeValue}
+{#if widget && node && nodeValue && $nodeValue}
     {#if widget.attrs.variant === "image"}
         <div class="wrapper comfy-image-widget" style={widget.attrs.style || ""} bind:this={element}>
             <Block variant="solid" padding={false}>

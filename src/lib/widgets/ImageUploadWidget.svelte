@@ -156,7 +156,7 @@
                  );
 
                  if (response.error) {
-                     notify(response.error, null, "error")
+                     notify(response.error, { type: "error" })
                  }
 
                  $nodeValue = normalise_file(_value, root, root_url) as GradioFileData[];

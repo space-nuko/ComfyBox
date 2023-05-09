@@ -54,11 +54,11 @@
      > .inner {
          padding: 2px;
          width: 100%;
+         height: 100%;
          display: flex;
          flex-direction: row;
-         height: min-content;
 
-         :global(> label) {
+         :global(> .block > label) {
              height: 100%;
          }
      }

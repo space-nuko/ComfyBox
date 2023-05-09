@@ -117,12 +117,15 @@
          height: fit-content;
      }
 
-     .edit > :global(.v-pane > .block) {
+     &.edit {
          border-color: var(--color-pink-500);
          border-width: 2px;
          border-style: dashed !important;
-         margin: 0.2em;
-         padding: 1.4em;
+         margin: 2em 0.2em;
+
+         :global(> .v-pane) {
+             padding: 1.4em;
+         }
      }
 
      /* :global(.hide-block > .v-pane > .block) {

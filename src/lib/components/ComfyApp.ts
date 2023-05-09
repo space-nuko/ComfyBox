@@ -28,7 +28,7 @@ import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import { get } from "svelte/store";
 import uiState from "$lib/stores/uiState";
-import { promptToGraphVis, workflowToGraphVis } from "$lib/utils";
+import { download, promptToGraphVis, workflowToGraphVis } from "$lib/utils";
 import notify from "$lib/notify";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
@@ -151,6 +151,7 @@ export default class ComfyApp {
             }
         } catch (err) {
             console.error("Error loading previous workflow", err);
+            notify(`Error loading previous workflow:\n${err}`, { type: "error", timeout: null })
         }
 
         // We failed to restore a workflow so load the default
@@ -171,6 +172,8 @@ export default class ComfyApp {
         // Ensure the canvas fills the window
         this.resizeCanvas();
         window.addEventListener("resize", this.resizeCanvas.bind(this));
+
+        this.requestPermissions();
 
         this.alreadySetup = true;
 
@@ -348,6 +351,13 @@ export default class ComfyApp {
         });
     }
 
+    private requestPermissions() {
+        if (Notification.permission === "default") {
+            Notification.requestPermission()
+                .then((result) => console.log("Notification status:", result));
+        }
+    }
+
     private setupColorScheme() {
         const setColor = (type: any, color: string) => {
             LGraphCanvas.DEFAULT_LINK_TYPE_COLORS[type] = color
@@ -452,6 +462,37 @@ export default class ComfyApp {
         layoutState.onStartConfigure();
         this.lGraph.configure(blankGraph)
         layoutState.initDefaultLayout();
+    }
+
+    runDefaultQueueAction() {
+        for (const node of this.lGraph.iterateNodesInOrder()) {
+            if ("onDefaultQueueAction" in node) {
+                (node as ComfyGraphNode).onDefaultQueueAction()
+            }
+        }
+    }
+
+    querySave() {
+        const promptFilename = true; // TODO
+
+        let filename = "workflow.json";
+        if (promptFilename) {
+            filename = prompt("Save workflow as:", filename);
+            if (!filename) return;
+            if (!filename.toLowerCase().endsWith(".json")) {
+                filename += ".json";
+            }
+        }
+        else {
+            const date = new Date();
+            const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
+            filename = `workflow-${formattedDate}.json`
+        }
+
+        const indent = 2
+        const json = JSON.stringify(this.serialize(), null, indent)
+
+        download(filename, json, "application/json")
     }
 
     /**
@@ -644,7 +685,7 @@ export default class ComfyApp {
                     } catch (error) {
                         // this.ui.dialog.show(error.response || error.toString());
                         const mes = error.response || error.toString()
-                        notify(`Error queuing prompt:\n${mes}`, null, "error")
+                        notify(`Error queuing prompt:\n${mes}`, { type: "error" })
                         console.error(promptToGraphVis(p))
                         console.error("Error queuing prompt", mes, num, p)
                         break;
@@ -682,7 +723,7 @@ export default class ComfyApp {
                 }
                 else {
                     console.error("No metadata found in image file.", pngInfo)
-                    notify("No metadata found in image file.")
+                    notify("No metadata found in image file.", { type: "error" })
                 }
             }
         } else if (file.type === "application/json" || file.name.endsWith(".json")) {
@@ -727,7 +768,7 @@ export default class ComfyApp {
                         if (inputNode && "doAutoConfig" in inputNode && comfyInput.widgetNodeType === inputNode.type) {
                             console.debug("[ComfyApp] Reconfiguring combo widget", inputNode.type, comfyInput.config.values)
                             const comfyComboNode = inputNode as nodes.ComfyComboNode;
-                            comfyComboNode.doAutoConfig(comfyInput)
+                            comfyComboNode.doAutoConfig(comfyInput, { includeProperties: new Set(["values"]), setWidgetTitle: false })
                             if (!comfyInput.config.values.includes(get(comfyComboNode.value))) {
                                 comfyComboNode.setValue(comfyInput.config.defaultValue || comfyInput.config.values[0])
                             }

@@ -18,6 +18,12 @@ import CheckboxWidget from "$lib/widgets/CheckboxWidget.svelte";
 import RadioWidget from "$lib/widgets/RadioWidget.svelte";
 import ImageUploadWidget from "$lib/widgets/ImageUploadWidget.svelte";
 
+export type AutoConfigOptions = {
+    includeProperties?: Set<string> | null,
+    setDefaultValue?: boolean
+    setWidgetTitle?: boolean
+}
+
 /*
  * NOTE: If you want to add a new widget but it has the same input/output type
  * as another one of the existing widgets, best to create a new "variant" of
@@ -165,7 +171,9 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     setValue(value: any, noChangedEvent: boolean = false) {
         if (noChangedEvent)
             this._noChangedEvent = true;
-        this.value.set(this.parseValue(value))
+
+        const parsed = this.parseValue(value)
+        this.value.set(parsed)
 
         // In case value.set() does not trigger onValueUpdated, we need to reset
         // the counter here also.
@@ -222,8 +230,6 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
                 if ("noChangedEvent" in param)
                     noChangedEvent = Boolean(param.noChangedEvent)
             }
-            value = this.parseValue(value);
-            console.warn("[Widget] Store!", param, "=>", value, noChangedEvent)
             this.setValue(value, noChangedEvent)
         }
     }
@@ -244,18 +250,24 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         return true;
     }
 
-    doAutoConfig(input: IComfyInputSlot) {
+    doAutoConfig(input: IComfyInputSlot, options: AutoConfigOptions = { setDefaultValue: true, setWidgetTitle: true }) {
         // Copy properties from default config in input slot
         const comfyInput = input as IComfyInputSlot;
-        for (const key in comfyInput.config)
-            this.setProperty(key, comfyInput.config[key])
+        for (const key in comfyInput.config) {
+            if (options.includeProperties == null || options.includeProperties.has(key))
+                this.setProperty(key, comfyInput.config[key])
+        }
 
-        if ("defaultValue" in this.properties)
-            this.setValue(this.properties.defaultValue)
+        if (options.setDefaultValue) {
+            if ("defaultValue" in this.properties)
+                this.setValue(this.properties.defaultValue)
+        }
 
-        const widget = layoutState.findLayoutForNode(this.id)
-        if (widget && input.name !== "") {
-            widget.attrs.title = input.name;
+        if (options.setWidgetTitle) {
+            const widget = layoutState.findLayoutForNode(this.id)
+            if (widget && input.name !== "") {
+                widget.attrs.title = input.name;
+            }
         }
 
         console.debug("Property copy", input, this.properties)

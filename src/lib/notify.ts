@@ -1,40 +1,82 @@
 import { toast } from "@zerodevx/svelte-toast";
 import type { SvelteToastOptions } from "@zerodevx/svelte-toast/stores";
+import { type Notification } from "framework7/components/notification"
 import { f7 } from "framework7-svelte"
 
-let notification;
+export type NotifyOptions = {
+    title?: string,
+    type?: "neutral" | "info" | "warning" | "error" | "success",
+    imageUrl?: string,
+    timeout?: number | null
+}
 
-function notifyf7(text: string, title?: string, type?: string) {
+function notifyf7(text: string, options: NotifyOptions) {
     if (!f7)
         return;
 
-    if (!notification) {
-        notification = f7.notification.create({
-            title: title,
-            titleRightText: 'now',
-            // subtitle: 'Notification with close on click',
-            text: text,
-            closeOnClick: true,
-            closeTimeout: 3000,
-        });
-    }
-    // Open it
+    let closeTimeout = options.timeout
+    if (closeTimeout === undefined)
+        closeTimeout = 3000;
+
+    const notification = f7.notification.create({
+        title: options.title,
+        titleRightText: 'now',
+        // subtitle: 'Notification with close on click',
+        text: text,
+        closeOnClick: true,
+        closeTimeout
+    });
     notification.open();
 }
 
-function notifyToast(text: string, title?: string, type?: string) {
-    const options: SvelteToastOptions = {}
+function notifyToast(text: string, options: NotifyOptions) {
+    const toastOptions: SvelteToastOptions = {
+        dismissable: options.timeout !== null,
+    }
 
-    if (type === "error") {
-        options.theme = {
+    if (options.type === "success") {
+        toastOptions.theme = {
+            '--toastBackground': 'var(--color-green-600)',
+        }
+    }
+    else if (options.type === "info") {
+        toastOptions.theme = {
+            '--toastBackground': 'var(--color-blue-500)',
+        }
+    }
+    else if (options.type === "error") {
+        toastOptions.theme = {
             '--toastBackground': 'var(--color-red-500)',
         }
     }
 
-    toast.push(text, options);
+    toast.push(text, toastOptions);
 }
 
-export default function notify(text: string, title?: string, type?: string) {
-    notifyf7(text, title, type);
-    notifyToast(text, title, type);
+function notifyNative(text: string, options: NotifyOptions) {
+    if (document.hasFocus())
+        return;
+
+    const title = options.title || "ComfyBox"
+    const nativeOptions: NotificationOptions = {
+        body: text,
+    }
+
+    if (options.imageUrl) {
+        nativeOptions.icon = options.imageUrl
+        nativeOptions.image = options.imageUrl
+    }
+    if (options.timeout === null) {
+        nativeOptions.requireInteraction = true;
+    }
+
+    const notification = new Notification(title, nativeOptions);
+
+    notification.onclick = () => window.focus();
+}
+
+export default function notify(text: string, options: NotifyOptions = {}) {
+    notifyf7(text, options);
+    notifyToast(text, options);
+    notifyNative(text, options)
 }

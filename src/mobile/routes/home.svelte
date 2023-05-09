@@ -1,21 +1,17 @@
 <script lang="ts">
- import { onMount } from "svelte";
- import { get } from "svelte/store";
- import { Pane, Splitpanes } from 'svelte-splitpanes';
- import { Button } from "@gradio/button";
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
- import { Checkbox } from "@gradio/form"
- import uiState from "$lib/stores/uiState";
- import { ImageViewer } from "$lib/ImageViewer";
- import { download } from "$lib/utils"
 
- import { LGraph, LGraphNode } from "@litegraph-ts/core";
- import type { ComfyAPIStatus } from "$lib/api";
- import queueState from "$lib/stores/queueState";
- import { Page, Navbar, Link, BlockTitle, Block, List, ListItem } from "framework7-svelte"
+ import { Page, Navbar, Button, BlockTitle, Block, List, ListItem } from "framework7-svelte"
+ import defaultGraph from "$lib/defaultGraph";
 
  export let app: ComfyApp | null = null;
 
+ async function doLoadDefault() {
+     var confirmed = confirm("Are you sure you want to clear the current workflow and load the default graph?");
+     if (confirmed) {
+         await app.deserialize(defaultGraph)
+     }
+ }
 </script>
 
 <Page name="home">
@@ -34,4 +30,7 @@
             <i class="icon icon-f7" slot="media" />
         </ListItem>
     </List>
+    <Block strong outlineIos>
+        <Button fill={true} onClick={doLoadDefault}>Load Default Graph</Button>
+    </Block>
 </Page>

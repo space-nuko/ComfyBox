@@ -65,6 +65,10 @@
  let graphSize = 0;
  let graphTransitioning = false;
 
+ function queuePrompt() {
+     app.runDefaultQueueAction()
+ }
+
  function toggleGraph() {
      if (graphSize == 0) {
          graphSize = 50;
@@ -103,26 +107,7 @@
      if (!app?.lGraph)
          return;
 
-     const promptFilename = true; // TODO
-
-     let filename = "workflow.json";
-     if (promptFilename) {
-         filename = prompt("Save workflow as:", filename);
-         if (!filename) return;
-         if (!filename.toLowerCase().endsWith(".json")) {
-             filename += ".json";
-         }
-     }
-     else {
-         const date = new Date();
-         const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
-         filename = `workflow-${formattedDate}.json`
-     }
-
-     const indent = 2
-     const json = JSON.stringify(app.serialize(), null, indent)
-
-     download(filename, json, "application/json")
+     app.querySave()
  }
 
  function doLoad(): void {
@@ -241,6 +226,11 @@
     </div>
     <div id="bottombar">
         <div class="left">
+            {#if $layoutState.attrs.queuePromptButtonName != ""}
+                <Button variant="primary" on:click={queuePrompt}>
+                    {$layoutState.attrs.queuePromptButtonName}
+                </Button>
+            {/if}
             <Button variant="secondary" on:click={toggleGraph}>
                 Toggle Graph
             </Button>

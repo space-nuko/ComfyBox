@@ -28,13 +28,9 @@ type DragItemEntry = {
  */
 export type LayoutAttributes = {
     /*
-     * Default subgraph to run when the "Queue Prompt" button in the bottom bar
-     * is pressed.
-     *
-     * If it's an empty string, all backend nodes will be included in the prompt
-     * instead.
+     * Name of the "Queue Prompt" button. Set to blank to hide the button.
      */
-    defaultSubgraph: string
+    queuePromptButtonName: string,
 }
 
 /*
@@ -522,11 +518,11 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
 
             // Workflow
             {
-                name: "defaultSubgraph",
+                name: "queuePromptButtonName",
                 type: "string",
                 location: "workflow",
                 editable: true,
-                defaultValue: ""
+                defaultValue: "Queue Prompt"
             }
         ]
     }
@@ -544,10 +540,16 @@ for (const cat of Object.values(ALL_ATTRIBUTES)) {
 export { ALL_ATTRIBUTES };
 
 const defaultWidgetAttributes: Attributes = {} as any
+const defaultWorkflowAttributes: LayoutAttributes = {} as any
 for (const cat of Object.values(ALL_ATTRIBUTES)) {
     for (const spec of Object.values(cat.specs)) {
-        if (spec.location === "widget" && spec.defaultValue != null) {
-            defaultWidgetAttributes[spec.name] = spec.defaultValue;
+        if (spec.defaultValue != null) {
+            if (spec.location === "widget") {
+                defaultWidgetAttributes[spec.name] = spec.defaultValue;
+            }
+            else if (spec.location === "workflow") {
+                defaultWorkflowAttributes[spec.name] = spec.defaultValue;
+            }
         }
     }
 }
@@ -634,7 +636,7 @@ const store: Writable<LayoutState> = writable({
     isMenuOpen: false,
     isConfiguring: true,
     attrs: {
-        defaultSubgraph: ""
+        ...defaultWorkflowAttributes
     }
 })
 
@@ -890,7 +892,7 @@ function initDefaultLayout() {
         isMenuOpen: false,
         isConfiguring: false,
         attrs: {
-            defaultSubgraph: ""
+            ...defaultWorkflowAttributes
         }
     })
 
@@ -1004,7 +1006,7 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
         currentSelectionNodes: [],
         isMenuOpen: false,
         isConfiguring: false,
-        attrs: data.attrs
+        attrs: { ...defaultWorkflowAttributes, ...data.attrs }
     }
 
     console.debug("[layoutState] deserialize", data, state)

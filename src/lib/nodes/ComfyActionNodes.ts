@@ -6,24 +6,27 @@ import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWid
 import { get } from "svelte/store";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 import type { ComfyWidgetNode, GalleryOutput } from "./ComfyWidgetNodes";
+import type { NotifyOptions } from "$lib/notify";
+import { convertComfyOutputToGradio } from "$lib/utils";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
         outputs: [
             { name: "beforeQueued", type: BuiltInSlotType.EVENT },
-            { name: "afterQueued", type: BuiltInSlotType.EVENT }
+            { name: "afterQueued", type: BuiltInSlotType.EVENT },
+            { name: "onDefaultQueueAction", type: BuiltInSlotType.EVENT },
         ],
     }
 
     private getActionParams(subgraph: string | null): any {
         let queue = get(queueState)
-        let remaining = 0;
+        let queueRemaining = 0;
 
         if (typeof queue.queueRemaining === "number")
-            remaining = queue.queueRemaining
+            queueRemaining = queue.queueRemaining
 
         return {
-            queueRemaining: remaining,
+            queueRemaining,
             subgraph
         }
     }
@@ -34,6 +37,16 @@ export class ComfyQueueEvents extends ComfyGraphNode {
 
     override afterQueued(p: SerializedPrompt, subgraph: string | null) {
         this.triggerSlot(1, this.getActionParams(subgraph))
+    }
+
+    override onDefaultQueueAction() {
+        let queue = get(queueState)
+        let queueRemaining = 0;
+
+        if (typeof queue.queueRemaining === "number")
+            queueRemaining = queue.queueRemaining
+
+        this.triggerSlot(2, { queueRemaining })
     }
 
     override onSerialize(o: SerializedLGraphNode) {
@@ -54,6 +67,7 @@ export interface ComfyStoreImagesActionProperties extends ComfyGraphNodeProperti
 
 export class ComfyStoreImagesAction extends ComfyGraphNode {
     override properties: ComfyStoreImagesActionProperties = {
+        tags: [],
         images: null
     }
 
@@ -175,13 +189,15 @@ LiteGraph.registerNodeType({
 })
 
 export interface ComfyNotifyActionProperties extends ComfyGraphNodeProperties {
-    message: string
+    message: string,
+    type: string
 }
 
 export class ComfyNotifyAction extends ComfyGraphNode {
     override properties: ComfyNotifyActionProperties = {
+        tags: [],
         message: "Nya.",
-        tags: []
+        type: "info"
     }
 
     static slotLayout: SlotLayout = {
@@ -192,10 +208,27 @@ export class ComfyNotifyAction extends ComfyGraphNode {
     }
 
     override onAction(action: any, param: any) {
-        const message = this.getInputData(0);
-        if (message) {
-            notify(message);
+        const message = this.getInputData(0) || this.properties.message;
+        if (!message)
+            return;
+
+        const options: NotifyOptions = {
+            type: this.properties.type
         }
+
+        // Check if this event was triggered from a backend node and has the
+        // onExecuted arguments. If so then use the first image as the icon for
+        // native notifications.
+        if (param != null && typeof param === "object") {
+            if ("images" in param) {
+                const output = param as GalleryOutput;
+                const converted = convertComfyOutputToGradio(output);
+                if (converted.length > 0)
+                    options.imageUrl = converted[0].data;
+            }
+        }
+
+        notify(message, options);
     };
 }
 
@@ -204,6 +237,40 @@ LiteGraph.registerNodeType({
     title: "Comfy.NotifyAction",
     desc: "Displays a message.",
     type: "actions/notify"
+})
+
+export interface ComfyPlaySoundActionProperties extends ComfyGraphNodeProperties {
+    sound: string,
+}
+
+export class ComfyPlaySoundAction extends ComfyGraphNode {
+    override properties: ComfyPlaySoundActionProperties = {
+        tags: [],
+        sound: "notification.mp3"
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "sound", type: "string" },
+            { name: "trigger", type: BuiltInSlotType.ACTION }
+        ],
+    }
+
+    override onAction(action: any, param: any) {
+        const sound = this.getInputData(0) || this.properties.sound;
+        if (sound) {
+            const url = `${location.origin}/sound/${sound}`;
+            const audio = new Audio(url);
+            audio.play();
+        }
+    };
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyPlaySoundAction,
+    title: "Comfy.PlaySoundAction",
+    desc: "Plays a sound located under the sound/ directory.",
+    type: "actions/play_sound"
 })
 
 export interface ComfyExecuteSubgraphActionProperties extends ComfyGraphNodeProperties {

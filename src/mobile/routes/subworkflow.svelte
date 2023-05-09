@@ -21,6 +21,9 @@
 <style lang="scss">
  .container {
      overflow-x: hidden;
+
+     // Disable pull to refresh
+     overscroll-behavior-y: contain;
  }
 
  // TODO generalize this to all properties!

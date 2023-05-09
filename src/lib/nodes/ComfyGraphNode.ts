@@ -28,10 +28,36 @@ export default class ComfyGraphNode extends LGraphNode {
 
     isBackendNode?: boolean;
 
+    /*
+     * Triggered when the user presses the global "Queue Prompt" button in the fixed toolbar.
+     */
+    onDefaultQueueAction?(): void;
+
+    /*
+     * Triggered before a prompt containing this node is passed to the backend.
+     */
     beforeQueued?(subgraph: string | null): void;
+
+    /*
+     * Triggered after a prompt containing this node is passed to the backend.
+     */
     afterQueued?(prompt: SerializedPrompt, subgraph: string | null): void;
+
+    /*
+     * Triggered when the backend sends a finished output back with this node's ID.
+     * Valid for output nodes like SaveImage and PreviewImage.
+     */
     onExecuted?(output: any): void;
 
+    /*
+     * Allows you to manually specify an auto-config for certain input slot
+     * indices, so that when a ComfyWidgetNode is connected to the input slot it
+     * receives the specified min/max/values/etc.
+     * Otherwise the config passed from the backend is used.
+     *
+     * Use this if you're creating a frontend-only node and want some input
+     * slots to have auto-configs, like for connected combo box widgets.
+     */
     defaultWidgets?: DefaultWidgetLayout
 
     /*
@@ -71,6 +97,12 @@ export default class ComfyGraphNode extends LGraphNode {
         this.addProperty("tags", [], "array")
     }
 
+    /*
+     * Adjusts output slot types to have the same type as the first connected
+     * input. Used for frontend-only nodes with inputs and outputs that act as
+     * wildcards, so that they can be connected to ComfyBackendNodes without
+     * rejection.
+     */
     private inheritSlotTypes(type: LConnectionKind, isConnected: boolean) {
         // Prevent multiple connections to different types when we have no input
         if (isConnected && type === LConnectionKind.OUTPUT) {
@@ -229,6 +261,7 @@ export default class ComfyGraphNode extends LGraphNode {
     }
 
     override onResize(size: Vector2) {
+        // Snap to grid if shift is held down.
         if ((window as any)?.app?.shiftDown) {
             const w = LiteGraph.CANVAS_GRID_SIZE * Math.round(this.size[0] / LiteGraph.CANVAS_GRID_SIZE);
             const h = LiteGraph.CANVAS_GRID_SIZE * Math.round(this.size[1] / LiteGraph.CANVAS_GRID_SIZE);
@@ -241,6 +274,8 @@ export default class ComfyGraphNode extends LGraphNode {
     }
 
     override onSerialize(o: SerializedLGraphNode) {
+        // Resync the widget node types for each input.
+        // This is so combo widget nodes will be correctly detected by ComfyApp.refreshComboInNodes().
         for (let index = 0; index < this.inputs.length; index++) {
             const input = this.inputs[index]
             const serInput = o.inputs[index]
@@ -254,6 +289,7 @@ export default class ComfyGraphNode extends LGraphNode {
                 (serInput as any).defaultWidgetNode = null
             }
         }
+
         (o as any).saveUserState = this.saveUserState
         if (!this.saveUserState) {
             this.stripUserState(o)
@@ -262,6 +298,7 @@ export default class ComfyGraphNode extends LGraphNode {
     }
 
     override onConfigure(o: SerializedLGraphNode) {
+        // Save the litegraph type of the default ComfyWidgetNode for each input.
         for (let index = 0; index < this.inputs.length; index++) {
             const input = this.inputs[index]
             const serInput = o.inputs[index]

@@ -17,7 +17,7 @@
  import GraphPage from './mobile/routes/graph.svelte';
  import ListSubWorkflowsPage from './mobile/routes/list-subworkflows.svelte';
  import SubWorkflowPage from './mobile/routes/subworkflow.svelte';
- import type { Framework7Parameters } from "framework7/types";
+ import type { Framework7Parameters, Modal } from "framework7/types";
 
  export let app: ComfyApp;
 
@@ -26,6 +26,25 @@
          // exitApp();
          e.preventDefault();
      } else {
+         const $ = f7.$
+         const modalIn = $('.modal-in');
+         if (modalIn.length && "f7Modal" in modalIn[0]) {
+             (modalIn[0].f7Modal as Modal.Modal).close(true);
+             e.preventDefault();
+             return;
+         }
+         if ($('.panel-active').length) {
+             f7.panel.close();
+             e.preventDefault();
+             return;
+         }
+         const photoBrowserClose = $('.photo-browser-page a.link.popup-close')
+         if (photoBrowserClose.length > 0) {
+             (photoBrowserClose[0] as HTMLElement).click();
+             e.preventDefault();
+             return;
+         }
+
          f7.dialog.close()
          f7.view.main.router.back()
          return false;
