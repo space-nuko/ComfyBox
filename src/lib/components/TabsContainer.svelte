@@ -116,7 +116,7 @@
             <Tabs elem_classes={["gradio-tabs"]}>
                 {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item, i(item.id)}
                     {@const tabName = getTabName(container, i)}
-                    <TabItem name={tabName} on:select={() => console.log("tab " + i)}>
+                    <TabItem name={tabName}>
                         <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
                     </TabItem>
                 {/each}

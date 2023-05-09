@@ -41,7 +41,7 @@
  };
 
  let style: Styles = {
-     grid_cols: [3],
+     grid_cols: [isMobile ? 2 : 3],
      object_fit: "cover",
  }
  let element: HTMLDivElement;
@@ -90,7 +90,7 @@
          thumbs: images.map(i => i.url),
          type: 'popup',
      });
-     mobileLightbox.open()
+     mobileLightbox.open(selected_image)
 
      event.stopPropagation()
  }
