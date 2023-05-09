@@ -48,7 +48,7 @@
 			  );
 
 	let prevValue: string[] | FileData[] | null = value;
-	let selected_image: number | null = null;
+	export let selected_image: number | null = null;
 	let old_selected_image: number | null = null;
 
 	$: if (prevValue !== value) {

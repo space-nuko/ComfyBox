@@ -283,7 +283,8 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     override onConfigure(o: SerializedLGraphNode) {
-        this.value.set((o as any).comfyValue);
+        const value = (o as any).comfyValue || LiteGraph.cloneObject(this.defaultValue);
+        this.value.set(value);
         this.shownOutputProperties = (o as any).shownOutputProperties;
     }
 
@@ -537,6 +538,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
             { name: "selected_index", type: "number" },
             { name: "width", type: "number" },
             { name: "height", type: "number" },
+            { name: "any_selected", type: "boolean" },
         ]
     }
 
@@ -550,6 +552,8 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     override saveUserState = false;
     override outputIndex = null;
     override changedIndex = null;
+
+    anyImageSelected: boolean = false;
 
     modeWidget: IComboWidget;
 
@@ -570,6 +574,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
         this.setOutputData(0, this.properties.index)
         this.setOutputData(1, this.imageSize[0])
         this.setOutputData(2, this.imageSize[1])
+        this.setOutputData(3, this.anyImageSelected)
     }
 
     override onAction(action: any, param: any, options: { action_call?: string }) {
@@ -592,6 +597,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
                 }
             }
             this.setProperty("index", 0)
+            this.anyImageSelected = false;
         }
     }
 
@@ -607,6 +613,9 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
         else {
             super.setValue([])
         }
+
+        if (!get(this.value))
+            this.anyImageSelected = false
 
         const len = get(this.value).length
         if (this.properties.index < 0 || this.properties.index >= len) {
@@ -793,9 +802,10 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
     }
 
     override svelteComponentType = ImageUploadWidget;
-    override defaultValue = null;
+    override defaultValue = [];
     override outputIndex = null;
     override changedIndex = 3;
+    override saveUserState = false;
 
     imageSize: Vector2 = [1, 1];
 
@@ -820,7 +830,7 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
     }
 
     override formatValue(value: GradioFileData[]): string {
-        return `Images: ${value.length}`
+        return `Images: ${value?.length || 0}`
     }
 }
 

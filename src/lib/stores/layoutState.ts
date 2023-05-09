@@ -424,6 +424,13 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 serialize: (s) => s === NodeMode.ALWAYS ? "ALWAYS" : "NEVER",
                 deserialize: (m) => m === "ALWAYS" ? NodeMode.ALWAYS : NodeMode.NEVER
             },
+            {
+                name: "horizontal",
+                type: "boolean",
+                location: "nodeVars",
+                editable: true,
+                defaultValue: false
+            },
 
             // Node properties
             {
