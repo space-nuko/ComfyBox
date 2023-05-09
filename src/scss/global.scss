@@ -10,3 +10,11 @@ body {
 :root {
     --color-blue-500: #3985f5;
 }
+
+@mixin disable-input {
+    -webkit-text-fill-color: var(--neutral-500);
+    background-color: var(--neutral-200);
+    border-color: var(--neutral-300);
+    box-shadow: 0 0 0 var(--shadow-spread) transparent, rgba(0, 0, 0, 0.08) 0px 2px 4px 0px inset;
+    cursor: not-allowed;
+}

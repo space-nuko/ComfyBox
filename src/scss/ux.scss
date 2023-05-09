@@ -76,6 +76,7 @@ License: GNU General Public License
     --ae-nav-color:hsl(210deg 4% 80%);
     --ae-nav-hover-color:hsl(0deg 0% 4%);
     --ae-input-color:hsl(210deg 4% 80%);
+    --ae-input-disabled-color:hsl(210deg 4% 40%);
     --ae-label-color:hsl(210deg 4% 80%);
     --ae-subgroup-input-color:hsl(0deg 100% 100%);
     --ae-placeholder-color:hsl(214deg 5% 30%);
@@ -461,6 +462,10 @@ select {
     color: var(--ae-input-color)!important;
 	text-align: left!important;
 	min-width: unset;
+}
+
+input:disabled, textarea:disabled {
+    -webkit-text-fill-color: var(--ae-input-disabled-color) !important;
 }
 
 select {

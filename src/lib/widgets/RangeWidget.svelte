@@ -126,6 +126,9 @@
 
      :global(input[type=number]) {
          text-overflow: ellipsis;
+         &:disabled {
+             @include disable-input;
+         }
      }
 
      &.mobile {
