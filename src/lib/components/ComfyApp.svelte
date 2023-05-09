@@ -49,14 +49,15 @@
      resizeTimeout = setTimeout(app.resizeCanvas.bind(app), 250);
  }
 
- function queuePrompt() {
-     console.log("Queuing!");
-     const workflow = $layoutState.attrs.defaultSubgraph;
-     app.queuePrompt(0, 1, workflow);
- }
+ $: if (app?.lCanvas) {
+     app.lCanvas.allow_dragnodes = $uiState.uiUnlocked;
+     app.lCanvas.allow_interaction = $uiState.uiUnlocked;
 
- $: if (app?.lCanvas) app.lCanvas.allow_dragnodes = !$uiState.nodesLocked;
- $: if (app?.lCanvas) app.lCanvas.allow_interaction = !$uiState.graphLocked;
+     if (!$uiState.uiUnlocked) {
+         app.lCanvas.deselectAllNodes();
+         $layoutState.currentSelectionNodes = []
+     }
+ }
 
  $: if ($uiState.uiEditMode)
      $layoutState.currentSelection = []
@@ -240,9 +241,6 @@
     </div>
     <div id="bottombar">
         <div class="left">
-            <Button variant="primary" on:click={queuePrompt}>
-                Queue Prompt
-            </Button>
             <Button variant="secondary" on:click={toggleGraph}>
                 Toggle Graph
             </Button>

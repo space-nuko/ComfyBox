@@ -51,7 +51,6 @@
     {/if}
 </div>
 <Toolbar bottom>
-    <Link on:click={queuePrompt}>Queue Prompt</Link>
     <Link on:click={() => app.refreshComboInNodes()}>🔄</Link>
     <Link on:click={doLoad}>Load</Link>
     <input bind:this={fileInput} id="comfy-file-input" type="file" accept=".json" on:change={loadWorkflow} />

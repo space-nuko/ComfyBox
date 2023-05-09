@@ -131,6 +131,10 @@ export default class ComfyApp {
         LiteGraph.release_link_on_empty_shows_menu = true;
         LiteGraph.alt_drag_do_clone_nodes = true;
 
+        const uiUnlocked = get(uiState).uiUnlocked;
+        this.lCanvas.allow_dragnodes = uiUnlocked;
+        this.lCanvas.allow_interaction = uiUnlocked;
+
         (window as any).LiteGraph = LiteGraph;
 
         // await this.#invokeExtensionsAsync("init");
@@ -542,6 +546,11 @@ export default class ComfyApp {
                     // nodes have conditional logic that determines which link
                     // to follow backwards.
                     while (isFrontendParent(parent)) {
+                        if (!("getUpstreamLink" in parent)) {
+                            console.warn("[graphToPrompt] Node does not support getUpstreamLink", parent.type)
+                            break;
+                        }
+
                         const nextLink = parent.getUpstreamLink()
                         if (nextLink == null) {
                             console.warn("[graphToPrompt] No upstream link found in frontend node", parent)
@@ -715,7 +724,8 @@ export default class ComfyApp {
                         comfyInput.config.values = def["input"]["required"][comfyInput.name][0];
                         const inputNode = node.getInputNode(index)
 
-                        if (inputNode && "doAutoConfig" in inputNode) {
+                        if (inputNode && "doAutoConfig" in inputNode && comfyInput.widgetNodeType === inputNode.type) {
+                            console.debug("[ComfyApp] Reconfiguring combo widget", inputNode.type, comfyInput.config.values)
                             const comfyComboNode = inputNode as nodes.ComfyComboNode;
                             comfyComboNode.doAutoConfig(comfyInput)
                             if (!comfyInput.config.values.includes(get(comfyComboNode.value))) {

@@ -133,14 +133,9 @@ export type Attributes = {
     disabled?: boolean,
 
     /*
-     * CSS height
+     * CSS styles
      */
-    height?: string,
-
-    /*
-     * CSS Flex grow
-     */
-    flexGrow?: number,
+    style?: string,
 
     /**
      * Display variant for widgets/containers (e.g. number widget can act as slider/knob/dial)
@@ -321,25 +316,18 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 canShow: (di: IDragItem) => di.type === "container"
             },
             {
-                name: "flexGrow",
-                type: "number",
-                location: "widget",
-                defaultValue: 100,
-                editable: true
-            },
-            {
-                name: "height",
-                type: "string",
-                location: "widget",
-                defaultValue: "auto",
-                editable: true
-            },
-            {
                 name: "classes",
                 type: "string",
                 location: "widget",
                 defaultValue: "",
                 editable: true,
+            },
+            {
+                name: "style",
+                type: "string",
+                location: "widget",
+                defaultValue: "",
+                editable: true
             },
             {
                 name: "nodeDisabledState",
@@ -435,6 +423,13 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: "ALWAYS",
                 serialize: (s) => s === NodeMode.ALWAYS ? "ALWAYS" : "NEVER",
                 deserialize: (m) => m === "ALWAYS" ? NodeMode.ALWAYS : NodeMode.NEVER
+            },
+            {
+                name: "horizontal",
+                type: "boolean",
+                location: "nodeVars",
+                editable: true,
+                defaultValue: false
             },
 
             // Node properties

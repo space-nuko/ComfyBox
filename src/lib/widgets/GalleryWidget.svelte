@@ -1,8 +1,9 @@
 <script lang="ts">
  import { ImageViewer } from "$lib/ImageViewer";
  import { Block, BlockLabel, Empty } from "@gradio/atoms";
- import { Gallery } from "@gradio/gallery";
+ import { Gallery } from "$lib/components/gradio/gallery";
  import { Image } from "@gradio/icons";
+ import { StaticImage } from "$lib/components/gradio/image";
  import type { Styles } from "@gradio/utils";
  import type { WidgetLayout } from "$lib/stores/layoutState";
  import type { Writable } from "svelte/store";
@@ -18,6 +19,9 @@
  let nodeValue: Writable<GradioFileData[]> | null = null;
  let propsChanged: Writable<number> | null = null;
  let option: number | null = null;
+ let imageWidth: number = 1;
+ let imageHeight: number = 1;
+ let selected_image: number | null = null;
 
  $: widget && setNodeValue(widget);
 
@@ -26,21 +30,30 @@
          node = widget.node as ComfyGalleryNode
          nodeValue = node.value;
          propsChanged = node.propsChanged;
+         node.anyImageSelected = false;
 
          if ($nodeValue != null) {
              if (node.properties.index < 0 || node.properties.index >= $nodeValue.length) {
-                 node.setProperty("index", clamp(node.properties.index, 0, $nodeValue))
+                 node.setProperty("index", clamp(node.properties.index, 0, $nodeValue.length))
              }
          }
      }
  };
 
  let style: Styles = {
-     grid_cols: [4],
-     grid_rows: [4],
-     // object_fit: "cover",
+     grid_cols: [3],
+     object_fit: "cover",
  }
  let element: HTMLDivElement;
+
+ $: if (node) {
+     if (imageWidth > 1 || imageHeight > 1) {
+         node.imageSize = [imageWidth, imageHeight]
+     }
+     else {
+         node.imageSize = [1, 1]
+     }
+ }
 
  let mobileLightbox = null;
 
@@ -121,29 +134,43 @@
 
      // Update index
      node.setProperty("index", e.detail.index as number)
+     node.anyImageSelected = true;
  }
+
+ $: if ($propsChanged > -1 && widget && $nodeValue) {
+     if (widget.attrs.variant === "image") {
+         selected_image = $nodeValue.length - 1
+         node.setProperty("index", selected_image)
+         node.anyImageSelected = true;
+     }
+ }
+ else {
+     node.setProperty("index", null)
+     node.anyImageSelected = false;
+ }
+
+ $: node.anyImageSelected = selected_image != null;
 </script>
 
-{#if widget && node && nodeValue && $nodeValue != null}
+{#if widget && node && nodeValue}
     {#if widget.attrs.variant === "image"}
-        <div class="wrapper comfy-image-widget" style="height: {widget.attrs.height || 'auto'}" bind:this={element}>
+        <div class="wrapper comfy-image-widget" style={widget.attrs.style || ""} bind:this={element}>
             <Block variant="solid" padding={false}>
-                {#if widget.attrs.title}
-                    <BlockLabel
-                        show_label={true}
-                        Icon={Image}
-                        label={widget.attrs.title || "Image"}
+                {#if $nodeValue && $nodeValue.length > 0}
+                    <StaticImage
+                        value={$nodeValue[$nodeValue.length-1].data}
+                        show_label={widget.attrs.title != ""}
+                        label={widget.attrs.title}
+                        bind:imageWidth
+                        bind:imageHeight
                     />
-                {/if}
-                {#if $nodeValue.length > 0}
-                    <img src={$nodeValue[$nodeValue.length-1].data}/>
                 {:else}
                     <Empty size="large" unpadded_box={true}><Image /></Empty>
                 {/if}
             </Block>
         </div>
     {:else}
-        <div class="wrapper comfy-gallery-widget gradio-gallery" bind:this={element}>
+        <div class="wrapper comfy-gallery-widget gradio-gallery" style={widget.attrs.style || ""} bind:this={element}>
             <Block variant="solid" padding={false}>
                 <div class="padding">
                     <Gallery
@@ -154,6 +181,9 @@
                         root={""}
                         root_url={""}
                         on:select={onSelect}
+                        bind:imageWidth
+                        bind:imageHeight
+                        bind:selected_image
                     />
                 </div>
             </Block>

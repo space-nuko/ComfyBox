@@ -136,7 +136,6 @@
 
  :global(.svelte-select) {
      width: auto;
-     max-width: 16rem;
      --font-size: 13px;
      --height: 32px;
  }

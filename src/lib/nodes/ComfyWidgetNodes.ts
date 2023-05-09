@@ -16,6 +16,7 @@ import GalleryWidget from "$lib/widgets/GalleryWidget.svelte";
 import ButtonWidget from "$lib/widgets/ButtonWidget.svelte";
 import CheckboxWidget from "$lib/widgets/CheckboxWidget.svelte";
 import RadioWidget from "$lib/widgets/RadioWidget.svelte";
+import ImageUploadWidget from "$lib/widgets/ImageUploadWidget.svelte";
 
 /*
  * NOTE: If you want to add a new widget but it has the same input/output type
@@ -79,12 +80,15 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     override isBackendNode = false;
     override serialize_widgets = true;
 
+
+    // TODO these are bad, create override methods instead
     // input slots
     inputIndex: number = 0;
 
     // output slots
     outputIndex: number | null = 0;
     changedIndex: number | null = 1;
+
 
     displayWidget: ITextWidget;
 
@@ -203,7 +207,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     ): boolean {
         const anyConnected = range(this.outputs.length).some(i => this.getOutputLinks(i).length > 0);
 
-        if (this.autoConfig && "config" in input && !anyConnected) {
+        if (this.autoConfig && "config" in input && !anyConnected && (input as IComfyInputSlot).widgetNodeType === this.type) {
             this.doAutoConfig(input as IComfyInputSlot)
         }
 
@@ -279,7 +283,8 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     override onConfigure(o: SerializedLGraphNode) {
-        this.value.set((o as any).comfyValue);
+        const value = (o as any).comfyValue || LiteGraph.cloneObject(this.defaultValue);
+        this.value.set(value);
         this.shownOutputProperties = (o as any).shownOutputProperties;
     }
 
@@ -464,7 +469,7 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
     }
 
     static slotLayout: SlotLayout = {
-        inputs: [
+        inputs: [
             { name: "value", type: "string" },
             { name: "store", type: BuiltInSlotType.ACTION }
         ],
@@ -530,7 +535,10 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
             { name: "clear", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
-            { name: "selected_index", type: "number" }
+            { name: "selected_index", type: "number" },
+            { name: "width", type: "number" },
+            { name: "height", type: "number" },
+            { name: "any_selected", type: "boolean" },
         ]
     }
 
@@ -545,6 +553,8 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     override outputIndex = null;
     override changedIndex = null;
 
+    anyImageSelected: boolean = false;
+
     modeWidget: IComboWidget;
 
     constructor(name?: string) {
@@ -558,8 +568,13 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
         }
     }
 
+    imageSize: Vector2 = [1, 1]
+
     override onExecute() {
         this.setOutputData(0, this.properties.index)
+        this.setOutputData(1, this.imageSize[0])
+        this.setOutputData(2, this.imageSize[1])
+        this.setOutputData(3, this.anyImageSelected)
     }
 
     override onAction(action: any, param: any, options: { action_call?: string }) {
@@ -582,6 +597,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
                 }
             }
             this.setProperty("index", 0)
+            this.anyImageSelected = false;
         }
     }
 
@@ -590,12 +606,16 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     }
 
     override setValue(value: any) {
+        console.warn("SETVALUE", value)
         if (Array.isArray(value)) {
             super.setValue(value)
         }
         else {
             super.setValue([])
         }
+
+        if (!get(this.value))
+            this.anyImageSelected = false
 
         const len = get(this.value).length
         if (this.properties.index < 0 || this.properties.index >= len) {
@@ -665,6 +685,10 @@ export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
     }
 
     static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "value", type: "boolean" },
+            { name: "store", type: BuiltInSlotType.ACTION }
+        ],
         outputs: [
             { name: "value", type: "boolean" },
             { name: "changed", type: BuiltInSlotType.EVENT },
@@ -674,6 +698,10 @@ export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
     override svelteComponentType = CheckboxWidget;
     override defaultValue = false;
 
+    constructor(name?: string) {
+        super(name, false)
+    }
+
     override setValue(value: any) {
         value = Boolean(value)
         const changed = value != get(this.value);
@@ -682,8 +710,9 @@ export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
             this.triggerSlot(1, value)
     }
 
-    constructor(name?: string) {
-        super(name, false)
+    override onAction(action: any, param: any) {
+        if (action === "store")
+            this.setValue(Boolean(param))
     }
 }
 
@@ -750,4 +779,64 @@ LiteGraph.registerNodeType({
     title: "UI.Radio",
     desc: "Radio that outputs a string and index",
     type: "ui/radio"
+})
+
+export interface ComfyImageUploadProperties extends ComfyWidgetProperties {
+    fileCount: "single" | "multiple" // gradio File component format
+}
+
+export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>> {
+    override properties: ComfyImageUploadProperties = {
+        defaultValue: [],
+        tags: [],
+        fileCount: "single",
+    }
+
+    static slotLayout: SlotLayout = {
+        outputs: [
+            { name: "filename", type: "string" }, // TODO support batches
+            { name: "width", type: "number" },
+            { name: "height", type: "number" },
+            { name: "changed", type: BuiltInSlotType.EVENT },
+        ]
+    }
+
+    override svelteComponentType = ImageUploadWidget;
+    override defaultValue = [];
+    override outputIndex = null;
+    override changedIndex = 3;
+    override saveUserState = false;
+
+    imageSize: Vector2 = [1, 1];
+
+    constructor(name?: string) {
+        super(name, [])
+    }
+
+    override onExecute(param: any, options: object) {
+        super.onExecute(param, options);
+
+        const value = get(this.value)
+        if (value.length > 0 && value[0].name) {
+            this.setOutputData(0, value[0].name) // TODO when ComfyUI LoadImage supports loading an image batch
+            this.setOutputData(1, this.imageSize[0])
+            this.setOutputData(2, this.imageSize[1])
+        }
+        else {
+            this.setOutputData(0, "")
+            this.setOutputData(1, 1)
+            this.setOutputData(2, 1)
+        }
+    }
+
+    override formatValue(value: GradioFileData[]): string {
+        return `Images: ${value?.length || 0}`
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyImageUploadNode,
+    title: "UI.ImageUpload",
+    desc: "Widget that lets you upload images into ComfyUI's input folder",
+    type: "ui/image_upload"
 })

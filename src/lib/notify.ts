@@ -4,7 +4,7 @@ import { f7 } from "framework7-svelte"
 
 let notification;
 
-function notifyf7(text: string, title?: string) {
+function notifyf7(text: string, title?: string, type?: string) {
     if (!f7)
         return;
 
@@ -22,7 +22,7 @@ function notifyf7(text: string, title?: string) {
     notification.open();
 }
 
-function notifyToast(text: string, type?: string) {
+function notifyToast(text: string, title?: string, type?: string) {
     const options: SvelteToastOptions = {}
 
     if (type === "error") {
@@ -35,6 +35,6 @@ function notifyToast(text: string, type?: string) {
 }
 
 export default function notify(text: string, title?: string, type?: string) {
-    notifyf7(text, title);
-    notifyToast(text, title);
+    notifyf7(text, title, type);
+    notifyToast(text, title, type);
 }

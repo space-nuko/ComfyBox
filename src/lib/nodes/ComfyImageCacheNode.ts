@@ -1,4 +1,4 @@
-import { BuiltInSlotType, LiteGraph, type ITextWidget, type SlotLayout, clamp, type PropertyLayout, type IComboWidget } from "@litegraph-ts/core";
+import { BuiltInSlotType, LiteGraph, type ITextWidget, type SlotLayout, clamp, type PropertyLayout, type IComboWidget, type SerializedLGraphNode } from "@litegraph-ts/core";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 import type { GalleryOutput } from "./ComfyWidgetNodes";
 
@@ -11,6 +11,10 @@ export interface ComfyImageCacheNodeProperties extends ComfyGraphNodeProperties 
 }
 
 type ImageCacheState = "none" | "uploading" | "failed" | "cached"
+
+interface ComfyUploadImageAPIResponse {
+    name: string
+}
 
 /*
  * A node that can act as both an input and output image node by uploading
@@ -42,6 +46,8 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
     static propertyLayout: PropertyLayout = [
         { name: "updateMode", defaultValue: "replace", type: "enum", options: { values: ["replace", "append"] } }
     ]
+
+    override saveUserState = false;
 
     private _uploadPromise: Promise<void> | null = null;
 
@@ -120,6 +126,14 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
         this.setOutputData(1, state)
     }
 
+    override stripUserState(o: SerializedLGraphNode) {
+        super.stripUserState(o);
+        o.properties.images = null
+        o.properties.index = 0
+        o.properties.filenames = {}
+        o.properties.genNumber = 0
+    }
+
     private setIndex(newIndex: number, force: boolean = false) {
         if (newIndex === this.properties.index && !force)
             return;
@@ -159,6 +173,7 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
         else {
             this.properties.filenames[newIndex] = { filename: null, status: "uploading" }
             this.onPropertyChanged("filenames", this.properties.filenames)
+
             const url = `http://${location.hostname}:8188` // TODO make configurable
             const params = new URLSearchParams(data)
 
@@ -176,10 +191,10 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
                     )
                 })
                 .then((r) => r.json())
-                .then((json) => {
+                .then((json: ComfyUploadImageAPIResponse) => {
                     console.debug("Gottem", json)
                     if (lastGenNumber === this.properties.genNumber) {
-                        this.properties.filenames[newIndex] = { filename: data.filename, status: "cached" }
+                        this.properties.filenames[newIndex] = { filename: json.name, status: "cached" }
                         this.onPropertyChanged("filenames", this.properties.filenames)
                     }
                     else {
