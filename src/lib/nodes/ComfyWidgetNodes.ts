@@ -594,6 +594,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     }
 
     override setValue(value: any) {
+        console.warn("SETVALUE", value)
         if (Array.isArray(value)) {
             super.setValue(value)
         }
@@ -669,6 +670,10 @@ export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
     }
 
     static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "value", type: "boolean" },
+            { name: "store", type: BuiltInSlotType.ACTION }
+        ],
         outputs: [
             { name: "value", type: "boolean" },
             { name: "changed", type: BuiltInSlotType.EVENT },
@@ -678,6 +683,10 @@ export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
     override svelteComponentType = CheckboxWidget;
     override defaultValue = false;
 
+    constructor(name?: string) {
+        super(name, false)
+    }
+
     override setValue(value: any) {
         value = Boolean(value)
         const changed = value != get(this.value);
@@ -686,8 +695,9 @@ export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
             this.triggerSlot(1, value)
     }
 
-    constructor(name?: string) {
-        super(name, false)
+    override onAction(action: any, param: any) {
+        if (action === "store")
+            this.setValue(Boolean(param))
     }
 }
 
@@ -770,6 +780,8 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
     static slotLayout: SlotLayout = {
         outputs: [
             { name: "filename", type: "string" }, // TODO support batches
+            { name: "width", type: "number" },
+            { name: "height", type: "number" },
             { name: "changed", type: BuiltInSlotType.EVENT },
         ]
     }
@@ -777,7 +789,9 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
     override svelteComponentType = ImageUploadWidget;
     override defaultValue = null;
     override outputIndex = null;
-    override changedIndex = 1;
+    override changedIndex = 3;
+
+    imageSize: Vector2 = [1, 1];
 
     constructor(name?: string) {
         super(name, [])
@@ -787,10 +801,16 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
         super.onExecute(param, options);
 
         const value = get(this.value)
-        if (value.length > 0 && value[0].name)
+        if (value.length > 0 && value[0].name) {
             this.setOutputData(0, value[0].name) // TODO when ComfyUI LoadImage supports loading an image batch
-        else
+            this.setOutputData(1, this.imageSize[0])
+            this.setOutputData(2, this.imageSize[1])
+        }
+        else {
             this.setOutputData(0, "")
+            this.setOutputData(1, 1)
+            this.setOutputData(2, 1)
+        }
     }
 
     override formatValue(value: GradioFileData[]): string {

@@ -1,9 +1,11 @@
-import { BuiltInSlotType, LiteGraph, NodeMode, type INodeInputSlot, type SlotLayout, type INodeOutputSlot, LLink, LConnectionKind, type ITextWidget } from "@litegraph-ts/core";
+import { BuiltInSlotType, LiteGraph, NodeMode, type INodeInputSlot, type SlotLayout, type INodeOutputSlot, LLink, LConnectionKind, type ITextWidget, type SerializedLGraphNode, type IComboWidget } from "@litegraph-ts/core";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 import { Watch } from "@litegraph-ts/nodes-basic";
 
+export type PickFirstMode = "anyActiveLink" | "truthy" | "dataNonNull"
+
 export interface ComfyPickFirstNodeProperties extends ComfyGraphNodeProperties {
-    acceptNullLinkData: boolean
+    mode: PickFirstMode
 }
 
 function nextLetter(s: string): string {
@@ -20,7 +22,7 @@ function nextLetter(s: string): string {
 export default class ComfyPickFirstNode extends ComfyGraphNode {
     override properties: ComfyPickFirstNodeProperties = {
         tags: [],
-        acceptNullLinkData: false
+        mode: "dataNonNull"
     }
 
     static slotLayout: SlotLayout = {
@@ -38,11 +40,13 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
     private selected: number = -1;
 
     displayWidget: ITextWidget;
+    modeWidget: IComboWidget;
 
     constructor(title?: string) {
         super(title);
         this.displayWidget = this.addWidget("text", "Value", "")
         this.displayWidget.disabled = true;
+        this.modeWidget = this.addWidget("combo", "Mode", this.properties.mode, null, { property: "mode", values: ["anyActiveLink", "truthy", "dataNonNull"] })
     }
 
     override onDrawBackground(ctx: CanvasRenderingContext2D) {
@@ -117,7 +121,12 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
             return true;
         }
         else {
-            return link.data != null || this.properties.acceptNullLinkData;
+            if (this.properties.mode === "dataNonNull")
+                return link.data != null;
+            else if (this.properties.mode === "truthy")
+                return Boolean(link.data)
+            else // anyActiveLink
+                return true;
         }
     }
 

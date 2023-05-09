@@ -9,6 +9,7 @@
  import UploadText from "$lib/components/gradio/app/UploadText.svelte";
 	import { tick } from "svelte";
 	import notify from "$lib/notify";
+	import type { Vector2 } from "@litegraph-ts/core";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -18,6 +19,9 @@
  let dragging = false;
  let pending_upload = false;
  let old_value: Array<GradioFileData> | null = null;
+ let imgElem: HTMLImageElement | null = null
+ let imgWidth: number = 1;
+ let imgHeight: number = 1;
 
  $: widget && setNodeValue(widget);
 
@@ -34,6 +38,18 @@
          propsChanged = node.propsChanged;
      }
  };
+
+ $: if (!(node && _value && _value.length > 0 && imgElem)) {
+     imgWidth = 1
+     imgHeight = 1
+     node.imageSize = [1, 1]
+ }
+ else if (imgWidth > 1 || imgHeight > 1) {
+     node.imageSize = [imgWidth, imgHeight]
+ }
+ else {
+     node.imageSize = [1, 1]
+ }
 
  function onChange() {
      console.warn("CHANGED", _value)
@@ -191,7 +207,12 @@
             {#if _value && _value.length > 0 && !pending_upload}
                 {@const firstImage = _value[0]}
                 <ModifyUpload on:clear={handle_clear} absolute />
-                <img src={getImageUrl(firstImage)} alt={firstImage.orig_name} />
+                <img src={getImageUrl(firstImage)}
+                     alt={firstImage.orig_name}
+                     bind:this={imgElem}
+                     bind:naturalWidth={imgWidth}
+                     bind:naturalHeight={imgHeight}
+                />
             {:else}
                 <Upload
                     file_count={node.properties.fileCount}

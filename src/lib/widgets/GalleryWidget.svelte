@@ -37,8 +37,7 @@
  };
 
  let style: Styles = {
-     grid_cols: [4],
-     grid_rows: [4],
+     grid_cols: [3],
      object_fit: "cover",
  }
  let element: HTMLDivElement;
@@ -125,11 +124,11 @@
  }
 </script>
 
-{#if widget && node && nodeValue && $nodeValue != null}
+{#if widget && node && nodeValue}
     {#if widget.attrs.variant === "image"}
         <div class="wrapper comfy-image-widget" style={widget.attrs.style || ""} bind:this={element}>
             <Block variant="solid" padding={false}>
-                {#if $nodeValue.length > 0}
+                {#if $nodeValue && $nodeValue.length > 0}
                     <StaticImage
                         value={$nodeValue[$nodeValue.length-1].data}
                         show_label={widget.attrs.title != ""}

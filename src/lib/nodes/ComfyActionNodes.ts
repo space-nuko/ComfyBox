@@ -306,7 +306,6 @@ export class ComfySetNodeModeAction extends ComfyGraphNode {
                     } else {
                         newMode = NodeMode.NEVER;
                     }
-                    console.warn("CHANGEMODE", newMode == NodeMode.ALWAYS ? "ALWAYS" : "NEVER", tags, node)
                     node.changeMode(newMode);
                     if ("notifyPropsChanged" in node)
                         (node as ComfyWidgetNode).notifyPropsChanged();
