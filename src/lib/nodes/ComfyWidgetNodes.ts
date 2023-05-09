@@ -468,7 +468,7 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
     }
 
     static slotLayout: SlotLayout = {
-        inputs: [
+        inputs: [
             { name: "value", type: "string" },
             { name: "store", type: BuiltInSlotType.ACTION }
         ],
@@ -534,7 +534,9 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
             { name: "clear", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
-            { name: "selected_index", type: "number" }
+            { name: "selected_index", type: "number" },
+            { name: "width", type: "number" },
+            { name: "height", type: "number" },
         ]
     }
 
@@ -562,8 +564,12 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
         }
     }
 
+    imageSize: Vector2 = [1, 1]
+
     override onExecute() {
         this.setOutputData(0, this.properties.index)
+        this.setOutputData(1, this.imageSize[0])
+        this.setOutputData(2, this.imageSize[1])
     }
 
     override onAction(action: any, param: any, options: { action_call?: string }) {

@@ -1,4 +1,4 @@
-import { BuiltInSlotType, LiteGraph, type ITextWidget, type SlotLayout, clamp, type PropertyLayout, type IComboWidget } from "@litegraph-ts/core";
+import { BuiltInSlotType, LiteGraph, type ITextWidget, type SlotLayout, clamp, type PropertyLayout, type IComboWidget, type SerializedLGraphNode } from "@litegraph-ts/core";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 import type { GalleryOutput } from "./ComfyWidgetNodes";
 
@@ -46,6 +46,8 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
     static propertyLayout: PropertyLayout = [
         { name: "updateMode", defaultValue: "replace", type: "enum", options: { values: ["replace", "append"] } }
     ]
+
+    override saveUserState = false;
 
     private _uploadPromise: Promise<void> | null = null;
 
@@ -122,6 +124,14 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
 
         this.setOutputData(0, filename)
         this.setOutputData(1, state)
+    }
+
+    override stripUserState(o: SerializedLGraphNode) {
+        super.stripUserState(o);
+        o.properties.images = null
+        o.properties.index = 0
+        o.properties.filenames = {}
+        o.properties.genNumber = 0
     }
 
     private setIndex(newIndex: number, force: boolean = false) {

@@ -1,9 +1,9 @@
 <script lang="ts">
  import { ImageViewer } from "$lib/ImageViewer";
  import { Block, BlockLabel, Empty } from "@gradio/atoms";
- import { Gallery } from "@gradio/gallery";
+ import { Gallery } from "$lib/components/gradio/gallery";
  import { Image } from "@gradio/icons";
- import { StaticImage } from "@gradio/image";
+ import { StaticImage } from "$lib/components/gradio/image";
  import type { Styles } from "@gradio/utils";
  import type { WidgetLayout } from "$lib/stores/layoutState";
  import type { Writable } from "svelte/store";
@@ -19,6 +19,8 @@
  let nodeValue: Writable<GradioFileData[]> | null = null;
  let propsChanged: Writable<number> | null = null;
  let option: number | null = null;
+ let imageWidth: number = 1;
+ let imageHeight: number = 1;
 
  $: widget && setNodeValue(widget);
 
@@ -30,7 +32,7 @@
 
          if ($nodeValue != null) {
              if (node.properties.index < 0 || node.properties.index >= $nodeValue.length) {
-                 node.setProperty("index", clamp(node.properties.index, 0, $nodeValue))
+                 node.setProperty("index", clamp(node.properties.index, 0, $nodeValue.length))
              }
          }
      }
@@ -41,6 +43,15 @@
      object_fit: "cover",
  }
  let element: HTMLDivElement;
+
+ $: if (node) {
+     if (imageWidth > 1 || imageHeight > 1) {
+         node.imageSize = [imageWidth, imageHeight]
+     }
+     else {
+         node.imageSize = [1, 1]
+     }
+ }
 
  let mobileLightbox = null;
 
@@ -133,6 +144,8 @@
                         value={$nodeValue[$nodeValue.length-1].data}
                         show_label={widget.attrs.title != ""}
                         label={widget.attrs.title}
+                        bind:imageWidth
+                        bind:imageHeight
                     />
                 {:else}
                     <Empty size="large" unpadded_box={true}><Image /></Empty>
@@ -151,6 +164,8 @@
                         root={""}
                         root_url={""}
                         on:select={onSelect}
+                        bind:imageWidth
+                        bind:imageHeight
                     />
                 </div>
             </Block>
