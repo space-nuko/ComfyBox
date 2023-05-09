@@ -213,7 +213,8 @@ export class ComfyNotifyAction extends ComfyGraphNode {
             return;
 
         const options: NotifyOptions = {
-            type: this.properties.type
+            type: this.properties.type,
+            showOn: "all"
         }
 
         // Check if this event was triggered from a backend node and has the
@@ -545,4 +546,36 @@ LiteGraph.registerNodeType({
     title: "Comfy.SetNodeModeAdvancedAction",
     desc: "Turns multiple groups of nodes on/off at once based on an array of rules [{ tag: string, enable: boolean }, ...]",
     type: "actions/set_node_mode_advanced"
+})
+
+export class ComfyNoChangeEvent extends ComfyGraphNode {
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "in", type: BuiltInSlotType.ACTION },
+        ],
+        outputs: [
+            { name: "out", type: BuiltInSlotType.EVENT },
+        ],
+    }
+
+    override onAction(action: any, param: any, options: { action_call?: string }) {
+        if (param && typeof param === "object" && "noChangedEvent" in param) {
+            param.noChangedEvent = true;
+        }
+        else {
+            param = {
+                value: param,
+                noChangedEvent: true
+            }
+        }
+
+        this.triggerSlot(0, param, null, options);
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyNoChangeEvent,
+    title: "Comfy.NoChangeEvent",
+    desc: "Wraps an event's parameter such that passing it into a ComfyWidgetNode's 'store' action will not trigger its 'changed' event",
+    type: "events/no_change"
 })

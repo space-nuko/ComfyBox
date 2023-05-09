@@ -90,7 +90,8 @@ export default class ComfyGraph extends LGraph {
         }
 
         if (get(uiState).autoAddUI) {
-            if (!("svelteComponentType" in node) && !options.addedByDeserialize) {
+            console.warn("ADD", node.type, options)
+            if (!("svelteComponentType" in node) && options.addedByDeserialize == null) {
                 console.debug("[ComfyGraph] AutoAdd UI")
                 const comfyNode = node as ComfyGraphNode;
                 const widgetNodesAdded = []

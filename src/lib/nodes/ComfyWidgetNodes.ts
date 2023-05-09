@@ -827,6 +827,7 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
             { name: "filename", type: "string" }, // TODO support batches
             { name: "width", type: "number" },
             { name: "height", type: "number" },
+            { name: "image_count", type: "number" },
             { name: "changed", type: BuiltInSlotType.EVENT },
         ]
     }
@@ -851,11 +852,13 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
             this.setOutputData(0, value[0].name) // TODO when ComfyUI LoadImage supports loading an image batch
             this.setOutputData(1, this.imageSize[0])
             this.setOutputData(2, this.imageSize[1])
+            this.setOutputData(3, value.length)
         }
         else {
             this.setOutputData(0, "")
             this.setOutputData(1, 1)
             this.setOutputData(2, 1)
+            this.setOutputData(3, 0)
         }
     }
 

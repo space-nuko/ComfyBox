@@ -32,6 +32,9 @@
  $: if (container) {
      children = $layoutState.allItems[container.id].children;
      attrsChanged = container.attrsChanged
+     if (container.isOpen == null) {
+         container.isOpen = container.attrs.openOnStartup
+     }
  }
  else {
      children = null;
@@ -97,7 +100,7 @@
             </Block>
         {:else}
             <Block elem_classes={["gradio-accordion"]}>
-                <Accordion label={container.attrs.title} open={container.attrs.openOnStartup}>
+                <Accordion label={container.attrs.title} bind:open={container.isOpen}>
                     {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
                         <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
                     {/each}

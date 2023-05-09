@@ -7,7 +7,8 @@ export type NotifyOptions = {
     title?: string,
     type?: "neutral" | "info" | "warning" | "error" | "success",
     imageUrl?: string,
-    timeout?: number | null
+    timeout?: number | null,
+    showOn?: "web" | "native" | "all" | "none"
 }
 
 function notifyf7(text: string, options: NotifyOptions) {
@@ -76,7 +77,17 @@ function notifyNative(text: string, options: NotifyOptions) {
 }
 
 export default function notify(text: string, options: NotifyOptions = {}) {
-    notifyf7(text, options);
-    notifyToast(text, options);
-    notifyNative(text, options)
+    const showOn = options.showOn || "web";
+
+    if (showOn === "none")
+        return;
+
+    if (showOn === "all" || showOn === "web") {
+        notifyf7(text, options);
+        notifyToast(text, options);
+    }
+
+    if (showOn === "all" || showOn === "native") {
+        notifyNative(text, options)
+    }
 }

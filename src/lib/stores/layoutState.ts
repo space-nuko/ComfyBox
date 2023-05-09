@@ -591,6 +591,12 @@ export interface IDragItem {
  */
 export interface ContainerLayout extends IDragItem {
     type: "container",
+
+    // Ephemeral state to preserve when the component gets recreated by Svelte
+    // (not serialized)
+
+    // Accordion
+    isOpen?: boolean,
 }
 
 /*
