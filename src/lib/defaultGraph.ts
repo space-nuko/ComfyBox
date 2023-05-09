@@ -4,8 +4,8 @@ const defaultGraph: SerializedAppState = {
   createdBy: "ComfyBox",
   version: 1,
   workflow: {
-    last_node_id: 243,
-    last_link_id: 384,
+    last_node_id: 284,
+    last_link_id: 445,
     nodes: [
       {
         id: 33,
@@ -59,11 +59,11 @@ const defaultGraph: SerializedAppState = {
           hidden: false
         },
         widgets_values: [
-          "a fluffy corgi wearing glasses"
+          "a fluffy corgi wearing sunglasses"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: "a fluffy corgi wearing glasses",
+        comfyValue: "a fluffy corgi wearing sunglasses",
         shownOutputProperties: {},
         saveUserState: true
       },
@@ -828,7 +828,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 140,
+        order: 142,
         mode: 0,
         inputs: [
           {
@@ -913,39 +913,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 78,
-        type: "basic/string",
-        pos: [
-          673.2486933619983,
-          634.4778575549986
-        ],
-        size: [
-          210,
-          38
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 12,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "string",
-            type: "string",
-            links: [
-              104
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Const String",
-        properties: {
-          value: "Prompt generated!",
-          tags: []
-        }
-      },
-      {
         id: 108,
         type: "ui/text",
         pos: [
@@ -959,7 +926,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 105,
+        order: 104,
         mode: 0,
         inputs: [
           {
@@ -994,11 +961,11 @@ const defaultGraph: SerializedAppState = {
           multiline: false
         },
         widgets_values: [
-          "none"
+          "cached"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: "none",
+        comfyValue: "cached",
         shownOutputProperties: {},
         saveUserState: true
       },
@@ -1016,7 +983,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 13,
+        order: 12,
         mode: 0,
         inputs: [],
         outputs: [
@@ -1050,7 +1017,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 14,
+        order: 13,
         mode: 0,
         inputs: [
           {
@@ -1149,7 +1116,7 @@ const defaultGraph: SerializedAppState = {
           66
         ],
         flags: {},
-        order: 139,
+        order: 141,
         mode: 0,
         inputs: [
           {
@@ -1203,7 +1170,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 15,
+        order: 14,
         mode: 0,
         inputs: [],
         outputs: [
@@ -1249,7 +1216,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 55,
+        order: 54,
         mode: 0,
         inputs: [
           {
@@ -1295,7 +1262,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 51,
+        order: 50,
         mode: 0,
         inputs: [
           {
@@ -1347,7 +1314,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 16,
+        order: 15,
         mode: 0,
         inputs: [],
         outputs: [
@@ -1380,7 +1347,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 116,
+        order: 115,
         mode: 0,
         inputs: [
           {
@@ -1418,7 +1385,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 114,
+        order: 113,
         mode: 0,
         inputs: [
           {
@@ -1453,11 +1420,11 @@ const defaultGraph: SerializedAppState = {
           multiline: false
         },
         widgets_values: [
-          "2"
+          "1024"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: "2",
+        comfyValue: "1024",
         shownOutputProperties: {},
         saveUserState: true
       },
@@ -1475,7 +1442,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 117,
+        order: 116,
         mode: 0,
         inputs: [
           {
@@ -1513,7 +1480,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 115,
+        order: 114,
         mode: 0,
         inputs: [
           {
@@ -1548,11 +1515,11 @@ const defaultGraph: SerializedAppState = {
           multiline: false
         },
         widgets_values: [
-          "2"
+          "1024"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: "2",
+        comfyValue: "1024",
         shownOutputProperties: {},
         saveUserState: true
       },
@@ -1570,7 +1537,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 118,
+        order: 117,
         mode: 0,
         inputs: [
           {
@@ -1609,7 +1576,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 119,
+        order: 118,
         mode: 0,
         inputs: [
           {
@@ -1648,7 +1615,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 17,
+        order: 16,
         mode: 0,
         inputs: [
           {
@@ -1710,11 +1677,11 @@ const defaultGraph: SerializedAppState = {
           precision: 0
         },
         widgets_values: [
-          "2.100"
+          "2.000"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: 2.1,
+        comfyValue: 2,
         shownOutputProperties: {
           min: {
             type: "number",
@@ -1749,7 +1716,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 18,
+        order: 17,
         mode: 0,
         inputs: [],
         outputs: [
@@ -1794,7 +1761,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 52,
+        order: 51,
         mode: 0,
         inputs: [
           {
@@ -1849,7 +1816,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 19,
+        order: 18,
         mode: 0,
         inputs: [],
         outputs: [
@@ -1883,7 +1850,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 71,
+        order: 70,
         mode: 0,
         inputs: [
           {
@@ -1937,8 +1904,8 @@ const defaultGraph: SerializedAppState = {
         properties: {
           tags: [],
           defaultValue: 1,
-          min: -10,
-          max: 10,
+          min: -2,
+          max: 2,
           step: 0.01,
           precision: 0
         },
@@ -1982,7 +1949,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 72,
+        order: 71,
         mode: 0,
         inputs: [
           {
@@ -2036,8 +2003,8 @@ const defaultGraph: SerializedAppState = {
         properties: {
           tags: [],
           defaultValue: 1,
-          min: -10,
-          max: 10,
+          min: -2,
+          max: 2,
           step: 0.01,
           precision: 0
         },
@@ -2081,7 +2048,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 20,
+        order: 19,
         mode: 0,
         inputs: [],
         outputs: [
@@ -2126,7 +2093,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 21,
+        order: 20,
         mode: 0,
         inputs: [
           {
@@ -2165,11 +2132,11 @@ const defaultGraph: SerializedAppState = {
           defaultValue: false
         },
         widgets_values: [
-          "false"
+          "true"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: false,
+        comfyValue: true,
         shownOutputProperties: {},
         saveUserState: true
       },
@@ -2187,7 +2154,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 81,
+        order: 82,
         mode: 0,
         inputs: [
           {
@@ -2240,7 +2207,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 80,
+        order: 81,
         mode: 0,
         inputs: [
           {
@@ -2291,7 +2258,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 22,
+        order: 21,
         mode: 0,
         inputs: [],
         outputs: [
@@ -2339,7 +2306,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 54,
+        order: 53,
         mode: 0,
         inputs: [
           {
@@ -2374,167 +2341,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 122,
-        type: "actions/notify",
-        pos: [
-          2020.6999999999966,
-          278.5
-        ],
-        size: [
-          151.2,
-          46
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 111,
-        mode: 0,
-        inputs: [
-          {
-            name: "message",
-            type: "string",
-            link: 185
-          },
-          {
-            name: "trigger",
-            type: -1,
-            link: 241,
-            shape: 1,
-            slot_index: 1
-          }
-        ],
-        outputs: [],
-        title: "Comfy.NotifyAction",
-        properties: {
-          message: "Nya.",
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
-        id: 77,
-        type: "actions/notify",
-        pos: [
-          674,
-          665
-        ],
-        size: [
-          151.2,
-          46
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 50,
-        mode: 0,
-        inputs: [
-          {
-            name: "message",
-            type: "string",
-            link: 104
-          },
-          {
-            name: "trigger",
-            type: -1,
-            link: null,
-            shape: 1,
-            slot_index: 1
-          }
-        ],
-        outputs: [],
-        title: "Comfy.NotifyAction",
-        properties: {
-          message: "Nya.",
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
-        id: 168,
-        type: "basic/CompareValues",
-        pos: [
-          -1466.1829785123962,
-          531.4379611570262
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 64,
-        mode: 0,
-        inputs: [
-          {
-            name: "A",
-            type: 0,
-            link: 251
-          },
-          {
-            name: "B",
-            type: 0,
-            link: 249
-          }
-        ],
-        outputs: [
-          {
-            name: "true",
-            type: "boolean",
-            links: [
-              253
-            ],
-            slot_index: 0
-          },
-          {
-            name: "false",
-            type: "boolean",
-            links: null
-          }
-        ],
-        title: "GenericCompare",
-        properties: {
-          A: "txt2img",
-          B: "txt2img",
-          OP: "==",
-          enabled: true,
-          tags: []
-        }
-      },
-      {
-        id: 166,
-        type: "basic/string",
-        pos: [
-          -1568.1829785123962,
-          530.4379611570262
-        ],
-        size: [
-          210,
-          38
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 23,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "string",
-            type: "string",
-            links: [
-              249
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Const String",
-        properties: {
-          value: "txt2img",
-          tags: []
-        }
-      },
-      {
         id: 39,
         type: "ui/slider",
         pos: [
@@ -2548,8 +2354,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 24,
-        mode: 0,
+        order: 22,
+        mode: 2,
         inputs: [
           {
             name: "value",
@@ -2651,7 +2457,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 25,
+        order: 23,
         mode: 0,
         inputs: [
           {
@@ -2710,10 +2516,10 @@ const defaultGraph: SerializedAppState = {
         ],
         size: [
           210,
-          78
+          102
         ],
         flags: {},
-        order: 74,
+        order: 73,
         mode: 0,
         inputs: [
           {
@@ -2753,7 +2559,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 57,
+        order: 56,
         mode: 0,
         inputs: [
           {
@@ -2789,7 +2595,7 @@ const defaultGraph: SerializedAppState = {
           78
         ],
         flags: {},
-        order: 26,
+        order: 24,
         mode: 0,
         inputs: [
           {
@@ -2828,7 +2634,7 @@ const defaultGraph: SerializedAppState = {
           defaultValue: false
         },
         widgets_values: [
-          "false"
+          "null"
         ],
         color: "#223",
         bgColor: "#335",
@@ -2850,8 +2656,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 27,
-        mode: 2,
+        order: 25,
+        mode: 0,
         inputs: [
           {
             name: "value",
@@ -2915,8 +2721,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 28,
-        mode: 2,
+        order: 26,
+        mode: 0,
         inputs: [
           {
             name: "value",
@@ -2979,8 +2785,8 @@ const defaultGraph: SerializedAppState = {
           66
         ],
         flags: {},
-        order: 134,
-        mode: 0,
+        order: 136,
+        mode: 2,
         inputs: [
           {
             name: "width",
@@ -3039,7 +2845,7 @@ const defaultGraph: SerializedAppState = {
           106
         ],
         flags: {},
-        order: 141,
+        order: 144,
         mode: 0,
         inputs: [
           {
@@ -3117,7 +2923,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 142,
+        order: 145,
         mode: 0,
         inputs: [
           {
@@ -3165,7 +2971,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 107,
+        order: 106,
         mode: 0,
         inputs: [
           {
@@ -3215,7 +3021,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 102,
+        order: 101,
         mode: 0,
         inputs: [
           {
@@ -3263,7 +3069,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 137,
+        order: 139,
         mode: 0,
         inputs: [
           {
@@ -3319,7 +3125,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 53,
+        order: 52,
         mode: 0,
         inputs: [
           {
@@ -3374,7 +3180,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 70,
+        order: 69,
         mode: 0,
         inputs: [
           {
@@ -3430,7 +3236,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 29,
+        order: 27,
         mode: 0,
         inputs: [],
         outputs: [
@@ -3464,8 +3270,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 30,
-        mode: 2,
+        order: 28,
+        mode: 0,
         inputs: [
           {
             name: "value",
@@ -3523,7 +3329,7 @@ const defaultGraph: SerializedAppState = {
           defaultValue: 0,
           min: 0,
           max: 1,
-          step: 0.05,
+          step: 0.01,
           precision: 1
         },
         widgets_values: [
@@ -3564,7 +3370,7 @@ const defaultGraph: SerializedAppState = {
           122
         ],
         flags: {},
-        order: 73,
+        order: 72,
         mode: 0,
         inputs: [
           {
@@ -3621,7 +3427,7 @@ const defaultGraph: SerializedAppState = {
           26
         ],
         flags: {},
-        order: 56,
+        order: 55,
         mode: 0,
         inputs: [
           {
@@ -3730,7 +3536,7 @@ const defaultGraph: SerializedAppState = {
           142
         ],
         flags: {},
-        order: 103,
+        order: 102,
         mode: 0,
         inputs: [
           {
@@ -3777,7 +3583,7 @@ const defaultGraph: SerializedAppState = {
         properties: {
           tags: [],
           defaultValue: null,
-          index: 0,
+          index: 5,
           updateMode: "append",
           values: []
         },
@@ -3802,7 +3608,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 69,
+        order: 68,
         mode: 0,
         inputs: [
           {
@@ -3856,7 +3662,7 @@ const defaultGraph: SerializedAppState = {
           206
         ],
         flags: {},
-        order: 110,
+        order: 109,
         mode: 0,
         inputs: [
           {
@@ -3972,7 +3778,7 @@ const defaultGraph: SerializedAppState = {
           106
         ],
         flags: {},
-        order: 82,
+        order: 83,
         mode: 0,
         inputs: [
           {
@@ -4058,7 +3864,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 89,
+        order: 90,
         mode: 0,
         inputs: [
           {
@@ -4113,7 +3919,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 90,
+        order: 91,
         mode: 0,
         inputs: [
           {
@@ -4168,8 +3974,8 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 83,
-        mode: 2,
+        order: 84,
+        mode: 0,
         inputs: [
           {
             name: "pixels",
@@ -4206,48 +4012,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 173,
-        type: "events/frame_delay",
-        pos: [
-          -1354.2999999999997,
-          524.1000000000004
-        ],
-        size: [
-          140,
-          26
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 67,
-        mode: 0,
-        inputs: [
-          {
-            name: "event",
-            type: -1,
-            link: 266,
-            shape: 1,
-            slot_index: 0
-          }
-        ],
-        outputs: [
-          {
-            name: "on_time",
-            type: -2,
-            links: [
-              265
-            ],
-            shape: 1,
-            slot_index: 0
-          }
-        ],
-        title: "Frame Delay",
-        properties: {
-          timeInFrames: 8,
-          tags: []
-        }
-      },
-      {
         id: 56,
         type: "utils/value_control",
         pos: [
@@ -4259,7 +4023,7 @@ const defaultGraph: SerializedAppState = {
           126
         ],
         flags: {},
-        order: 138,
+        order: 140,
         mode: 0,
         inputs: [
           {
@@ -4323,7 +4087,7 @@ const defaultGraph: SerializedAppState = {
         title: "Comfy.ValueControl",
         properties: {
           tags: [],
-          value: 1089491900447023,
+          value: 346653876594339,
           action: "randomize",
           min: 0,
           max: 18446744073709552000,
@@ -4345,7 +4109,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 123,
+        order: 122,
         mode: 0,
         inputs: [
           {
@@ -4420,11 +4184,11 @@ const defaultGraph: SerializedAppState = {
           hidden: false
         },
         widgets_values: [
-          "1089491900447023.000"
+          "346653876594339.000"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: 1089491900447023,
+        comfyValue: 346653876594339,
         shownOutputProperties: {
           min: {
             type: "number",
@@ -4457,8 +4221,8 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 60,
-        mode: 2,
+        order: 59,
+        mode: 0,
         inputs: [
           {
             name: "image",
@@ -4510,7 +4274,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 58,
+        order: 57,
         mode: 0,
         inputs: [
           {
@@ -4565,7 +4329,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 125,
+        order: 124,
         mode: 0,
         inputs: [
           {
@@ -4620,7 +4384,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 31,
+        order: 29,
         mode: 0,
         inputs: [
           {
@@ -4668,62 +4432,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 159,
-        type: "SaveImage",
-        pos: [
-          1831,
-          -8
-        ],
-        size: [
-          220,
-          46
-        ],
-        flags: {},
-        order: 121,
-        mode: 0,
-        inputs: [
-          {
-            name: "images",
-            type: "IMAGE",
-            link: 239,
-            config: {}
-          },
-          {
-            name: "filename_prefix",
-            type: "string",
-            link: 311,
-            config: {},
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/text",
-            serialize: true,
-            slot_index: 1
-          }
-        ],
-        outputs: [
-          {
-            name: "onExecuted",
-            type: -2,
-            links: [
-              240,
-              241
-            ],
-            color_off: "rebeccapurple",
-            color_on: "rebeccapurple",
-            shape: 1,
-            slot_index: 0
-          }
-        ],
-        title: "SaveImage",
-        properties: {
-          tags: [
-            "hr"
-          ]
-        },
-        color: "#432",
-        bgColor: "#653",
-        saveUserState: true
-      },
-      {
         id: 193,
         type: "utils/pick_first",
         pos: [
@@ -4737,7 +4445,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 59,
+        order: 58,
         mode: 0,
         inputs: [
           {
@@ -4790,7 +4498,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 32,
+        order: 30,
         mode: 0,
         inputs: [],
         outputs: [
@@ -4823,8 +4531,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 33,
-        mode: 0,
+        order: 31,
+        mode: 2,
         inputs: [],
         outputs: [
           {
@@ -4873,8 +4581,8 @@ const defaultGraph: SerializedAppState = {
           66
         ],
         flags: {},
-        order: 126,
-        mode: 0,
+        order: 125,
+        mode: 2,
         inputs: [
           {
             name: "A",
@@ -4934,8 +4642,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 34,
-        mode: 0,
+        order: 32,
+        mode: 2,
         inputs: [],
         outputs: [
           {
@@ -4987,8 +4695,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 136,
-        mode: 0,
+        order: 138,
+        mode: 2,
         inputs: [
           {
             name: "value",
@@ -5089,8 +4797,8 @@ const defaultGraph: SerializedAppState = {
           106
         ],
         flags: {},
-        order: 124,
-        mode: 2,
+        order: 123,
+        mode: 0,
         inputs: [
           {
             name: "samples",
@@ -5170,8 +4878,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 135,
-        mode: 0,
+        order: 137,
+        mode: 2,
         inputs: [
           {
             name: "value",
@@ -5275,8 +4983,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 91,
-        mode: 2,
+        order: 92,
+        mode: 0,
         inputs: [
           {
             name: "value",
@@ -5313,11 +5021,11 @@ const defaultGraph: SerializedAppState = {
           multiline: false
         },
         widgets_values: [
-          "2"
+          "2048"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: "2",
+        comfyValue: "2048",
         shownOutputProperties: {},
         saveUserState: true
       },
@@ -5335,8 +5043,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 92,
-        mode: 2,
+        order: 93,
+        mode: 0,
         inputs: [
           {
             name: "value",
@@ -5373,11 +5081,11 @@ const defaultGraph: SerializedAppState = {
           multiline: false
         },
         widgets_values: [
-          "2"
+          "2048"
         ],
         color: "#223",
         bgColor: "#335",
-        comfyValue: "2",
+        comfyValue: "2048",
         shownOutputProperties: {},
         saveUserState: true
       },
@@ -5395,8 +5103,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 62,
-        mode: 2,
+        order: 61,
+        mode: 0,
         inputs: [
           {
             name: "A",
@@ -5422,7 +5130,7 @@ const defaultGraph: SerializedAppState = {
         title: "Operation",
         properties: {
           A: 2,
-          B: 1,
+          B: 1024,
           OP: "*",
           tags: [
             "i2i",
@@ -5444,8 +5152,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 84,
-        mode: 2,
+        order: 85,
+        mode: 0,
         inputs: [
           {
             name: "in",
@@ -5485,8 +5193,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 85,
-        mode: 2,
+        order: 86,
+        mode: 0,
         inputs: [
           {
             name: "in",
@@ -5526,8 +5234,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 61,
-        mode: 2,
+        order: 60,
+        mode: 0,
         inputs: [
           {
             name: "A",
@@ -5553,7 +5261,7 @@ const defaultGraph: SerializedAppState = {
         title: "Operation",
         properties: {
           A: 2,
-          B: 1,
+          B: 1024,
           OP: "*",
           tags: [
             "i2i",
@@ -5575,8 +5283,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 76,
-        mode: 2,
+        order: 75,
+        mode: 0,
         inputs: [
           {
             name: "in",
@@ -5604,233 +5312,6 @@ const defaultGraph: SerializedAppState = {
         }
       },
       {
-        id: 216,
-        type: "logic/NOT",
-        pos: [
-          -942.8879999999998,
-          980.8429999999998
-        ],
-        size: [
-          140,
-          26
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 99,
-        mode: 0,
-        inputs: [
-          {
-            name: "in",
-            type: "boolean",
-            link: 336
-          }
-        ],
-        outputs: [
-          {
-            name: "out",
-            type: "boolean",
-            links: [
-              337
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "NOT",
-        properties: {
-          tags: []
-        }
-      },
-      {
-        id: 167,
-        type: "basic/string",
-        pos: [
-          -2065.2999999999993,
-          687.1000000000004
-        ],
-        size: [
-          210,
-          38
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 35,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "string",
-            type: "string",
-            links: [
-              250
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Const String",
-        properties: {
-          value: "img2img",
-          tags: []
-        }
-      },
-      {
-        id: 169,
-        type: "basic/CompareValues",
-        pos: [
-          -1941.7999999999997,
-          643.2000000000004
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: false
-        },
-        order: 65,
-        mode: 0,
-        inputs: [
-          {
-            name: "A",
-            type: 0,
-            link: 252
-          },
-          {
-            name: "B",
-            type: 0,
-            link: 250
-          }
-        ],
-        outputs: [
-          {
-            name: "true",
-            type: "boolean",
-            links: [
-              343
-            ],
-            slot_index: 0
-          },
-          {
-            name: "false",
-            type: "boolean",
-            links: null
-          }
-        ],
-        title: "GenericCompare",
-        properties: {
-          A: "txt2img",
-          B: "img2img",
-          OP: "==",
-          enabled: true,
-          tags: []
-        }
-      },
-      {
-        id: 219,
-        type: "basic/boolean",
-        pos: [
-          -1288.0000000000007,
-          817.700000000001
-        ],
-        size: [
-          210,
-          38
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 36,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "bool",
-            type: "boolean",
-            links: [
-              342
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Const Boolean",
-        properties: {
-          value: false,
-          tags: []
-        }
-      },
-      {
-        id: 222,
-        type: "basic/boolean",
-        pos: [
-          -1302,
-          691
-        ],
-        size: [
-          210,
-          38
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 37,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "bool",
-            type: "boolean",
-            links: [
-              344
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Const Boolean",
-        properties: {
-          value: 1,
-          tags: []
-        }
-      },
-      {
-        id: 220,
-        type: "actions/set_node_mode",
-        pos: [
-          -1232,
-          668
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: false
-        },
-        order: 87,
-        mode: 0,
-        inputs: [
-          {
-            name: "enabled",
-            type: "boolean",
-            link: 344
-          },
-          {
-            name: "set",
-            type: -1,
-            link: 347,
-            shape: 1
-          }
-        ],
-        outputs: [],
-        title: "Comfy.SetNodeModeAction",
-        properties: {
-          targetTags: "i2i",
-          enable: false,
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
         id: 133,
         type: "math/operation",
         pos: [
@@ -5844,7 +5325,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 113,
+        order: 112,
         mode: 0,
         inputs: [
           {
@@ -5870,8 +5351,8 @@ const defaultGraph: SerializedAppState = {
         ],
         title: "Operation",
         properties: {
-          A: 2.1,
-          B: 1,
+          A: 2,
+          B: 512,
           OP: "*",
           tags: []
         }
@@ -5890,7 +5371,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 112,
+        order: 111,
         mode: 0,
         inputs: [
           {
@@ -5916,8 +5397,8 @@ const defaultGraph: SerializedAppState = {
         ],
         title: "Operation",
         properties: {
-          A: 2.1,
-          B: 1,
+          A: 2,
+          B: 512,
           OP: "*",
           tags: []
         }
@@ -5934,7 +5415,7 @@ const defaultGraph: SerializedAppState = {
           166
         ],
         flags: {},
-        order: 108,
+        order: 107,
         mode: 0,
         inputs: [
           {
@@ -6006,14 +5487,14 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 109,
+        order: 108,
         mode: 0,
         inputs: [
           {
             name: "value",
             type: 0,
             link: 184,
-            label: "0.000"
+            label: "15.000"
           }
         ],
         outputs: [],
@@ -6035,8 +5516,8 @@ const defaultGraph: SerializedAppState = {
           66
         ],
         flags: {},
-        order: 129,
-        mode: 0,
+        order: 128,
+        mode: 2,
         inputs: [
           {
             name: "A",
@@ -6098,8 +5579,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 127,
-        mode: 0,
+        order: 126,
+        mode: 2,
         inputs: [
           {
             name: "value",
@@ -6205,8 +5686,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 128,
-        mode: 0,
+        order: 127,
+        mode: 2,
         inputs: [
           {
             name: "value",
@@ -6311,8 +5792,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 75,
-        mode: 2,
+        order: 74,
+        mode: 0,
         inputs: [
           {
             name: "in",
@@ -6353,8 +5834,8 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 38,
-        mode: 2,
+        order: 33,
+        mode: 0,
         inputs: [
           {
             name: "value",
@@ -6455,7 +5936,7 @@ const defaultGraph: SerializedAppState = {
           122
         ],
         flags: {},
-        order: 130,
+        order: 129,
         mode: 0,
         inputs: [
           {
@@ -6505,7 +5986,7 @@ const defaultGraph: SerializedAppState = {
           122
         ],
         flags: {},
-        order: 131,
+        order: 130,
         mode: 0,
         inputs: [
           {
@@ -6544,109 +6025,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 214,
-        type: "ui/checkbox",
-        pos: [
-          -1087.988,
-          982.2430000000006
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 98,
-        mode: 2,
-        inputs: [
-          {
-            name: "value",
-            type: "boolean",
-            link: null
-          },
-          {
-            name: "store",
-            type: -1,
-            link: 352,
-            shape: 1
-          }
-        ],
-        outputs: [
-          {
-            name: "value",
-            type: "boolean",
-            links: [
-              335,
-              336
-            ],
-            slot_index: 0
-          },
-          {
-            name: "changed",
-            type: -2,
-            links: [
-              338,
-              339
-            ],
-            shape: 1,
-            slot_index: 1
-          }
-        ],
-        title: "UI.Checkbox",
-        properties: {
-          tags: [
-            "i2i"
-          ],
-          defaultValue: false
-        },
-        widgets_values: [
-          "null"
-        ],
-        color: "#223",
-        bgColor: "#335",
-        shownOutputProperties: {},
-        saveUserState: true
-      },
-      {
-        id: 164,
-        type: "actions/set_node_mode",
-        pos: [
-          -1225,
-          524
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: false
-        },
-        order: 78,
-        mode: 0,
-        inputs: [
-          {
-            name: "enabled",
-            type: "boolean",
-            link: 253
-          },
-          {
-            name: "set",
-            type: -1,
-            link: 265,
-            shape: 1
-          }
-        ],
-        outputs: [],
-        title: "Comfy.SetNodeModeAction",
-        properties: {
-          targetTags: "t2i",
-          enable: false,
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
         id: 109,
         type: "ui/button",
         pos: [
@@ -6660,7 +6038,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 39,
+        order: 34,
         mode: 0,
         inputs: [],
         outputs: [
@@ -6707,7 +6085,7 @@ const defaultGraph: SerializedAppState = {
           142
         ],
         flags: {},
-        order: 104,
+        order: 103,
         mode: 0,
         inputs: [
           {
@@ -6779,127 +6157,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: false
       },
       {
-        id: 231,
-        type: "basic/string",
-        pos: [
-          1523,
-          444
-        ],
-        size: [
-          210,
-          38
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 40,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "string",
-            type: "string",
-            links: [
-              365
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Const String",
-        properties: {
-          value: "Select an image from the Result gallery to upscale first.",
-          tags: []
-        }
-      },
-      {
-        id: 123,
-        type: "basic/string",
-        pos: [
-          2021,
-          249
-        ],
-        size: [
-          210,
-          38
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 41,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "string",
-            type: "string",
-            links: [
-              185
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Const String",
-        properties: {
-          value: "Upscale complete!",
-          tags: []
-        }
-      },
-      {
-        id: 157,
-        type: "SaveImage",
-        pos: [
-          377,
-          241
-        ],
-        size: [
-          220,
-          46
-        ],
-        flags: {},
-        order: 120,
-        mode: 0,
-        inputs: [
-          {
-            name: "images",
-            type: "IMAGE",
-            link: 245,
-            config: {}
-          },
-          {
-            name: "filename_prefix",
-            type: "string",
-            link: 310,
-            config: {},
-            defaultWidgetNode: null,
-            widgetNodeType: "ui/text",
-            serialize: true
-          }
-        ],
-        outputs: [
-          {
-            name: "onExecuted",
-            type: -2,
-            links: [
-              242,
-              243
-            ],
-            color_off: "rebeccapurple",
-            color_on: "rebeccapurple",
-            shape: 1,
-            slot_index: 0
-          }
-        ],
-        title: "SaveImage",
-        properties: {
-          tags: [
-            "txt2img"
-          ]
-        },
-        color: "#432",
-        bgColor: "#653",
-        saveUserState: true
-      },
-      {
         id: 127,
         type: "actions/execute_subgraph",
         pos: [
@@ -6947,8 +6204,8 @@ const defaultGraph: SerializedAppState = {
           118
         ],
         flags: {},
-        order: 42,
-        mode: 2,
+        order: 35,
+        mode: 0,
         inputs: [],
         outputs: [
           {
@@ -7012,7 +6269,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 43,
+        order: 36,
         mode: 0,
         inputs: [],
         outputs: [
@@ -7045,7 +6302,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 63,
+        order: 62,
         mode: 0,
         inputs: [
           {
@@ -7088,7 +6345,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 44,
+        order: 37,
         mode: 0,
         inputs: [],
         outputs: [
@@ -7121,7 +6378,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 77,
+        order: 76,
         mode: 0,
         inputs: [
           {
@@ -7164,7 +6421,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 86,
+        order: 87,
         mode: 0,
         inputs: [
           {
@@ -7189,145 +6446,6 @@ const defaultGraph: SerializedAppState = {
         }
       },
       {
-        id: 126,
-        type: "ui/button",
-        pos: [
-          396,
-          1124
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 45,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "clicked",
-            type: -2,
-            links: [
-              367
-            ],
-            shape: 1,
-            slot_index: 0
-          },
-          {
-            name: "isClicked",
-            type: "boolean",
-            links: null
-          }
-        ],
-        title: "UI.Button",
-        properties: {
-          tags: [],
-          defaultValue: false,
-          param: "bang",
-          message: "bang"
-        },
-        widgets_values: [
-          "false"
-        ],
-        color: "#223",
-        bgColor: "#335",
-        comfyValue: false,
-        shownOutputProperties: {},
-        saveUserState: true
-      },
-      {
-        id: 233,
-        type: "events/branch",
-        pos: [
-          533,
-          1099
-        ],
-        size: [
-          140,
-          46
-        ],
-        flags: {},
-        order: 93,
-        mode: 0,
-        inputs: [
-          {
-            name: "in",
-            type: -1,
-            link: 367,
-            shape: 1
-          },
-          {
-            name: "cond",
-            type: "boolean",
-            link: 376
-          }
-        ],
-        outputs: [
-          {
-            name: "true",
-            type: -2,
-            links: [
-              368
-            ],
-            shape: 1,
-            slot_index: 0
-          },
-          {
-            name: "false",
-            type: -2,
-            links: [
-              379
-            ],
-            shape: 1,
-            slot_index: 1
-          }
-        ],
-        title: "Branch",
-        properties: {
-          tags: []
-        }
-      },
-      {
-        id: 240,
-        type: "actions/notify",
-        pos: [
-          750,
-          1231
-        ],
-        size: [
-          151.2,
-          46
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 97,
-        mode: 0,
-        inputs: [
-          {
-            name: "message",
-            type: "string",
-            link: 378
-          },
-          {
-            name: "trigger",
-            type: -1,
-            link: 379,
-            shape: 1,
-            slot_index: 1
-          }
-        ],
-        outputs: [],
-        title: "Comfy.NotifyAction",
-        properties: {
-          message: "Nya.",
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
         id: 241,
         type: "basic/string",
         pos: [
@@ -7341,7 +6459,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 46,
+        order: 38,
         mode: 0,
         inputs: [],
         outputs: [
@@ -7374,7 +6492,7 @@ const defaultGraph: SerializedAppState = {
         flags: {
           collapsed: true
         },
-        order: 66,
+        order: 63,
         mode: 0,
         inputs: [
           {
@@ -7404,301 +6522,6 @@ const defaultGraph: SerializedAppState = {
         }
       },
       {
-        id: 163,
-        type: "ui/radio",
-        pos: [
-          -1969,
-          495
-        ],
-        size: [
-          210,
-          122
-        ],
-        flags: {
-          collapsed: false
-        },
-        order: 47,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "value",
-            type: "string",
-            links: [
-              251,
-              252,
-              370
-            ],
-            slot_index: 0
-          },
-          {
-            name: "index",
-            type: "number",
-            links: null
-          },
-          {
-            name: "changed",
-            type: -2,
-            links: [
-              266,
-              268
-            ],
-            shape: 1,
-            slot_index: 2
-          }
-        ],
-        title: "UI.Radio",
-        properties: {
-          tags: [],
-          choices: [
-            "txt2img",
-            "img2img"
-          ],
-          defaultValue: "Choice A"
-        },
-        widgets_values: [
-          "txt2img",
-          0
-        ],
-        color: "#223",
-        bgColor: "#335",
-        comfyValue: "txt2img",
-        shownOutputProperties: {},
-        saveUserState: true
-      },
-      {
-        id: 174,
-        type: "events/frame_delay",
-        pos: [
-          -1780,
-          674
-        ],
-        size: [
-          140,
-          26
-        ],
-        flags: {
-          collapsed: false
-        },
-        order: 68,
-        mode: 0,
-        inputs: [
-          {
-            name: "event",
-            type: -1,
-            link: 268,
-            shape: 1,
-            slot_index: 0
-          }
-        ],
-        outputs: [
-          {
-            name: "on_time",
-            type: -2,
-            links: [
-              381
-            ],
-            shape: 1,
-            slot_index: 0
-          }
-        ],
-        title: "Frame Delay",
-        properties: {
-          timeInFrames: 3,
-          tags: []
-        }
-      },
-      {
-        id: 218,
-        type: "events/branch",
-        pos: [
-          -1633,
-          668
-        ],
-        size: [
-          140,
-          46
-        ],
-        flags: {},
-        order: 79,
-        mode: 0,
-        inputs: [
-          {
-            name: "in",
-            type: -1,
-            link: 381,
-            shape: 1
-          },
-          {
-            name: "cond",
-            type: "boolean",
-            link: 343
-          }
-        ],
-        outputs: [
-          {
-            name: "true",
-            type: -2,
-            links: [
-              347
-            ],
-            shape: 1,
-            slot_index: 0
-          },
-          {
-            name: "false",
-            type: -2,
-            links: [
-              382
-            ],
-            shape: 1,
-            slot_index: 1
-          }
-        ],
-        title: "Branch",
-        properties: {
-          tags: []
-        }
-      },
-      {
-        id: 243,
-        type: "events/sequence",
-        pos: [
-          -1452,
-          761
-        ],
-        size: [
-          210,
-          98
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 88,
-        mode: 0,
-        inputs: [
-          {
-            name: "",
-            type: -1,
-            link: 382,
-            shape: 1
-          },
-          {
-            name: "",
-            type: -1,
-            link: null,
-            shape: 1
-          },
-          {
-            name: "",
-            type: -1,
-            link: null,
-            shape: 1
-          }
-        ],
-        outputs: [
-          {
-            name: "",
-            type: -2,
-            links: [
-              383
-            ],
-            shape: 1,
-            slot_index: 0
-          },
-          {
-            name: "",
-            type: -2,
-            links: [
-              384
-            ],
-            shape: 1,
-            slot_index: 1
-          },
-          {
-            name: "",
-            type: -2,
-            links: null,
-            shape: 1
-          }
-        ],
-        title: "Sequence",
-        properties: {
-          tags: []
-        }
-      },
-      {
-        id: 226,
-        type: "basic/boolean",
-        pos: [
-          -1425.8069999999982,
-          953.7649999999993
-        ],
-        size: [
-          210,
-          38
-        ],
-        flags: {
-          collapsed: true
-        },
-        order: 48,
-        mode: 0,
-        inputs: [],
-        outputs: [
-          {
-            name: "bool",
-            type: "boolean",
-            links: [
-              350
-            ],
-            slot_index: 0
-          }
-        ],
-        title: "Const Boolean",
-        properties: {
-          value: false,
-          tags: []
-        }
-      },
-      {
-        id: 165,
-        type: "actions/set_node_mode",
-        pos: [
-          -1211,
-          797
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: false
-        },
-        order: 94,
-        mode: 0,
-        inputs: [
-          {
-            name: "enabled",
-            type: "boolean",
-            link: 342
-          },
-          {
-            name: "set",
-            type: -1,
-            link: 383,
-            shape: 1
-          }
-        ],
-        outputs: [],
-        title: "Comfy.SetNodeModeAction",
-        properties: {
-          targetTags: "i2i",
-          enable: false,
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
         id: 16,
         type: "KSampler",
         pos: [
@@ -7710,7 +6533,7 @@ const defaultGraph: SerializedAppState = {
           206
         ],
         flags: {},
-        order: 122,
+        order: 121,
         mode: 0,
         inputs: [
           {
@@ -7811,161 +6634,6 @@ const defaultGraph: SerializedAppState = {
         saveUserState: true
       },
       {
-        id: 215,
-        type: "actions/set_node_mode",
-        pos: [
-          -862.66,
-          921.2869999999992
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {},
-        order: 100,
-        mode: 0,
-        inputs: [
-          {
-            name: "enabled",
-            type: "boolean",
-            link: 335
-          },
-          {
-            name: "set",
-            type: -1,
-            link: 338,
-            shape: 1
-          }
-        ],
-        outputs: [],
-        title: "Comfy.SetNodeModeAction",
-        properties: {
-          targetTags: "i2iScaleSize",
-          enable: false,
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
-        id: 225,
-        type: "actions/copy",
-        pos: [
-          -1340,
-          934
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {
-          collapsed: false
-        },
-        order: 95,
-        mode: 0,
-        inputs: [
-          {
-            name: "in",
-            type: "*",
-            link: 350
-          },
-          {
-            name: "copy",
-            type: -1,
-            link: 384,
-            shape: 1
-          }
-        ],
-        outputs: [
-          {
-            name: "out",
-            type: -2,
-            links: [
-              352
-            ],
-            shape: 1,
-            slot_index: 0
-          }
-        ],
-        title: "Comfy.CopyAction",
-        properties: {
-          value: false,
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
-        id: 217,
-        type: "actions/set_node_mode",
-        pos: [
-          -864,
-          1034
-        ],
-        size: [
-          210,
-          78
-        ],
-        flags: {},
-        order: 101,
-        mode: 0,
-        inputs: [
-          {
-            name: "enabled",
-            type: "boolean",
-            link: 337
-          },
-          {
-            name: "set",
-            type: -1,
-            link: 339,
-            shape: 1
-          }
-        ],
-        outputs: [],
-        title: "Comfy.SetNodeModeAction",
-        properties: {
-          targetTags: "i2iPixelSize",
-          enable: false,
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
-        id: 230,
-        type: "actions/notify",
-        pos: [
-          1543,
-          481
-        ],
-        size: [
-          151.2,
-          46
-        ],
-        flags: {},
-        order: 133,
-        mode: 0,
-        inputs: [
-          {
-            name: "message",
-            type: "string",
-            link: 365
-          },
-          {
-            name: "trigger",
-            type: -1,
-            link: 364,
-            shape: 1,
-            slot_index: 1
-          }
-        ],
-        outputs: [],
-        title: "Comfy.NotifyAction",
-        properties: {
-          message: "Nya.",
-          tags: []
-        },
-        saveUserState: true
-      },
-      {
         id: 228,
         type: "events/branch",
         pos: [
@@ -7977,7 +6645,7 @@ const defaultGraph: SerializedAppState = {
           46
         ],
         flags: {},
-        order: 132,
+        order: 131,
         mode: 0,
         inputs: [
           {
@@ -7997,7 +6665,8 @@ const defaultGraph: SerializedAppState = {
             name: "true",
             type: -2,
             links: [
-              361
+              361,
+              443
             ],
             shape: 1,
             slot_index: 0
@@ -8028,7 +6697,7 @@ const defaultGraph: SerializedAppState = {
           78
         ],
         flags: {},
-        order: 106,
+        order: 105,
         mode: 0,
         inputs: [
           {
@@ -8049,6 +6718,1536 @@ const defaultGraph: SerializedAppState = {
           tags: [],
           targetTag: "hr",
           tag: "hr"
+        },
+        saveUserState: true
+      },
+      {
+        id: 263,
+        type: "basic/boolean",
+        pos: [
+          -1144.9562904132222,
+          1007.88950710744
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 39,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "bool",
+            type: "boolean",
+            links: [
+              404
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const Boolean",
+        properties: {
+          value: true,
+          tags: []
+        }
+      },
+      {
+        id: 261,
+        type: "actions/set_node_mode_advanced",
+        pos: [
+          -1059.69074,
+          1283.15526
+        ],
+        size: [
+          260.4,
+          102
+        ],
+        flags: {},
+        order: 100,
+        mode: 0,
+        inputs: [
+          {
+            name: "enabled",
+            type: "boolean",
+            link: null
+          },
+          {
+            name: "set",
+            type: -1,
+            link: 409,
+            shape: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.SetNodeModeAdvancedAction",
+        properties: {
+          targetTags: [
+            {
+              tag: "i2iScaleSize",
+              enable: false
+            },
+            {
+              tag: "i2iPixelSize",
+              enable: true
+            }
+          ],
+          enable: true,
+          tags: []
+        },
+        boxcolor: "#666",
+        saveUserState: true
+      },
+      {
+        id: 163,
+        type: "ui/radio",
+        pos: [
+          -2080.056843593749,
+          467.44071808593736
+        ],
+        size: [
+          210,
+          122
+        ],
+        flags: {
+          collapsed: false
+        },
+        order: 40,
+        mode: 0,
+        inputs: [
+          {
+            name: "value",
+            type: "string,number",
+            link: null
+          },
+          {
+            name: "store",
+            type: -1,
+            link: null,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "value",
+            type: "string",
+            links: [
+              370,
+              432
+            ],
+            slot_index: 0
+          },
+          {
+            name: "index",
+            type: "number",
+            links: null
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: [
+              398,
+              400,
+              434
+            ],
+            shape: 1,
+            slot_index: 2
+          }
+        ],
+        title: "UI.Radio",
+        properties: {
+          tags: [],
+          choices: [
+            "txt2img",
+            "img2img"
+          ],
+          defaultValue: "Choice A"
+        },
+        widgets_values: [
+          "txt2img",
+          1
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: "txt2img",
+        shownOutputProperties: {},
+        saveUserState: true
+      },
+      {
+        id: 78,
+        type: "basic/string",
+        pos: [
+          668,
+          635
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 41,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "string",
+            type: "string",
+            links: [
+              104
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const String",
+        properties: {
+          value: "Generation finished!",
+          tags: []
+        }
+      },
+      {
+        id: 277,
+        type: "string/template",
+        pos: [
+          -1845.056843593749,
+          466.44071808593736
+        ],
+        size: [
+          210,
+          98
+        ],
+        flags: {},
+        order: 66,
+        mode: 0,
+        inputs: [
+          {
+            name: "",
+            type: "string,array",
+            link: 432
+          },
+          {
+            name: "",
+            type: "string",
+            link: null
+          },
+          {
+            name: "update",
+            type: -1,
+            link: 434,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "out",
+            type: "string",
+            links: [
+              431
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Template",
+        properties: {
+          template: "Queue $1",
+          stringQuote: "",
+          tags: []
+        }
+      },
+      {
+        id: 276,
+        type: "events/trigger",
+        pos: [
+          -1618.056843593749,
+          471.44071808593736
+        ],
+        size: [
+          140,
+          66
+        ],
+        flags: {},
+        order: 80,
+        mode: 0,
+        inputs: [
+          {
+            name: "if",
+            type: "",
+            link: 431
+          }
+        ],
+        outputs: [
+          {
+            name: "true",
+            type: -2,
+            links: null,
+            shape: 1
+          },
+          {
+            name: "change",
+            type: -2,
+            links: [
+              433
+            ],
+            shape: 1,
+            slot_index: 1
+          },
+          {
+            name: "false",
+            type: -2,
+            links: null,
+            shape: 1
+          }
+        ],
+        title: "Trigger Event",
+        properties: {
+          onlyOnChange: true,
+          tags: []
+        }
+      },
+      {
+        id: 246,
+        type: "events/filter",
+        pos: [
+          -2087.056843593749,
+          632.4407180859373
+        ],
+        size: [
+          210,
+          150
+        ],
+        flags: {},
+        order: 64,
+        mode: 0,
+        inputs: [
+          {
+            name: "event",
+            type: -1,
+            link: 398,
+            shape: 1
+          },
+          {
+            name: "compare_value",
+            type: "*",
+            link: null
+          }
+        ],
+        outputs: [
+          {
+            name: "accept",
+            type: -2,
+            links: [
+              402
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "reject",
+            type: -2,
+            links: [],
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        title: "Filter Event",
+        properties: {
+          compareValue: "txt2img",
+          propertyName: "",
+          mode: "param",
+          operation: "==",
+          tags: []
+        }
+      },
+      {
+        id: 256,
+        type: "events/filter",
+        pos: [
+          -2080.056843593749,
+          806.4407180859373
+        ],
+        size: [
+          210,
+          150
+        ],
+        flags: {
+          collapsed: false
+        },
+        order: 65,
+        mode: 0,
+        inputs: [
+          {
+            name: "event",
+            type: -1,
+            link: 400,
+            shape: 1
+          },
+          {
+            name: "compare_value",
+            type: "*",
+            link: null
+          }
+        ],
+        outputs: [
+          {
+            name: "accept",
+            type: -2,
+            links: [
+              401,
+              403
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "reject",
+            type: -2,
+            links: null,
+            shape: 1
+          }
+        ],
+        title: "Filter Event",
+        properties: {
+          compareValue: "img2img",
+          propertyName: "",
+          mode: "param",
+          operation: "==",
+          tags: []
+        }
+      },
+      {
+        id: 258,
+        type: "actions/set_node_mode_advanced",
+        pos: [
+          -1778.056843593749,
+          609.4407180859373
+        ],
+        size: [
+          260.4,
+          102
+        ],
+        flags: {},
+        order: 77,
+        mode: 0,
+        inputs: [
+          {
+            name: "enabled",
+            type: "boolean",
+            link: null
+          },
+          {
+            name: "set",
+            type: -1,
+            link: 402,
+            shape: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.SetNodeModeAdvancedAction",
+        properties: {
+          targetTags: [
+            {
+              tag: "t2i",
+              enable: true
+            },
+            {
+              tag: "i2i",
+              enable: false
+            }
+          ],
+          enable: true,
+          tags: []
+        },
+        boxcolor: "#666",
+        saveUserState: true
+      },
+      {
+        id: 259,
+        type: "actions/set_node_mode_advanced",
+        pos: [
+          -1797.056843593749,
+          794.4407180859373
+        ],
+        size: [
+          260.4,
+          102
+        ],
+        flags: {},
+        order: 79,
+        mode: 0,
+        inputs: [
+          {
+            name: "enabled",
+            type: "boolean",
+            link: null
+          },
+          {
+            name: "set",
+            type: -1,
+            link: 403,
+            shape: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.SetNodeModeAdvancedAction",
+        properties: {
+          targetTags: [
+            {
+              tag: "i2i",
+              enable: true
+            },
+            {
+              tag: "t2i",
+              enable: false
+            },
+            {
+              tag: "i2iPixelSize",
+              enable: true
+            },
+            {
+              tag: "i2iScaleSize",
+              enable: false
+            }
+          ],
+          enable: true,
+          tags: []
+        },
+        boxcolor: "#666",
+        saveUserState: true
+      },
+      {
+        id: 252,
+        type: "basic/json",
+        pos: [
+          -1859.8217735937492,
+          1022.4599680859374
+        ],
+        size: [
+          210,
+          86
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 42,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "data",
+            type: "object",
+            links: [
+              387
+            ],
+            shape: 0,
+            slot_index: 0
+          }
+        ],
+        title: "Const JSON",
+        properties: {
+          json: "{ \value\: false, \noChangedEvent\: true }",
+          value: "[object Object]",
+          type: "object",
+          tags: []
+        },
+        boxcolor: "#AEA"
+      },
+      {
+        id: 260,
+        type: "actions/set_node_mode_advanced",
+        pos: [
+          -1058.6012399999997,
+          1148.6630599999996
+        ],
+        size: [
+          260.4,
+          102
+        ],
+        flags: {},
+        order: 99,
+        mode: 0,
+        inputs: [
+          {
+            name: "enabled",
+            type: "boolean",
+            link: null
+          },
+          {
+            name: "set",
+            type: -1,
+            link: 408,
+            shape: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.SetNodeModeAdvancedAction",
+        properties: {
+          targetTags: [
+            {
+              tag: "i2iScaleSize",
+              enable: true
+            },
+            {
+              tag: "i2iPixelSize",
+              enable: false
+            }
+          ],
+          enable: true,
+          tags: []
+        },
+        boxcolor: "#666",
+        saveUserState: true
+      },
+      {
+        id: 262,
+        type: "events/filter",
+        pos: [
+          -1071,
+          965
+        ],
+        size: [
+          210,
+          150
+        ],
+        flags: {
+          collapsed: false
+        },
+        order: 95,
+        mode: 0,
+        inputs: [
+          {
+            name: "event",
+            type: -1,
+            link: 407,
+            shape: 1
+          },
+          {
+            name: "compare_value",
+            type: "*",
+            link: 404
+          }
+        ],
+        outputs: [
+          {
+            name: "accept",
+            type: -2,
+            links: [
+              408
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "reject",
+            type: -2,
+            links: [
+              409
+            ],
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        title: "Filter Event",
+        properties: {
+          compareValue: true,
+          propertyName: "",
+          mode: "param",
+          operation: "==",
+          tags: []
+        }
+      },
+      {
+        id: 272,
+        type: "workflow/configure_queue_prompt_button",
+        pos: [
+          -1681.7597994531247,
+          402.4011205078125
+        ],
+        size: [
+          268.8,
+          26
+        ],
+        flags: {
+          collapsed: false
+        },
+        order: 89,
+        mode: 0,
+        inputs: [
+          {
+            name: "config",
+            type: -1,
+            link: 433,
+            shape: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.ConfigureQueuePromptButton",
+        properties: {
+          tags: []
+        }
+      },
+      {
+        id: 251,
+        type: "events/trigger_new_event",
+        pos: [
+          -1726.36279296875,
+          981.864013671875
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {},
+        order: 78,
+        mode: 0,
+        inputs: [
+          {
+            name: "in",
+            type: -1,
+            link: 401,
+            shape: 1
+          },
+          {
+            name: "param",
+            type: "*",
+            link: 387
+          }
+        ],
+        outputs: [
+          {
+            name: "out",
+            type: -2,
+            links: [
+              436
+            ],
+            shape: 1,
+            slot_index: 0
+          }
+        ],
+        title: "Comfy.TriggerNewEvent",
+        properties: {
+          param: {
+            value: false,
+            noChangedEvent: true
+          },
+          tags: []
+        }
+      },
+      {
+        id: 214,
+        type: "ui/checkbox",
+        pos: [
+          -1362,
+          949
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: false
+        },
+        order: 88,
+        mode: 0,
+        inputs: [
+          {
+            name: "value",
+            type: "boolean",
+            link: null
+          },
+          {
+            name: "store",
+            type: -1,
+            link: 436,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "value",
+            type: "boolean",
+            links: [],
+            slot_index: 0
+          },
+          {
+            name: "changed",
+            type: -2,
+            links: [
+              407
+            ],
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        title: "UI.Checkbox",
+        properties: {
+          tags: [
+            "i2i"
+          ],
+          defaultValue: false
+        },
+        widgets_values: [
+          "true"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: true,
+        shownOutputProperties: {},
+        saveUserState: true
+      },
+      {
+        id: 233,
+        type: "events/branch",
+        pos: [
+          533,
+          1099
+        ],
+        size: [
+          140,
+          46
+        ],
+        flags: {},
+        order: 94,
+        mode: 0,
+        inputs: [
+          {
+            name: "in",
+            type: -1,
+            link: 439,
+            shape: 1
+          },
+          {
+            name: "cond",
+            type: "boolean",
+            link: 376
+          }
+        ],
+        outputs: [
+          {
+            name: "true",
+            type: -2,
+            links: [
+              368,
+              441
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "false",
+            type: -2,
+            links: [
+              379
+            ],
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        title: "Branch",
+        properties: {
+          tags: []
+        }
+      },
+      {
+        id: 273,
+        type: "actions/queue_events",
+        pos: [
+          199,
+          1046
+        ],
+        size: [
+          178,
+          66
+        ],
+        flags: {},
+        order: 43,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "beforeQueued",
+            type: -2,
+            links: null,
+            shape: 1
+          },
+          {
+            name: "afterQueued",
+            type: -2,
+            links: null,
+            shape: 1
+          },
+          {
+            name: "onDefaultQueueAction",
+            type: -2,
+            links: [
+              438
+            ],
+            shape: 1,
+            slot_index: 2
+          }
+        ],
+        title: "Comfy.QueueEvents",
+        properties: {
+          tags: []
+        },
+        saveUserState: true
+      },
+      {
+        id: 126,
+        type: "ui/button",
+        pos: [
+          354,
+          1139
+        ],
+        size: [
+          210,
+          78
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 44,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "clicked",
+            type: -2,
+            links: [
+              437
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "isClicked",
+            type: "boolean",
+            links: null
+          }
+        ],
+        title: "UI.Button",
+        properties: {
+          tags: [],
+          defaultValue: false,
+          param: "bang",
+          message: "bang"
+        },
+        widgets_values: [
+          "false"
+        ],
+        color: "#223",
+        bgColor: "#335",
+        comfyValue: false,
+        shownOutputProperties: {},
+        saveUserState: true
+      },
+      {
+        id: 278,
+        type: "events/sequence",
+        pos: [
+          422,
+          1106
+        ],
+        size: [
+          140,
+          66
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 67,
+        mode: 0,
+        inputs: [
+          {
+            name: "",
+            type: -1,
+            link: 437,
+            shape: 1
+          },
+          {
+            name: "",
+            type: -1,
+            link: 438,
+            shape: 1
+          },
+          {
+            name: "",
+            type: -1,
+            link: null,
+            shape: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "",
+            type: -2,
+            links: [
+              439
+            ],
+            shape: 1,
+            slot_index: 0
+          },
+          {
+            name: "",
+            type: -2,
+            links: null,
+            shape: 1
+          }
+        ],
+        title: "Sequence",
+        properties: {
+          tags: []
+        }
+      },
+      {
+        id: 240,
+        type: "actions/notify",
+        pos: [
+          750,
+          1231
+        ],
+        size: [
+          151.2,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 98,
+        mode: 0,
+        inputs: [
+          {
+            name: "message",
+            type: "string",
+            link: 378
+          },
+          {
+            name: "trigger",
+            type: -1,
+            link: 379,
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.NotifyAction",
+        properties: {
+          tags: [],
+          message: "Nya.",
+          type: "error"
+        },
+        saveUserState: true
+      },
+      {
+        id: 123,
+        type: "basic/string",
+        pos: [
+          2021,
+          249
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 45,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "string",
+            type: "string",
+            links: [
+              185
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const String",
+        properties: {
+          value: "Upscale complete!",
+          tags: []
+        }
+      },
+      {
+        id: 122,
+        type: "actions/notify",
+        pos: [
+          2021,
+          279
+        ],
+        size: [
+          151.2,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 110,
+        mode: 0,
+        inputs: [
+          {
+            name: "message",
+            type: "string",
+            link: 185
+          },
+          {
+            name: "trigger",
+            type: -1,
+            link: 241,
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.NotifyAction",
+        properties: {
+          tags: [],
+          message: "Nya.",
+          type: "success"
+        },
+        saveUserState: true
+      },
+      {
+        id: 77,
+        type: "actions/notify",
+        pos: [
+          674,
+          665
+        ],
+        size: [
+          151.2,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 143,
+        mode: 0,
+        inputs: [
+          {
+            name: "message",
+            type: "string",
+            link: 104
+          },
+          {
+            name: "trigger",
+            type: -1,
+            link: 435,
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.NotifyAction",
+        properties: {
+          tags: [],
+          message: "Nya.",
+          type: "success"
+        },
+        saveUserState: true
+      },
+      {
+        id: 281,
+        type: "actions/notify",
+        pos: [
+          1509,
+          505
+        ],
+        size: [
+          151.2,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 133,
+        mode: 0,
+        inputs: [
+          {
+            name: "message",
+            type: "string",
+            link: 442
+          },
+          {
+            name: "trigger",
+            type: -1,
+            link: 443,
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.NotifyAction",
+        properties: {
+          tags: [],
+          message: "Nya.",
+          type: "info"
+        },
+        saveUserState: true
+      },
+      {
+        id: 230,
+        type: "actions/notify",
+        pos: [
+          1689,
+          524
+        ],
+        size: [
+          151.2,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 132,
+        mode: 0,
+        inputs: [
+          {
+            name: "message",
+            type: "string",
+            link: 365
+          },
+          {
+            name: "trigger",
+            type: -1,
+            link: 364,
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.NotifyAction",
+        properties: {
+          tags: [],
+          message: "Nya.",
+          type: "error"
+        },
+        saveUserState: true
+      },
+      {
+        id: 231,
+        type: "basic/string",
+        pos: [
+          1674,
+          486
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 46,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "string",
+            type: "string",
+            links: [
+              365
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const String",
+        properties: {
+          value: "Select an image from the Result gallery to upscale first.",
+          tags: []
+        }
+      },
+      {
+        id: 279,
+        type: "actions/notify",
+        pos: [
+          737,
+          1038
+        ],
+        size: [
+          151.2,
+          46
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 97,
+        mode: 0,
+        inputs: [
+          {
+            name: "message",
+            type: "string",
+            link: 440
+          },
+          {
+            name: "trigger",
+            type: -1,
+            link: 441,
+            shape: 1,
+            slot_index: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.NotifyAction",
+        properties: {
+          tags: [],
+          message: "Nya.",
+          type: "info"
+        },
+        saveUserState: true
+      },
+      {
+        id: 280,
+        type: "basic/string",
+        pos: [
+          738,
+          1009
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 47,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "string",
+            type: "string",
+            links: [
+              440
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const String",
+        properties: {
+          value: "Prompt queued.",
+          tags: []
+        }
+      },
+      {
+        id: 282,
+        type: "basic/string",
+        pos: [
+          1514,
+          475
+        ],
+        size: [
+          210,
+          38
+        ],
+        flags: {
+          collapsed: true
+        },
+        order: 48,
+        mode: 0,
+        inputs: [],
+        outputs: [
+          {
+            name: "string",
+            type: "string",
+            links: [
+              442
+            ],
+            slot_index: 0
+          }
+        ],
+        title: "Const String",
+        properties: {
+          value: "Upscale queued.",
+          tags: []
+        }
+      },
+      {
+        id: 159,
+        type: "SaveImage",
+        pos: [
+          1831,
+          -8
+        ],
+        size: [
+          220,
+          46
+        ],
+        flags: {},
+        order: 120,
+        mode: 0,
+        inputs: [
+          {
+            name: "images",
+            type: "IMAGE",
+            link: 239,
+            config: {}
+          },
+          {
+            name: "filename_prefix",
+            type: "string",
+            link: 311,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/text",
+            serialize: true,
+            slot_index: 1
+          }
+        ],
+        outputs: [
+          {
+            name: "onExecuted",
+            type: -2,
+            links: [
+              240,
+              241,
+              444
+            ],
+            color_off: "rebeccapurple",
+            color_on: "rebeccapurple",
+            shape: 1,
+            slot_index: 0
+          }
+        ],
+        title: "SaveImage",
+        properties: {
+          tags: [
+            "hr"
+          ]
+        },
+        color: "#432",
+        bgColor: "#653",
+        saveUserState: true
+      },
+      {
+        id: 283,
+        type: "actions/play_sound",
+        pos: [
+          2379,
+          257
+        ],
+        size: [
+          176.4,
+          46
+        ],
+        flags: {},
+        order: 134,
+        mode: 0,
+        inputs: [
+          {
+            name: "sound",
+            type: "string",
+            link: null
+          },
+          {
+            name: "trigger",
+            type: -1,
+            link: 444,
+            shape: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.PlaySoundAction",
+        properties: {
+          tags: [],
+          sound: "notification.mp3"
+        },
+        saveUserState: true
+      },
+      {
+        id: 157,
+        type: "SaveImage",
+        pos: [
+          377,
+          241
+        ],
+        size: [
+          220,
+          46
+        ],
+        flags: {},
+        order: 119,
+        mode: 0,
+        inputs: [
+          {
+            name: "images",
+            type: "IMAGE",
+            link: 245,
+            config: {}
+          },
+          {
+            name: "filename_prefix",
+            type: "string",
+            link: 310,
+            config: {},
+            defaultWidgetNode: null,
+            widgetNodeType: "ui/text",
+            serialize: true
+          }
+        ],
+        outputs: [
+          {
+            name: "onExecuted",
+            type: -2,
+            links: [
+              242,
+              243,
+              435,
+              445
+            ],
+            color_off: "rebeccapurple",
+            color_on: "rebeccapurple",
+            shape: 1,
+            slot_index: 0
+          }
+        ],
+        title: "SaveImage",
+        properties: {
+          tags: [
+            "txt2img"
+          ]
+        },
+        color: "#432",
+        bgColor: "#653",
+        saveUserState: true
+      },
+      {
+        id: 284,
+        type: "actions/play_sound",
+        pos: [
+          652,
+          534
+        ],
+        size: [
+          176.4,
+          46
+        ],
+        flags: {},
+        order: 135,
+        mode: 0,
+        inputs: [
+          {
+            name: "sound",
+            type: "string",
+            link: null
+          },
+          {
+            name: "trigger",
+            type: -1,
+            link: 445,
+            shape: 1
+          }
+        ],
+        outputs: [],
+        title: "Comfy.PlaySoundAction",
+        properties: {
+          tags: [],
+          sound: "notification.mp3"
         },
         saveUserState: true
       }
@@ -8751,70 +8950,6 @@ const defaultGraph: SerializedAppState = {
         "IMAGE"
       ],
       [
-        249,
-        166,
-        0,
-        168,
-        1,
-        "string"
-      ],
-      [
-        250,
-        167,
-        0,
-        169,
-        1,
-        "string"
-      ],
-      [
-        251,
-        163,
-        0,
-        168,
-        0,
-        "string"
-      ],
-      [
-        252,
-        163,
-        0,
-        169,
-        0,
-        "string"
-      ],
-      [
-        253,
-        168,
-        0,
-        164,
-        0,
-        "boolean"
-      ],
-      [
-        265,
-        173,
-        0,
-        164,
-        1,
-        -1
-      ],
-      [
-        266,
-        163,
-        2,
-        173,
-        0,
-        -1
-      ],
-      [
-        268,
-        163,
-        2,
-        174,
-        0,
-        -1
-      ],
-      [
         269,
         161,
         0,
@@ -9207,94 +9342,6 @@ const defaultGraph: SerializedAppState = {
         "*"
       ],
       [
-        335,
-        214,
-        0,
-        215,
-        0,
-        "boolean"
-      ],
-      [
-        336,
-        214,
-        0,
-        216,
-        0,
-        "boolean"
-      ],
-      [
-        337,
-        216,
-        0,
-        217,
-        0,
-        "boolean"
-      ],
-      [
-        338,
-        214,
-        1,
-        215,
-        1,
-        -1
-      ],
-      [
-        339,
-        214,
-        1,
-        217,
-        1,
-        -1
-      ],
-      [
-        342,
-        219,
-        0,
-        165,
-        0,
-        "boolean"
-      ],
-      [
-        343,
-        169,
-        0,
-        218,
-        1,
-        "boolean"
-      ],
-      [
-        344,
-        222,
-        0,
-        220,
-        0,
-        "boolean"
-      ],
-      [
-        347,
-        218,
-        0,
-        220,
-        1,
-        -1
-      ],
-      [
-        350,
-        226,
-        0,
-        225,
-        0,
-        "*"
-      ],
-      [
-        352,
-        225,
-        0,
-        214,
-        1,
-        -1
-      ],
-      [
         353,
         212,
         0,
@@ -9381,14 +9428,6 @@ const defaultGraph: SerializedAppState = {
         230,
         0,
         "string"
-      ],
-      [
-        367,
-        126,
-        0,
-        233,
-        0,
-        -1
       ],
       [
         368,
@@ -9479,34 +9518,202 @@ const defaultGraph: SerializedAppState = {
         -1
       ],
       [
-        381,
-        174,
+        387,
+        252,
         0,
-        218,
+        251,
+        1,
+        "*"
+      ],
+      [
+        398,
+        163,
+        2,
+        246,
         0,
         -1
       ],
       [
-        382,
-        218,
-        1,
-        243,
+        400,
+        163,
+        2,
+        256,
         0,
         -1
       ],
       [
-        383,
-        243,
+        401,
+        256,
         0,
-        165,
+        251,
+        0,
+        -1
+      ],
+      [
+        402,
+        246,
+        0,
+        258,
         1,
         -1
       ],
       [
-        384,
-        243,
+        403,
+        256,
+        0,
+        259,
         1,
-        225,
+        -1
+      ],
+      [
+        404,
+        263,
+        0,
+        262,
+        1,
+        "*"
+      ],
+      [
+        407,
+        214,
+        1,
+        262,
+        0,
+        -1
+      ],
+      [
+        408,
+        262,
+        0,
+        260,
+        1,
+        -1
+      ],
+      [
+        409,
+        262,
+        1,
+        261,
+        1,
+        -1
+      ],
+      [
+        431,
+        277,
+        0,
+        276,
+        0,
+        "string"
+      ],
+      [
+        432,
+        163,
+        0,
+        277,
+        0,
+        "string,array"
+      ],
+      [
+        433,
+        276,
+        1,
+        272,
+        0,
+        -1
+      ],
+      [
+        434,
+        163,
+        2,
+        277,
+        2,
+        -1
+      ],
+      [
+        435,
+        157,
+        0,
+        77,
+        1,
+        -1
+      ],
+      [
+        436,
+        251,
+        0,
+        214,
+        1,
+        -1
+      ],
+      [
+        437,
+        126,
+        0,
+        278,
+        0,
+        -1
+      ],
+      [
+        438,
+        273,
+        2,
+        278,
+        1,
+        -1
+      ],
+      [
+        439,
+        278,
+        0,
+        233,
+        0,
+        -1
+      ],
+      [
+        440,
+        280,
+        0,
+        279,
+        0,
+        "string"
+      ],
+      [
+        441,
+        233,
+        0,
+        279,
+        1,
+        -1
+      ],
+      [
+        442,
+        282,
+        0,
+        281,
+        0,
+        "string"
+      ],
+      [
+        443,
+        228,
+        0,
+        281,
+        1,
+        -1
+      ],
+      [
+        444,
+        159,
+        0,
+        283,
+        1,
+        -1
+      ],
+      [
+        445,
+        157,
+        0,
+        284,
         1,
         -1
       ]
@@ -9551,6 +9758,16 @@ const defaultGraph: SerializedAppState = {
           270
         ],
         color: "#A88"
+      },
+      {
+        title: "Mode Switcher",
+        bounding: [
+          -2109,
+          329,
+          707,
+          745
+        ],
+        color: "#b58b2a"
       }
     ],
     config: {},
@@ -9618,6 +9835,7 @@ const defaultGraph: SerializedAppState = {
           "27",
           "33",
           "16",
+          "58",
           "79",
           "41"
         ],
@@ -9648,8 +9866,7 @@ const defaultGraph: SerializedAppState = {
           }
         },
         children: [
-          "95",
-          "58"
+          "95"
         ],
         parent: "0"
       },
@@ -9740,7 +9957,7 @@ const defaultGraph: SerializedAppState = {
           id: "13",
           nodeId: 20,
           attrs: {
-            title: "sampler_name",
+            title: "Sampler",
             hidden: false,
             disabled: false,
             direction: "horizontal",
@@ -9767,7 +9984,7 @@ const defaultGraph: SerializedAppState = {
           id: "14",
           nodeId: 21,
           attrs: {
-            title: "scheduler",
+            title: "Scheduler",
             hidden: false,
             disabled: false,
             direction: "horizontal",
@@ -10165,7 +10382,7 @@ const defaultGraph: SerializedAppState = {
           id: "47",
           attrs: {
             title: "",
-            hidden: false,
+            hidden: true,
             disabled: false,
             direction: "horizontal",
             classes: "",
@@ -10228,7 +10445,7 @@ const defaultGraph: SerializedAppState = {
           id: "51",
           nodeId: 75,
           attrs: {
-            title: "ckpt_name",
+            title: "Checkpoint",
             hidden: false,
             disabled: false,
             direction: "horizontal",
@@ -10315,7 +10532,7 @@ const defaultGraph: SerializedAppState = {
           id: "55",
           nodeId: 80,
           attrs: {
-            title: "lora_name",
+            title: "LoRA Name",
             hidden: false,
             disabled: false,
             direction: "horizontal",
@@ -10334,7 +10551,7 @@ const defaultGraph: SerializedAppState = {
           }
         },
         children: [],
-        parent: "58"
+        parent: "131"
       },
       56: {
         dragItem: {
@@ -10415,10 +10632,10 @@ const defaultGraph: SerializedAppState = {
           }
         },
         children: [
-          "55",
+          "131",
           "59"
         ],
-        parent: "2"
+        parent: "1"
       },
       59: {
         dragItem: {
@@ -10457,7 +10674,7 @@ const defaultGraph: SerializedAppState = {
           id: "64",
           nodeId: 91,
           attrs: {
-            title: "upscale_method",
+            title: "Upscale Method",
             hidden: false,
             disabled: false,
             direction: "horizontal",
@@ -10511,7 +10728,7 @@ const defaultGraph: SerializedAppState = {
           id: "67",
           nodeId: 94,
           attrs: {
-            title: "crop",
+            title: "Crop",
             hidden: false,
             disabled: false,
             direction: "horizontal",
@@ -10826,7 +11043,7 @@ const defaultGraph: SerializedAppState = {
           nodeId: 126,
           attrs: {
             title: "Generate",
-            hidden: false,
+            hidden: true,
             disabled: false,
             direction: "horizontal",
             classes: "",
@@ -10852,7 +11069,7 @@ const defaultGraph: SerializedAppState = {
           id: "88",
           attrs: {
             title: "",
-            hidden: false,
+            hidden: true,
             disabled: false,
             direction: "vertical",
             classes: "",
@@ -11098,7 +11315,7 @@ const defaultGraph: SerializedAppState = {
           id: "103",
           nodeId: 177,
           attrs: {
-            title: "vae_name",
+            title: "VAE",
             hidden: false,
             disabled: false,
             direction: "vertical",
@@ -11178,7 +11395,7 @@ const defaultGraph: SerializedAppState = {
           id: "106",
           nodeId: 183,
           attrs: {
-            title: "upscale_method",
+            title: "Upscale Method",
             hidden: false,
             disabled: false,
             direction: "vertical",
@@ -11204,7 +11421,7 @@ const defaultGraph: SerializedAppState = {
           id: "107",
           nodeId: 184,
           attrs: {
-            title: "crop",
+            title: "Crop",
             hidden: false,
             disabled: false,
             direction: "vertical",
@@ -11230,7 +11447,7 @@ const defaultGraph: SerializedAppState = {
           id: "108",
           attrs: {
             title: "",
-            hidden: true,
+            hidden: false,
             disabled: false,
             direction: "horizontal",
             classes: "",
@@ -11260,7 +11477,7 @@ const defaultGraph: SerializedAppState = {
           id: "109",
           attrs: {
             title: "img2img",
-            hidden: true,
+            hidden: false,
             disabled: false,
             direction: "vertical",
             classes: "",
@@ -11372,7 +11589,7 @@ const defaultGraph: SerializedAppState = {
           id: "117",
           attrs: {
             title: "",
-            hidden: true,
+            hidden: false,
             disabled: false,
             direction: "vertical",
             classes: "",
@@ -11495,7 +11712,7 @@ const defaultGraph: SerializedAppState = {
           id: "122",
           attrs: {
             title: "",
-            hidden: true,
+            hidden: false,
             disabled: false,
             direction: "horizontal",
             classes: "",
@@ -11597,7 +11814,7 @@ const defaultGraph: SerializedAppState = {
           id: "127",
           attrs: {
             title: "",
-            hidden: true,
+            hidden: false,
             disabled: false,
             direction: "horizontal",
             classes: "",
@@ -11669,19 +11886,45 @@ const defaultGraph: SerializedAppState = {
           "128"
         ],
         parent: "33"
+      },
+      131: {
+        dragItem: {
+          type: "container",
+          id: "131",
+          attrs: {
+            title: "",
+            hidden: false,
+            disabled: false,
+            direction: "horizontal",
+            classes: "",
+            style: "",
+            nodeDisabledState: "disabled",
+            variant: "gallery",
+            containerVariant: "block",
+            openOnStartup: false,
+            buttonVariant: "primary",
+            buttonSize: "large",
+            tags: []
+          }
+        },
+        children: [
+          "55"
+        ],
+        parent: "58"
       }
     },
-    currentId: 130,
+    currentId: 132,
     attrs: {
+      queuePromptButtonName: "Queue img2img",
       defaultSubgraph: "txt2img"
     }
   },
   canvas: {
     offset: [
-      949.2317346499664,
-      180.17640279910015
+      37.53040750483387,
+      -130.58436749955789
     ],
-    scale: 0.7513148009015782
+    scale: 0.8264462809917354
   }
 }
 
