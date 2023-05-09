@@ -67,6 +67,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
 
     private _aboutToChange: number = 0;
     private _aboutToChangeValue: any = null;
+    private _noChangedEvent: boolean = false;
 
     abstract defaultValue: T;
 
@@ -84,6 +85,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     // TODO these are bad, create override methods instead
     // input slots
     inputIndex: number = 0;
+    storeActionName: string | null = "store";
 
     // output slots
     outputIndex: number | null = 0;
@@ -139,30 +141,43 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
             this.setOutputData(this.outputIndex, get(this.value))
         }
 
-        if (this.changedIndex !== null && this.outputs.length >= this.changedIndex) {
+        if (this.changedIndex !== null && this.outputs.length >= this.changedIndex && !this._noChangedEvent) {
             if (!this.delayChangedEvent)
                 this.triggerChangeEvent(get(this.value))
             else {
-                this._aboutToChange = 2; // wait 1.5-2 frames, in case we're already in the middle of one
+                console.debug("[Widget] queueChangeEvent", this, value)
+                this._aboutToChange = 2; // wait 1.5-2 frames, in case we're already in the middle of executing the graph
                 this._aboutToChangeValue = get(this.value);
             }
         }
+        this._noChangedEvent = false;
     }
 
     private triggerChangeEvent(value: any) {
+        console.debug("[Widget] trigger changed", this, value)
         const changedOutput = this.outputs[this.changedIndex]
         if (changedOutput.type === BuiltInSlotType.EVENT)
             this.triggerSlot(this.changedIndex, value)
     }
 
-    setValue(value: any) {
-        this.value.set(value)
+    parseValue(value: any): T { return value as T };
+
+    setValue(value: any, noChangedEvent: boolean = false) {
+        if (noChangedEvent)
+            this._noChangedEvent = true;
+        this.value.set(this.parseValue(value))
+
+        // In case value.set() does not trigger onValueUpdated, we need to reset
+        // the counter here also.
+        this._noChangedEvent = false;
     }
 
     override onPropertyChanged(property: string, value: any, prevValue?: any) {
-        const data = this.shownOutputProperties[property]
-        if (data)
-            this.setOutputData(data.index, value)
+        if (this.shownOutputProperties != null) {
+            const data = this.shownOutputProperties[property]
+            if (data)
+                this.setOutputData(data.index, value)
+        }
     }
 
     /*
@@ -195,6 +210,21 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
                 this._aboutToChangeValue = null;
                 this.triggerChangeEvent(value);
             }
+        }
+    }
+
+    override onAction(action: any, param: any, options: { action_call?: string }) {
+        if (action === this.storeActionName) {
+            let noChangedEvent = false;
+            let value = param;
+            if (param != null && typeof param === "object" && "value" in param) {
+                value = param.value
+                if ("noChangedEvent" in param)
+                    noChangedEvent = Boolean(param.noChangedEvent)
+            }
+            value = this.parseValue(value);
+            console.warn("[Widget] Store!", param, "=>", value, noChangedEvent)
+            this.setValue(value, noChangedEvent)
         }
     }
 
@@ -337,15 +367,10 @@ export class ComfySliderNode extends ComfyWidgetNode<number> {
         super(name, 0)
     }
 
-    override onAction(action: any, param: any) {
-        if (action === "store" && typeof param === "number")
-            this.setValue(param)
-    }
-
-    override setValue(value: any) {
+    override parseValue(value: any): number {
         if (typeof value !== "number")
-            return;
-        super.setValue(clamp(value, this.properties.min, this.properties.max))
+            return this.properties.min;
+        return clamp(value, this.properties.min, this.properties.max)
     }
 
     override clampOneConfig(input: IComfyInputSlot) {
@@ -422,15 +447,10 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
         return true;
     }
 
-    override onAction(action: any, param: any) {
-        if (action === "store" && typeof param === "string")
-            this.setValue(param)
-    }
-
-    override setValue(value: any) {
+    override parseValue(value: any): string {
         if (typeof value !== "string" || this.properties.values.indexOf(value) === -1)
-            return;
-        super.setValue(value)
+            return this.properties.values[0]
+        return value
     }
 
     override clampOneConfig(input: IComfyInputSlot) {
@@ -469,7 +489,7 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
     }
 
     static slotLayout: SlotLayout = {
-        inputs: [
+        inputs: [
             { name: "value", type: "string" },
             { name: "store", type: BuiltInSlotType.ACTION }
         ],
@@ -486,13 +506,8 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
         super(name, "")
     }
 
-    override onAction(action: any, param: any) {
-        if (action === "store")
-            this.setValue(param)
-    }
-
-    override setValue(value: any) {
-        super.setValue(`${value}`)
+    override parseValue(value: any): string {
+        return `${value}`
     }
 }
 
@@ -578,26 +593,10 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     }
 
     override onAction(action: any, param: any, options: { action_call?: string }) {
+        super.onAction(action, param, options)
+
         if (action === "clear") {
             this.setValue([])
-        }
-        else if (action === "store") {
-            if (param && "images" in param) {
-                const data = param as GalleryOutput
-                console.debug("[ComfyGalleryNode] Received output!", data)
-
-                const galleryItems: GradioFileData[] = convertComfyOutputToGradio(data)
-
-                if (this.properties.updateMode === "append") {
-                    const currentValue = get(this.value)
-                    this.setValue(currentValue.concat(galleryItems))
-                }
-                else {
-                    this.setValue(galleryItems)
-                }
-            }
-            this.setProperty("index", 0)
-            this.anyImageSelected = false;
         }
     }
 
@@ -605,22 +604,31 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
         return `Images: ${value?.length || 0}`
     }
 
-    override setValue(value: any) {
-        console.warn("SETVALUE", value)
-        if (Array.isArray(value)) {
-            super.setValue(value)
+    override parseValue(param: any): GradioFileData[] {
+        if (!(typeof param === "object" && "images" in param)) {
+            return []
+        }
+
+        const data = param as GalleryOutput
+        console.debug("[ComfyGalleryNode] Received output!", data)
+
+        const galleryItems: GradioFileData[] = convertComfyOutputToGradio(data)
+
+        if (this.properties.updateMode === "append") {
+            const currentValue = get(this.value)
+            return currentValue.concat(galleryItems)
         }
         else {
-            super.setValue([])
+            return galleryItems;
         }
+    }
 
-        if (!get(this.value))
-            this.anyImageSelected = false
+    override setValue(value: any, noChangedEvent: boolean = false) {
+        console.warn("SETVALUE", value)
+        super.setValue(value, noChangedEvent)
 
-        const len = get(this.value).length
-        if (this.properties.index < 0 || this.properties.index >= len) {
-            this.setProperty("index", clamp(this.properties.index, 0, len))
-        }
+        this.setProperty("index", 0)
+        this.anyImageSelected = false;
     }
 }
 
@@ -657,8 +665,8 @@ export class ComfyButtonNode extends ComfyWidgetNode<boolean> {
         super(name, false)
     }
 
-    override setValue(value: any) {
-        super.setValue(Boolean(value))
+    override parseValue(param: any): boolean {
+        return Boolean(param);
     }
 
     onClick() {
@@ -697,22 +705,14 @@ export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
 
     override svelteComponentType = CheckboxWidget;
     override defaultValue = false;
+    override changedIndex = 1;
 
     constructor(name?: string) {
         super(name, false)
     }
 
-    override setValue(value: any) {
-        value = Boolean(value)
-        const changed = value != get(this.value);
-        super.setValue(Boolean(value))
-        if (changed)
-            this.triggerSlot(1, value)
-    }
-
-    override onAction(action: any, param: any) {
-        if (action === "store")
-            this.setValue(Boolean(param))
+    override parseValue(param: any) {
+        return Boolean(param);
     }
 }
 
@@ -735,6 +735,10 @@ export class ComfyRadioNode extends ComfyWidgetNode<string> {
     }
 
     static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "value", type: "string,number" },
+            { name: "store", type: BuiltInSlotType.ACTION }
+        ],
         outputs: [
             { name: "value", type: "string" },
             { name: "index", type: "number" },
@@ -761,16 +765,30 @@ export class ComfyRadioNode extends ComfyWidgetNode<string> {
         this.setOutputData(1, this.index)
     }
 
-    override setValue(value: string) {
+    override setValue(value: string, noChangedEvent: boolean = false) {
+        super.setValue(value, noChangedEvent)
+
+        value = get(this.value);
+
         const index = this.properties.choices.indexOf(value)
-        if (index == -1)
+        if (index === -1)
             return;
 
         this.index = index;
         this.indexWidget.value = index;
         this.setOutputData(1, this.index)
+    }
 
-        super.setValue(value)
+    override parseValue(param: any): string {
+        if (typeof param === "string") {
+            if (this.properties.choices.indexOf(param) === -1)
+                return this.properties.choices[0]
+            return param
+        }
+        else {
+            const index = clamp(parseInt(param), 0, this.properties.choices.length - 1)
+            return this.properties.choices[index] || this.properties.defaultValue
+        }
     }
 }
 

@@ -603,7 +603,7 @@ export interface WidgetLayout extends IDragItem {
     node: ComfyWidgetNode
 }
 
-type DragItemID = string;
+export type DragItemID = string;
 
 type LayoutStateOps = {
     addContainer: (parent: ContainerLayout | null, attrs: Partial<Attributes>, index?: number) => ContainerLayout,
