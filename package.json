@@ -54,6 +54,7 @@
     "@litegraph-ts/nodes-math": "workspace:*",
     "@litegraph-ts/nodes-strings": "workspace:*",
     "@litegraph-ts/tsconfig": "workspace:*",
+    "@sveltejs/svelte-virtual-list": "^3.0.1",
     "@sveltejs/vite-plugin-svelte": "^2.1.1",
     "@tsconfig/svelte": "^4.0.1",
     "events": "^3.3.0",

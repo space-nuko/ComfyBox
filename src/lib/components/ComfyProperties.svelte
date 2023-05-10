@@ -268,7 +268,7 @@
                                     on:input={(e) => updateAttribute(spec, target, e.detail)}
                                     disabled={!$uiState.uiUnlocked || !spec.editable}
                                     label={spec.name}
-                                    max_lines={1}
+                                    max_lines={spec.multiline ? 5 : 1}
                                     />
                             {:else if spec.type === "boolean"}
                                     <Checkbox
@@ -307,7 +307,7 @@
                                         on:input={(e) => updateProperty(spec, e.detail)}
                                         label={spec.name}
                                         disabled={!$uiState.uiUnlocked || !spec.editable}
-                                        max_lines={1}
+                                    max_lines={spec.multiline ? 5 : 1}
                                         />
                                 {:else if spec.type === "boolean"}
                                         <Checkbox
@@ -345,7 +345,7 @@
                                         on:input={(e) => updateVar(spec, e.detail)}
                                         label={spec.name}
                                         disabled={!$uiState.uiUnlocked || !spec.editable}
-                                        max_lines={1}
+                                    max_lines={spec.multiline ? 5 : 1}
                                         />
                                 {:else if spec.type === "boolean"}
                                         <Checkbox
@@ -384,7 +384,7 @@
                                     on:input={(e) => updateWorkflowAttribute(spec, e.detail)}
                                     label={spec.name}
                                     disabled={!$uiState.uiUnlocked || !spec.editable}
-                                    max_lines={1}
+                                    max_lines={spec.multiline ? 5 : 1}
                                     />
                             {:else if spec.type === "boolean"}
                                     <Checkbox

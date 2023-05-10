@@ -1,9 +1,11 @@
 <script lang="ts">
  import { BlockTitle } from "@gradio/atoms";
  import Select from 'svelte-select';
+ import VirtualList from '@sveltejs/svelte-virtual-list';
+ import ListItem from "./ListItem.svelte"
  import type { ComfyComboNode } from "$lib/nodes/index";
  import { type WidgetLayout } from "$lib/stores/layoutState";
- import { get, type Writable } from "svelte/store";
+ import { get, writable, type Writable } from "svelte/store";
  import { isDisabled } from "./utils"
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -12,22 +14,21 @@
  let propsChanged: Writable<number> | null = null;
  let comboRefreshed: Writable<boolean> | null = null;
  let wasComboRefreshed: boolean = false;
- let option: any
 
  export let debug: boolean = false;
  let input: HTMLInputElement | null = null
 
  $: widget && setNodeValue(widget);
 
- $: if (nodeValue !== null && (!$propsChanged || $propsChanged)) {
-     if (node.properties.values.indexOf(option.value) === -1) {
-         setOption($nodeValue)
-         $nodeValue = option
-     }
-     else {
-         $nodeValue = option
-         setOption($nodeValue)
-     }
+ $: if (nodeValue !== null) {
+     // if (option == null || node.properties.values.indexOf(option.value) === -1) {
+     //     setOption($nodeValue)
+     //     $nodeValue = option
+     // }
+     // else {
+     //     $nodeValue = option
+     //     setOption($nodeValue)
+     // }
      setNodeValue(widget)
      node.properties = node.properties
  }
@@ -40,16 +41,8 @@
          comboRefreshed = node.comboRefreshed;
          if ($comboRefreshed)
              flashOnRefreshed();
-         setOption($nodeValue) // don't react on option
+         // setOption($nodeValue) // don't react on option
      }
- }
-
- function setOption(value: any) {
-     option = value;
- }
-
- $: if (nodeValue && option && option.value) {
-     $nodeValue = option.value;
  }
 
  $: $comboRefreshed && flashOnRefreshed();
@@ -76,39 +69,81 @@
          input.blur();
      navigator.vibrate(20)
  }
+
+ let start = 0;
+ let end = 0;
+ let listOpen: boolean = false
+
+ function selectItem(item: any) {
+     $nodeValue = item.value;
+     listOpen = false;
+     document.activeElement?.blur();
+ }
+
+ let option: any = null;
+ let rebuild = writable(0);
+ let virtualList = null;
+
+ function onFilter() {
+     // $rebuild += 1
+     if (virtualList) {
+         // force refresh virtual list
+         const viewport = virtualList.querySelector("svelte-virtual-list-viewport")
+         viewport.scrollTo(0, 1)
+         viewport.scrollTo(0, 0)
+     }
+     else {
+         console.log("no")
+     }
+ }
 </script>
 
 <div class="wrapper comfy-combo" class:updated={$comboRefreshed}>
-    {#key $propsChanged}
-        {#key $comboRefreshed}
-            {#if node !== null && nodeValue !== null}
+    {#key $comboRefreshed}
+        {#if node !== null && nodeValue !== null}
+            {#if node.valuesForCombo == null}
+                <span>Loading...</span>
+            {:else}
+                <span>Count {node.valuesForCombo.length}</span>
                 <label>
                     {#if widget.attrs.title !== ""}
                         <BlockTitle show_label={true}>{widget.attrs.title}</BlockTitle>
                     {/if}
                     <Select
-                        bind:value={option}
-                        items={node.properties.values}
-                        disabled={isDisabled(widget) || node.properties.values.length === 0}
+                        value={$nodeValue}
+                        bind:justValue={option}
+                        bind:listOpen
+                        items={node.valuesForCombo}
+                        disabled={isDisabled(widget)}
                         clearable={false}
                         showChevron={true}
+                        listAutoWidth={true}
                         inputAttributes={{ autocomplete: 'off' }}
                         bind:input
                         on:change
                         on:focus={onFocus}
                         on:select={onSelect}
-                        on:filter
+                        on:filter={onFilter}
                         on:blur
-                    />
-                    {#if debug}
-                        <div>Value: {option?.value}</div>
-                        <div>Items: {node.properties.values}</div>
-                        <div>NodeValue: {$nodeValue}</div>
-                        <div>LinkValue: {getLinkValue()}</div>
-                    {/if}
+                    >
+                        <div slot="list" class="list" let:filteredItems>
+                            {#key $rebuild}
+                                <div class="container" bind:this={virtualList}>
+                                    <VirtualList items={filteredItems} bind:start bind:end let:item>
+                                        <div class="item"
+                                              class:selected={option === item.value}
+                                              on:click={() => selectItem(item)}>
+                                            {item.label}
+                                        </div>
+                                    </VirtualList>
+                                    <p class="details">showing items {start}-{end}</p>
+                                </div>
+                            {/key}
+                        </div>
+                    </Select>
                 </label>
             {/if}
-        {/key}
+        {/if}
     {/key}
 </div>
 
@@ -116,6 +151,12 @@
  .wrapper {
      padding: 2px;
      width: 100%;
+
+     :global(.selected-item) {
+         // no idea how to get the select box to shrink in the flexbox otherwise...
+         position: absolute !important;
+         width: -webkit-fill-available !important;
+     }
  }
 
  @keyframes -global-light-up {
@@ -142,5 +183,43 @@
 
  :global(.svelte-select-list) {
      z-index: var(--layer-top) !important;
+     overflow-y: initial !important;
+     width: auto !important; // seems floating-ui overrides listAutoWidth
+ }
+
+ .container {
+     border-top: 1px solid #333;
+     border-bottom: 1px solid #333;
+
+     height: 100%
+ }
+
+ .list {
+     height: 30rem;
+     width: 30rem;
+     background-color: white;
+
+     .item {
+         font-size: 16px;
+         &.selected {
+             color: white;
+             background: var(--color-yellow-500);
+         }
+     }
+
+     .details {
+         background: white;
+         border: 1px solid grey;
+     }
+
+     :global(svelte-virtual-list-row) {
+         white-space: nowrap;
+     }
+
+     :global(svelte-virtual-list-row:hover) {
+         color: white;
+         background: var(--color-blue-500);
+         cursor: pointer;
+     }
  }
 </style>

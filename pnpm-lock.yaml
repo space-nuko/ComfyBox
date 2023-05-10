@@ -64,6 +64,9 @@ importers:
       '@litegraph-ts/tsconfig':
         specifier: workspace:*
         version: link:litegraph/packages/tsconfig
+      '@sveltejs/svelte-virtual-list':
+        specifier: ^3.0.1
+        version: 3.0.1
       '@sveltejs/vite-plugin-svelte':
         specifier: ^2.1.1
         version: 2.1.1(svelte@3.58.0)(vite@4.3.1)
@@ -2224,6 +2227,10 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@sveltejs/svelte-virtual-list@3.0.1:
+    resolution: {integrity: sha512-aF9TptS7NKKS7/TqpsxQBSDJ9Q0XBYzBehCeIC5DzdMEgrJZpIYao9LRLnyyo6SVodpapm2B7FE/Lj+FSA5/SQ==}
+    dev: false
 
   /@sveltejs/vite-plugin-svelte@2.1.1(svelte@3.58.0):
     resolution: {integrity: sha512-7YeBDt4us0FiIMNsVXxyaP4Hwyn2/v9x3oqStkHU3ZdIc5O22pGwUwH33wUqYo+7Itdmo8zxJ45Qvfm3H7UUjQ==}

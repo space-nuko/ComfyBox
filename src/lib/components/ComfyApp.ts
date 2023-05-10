@@ -766,6 +766,16 @@ export default class ComfyApp {
 
         for (let nodeNum in this.lGraph._nodes) {
             const node = this.lGraph._nodes[nodeNum];
+            if (node.type === "ui/combo") {
+                (node as nodes.ComfyComboNode).valuesForCombo = null;
+                (node as nodes.ComfyComboNode).comboRefreshed.set(true);
+            }
+        }
+
+        let seen = new Set()
+
+        for (let nodeNum in this.lGraph._nodes) {
+            const node = this.lGraph._nodes[nodeNum];
 
             const def = defs[node.type];
 
@@ -775,13 +785,18 @@ export default class ComfyApp {
                     const comfyInput = input as IComfyInputSlot;
 
                     if (comfyInput.defaultWidgetNode == nodes.ComfyComboNode && def["input"]["required"][comfyInput.name] !== undefined) {
-                        comfyInput.config.values = def["input"]["required"][comfyInput.name][0];
+                        const rawValues = def["input"]["required"][comfyInput.name][0];
+
+                        comfyInput.config.values = rawValues;
                         const inputNode = node.getInputNode(index)
 
-                        if (inputNode && "doAutoConfig" in inputNode && comfyInput.widgetNodeType === inputNode.type) {
-                            console.debug("[ComfyApp] Reconfiguring combo widget", inputNode.type, comfyInput.config.values)
+                        if (inputNode && "doAutoConfig" in inputNode && comfyInput.widgetNodeType === inputNode.type && !seen.has(inputNode.id)) {
+                            seen.add(inputNode.id)
+                            console.warn("[ComfyApp] Reconfiguring combo widget", inputNode.type, comfyInput.config.values.length)
                             const comfyComboNode = inputNode as nodes.ComfyComboNode;
                             comfyComboNode.doAutoConfig(comfyInput, { includeProperties: new Set(["values"]), setWidgetTitle: false })
+
+                            comfyComboNode.formatValues(rawValues)
                             if (!comfyInput.config.values.includes(get(comfyComboNode.value))) {
                                 comfyComboNode.setValue(comfyInput.config.defaultValue || comfyInput.config.values[0])
                             }

@@ -140,7 +140,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     private onValueUpdated(value: any) {
-        console.debug("[Widget] valueUpdated", this, value)
+        // console.debug("[Widget] valueUpdated", this, value)
         this.displayWidget.value = this.formatValue(value)
 
         if (this.outputIndex !== null && this.outputs.length >= this.outputIndex) {
@@ -151,7 +151,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
             if (!this.delayChangedEvent)
                 this.triggerChangeEvent(get(this.value))
             else {
-                console.debug("[Widget] queueChangeEvent", this, value)
+                // console.debug("[Widget] queueChangeEvent", this, value)
                 this._aboutToChange = 2; // wait 1.5-2 frames, in case we're already in the middle of executing the graph
                 this._aboutToChangeValue = get(this.value);
             }
@@ -402,13 +402,17 @@ LiteGraph.registerNodeType({
 
 export interface ComfyComboProperties extends ComfyWidgetProperties {
     values: string[]
+
+    /* JS Function body that takes a parameter named "value" as a parameter and returns the label for each combo entry */
+    convertValueToLabelCode: string
 }
 
 export class ComfyComboNode extends ComfyWidgetNode<string> {
     override properties: ComfyComboProperties = {
         tags: [],
         defaultValue: "A",
-        values: ["A", "B", "C", "D"]
+        values: ["A", "B", "C", "D"],
+        convertValueToLabelCode: ""
     }
 
     static slotLayout: SlotLayout = {
@@ -428,9 +432,50 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
 
     comboRefreshed: Writable<boolean>;
 
+    valuesForCombo: any[] | null = null;
+
     constructor(name?: string) {
         super(name, "A")
         this.comboRefreshed = writable(false)
+    }
+
+    override onPropertyChanged(property: any, value: any) {
+        if (property === "values" || property === "convertValueToLabelCode") {
+            this.formatValues(this.properties.values)
+        }
+    }
+
+    formatValues(values: string[]) {
+        if (values == null)
+            return;
+
+        this.properties.values = values;
+
+        let formatter: any;
+        if (this.properties.convertValueToLabelCode)
+            formatter = new Function("value", this.properties.convertValueToLabelCode) as (v: string) => string;
+        else
+            formatter = (value) => `${value}`;
+
+        try {
+            this.valuesForCombo = this.properties.values.map(value => {
+                return {
+                    value,
+                    label: formatter(value)
+                }
+            })
+        }
+        catch (err) {
+            console.error("Failed formatting!", err)
+            this.valuesForCombo = this.properties.values.map(value => {
+                return {
+                    value,
+                    label: `${value}`
+                }
+            })
+        }
+
+        this.comboRefreshed.set(true);
     }
 
     onConnectOutput(
@@ -474,6 +519,12 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
             else
                 this.setValue(input.config.defaultValue || input.config.values[0])
         }
+    }
+
+    override onSerialize(o: SerializedLGraphNode) {
+        super.onSerialize(o);
+        // TODO fix saving combo nodes with huge values lists
+        o.properties.values = []
     }
 
     override stripUserState(o: SerializedLGraphNode) {

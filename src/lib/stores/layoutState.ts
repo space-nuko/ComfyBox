@@ -220,6 +220,11 @@ export type AttributesSpec = {
     max?: number,
 
     /*
+     * If `type` is "string", display as a textarea.
+     */
+    multiline?: boolean,
+
+    /*
      * Valid `LGraphNode.type`s this property applies to if it's located in a node.
      * These are like "ui/button", "ui/slider".
      */
@@ -384,6 +389,17 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 validNodeTypes: ["ui/button"],
                 values: ["large", "small"],
                 defaultValue: "large"
+            },
+
+            // Combo
+            {
+                name: "convertValueToLabelCode",
+                type: "string",
+                location: "nodeProps",
+                editable: true,
+                multiline: true,
+                validNodeTypes: ["ui/combo"],
+                defaultValue: ""
             },
 
             // Gallery
