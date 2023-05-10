@@ -13,8 +13,8 @@
  let node: ComfyComboNode | null = null;
  let nodeValue: Writable<string> | null = null;
  let propsChanged: Writable<number> | null = null;
- let comboRefreshed: Writable<boolean> | null = null;
- let wasComboRefreshed: boolean = false;
+ let valuesForCombo: Writable<any[]> | null = null;
+ let lastConfigured: any = null;
  let option: any = null;
 
  export let debug: boolean = false;
@@ -40,23 +40,26 @@
          node = widget.node as ComfyComboNode
          nodeValue = node.value;
          propsChanged = node.propsChanged;
-         comboRefreshed = node.comboRefreshed;
-         if ($comboRefreshed)
-             flashOnRefreshed();
+         valuesForCombo = node.valuesForCombo;
      }
  }
 
- $: node.valuesForCombo && updateActiveIndex(node.valuesForCombo)
+ $: $valuesForCombo != null && updateActiveIndex($valuesForCombo)
 
  function updateActiveIndex(values: any) {
      const value = $nodeValue;
      activeIndex = values.findIndex(v => v.value === value);
  }
 
- $: $comboRefreshed && flashOnRefreshed();
+ $: $valuesForCombo != lastConfigured && flashOnRefreshed();
+ let lightUp = false;
 
  function flashOnRefreshed() {
-     setTimeout(() => ($comboRefreshed = false), 1000);
+     lastConfigured = $valuesForCombo
+     if (lastConfigured != null) {
+         lightUp = true;
+         setTimeout(() => (lightUp = false), 1000);
+     }
  }
 
  function getLinkValue() {
@@ -69,7 +72,10 @@
  }
 
  function onFocus() {
-     navigator.vibrate(20)
+     // console.warn("FOCUS")
+     if (listOpen) {
+         navigator.vibrate(20)
+     }
  }
 
  function onSelect(e: CustomEvent<any>) {
@@ -79,7 +85,7 @@
 
      const item = e.detail
 
-     console.warn("SELECT", item, item.index)
+     console.debug("[ComboWidget] SELECT", item, item.index)
      $nodeValue = item.value;
      activeIndex = item.index;
      listOpen = false;
@@ -94,14 +100,14 @@
  let end = 0;
 
  function handleHover(index: number) {
-     console.warn("HOV", index)
+     // console.warn("HOV", index)
      hoverItemIndex = index;
  }
 
  function handleSelect(index: number) {
-     console.warn("SEL", index)
+     // console.warn("SEL", index)
      navigator.vibrate(20)
-     const item = node.valuesForCombo[index]
+     const item = $valuesForCombo[index]
      activeIndex = index;
      $nodeValue = item.value
      listOpen = false;
@@ -130,13 +136,13 @@
 
 </script>
 
-<div class="wrapper comfy-combo" class:updated={$comboRefreshed}>
-    {#key $comboRefreshed}
+<div class="wrapper comfy-combo" class:updated={lightUp}>
+    {#key $valuesForCombo}
         {#if node !== null && nodeValue !== null}
-            {#if node.valuesForCombo == null}
+            {#if $valuesForCombo == null}
                 <span>Loading...</span>
             {:else}
-                <span>Count {node.valuesForCombo.length}</span>
+                <span>Count {$valuesForCombo.length}</span>
                 <label>
                     {#if widget.attrs.title !== ""}
                         <BlockTitle show_label={true}>{widget.attrs.title}</BlockTitle>
@@ -148,7 +154,7 @@
                         bind:filterText
                         bind:listOpen
                         bind:input
-                        items={node.valuesForCombo}
+                        items={$valuesForCombo}
                         disabled={isDisabled(widget)}
                         clearable={false}
                         showChevron={true}
@@ -160,7 +166,7 @@
                         on:select={(e) => handleSelect(e.detail.index)}
                         on:blur
                         on:filter={onFilter}>
-                        <div class="list" slot="list" let:filteredItems>
+                        <div class="comfy-select-list" slot="list" let:filteredItems>
                             {#if filteredItems.length > 0}
                                 <VirtualList
                                     items={filteredItems}
@@ -170,20 +176,25 @@
                                     itemSize={50}
                                     scrollToIndex={hoverItemIndex}>
                                     <div slot="item"
+                                         class="comfy-select-item"
                                          let:index={i}
                                          let:style
                                          {style}
-                                         class="item"
                                          class:active={activeIndex === filteredItems[i].index}
                                          class:hover={hoverItemIndex === i}
                                          on:click={() => handleSelect(filteredItems[i].index)}
-                                         on:focus={() => handleHover(i)}
-                                         on:mouseover={() => handleHover(i)}>
+                                        on:focus={() => handleHover(i)}
+                                        on:mouseover={() => handleHover(i)}>
                                         {@const item = filteredItems[i]}
-                                        {item.label}
+                                        <span class="comfy-select-label">
+                                            {item.label}
+                                        </span>
                                     </div>
                                 </VirtualList>
-                                <p class="details">active: {activeIndex}, hover: {hoverItemIndex}<p>
+                            {:else}
+                                <div class="comfy-empty-list">
+                                    <span>(No items)</span>
+                                </div>
                             {/if}
                         </div>
                     </Select>
@@ -240,12 +251,21 @@
      height: 100%
  }
 
- .list {
-     height: 30rem;
+ .comfy-select-list {
+     height: 300px;
      width: 30rem;
      background-color: white;
 
-     .item {
+     .comfy-empty-list {
+         height: 100%;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         font-size: xx-large;
+         color: var(--neutral-700)
+     }
+
+     .comfy-select-item {
          font-size: 16px;
          padding: 1.2rem;
          border: 1px solid var(--neutral-300);
@@ -253,6 +273,9 @@
          white-space: nowrap;
          overflow: hidden;
          text-overflow: ellipsis;
+         display: flex;
+         align-items: center;
+
          &.hover {
              color: white;
              background: var(--neutral-400);
@@ -261,6 +284,10 @@
          &.active {
              color: white;
              background: var(--color-blue-500);
+         }
+
+         .comfy-select-label {
+
          }
      }
 

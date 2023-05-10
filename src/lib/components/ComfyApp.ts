@@ -19,7 +19,7 @@ import ComfyGraphCanvas, { type SerializedGraphCanvasState } from "$lib/ComfyGra
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import * as widgets from "$lib/widgets/index"
 import queueState from "$lib/stores/queueState";
-import type { SvelteComponentDev } from "svelte/internal";
+import { type SvelteComponentDev } from "svelte/internal";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import type { SerializedLayoutState } from "$lib/stores/layoutState";
 import layoutState from "$lib/stores/layoutState";
@@ -27,8 +27,9 @@ import { toast } from '@zerodevx/svelte-toast'
 import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import { get } from "svelte/store";
+import { tick } from "svelte";
 import uiState from "$lib/stores/uiState";
-import { download, jsonToJsObject, promptToGraphVis, workflowToGraphVis } from "$lib/utils";
+import { download, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
 import notify from "$lib/notify";
 import configState from "$lib/stores/configState";
 
@@ -70,6 +71,12 @@ export type SerializedPrompt = {
 export type Progress = {
     value: number,
     max: number
+}
+
+type BackendComboNode = {
+    comboNode: nodes.ComfyComboNode
+    inputSlot: IComfyInputSlot,
+    backendNode: ComfyBackendNode
 }
 
 function isActiveBackendNode(node: ComfyGraphNode, tag: string | null): boolean {
@@ -764,47 +771,78 @@ export default class ComfyApp {
     async refreshComboInNodes(flashUI: boolean = false) {
         const defs = await this.api.getNodeDefs();
 
-        for (let nodeNum in this.lGraph._nodes) {
-            const node = this.lGraph._nodes[nodeNum];
-            if (node.type === "ui/combo") {
-                (node as nodes.ComfyComboNode).valuesForCombo = null;
-                (node as nodes.ComfyComboNode).comboRefreshed.set(true);
+        const toUpdate: BackendComboNode[] = []
+
+        const isComfyComboNode = (node: LGraphNode): boolean => {
+            return node
+                && node.type === "ui/combo"
+                && "doAutoConfig" in node;
+        }
+
+        // Node IDs of combo widgets attached to a backend node
+        let backendCombos: Set<number> = new Set()
+
+        console.debug("[refreshComboInNodes] start")
+
+        // Figure out which combo nodes to update. They need to be connected to
+        // an input slot on a backend node with a backend config in the input
+        // slot connected to.
+        for (const node of this.lGraph.iterateNodesInOrder()) {
+            if (!(node as any).isBackendNode)
+                continue;
+
+            const backendNode = (node as ComfyBackendNode)
+            const inputIndex = range(backendNode.inputs.length)
+                .find(i => {
+                    const input = backendNode.inputs[i]
+                    const inputNode = backendNode.getInputNode(i)
+
+                    // Does this input autocreate a combo box on creation?
+                    const isComfyInput = "config" in input
+                        && "widgetNodeType" in input
+                        && input.widgetNodeType === "ui/combo";
+
+                    return isComfyComboNode(inputNode) && isComfyInput
+                });
+
+            if (inputIndex != null) {
+                const comboNode = backendNode.getInputNode(inputIndex) as nodes.ComfyComboNode
+                const inputSlot = backendNode.inputs[inputIndex] as IComfyInputSlot;
+                const def = defs[backendNode.type];
+
+                const hasBackendConfig = def["input"]["required"][inputSlot.name] !== undefined
+                console.log("hasBackendConfig", node.title, inputSlot.name, hasBackendConfig)
+
+                if (hasBackendConfig) {
+                    backendCombos.add(comboNode.id)
+                    toUpdate.push({ comboNode, inputSlot, backendNode })
+                }
             }
         }
 
-        let seen = new Set()
+        console.debug("[refreshComboInNodes] found:", toUpdate.length, toUpdate)
 
-        for (let nodeNum in this.lGraph._nodes) {
-            const node = this.lGraph._nodes[nodeNum];
+        // Mark combo nodes without backend configs as being loaded already.
+        for (const node of this.lGraph.iterateNodesInOrder()) {
+            if (isComfyComboNode(node) && !backendCombos.has(node.id)) {
+                const comboNode = node as nodes.ComfyComboNode;
+                comboNode.formatValues(comboNode.properties.values);
+            }
+        }
 
-            const def = defs[node.type];
+        await tick();
 
-            for (let index = 0; index < node.inputs.length; index++) {
-                const input = node.inputs[index];
-                if ("config" in input) {
-                    const comfyInput = input as IComfyInputSlot;
+        // Load definitions from the backend.
+        for (const { comboNode, inputSlot, backendNode } of toUpdate) {
+            const def = defs[backendNode.type];
+            const rawValues = def["input"]["required"][inputSlot.name][0];
 
-                    if (comfyInput.defaultWidgetNode == nodes.ComfyComboNode && def["input"]["required"][comfyInput.name] !== undefined) {
-                        const rawValues = def["input"]["required"][comfyInput.name][0];
+            console.warn("[ComfyApp] Reconfiguring combo widget", backendNode.type, "=>", comboNode.type, inputSlot.config.values.length)
+            comboNode.doAutoConfig(inputSlot, { includeProperties: new Set(["values"]), setWidgetTitle: false })
 
-                        comfyInput.config.values = rawValues;
-                        const inputNode = node.getInputNode(index)
-
-                        if (inputNode && "doAutoConfig" in inputNode && comfyInput.widgetNodeType === inputNode.type && !seen.has(inputNode.id)) {
-                            seen.add(inputNode.id)
-                            console.warn("[ComfyApp] Reconfiguring combo widget", inputNode.type, comfyInput.config.values.length)
-                            const comfyComboNode = inputNode as nodes.ComfyComboNode;
-                            comfyComboNode.doAutoConfig(comfyInput, { includeProperties: new Set(["values"]), setWidgetTitle: false })
-
-                            comfyComboNode.formatValues(rawValues)
-                            if (!comfyInput.config.values.includes(get(comfyComboNode.value))) {
-                                comfyComboNode.setValue(comfyInput.config.defaultValue || comfyInput.config.values[0])
-                            }
-                            if (flashUI)
-                                comfyComboNode.comboRefreshed.set(true)
-                        }
-                    }
-                }
+            comboNode.formatValues(rawValues)
+            if (!inputSlot.config.values.includes(get(comboNode.value))) {
+                comboNode.setValue(inputSlot.config.defaultValue || inputSlot.config.values[0])
             }
         }
     }

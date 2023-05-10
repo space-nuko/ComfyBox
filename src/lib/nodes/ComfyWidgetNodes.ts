@@ -273,7 +273,13 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         console.debug("Property copy", input, this.properties)
 
         this.setValue(get(this.value))
+
+        this.onAutoConfig(input);
+
         this.notifyPropsChanged();
+    }
+
+    onAutoConfig(input: IComfyInputSlot) {
     }
 
     notifyPropsChanged() {
@@ -430,18 +436,20 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
     override defaultValue = "A";
     override saveUserState = false;
 
-    comboRefreshed: Writable<boolean>;
-
-    valuesForCombo: any[] | null = null;
+    // True if at least one combo box refresh has taken place
+    // Wait until the initial graph load for combo to be valid.
+    firstLoad: Writable<boolean>;
+    valuesForCombo: Writable<any[] | null>; // Changed when the combo box has values.
 
     constructor(name?: string) {
         super(name, "A")
-        this.comboRefreshed = writable(false)
+        this.firstLoad = writable(false)
+        this.valuesForCombo = writable(null)
     }
 
     override onPropertyChanged(property: any, value: any) {
         if (property === "values" || property === "convertValueToLabelCode") {
-            this.formatValues(this.properties.values)
+            // this.formatValues(this.properties.values)
         }
     }
 
@@ -455,10 +463,12 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
         if (this.properties.convertValueToLabelCode)
             formatter = new Function("value", this.properties.convertValueToLabelCode) as (v: string) => string;
         else
-            formatter = (value) => `${value}`;
+            formatter = (value: any) => `${value}`;
+
+        let valuesForCombo = []
 
         try {
-            this.valuesForCombo = this.properties.values.map((value, index) => {
+            valuesForCombo = this.properties.values.map((value, index) => {
                 return {
                     value,
                     label: formatter(value),
@@ -468,7 +478,7 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
         }
         catch (err) {
             console.error("Failed formatting!", err)
-            this.valuesForCombo = this.properties.values.map((value, index) => {
+            valuesForCombo = this.properties.values.map((value, index) => {
                 return {
                     value,
                     label: `${value}`,
@@ -477,7 +487,8 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
             })
         }
 
-        this.comboRefreshed.set(true);
+        this.firstLoad.set(true)
+        this.valuesForCombo.set(valuesForCombo);
     }
 
     onConnectOutput(

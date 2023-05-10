@@ -61,6 +61,10 @@
 
      return tabName
  }
+
+ function handleSelect() {
+     navigator.vibrate(20)
+ }
 </script>
 
 {#if container && children}
@@ -113,7 +117,7 @@
                 {/if}
             </Block>
         {:else}
-            <Tabs elem_classes={["gradio-tabs"]}>
+            <Tabs elem_classes={["gradio-tabs"]} on:select={handleSelect}>
                 {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item, i(item.id)}
                     {@const tabName = getTabName(container, i)}
                     <TabItem name={tabName}>

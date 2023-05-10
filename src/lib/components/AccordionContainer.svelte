@@ -1,6 +1,6 @@
 <script lang="ts">
  import { Block, BlockTitle } from "@gradio/atoms";
- import { Accordion } from "@gradio/accordion";
+ import Accordion from "$lib/components/gradio/app/Accordion.svelte";
  import uiState from "$lib/stores/uiState";
  import WidgetContainer from "./WidgetContainer.svelte"
 
@@ -50,6 +50,10 @@
      children = layoutState.updateChildren(container, evt.detail.items)
      // Ensure dragging is stopped on drag finish
  };
+
+ function handleClick({ clicked }: CustomEvent<boolean>) {
+     navigator.vibrate(20)
+ }
 </script>
 
 {#if container && children}
@@ -100,7 +104,7 @@
             </Block>
         {:else}
             <Block elem_classes={["gradio-accordion"]}>
-                <Accordion label={container.attrs.title} bind:open={container.isOpen}>
+                <Accordion label={container.attrs.title} bind:open={container.isOpen} on:click={handleClick}>
                     {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
                         <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
                     {/each}

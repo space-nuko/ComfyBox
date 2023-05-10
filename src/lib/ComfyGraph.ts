@@ -82,8 +82,9 @@ export default class ComfyGraph extends LGraph {
                         const [index, spec] = pair
                         const input = comfyNode.inputs[index] as IComfyInputSlot;
                         input.defaultWidgetNode = spec.defaultWidgetNode;
-                        if (spec.config)
+                        if (spec.config) {
                             input.config = spec.config
+                        }
                     }
                 }
             }
