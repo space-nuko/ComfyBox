@@ -4,6 +4,7 @@ import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode"
 export interface ComfyRerouteProperties extends ComfyGraphNodeProperties {
     showOutputText: boolean;
     horizontal: boolean;
+    ignoreTypes: boolean;
 }
 
 export default class ComfyReroute extends ComfyGraphNode {
@@ -24,7 +25,8 @@ export default class ComfyReroute extends ComfyGraphNode {
     override properties: ComfyRerouteProperties = {
         tags: [],
         showOutputText: ComfyReroute.defaultVisibility,
-        horizontal: false
+        horizontal: false,
+        ignoreTypes: false
     }
 
     static slotLayout: SlotLayout = {
@@ -61,6 +63,7 @@ export default class ComfyReroute extends ComfyGraphNode {
     override onConnectionsChange(type: LConnectionKind, slotIndex: number, isConnected: boolean, link: LLink, ioSlot: (INodeInputSlot | INodeOutputSlot)) {
         this.applyOrientation();
 
+        this.canInheritSlotTypes = !this.properties.ignoreTypes;
         super.onConnectionsChange(type, slotIndex, isConnected, link, ioSlot);
     };
 

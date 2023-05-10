@@ -136,7 +136,7 @@
 
 </script>
 
-<div class="wrapper comfy-combo" class:updated={lightUp}>
+<div class="wrapper comfy-combo" class:mobile={isMobile} class:updated={lightUp}>
     {#key $valuesForCombo}
         {#if node !== null && nodeValue !== null}
             {#if $valuesForCombo == null}
@@ -173,12 +173,14 @@
                                 <VirtualList
                                     items={filteredItems}
                                     width="100%"
-                                    height={300}
+                                    height={isMobile ? 300 : 600}
                                     itemCount={filteredItems?.length}
-                                    itemSize={50}
+                                    itemSize={isMobile ? 50 : 24}
+                                    overscanCount={5}
                                     scrollToIndex={hoverItemIndex}>
                                     <div slot="item"
                                          class="comfy-select-item"
+                                         class:mobile={isMobile}
                                          let:index={i}
                                          let:style
                                          {style}
@@ -260,7 +262,11 @@
  .comfy-select-list {
      height: 300px;
      width: 30rem;
-     background-color: white;
+
+     > :global(.virtual-list-wrapper) {
+         box-shadow: var(--block-shadow);
+         background-color: white;
+     }
 
      .comfy-empty-list {
          height: 100%;
@@ -268,12 +274,10 @@
          justify-content: center;
          align-items: center;
          font-size: xx-large;
-         color: var(--neutral-700)
+         color: var(--neutral-400)
      }
 
      .comfy-select-item {
-         font-size: 16px;
-         padding: 1.2rem;
          border: 1px solid var(--neutral-300);
          border-top: none;
          white-space: nowrap;
@@ -281,6 +285,15 @@
          text-overflow: ellipsis;
          display: flex;
          align-items: center;
+         background-color: white;
+
+         font-size: 14px;
+         padding: 0.2rem;
+
+         &.mobile {
+             font-size: 16px;
+             padding: 1.2rem;
+         }
 
          &.hover {
              color: white;

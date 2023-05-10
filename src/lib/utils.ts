@@ -6,7 +6,8 @@ import { get } from "svelte/store"
 import layoutState from "$lib/stores/layoutState"
 import type { SvelteComponentDev } from "svelte/internal";
 import type { SerializedLGraph } from "@litegraph-ts/core";
-import type { GalleryOutput } from "./nodes/ComfyWidgetNodes";
+import type { GalleryOutput, GalleryOutputEntry } from "./nodes/ComfyWidgetNodes";
+import type { FileData as GradioFileData } from "@gradio/upload";
 
 export function clamp(n: number, min: number, max: number): number {
     return Math.min(Math.max(n, min), max)
@@ -125,10 +126,13 @@ export function convertComfyOutputToGradio(output: GalleryOutput): GradioFileDat
         // TODO configure backend URL
         const url = `http://${location.hostname}:8188` // TODO make configurable
         const params = new URLSearchParams(r)
-        return {
-            name: null,
+        const fileData: GradioFileData = {
+            name: r.filename,
+            orig_name: r.filename,
+            is_file: false,
             data: url + "/view?" + params
         }
+        return fileData
     });
 }
 
@@ -144,4 +148,28 @@ export function jsonToJsObject(json: string): string {
             .replace(hyphenRegex, g => g[1].toUpperCase())
             .replace(regex, "$1:");
     });
+}
+
+export interface ComfyUploadImageAPIResponse {
+    name: string
+}
+
+export async function uploadImageToComfyUI(data: GalleryOutputEntry): Promise<ComfyUploadImageAPIResponse> {
+    const url = `http://${location.hostname}:8188` // TODO make configurable
+    const params = new URLSearchParams(data)
+
+    return fetch(url + "/view?" + params)
+        .then((r) => r.blob())
+        .then((blob) => {
+            console.debug("Fetchin", url, params)
+            const formData = new FormData();
+            formData.append("image", blob, data.filename);
+            return fetch(
+                new Request(url + "/upload/image", {
+                    body: formData,
+                    method: 'POST'
+                })
+            )
+        })
+        .then((r) => r.json())
 }

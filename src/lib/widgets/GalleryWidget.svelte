@@ -30,7 +30,6 @@
          node = widget.node as ComfyGalleryNode
          nodeValue = node.value;
          propsChanged = node.propsChanged;
-         node.anyImageSelected = false;
 
          if ($nodeValue != null) {
              if (node.properties.index < 0 || node.properties.index >= $nodeValue.length) {
@@ -135,22 +134,19 @@
 
      // Update index
      node.setProperty("index", e.detail.index as number)
-     node.anyImageSelected = true;
  }
 
  $: if ($propsChanged > -1 && widget && $nodeValue) {
      if (widget.attrs.variant === "image") {
          selected_image = $nodeValue.length - 1
          node.setProperty("index", selected_image)
-         node.anyImageSelected = true;
      }
  }
  else {
      node.setProperty("index", null)
-     node.anyImageSelected = false;
  }
 
- $: node.anyImageSelected = selected_image != null;
+ $: node.setProperty("index", selected_image)
 </script>
 
 {#if widget && node && nodeValue && $nodeValue}

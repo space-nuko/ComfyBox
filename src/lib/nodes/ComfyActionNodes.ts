@@ -5,9 +5,9 @@ import queueState from "$lib/stores/queueState";
 import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWidget, type SerializedLGraphNode, type SlotLayout, type PropertyLayout } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
-import type { ComfyWidgetNode, GalleryOutput } from "./ComfyWidgetNodes";
+import type { ComfyWidgetNode, GalleryOutput, GalleryOutputEntry } from "./ComfyWidgetNodes";
 import type { NotifyOptions } from "$lib/notify";
-import { convertComfyOutputToGradio } from "$lib/utils";
+import { convertComfyOutputToGradio, uploadImageToComfyUI, type ComfyUploadImageAPIResponse } from "$lib/utils";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
@@ -578,4 +578,84 @@ LiteGraph.registerNodeType({
     title: "Comfy.NoChangeEvent",
     desc: "Wraps an event's parameter such that passing it into a ComfyWidgetNode's 'store' action will not trigger its 'changed' event",
     type: "events/no_change"
+})
+
+export interface ComfyUploadImageActionProperties extends ComfyGraphNodeProperties {
+    folderType: "output" | "temp"
+    lastUploadedImageFile: string | null
+}
+
+export class ComfyUploadImageAction extends ComfyGraphNode {
+    override properties: ComfyUploadImageActionProperties = {
+        tags: [],
+        folderType: "output",
+        lastUploadedImageFile: null
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "filename", type: "string" },
+            { name: "trigger", type: BuiltInSlotType.ACTION }
+        ],
+        outputs: [
+            { name: "input_filename", type: "string" },
+            { name: "uploaded", type: BuiltInSlotType.EVENT }
+        ],
+    }
+
+    private _promise = null;
+
+    displayWidget: ITextWidget;
+
+    constructor(title?: string) {
+        super(title);
+        this.displayWidget = this.addWidget<ITextWidget>(
+            "text",
+            "File",
+            this.properties.lastUploadedImageFile,
+            "lastUploadedImageFile"
+        );
+        this.displayWidget.disabled = true;
+    }
+
+    override onExecute() {
+        this.setOutputData(0, this.properties.lastUploadedImageFile)
+    }
+
+    override onAction(action: any, param: any) {
+        if (action !== "trigger" || this._promise != null)
+            return;
+
+        const filename = this.getInputData(0)
+        if (typeof filename !== "string" || !filename) {
+            return;
+        }
+
+        const data: GalleryOutputEntry = {
+            filename,
+            subfolder: "",
+            type: this.properties.folderType || "output"
+        }
+
+        this._promise = uploadImageToComfyUI(data)
+            .then((json: ComfyUploadImageAPIResponse) => {
+                console.debug("[UploadImageAction] Succeeded", json)
+                this.properties.lastUploadedImageFile = json.name;
+                this.triggerSlot(1, this.properties.lastUploadedImageFile);
+                this._promise = null;
+            })
+            .catch((e) => {
+                console.error("Error uploading:", e)
+                notify(`Error uploading image to ComfyUi: ${e}`, { type: "error", timeout: 10000 })
+                this.properties.lastUploadedImageFile = null;
+                this._promise = null;
+            })
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyUploadImageAction,
+    title: "Comfy.UploadImageAction",
+    desc: "Uploads an image from the specified ComfyUI folder into its input folder",
+    type: "actions/store_images"
 })

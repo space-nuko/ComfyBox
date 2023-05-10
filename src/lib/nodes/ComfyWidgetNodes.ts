@@ -608,7 +608,7 @@ export type GalleryOutputEntry = {
 
 export interface ComfyGalleryProperties extends ComfyWidgetProperties {
     index: number,
-    updateMode: "replace" | "append"
+    updateMode: "replace" | "append",
 }
 
 export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
@@ -616,7 +616,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
         tags: [],
         defaultValue: [],
         index: 0,
-        updateMode: "replace"
+        updateMode: "replace",
     }
 
     static slotLayout: SlotLayout = {
@@ -629,7 +629,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
             { name: "selected_index", type: "number" },
             { name: "width", type: "number" },
             { name: "height", type: "number" },
-            { name: "any_selected", type: "boolean" },
+            { name: "filename", type: "string" },
         ]
     }
 
@@ -644,12 +644,15 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     override outputIndex = null;
     override changedIndex = null;
 
-    anyImageSelected: boolean = false;
+    selectedFilename: string | null = null;
 
+    selectedIndexWidget: ITextWidget;
     modeWidget: IComboWidget;
 
     constructor(name?: string) {
         super(name, [])
+        this.selectedIndexWidget = this.addWidget("text", "Selected", String(this.properties.index), "index")
+        this.selectedIndexWidget.disabled = true;
         this.modeWidget = this.addWidget("combo", "Mode", this.properties.updateMode, null, { property: "updateMode", values: ["replace", "append"] })
     }
 
@@ -662,10 +665,20 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     imageSize: Vector2 = [1, 1]
 
     override onExecute() {
-        this.setOutputData(0, this.properties.index)
+        const index = this.properties.index;
+
+        this.setOutputData(0, index)
         this.setOutputData(1, this.imageSize[0])
         this.setOutputData(2, this.imageSize[1])
-        this.setOutputData(3, this.anyImageSelected)
+
+        let filename: string | null = null;
+        if (index != null) {
+            const entry = get(this.value)[index];
+            if (entry)
+                filename = entry.name
+        }
+
+        this.setOutputData(3, filename)
     }
 
     override onAction(action: any, param: any, options: { action_call?: string }) {
@@ -700,11 +713,8 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     }
 
     override setValue(value: any, noChangedEvent: boolean = false) {
-        console.warn("SETVALUE", value)
         super.setValue(value, noChangedEvent)
-
-        this.setProperty("index", 0)
-        this.anyImageSelected = false;
+        this.setProperty("index", null)
     }
 }
 
@@ -887,6 +897,9 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
     }
 
     static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "store", type: BuiltInSlotType.ACTION }
+        ],
         outputs: [
             { name: "filename", type: "string" }, // TODO support batches
             { name: "width", type: "number" },
@@ -900,12 +913,25 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
     override defaultValue = [];
     override outputIndex = null;
     override changedIndex = 3;
+    override storeActionName = "store";
     override saveUserState = false;
 
     imageSize: Vector2 = [1, 1];
 
     constructor(name?: string) {
         super(name, [])
+    }
+
+    override parseValue(value: any): GradioFileData[] {
+        if (value == null)
+            return []
+
+        if (typeof value === "string" && value !== "") { // Single filename
+            return [{ name: value, data: value, orig_name: value, is_file: true }]
+        }
+        else {
+            return []
+        }
     }
 
     override onExecute(param: any, options: object) {

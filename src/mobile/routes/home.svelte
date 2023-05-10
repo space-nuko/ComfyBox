@@ -2,14 +2,13 @@
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
 
  import { Page, Navbar, Button, BlockTitle, Block, List, ListItem } from "framework7-svelte"
- import defaultGraph from "$lib/defaultGraph";
 
  export let app: ComfyApp | null = null;
 
  async function doLoadDefault() {
      var confirmed = confirm("Are you sure you want to clear the current workflow and load the default graph?");
      if (confirmed) {
-         await app.deserialize(defaultGraph)
+         await app.initDefaultGraph();
      }
  }
 </script>

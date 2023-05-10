@@ -1,7 +1,6 @@
 import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
 import ComfyAPI, { type ComfyAPIQueueStatus } from "$lib/api"
-import defaultGraph from "$lib/defaultGraph"
 import { getPngMetadata, importA1111 } from "$lib/pnginfo";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
@@ -32,6 +31,7 @@ import uiState from "$lib/stores/uiState";
 import { download, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
 import notify from "$lib/notify";
 import configState from "$lib/stores/configState";
+import { blankGraph } from "$lib/defaultGraph";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -436,7 +436,16 @@ export default class ComfyApp {
     }
 
     async initDefaultGraph() {
-        const state = structuredClone(defaultGraph)
+        let state = null;
+        try {
+            const graphResponse = await fetch("/workflows/defaultWorkflow.json");
+            state = await graphResponse.json() as SerializedAppState;
+        }
+        catch (error) {
+            console.error("Failed to load default graph", error)
+            notify(`Failed to load default graph: ${error}`, { type: "error" })
+            state = structuredClone(blankGraph)
+        }
         await this.deserialize(state)
     }
 
@@ -840,7 +849,7 @@ export default class ComfyApp {
             const def = defs[backendNode.type];
             const rawValues = def["input"]["required"][inputSlot.name][0];
 
-            console.warn("[ComfyApp] Reconfiguring combo widget", backendNode.type, "=>", comboNode.type, inputSlot.config.values.length)
+            console.warn("[ComfyApp] Reconfiguring combo widget", backendNode.type, "=>", comboNode.type, rawValues.length)
             comboNode.doAutoConfig(inputSlot, { includeProperties: new Set(["values"]), setWidgetTitle: false })
 
             comboNode.formatValues(rawValues)
