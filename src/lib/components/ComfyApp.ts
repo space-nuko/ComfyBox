@@ -792,8 +792,8 @@ export default class ComfyApp {
                 continue;
 
             const backendNode = (node as ComfyBackendNode)
-            const inputIndex = range(backendNode.inputs.length)
-                .find(i => {
+            const found = range(backendNode.inputs.length)
+                .filter(i => {
                     const input = backendNode.inputs[i]
                     const inputNode = backendNode.getInputNode(i)
 
@@ -802,16 +802,19 @@ export default class ComfyApp {
                         && "widgetNodeType" in input
                         && input.widgetNodeType === "ui/combo";
 
-                    return isComfyComboNode(inputNode) && isComfyInput
+                    const isComfyCombo = isComfyComboNode(inputNode)
+
+                    console.debug("[refreshComboInNodes] CHECK", backendNode.type, input.name, "isComfyCombo", isComfyCombo, "isComfyInput", isComfyInput)
+
+                    return isComfyCombo && isComfyInput
                 });
 
-            if (inputIndex != null) {
+            for (const inputIndex of found) {
                 const comboNode = backendNode.getInputNode(inputIndex) as nodes.ComfyComboNode
                 const inputSlot = backendNode.inputs[inputIndex] as IComfyInputSlot;
                 const def = defs[backendNode.type];
 
                 const hasBackendConfig = def["input"]["required"][inputSlot.name] !== undefined
-                console.log("hasBackendConfig", node.title, inputSlot.name, hasBackendConfig)
 
                 if (hasBackendConfig) {
                     backendCombos.add(comboNode.id)

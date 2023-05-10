@@ -142,10 +142,12 @@
             {#if $valuesForCombo == null}
                 <span>Loading...</span>
             {:else}
-                <span>Count {$valuesForCombo.length}</span>
                 <label>
                     {#if widget.attrs.title !== ""}
-                        <BlockTitle show_label={true}>{widget.attrs.title}</BlockTitle>
+                        <BlockTitle show_label={true}>
+                            {widget.attrs.title}
+                            <span class="count-text">({$valuesForCombo.length})</span>
+                        </BlockTitle>
                     {/if}
                     <Select
                         value={$nodeValue}
@@ -208,6 +210,10 @@
  .wrapper {
      padding: 2px;
      width: 100%;
+
+     .count-text {
+         font-size: smaller;
+     }
 
      :global(.selected-item) {
          // no idea how to get the select box to shrink in the flexbox otherwise...
