@@ -296,13 +296,13 @@
  #bottombar {
      padding-top: 0.5em;
      display: flex;
-     align-items: center;
      width: 100%;
      gap: var(--layout-gap);
      padding-left: 1em;
      padding-right: 1em;
      margin-top: auto;
      overflow-x: auto;
+     height: 70px;
 
      > .left {
          flex-shrink: 0;
