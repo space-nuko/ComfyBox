@@ -91,10 +91,10 @@
                         {/each}
                     </div>
                     {#if isHidden(container) && edit}
-                        <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>
+                        <div class="handle handle-hidden" class:hidden={!edit} />
                     {/if}
                     {#if showHandles}
-                        <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+                        <div class="handle handle-container" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
                     {/if}
                 </Accordion>
             </Block>

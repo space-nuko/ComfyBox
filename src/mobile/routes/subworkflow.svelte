@@ -24,6 +24,11 @@
 
      // Disable pull to refresh
      overscroll-behavior-y: contain;
+
+     // framework7's css conflicts with gradio's
+     :global(.block) {
+         z-index: unset; // f7 sets it to 1
+     }
  }
 
  // TODO generalize this to all properties!
