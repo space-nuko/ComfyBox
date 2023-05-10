@@ -28,8 +28,9 @@ import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import { get } from "svelte/store";
 import uiState from "$lib/stores/uiState";
-import { download, promptToGraphVis, workflowToGraphVis } from "$lib/utils";
+import { download, jsonToJsObject, promptToGraphVis, workflowToGraphVis } from "$lib/utils";
 import notify from "$lib/notify";
+import configState from "$lib/stores/configState";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -189,9 +190,19 @@ export default class ComfyApp {
     }
 
     saveStateToLocalStorage() {
-        const savedWorkflow = this.serialize();
-        const json = JSON.stringify(savedWorkflow);
-        localStorage.setItem("workflow", json)
+        try {
+            uiState.update(s => { s.isSavingToLocalStorage = true; return s; })
+            const savedWorkflow = this.serialize();
+            const json = JSON.stringify(savedWorkflow);
+            localStorage.setItem("workflow", json)
+            notify("Saved to local storage.")
+        }
+        catch (err) {
+            notify(`Failed saving to local storage:\n${err}`, { type: "error" })
+        }
+        finally {
+            uiState.update(s => { s.isSavingToLocalStorage = false; return s; })
+        }
     }
 
     static node_type_overrides: Record<string, typeof ComfyBackendNode> = {}
@@ -473,7 +484,7 @@ export default class ComfyApp {
     }
 
     querySave() {
-        const promptFilename = true; // TODO
+        const promptFilename = get(configState).promptForWorkflowName;
 
         let filename = "workflow.json";
         if (promptFilename) {
@@ -493,6 +504,8 @@ export default class ComfyApp {
         const json = JSON.stringify(this.serialize(), null, indent)
 
         download(filename, json, "application/json")
+
+        console.debug(jsonToJsObject(json))
     }
 
     /**

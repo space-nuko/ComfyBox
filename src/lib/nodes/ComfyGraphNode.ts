@@ -7,6 +7,7 @@ import type { ComfyWidgetNode } from "./ComfyWidgetNodes";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import uiState from "$lib/stores/uiState";
 import { get } from "svelte/store";
+import configState from "$lib/stores/configState";
 
 export type DefaultWidgetSpec = {
     defaultWidgetNode: new (name?: string) => ComfyWidgetNode,
@@ -291,7 +292,7 @@ export default class ComfyGraphNode extends LGraphNode {
         }
 
         (o as any).saveUserState = this.saveUserState
-        if (!this.saveUserState) {
+        if (!this.saveUserState && (!get(uiState).isSavingToLocalStorage || get(configState).alwaysStripUserState)) {
             this.stripUserState(o)
             console.warn("[ComfyGraphNode] stripUserState", this, o)
         }

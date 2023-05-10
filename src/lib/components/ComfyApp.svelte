@@ -127,16 +127,9 @@
          return;
 
      app.saveStateToLocalStorage();
-     notify("Saved to local storage.")
-     console.debug(jsonToJsObject(JSON.stringify(app.serialize(), null, 2)))
-     //
-     //      const date = new Date();
-     //      const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
-     //
-     //      download(`workflow-${formattedDate}.json`, JSON.stringify(app.serialize()), "application/json")
  }
 
- async function doLoadDefault(): void {
+ async function doLoadDefault() {
      var confirmed = confirm("Are you sure you want to clear the current workflow and load the default graph?");
      if (confirmed) {
          await app.deserialize(defaultGraph)

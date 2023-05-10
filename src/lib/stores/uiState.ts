@@ -9,6 +9,8 @@ export type UIState = {
     autoAddUI: boolean,
     uiUnlocked: boolean,
     uiEditMode: UIEditMode,
+
+    isSavingToLocalStorage: boolean
 }
 
 export type WritableUIStateStore = Writable<UIState>;
@@ -18,7 +20,9 @@ const store: WritableUIStateStore = writable(
         nodesLocked: false,
         autoAddUI: true,
         uiUnlocked: false,
-        uiEditMode: "widgets"
+        uiEditMode: "widgets",
+
+        isSavingToLocalStorage: false
     })
 
 const uiStateStore: WritableUIStateStore =

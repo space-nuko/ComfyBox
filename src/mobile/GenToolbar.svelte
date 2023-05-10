@@ -53,7 +53,6 @@
 
      navigator.vibrate(20)
      app.saveStateToLocalStorage();
-     notify("Saved to local storage.")
  }
 </script>
 
