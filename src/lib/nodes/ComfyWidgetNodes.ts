@@ -458,19 +458,21 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
             formatter = (value) => `${value}`;
 
         try {
-            this.valuesForCombo = this.properties.values.map(value => {
+            this.valuesForCombo = this.properties.values.map((value, index) => {
                 return {
                     value,
-                    label: formatter(value)
+                    label: formatter(value),
+                    index
                 }
             })
         }
         catch (err) {
             console.error("Failed formatting!", err)
-            this.valuesForCombo = this.properties.values.map(value => {
+            this.valuesForCombo = this.properties.values.map((value, index) => {
                 return {
                     value,
-                    label: `${value}`
+                    label: `${value}`,
+                    index
                 }
             })
         }

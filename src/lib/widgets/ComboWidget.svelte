@@ -1,8 +1,9 @@
 <script lang="ts">
+ import { tick } from 'svelte'
  import { BlockTitle } from "@gradio/atoms";
  import Select from 'svelte-select';
- import VirtualList from '@sveltejs/svelte-virtual-list';
- import ListItem from "./ListItem.svelte"
+ // import VirtualList from '$lib/components/VirtualList.svelte';
+ import VirtualList from 'svelte-tiny-virtual-list';
  import type { ComfyComboNode } from "$lib/nodes/index";
  import { type WidgetLayout } from "$lib/stores/layoutState";
  import { get, writable, type Writable } from "svelte/store";
@@ -14,6 +15,7 @@
  let propsChanged: Writable<number> | null = null;
  let comboRefreshed: Writable<boolean> | null = null;
  let wasComboRefreshed: boolean = false;
+ let option: any = null;
 
  export let debug: boolean = false;
  let input: HTMLInputElement | null = null
@@ -41,8 +43,14 @@
          comboRefreshed = node.comboRefreshed;
          if ($comboRefreshed)
              flashOnRefreshed();
-         // setOption($nodeValue) // don't react on option
      }
+ }
+
+ $: node.valuesForCombo && updateActiveIndex(node.valuesForCombo)
+
+ function updateActiveIndex(values: any) {
+     const value = $nodeValue;
+     activeIndex = values.findIndex(v => v.value === value);
  }
 
  $: $comboRefreshed && flashOnRefreshed();
@@ -64,38 +72,62 @@
      navigator.vibrate(20)
  }
 
- function onSelect() {
+ function onSelect(e: CustomEvent<any>) {
      if (input)
          input.blur();
      navigator.vibrate(20)
+
+     const item = e.detail
+
+     console.warn("SELECT", item, item.index)
+     $nodeValue = item.value;
+     activeIndex = item.index;
+     listOpen = false;
  }
 
+ let activeIndex = null;
+ let hoverItemIndex = null;
+ let filterText = "";
+ let listOpen = null;
+ let scrollToIndex = null;
  let start = 0;
  let end = 0;
- let listOpen: boolean = false
 
- function selectItem(item: any) {
-     $nodeValue = item.value;
-     listOpen = false;
-     document.activeElement?.blur();
+ function handleHover(index: number) {
+     console.warn("HOV", index)
+     hoverItemIndex = index;
  }
 
- let option: any = null;
- let rebuild = writable(0);
- let virtualList = null;
+ function handleSelect(index: number) {
+     console.warn("SEL", index)
+     navigator.vibrate(20)
+     const item = node.valuesForCombo[index]
+     activeIndex = index;
+     $nodeValue = item.value
+     listOpen = false;
+     filterText = ""
+     input?.blur()
+ }
 
  function onFilter() {
-     // $rebuild += 1
-     if (virtualList) {
-         // force refresh virtual list
-         const viewport = virtualList.querySelector("svelte-virtual-list-viewport")
-         viewport.scrollTo(0, 1)
-         viewport.scrollTo(0, 0)
-     }
-     else {
-         console.log("no")
-     }
+     // if (scrollToIndex)
+     //     scrollToIndex(0)
  }
+
+ const activeScroll = scrollAction;
+ const hoverScroll = scrollAction;
+
+ function scrollAction(node) {
+     return {
+         update(args) {
+             if (args.scroll) {
+                 // handleListScroll();
+                 node.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+             }
+         },
+     };
+ }
+
 </script>
 
 <div class="wrapper comfy-combo" class:updated={$comboRefreshed}>
@@ -112,33 +144,47 @@
                     <Select
                         value={$nodeValue}
                         bind:justValue={option}
+                        bind:hoverItemIndex
+                        bind:filterText
                         bind:listOpen
+                        bind:input
                         items={node.valuesForCombo}
                         disabled={isDisabled(widget)}
                         clearable={false}
                         showChevron={true}
                         listAutoWidth={true}
                         inputAttributes={{ autocomplete: 'off' }}
-                        bind:input
                         on:change
                         on:focus={onFocus}
-                        on:select={onSelect}
-                        on:filter={onFilter}
+                        on:hoverItem={(e) => handleHover(e.detail)}
+                        on:select={(e) => handleSelect(e.detail.index)}
                         on:blur
-                    >
-                        <div slot="list" class="list" let:filteredItems>
-                            {#key $rebuild}
-                                <div class="container" bind:this={virtualList}>
-                                    <VirtualList items={filteredItems} bind:start bind:end let:item>
-                                        <div class="item"
-                                              class:selected={option === item.value}
-                                              on:click={() => selectItem(item)}>
-                                            {item.label}
-                                        </div>
-                                    </VirtualList>
-                                    <p class="details">showing items {start}-{end}</p>
-                                </div>
-                            {/key}
+                        on:filter={onFilter}>
+                        <div class="list" slot="list" let:filteredItems>
+                            {#if filteredItems.length > 0}
+                                <VirtualList
+                                    items={filteredItems}
+                                    width="100%"
+                                    height={300}
+                                    itemCount={filteredItems?.length}
+                                    itemSize={50}
+                                    scrollToIndex={hoverItemIndex}>
+                                    <div slot="item"
+                                         let:index={i}
+                                         let:style
+                                         {style}
+                                         class="item"
+                                         class:active={activeIndex === filteredItems[i].index}
+                                         class:hover={hoverItemIndex === i}
+                                         on:click={() => handleSelect(filteredItems[i].index)}
+                                         on:focus={() => handleHover(i)}
+                                         on:mouseover={() => handleHover(i)}>
+                                        {@const item = filteredItems[i]}
+                                        {item.label}
+                                    </div>
+                                </VirtualList>
+                                <p class="details">active: {activeIndex}, hover: {hoverItemIndex}<p>
+                            {/if}
                         </div>
                     </Select>
                 </label>
@@ -201,9 +247,20 @@
 
      .item {
          font-size: 16px;
-         &.selected {
+         padding: 1.2rem;
+         border: 1px solid var(--neutral-300);
+         border-top: none;
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         &.hover {
              color: white;
-             background: var(--color-yellow-500);
+             background: var(--neutral-400);
+             cursor: pointer;
+         }
+         &.active {
+             color: white;
+             background: var(--color-blue-500);
          }
      }
 
@@ -214,12 +271,6 @@
 
      :global(svelte-virtual-list-row) {
          white-space: nowrap;
-     }
-
-     :global(svelte-virtual-list-row:hover) {
-         color: white;
-         background: var(--color-blue-500);
-         cursor: pointer;
      }
  }
 </style>
