@@ -10,7 +10,7 @@
  }
 </script>
 
-<div class="wrapper">
+<div class="wrapper litegraph">
     <div class="canvas-wrapper pane-wrapper">
         <canvas id="graph-canvas" />
     </div>

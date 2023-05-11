@@ -42,7 +42,6 @@
          container.isOpen = writable(container.attrs.openOnStartup)
      }
      isOpen = container.isOpen
-     console.warn("REBUILD", container.attrs.title, $isOpen)
  }
 
  function handleConsider(evt: any) {
