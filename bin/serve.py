@@ -29,6 +29,8 @@ class HttpRequestHandler(http.server.SimpleHTTPRequestHandler):
         '.svg': 'image/svg+xml',
         '.css': 'text/css',
         '.js': 'application/x-javascript',
+        '.mjs': 'application/x-javascript',
+        '.cjs': 'application/x-javascript',
         '.wasm': 'application/wasm',
         '.json': 'application/json',
         '.xml': 'application/xml',
