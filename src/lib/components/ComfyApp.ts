@@ -352,6 +352,15 @@ export default class ComfyApp {
             }
         });
 
+        this.api.addEventListener("execution_cached", ({ detail }: CustomEvent) => {
+            // TODO detail.nodes
+        });
+
+        this.api.addEventListener("execution_error", ({ detail }: CustomEvent) => {
+            queueState.update(s => { s.progress = null; s.runningNodeId = null; return s; })
+            notify(`Execution error: ${detail.message}`, { type: "error", timeout: 10000 })
+        });
+
         this.api.init();
     }
 
@@ -447,6 +456,11 @@ export default class ComfyApp {
             state = structuredClone(blankGraph)
         }
         await this.deserialize(state)
+        uiState.update(s => {
+            s.uiUnlocked = true;
+            s.uiEditMode = "widgets";
+            return s;
+        })
     }
 
     /**

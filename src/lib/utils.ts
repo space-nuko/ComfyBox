@@ -123,7 +123,6 @@ export const debounce = (callback: Function, wait = 250) => {
 
 export function convertComfyOutputToGradio(output: GalleryOutput): GradioFileData[] {
     return output.images.map(r => {
-        // TODO configure backend URL
         const url = `http://${location.hostname}:8188` // TODO make configurable
         const params = new URLSearchParams(r)
         const fileData: GradioFileData = {
@@ -134,6 +133,18 @@ export function convertComfyOutputToGradio(output: GalleryOutput): GradioFileDat
         }
         return fileData
     });
+}
+
+export function convertFilenameToComfyURL(filename: string,
+    subfolder: string = "",
+    type: "input" | "output" | "temp" = "output"): string {
+    const params = new URLSearchParams({
+        filename,
+        subfolder,
+        type
+    })
+    const url = `http://${location.hostname}:8188` // TODO make configurable
+    return url + "/view?" + params
 }
 
 export function jsonToJsObject(json: string): string {

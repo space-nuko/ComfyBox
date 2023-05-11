@@ -17,6 +17,7 @@ import ButtonWidget from "$lib/widgets/ButtonWidget.svelte";
 import CheckboxWidget from "$lib/widgets/CheckboxWidget.svelte";
 import RadioWidget from "$lib/widgets/RadioWidget.svelte";
 import ImageUploadWidget from "$lib/widgets/ImageUploadWidget.svelte";
+import ImageCompareWidget from "$lib/widgets/ImageCompareWidget.svelte";
 
 export type AutoConfigOptions = {
     includeProperties?: Set<string> | null,
@@ -962,4 +963,93 @@ LiteGraph.registerNodeType({
     title: "UI.ImageUpload",
     desc: "Widget that lets you upload images into ComfyUI's input folder",
     type: "ui/image_upload"
+})
+
+export interface ComfyImageCompareNodeProperties extends ComfyWidgetProperties {
+}
+
+export type FileNameOrGalleryData = string | GalleryOutputEntry;
+export type ImageCompareData = [FileNameOrGalleryData, FileNameOrGalleryData]
+
+export class ComfyImageCompareNode extends ComfyWidgetNode<ImageCompareData> {
+    override properties: ComfyImageCompareNodeProperties = {
+        defaultValue: [],
+        tags: [],
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "store", type: BuiltInSlotType.ACTION },
+            { name: "left_image", type: "string" },
+            { name: "right_image", type: "string" },
+        ],
+        outputs: [
+        ]
+    }
+
+    override svelteComponentType = ImageCompareWidget;
+    override defaultValue: ImageCompareData = ["", ""];
+    override outputIndex = null;
+    override changedIndex = 3;
+    override storeActionName = "store";
+    override saveUserState = false;
+
+    constructor(name?: string) {
+        super(name, ["", ""])
+    }
+
+    override onExecute() {
+        const valueA = this.getInputData(1)
+        const valueB = this.getInputData(2)
+        let current = get(this.value)
+        let changed = false;
+        if (valueA != null && current[0] != valueA) {
+            current[0] = valueA
+            changed = true;
+        }
+        if (valueB != null && current[1] != valueB) {
+            current[1] = valueB
+            changed = true;
+        }
+        if (changed)
+            this.value.set(current)
+    }
+
+    override parseValue(value: any): ImageCompareData {
+        if (value == null) {
+            return ["", ""]
+        }
+        else if (typeof value === "string" && value !== "") { // Single filename
+            const prevValue = get(this.value)
+            prevValue.push(value)
+            if (prevValue.length > 2)
+                prevValue.splice(0, 1)
+            return prevValue as ImageCompareData
+        }
+        else if (typeof value === "object" && "images" in value && value.images.length > 0) {
+            const output = value as GalleryOutput
+            const prevValue = get(this.value)
+            prevValue.push(output.images[0].filename)
+            if (prevValue.length > 2)
+                prevValue.splice(0, 1)
+            return prevValue as ImageCompareData
+        }
+        else if (Array.isArray(value) && typeof value[0] === "string" && typeof value[1] === "string") {
+            return value as ImageCompareData
+        }
+        else {
+            return ["", ""]
+        }
+    }
+
+    override formatValue(value: GradioFileData[]): string {
+        return `Images: ${value?.length || 0}`
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyImageCompareNode,
+    title: "UI.ImageCompare",
+    desc: "Widget that lets you compare two images",
+    type: "ui/image_compare"
 })

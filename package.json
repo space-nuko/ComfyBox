@@ -59,6 +59,7 @@
     "events": "^3.3.0",
     "framework7": "^8.0.3",
     "framework7-svelte": "^8.0.3",
+    "img-comparison-slider": "^8.0.0",
     "pollen-css": "^4.6.2",
     "radix-icons-svelte": "^1.2.1",
     "svelte-preprocess": "^5.0.3",

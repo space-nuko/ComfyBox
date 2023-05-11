@@ -79,6 +79,9 @@ importers:
       framework7-svelte:
         specifier: ^8.0.3
         version: 8.0.3
+      img-comparison-slider:
+        specifier: ^8.0.0
+        version: 8.0.0
       pollen-css:
         specifier: ^4.6.2
         version: 4.6.2
@@ -4188,6 +4191,10 @@ packages:
     resolution: {integrity: sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==}
     engines: {node: '>= 4'}
     dev: true
+
+  /img-comparison-slider@8.0.0:
+    resolution: {integrity: sha512-ZOKkdN/+W/U/2LFEwrZuxRVbIwQK1GyEKhTETfsy55/bmBoNfM81MnQsc1j81Q50dkwTKjuecicsnp3O7lBRqQ==}
+    dev: false
 
   /immutable@4.3.0:
     resolution: {integrity: sha512-0AOCmOip+xgJwEVTQj1EfiDDOkPmuyllDuTuEX+DDXUgapLAsBIfkg3sxCYyCEA8mQqZrrxPUGjcOQ2JS3WLkg==}
