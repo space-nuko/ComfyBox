@@ -456,11 +456,6 @@ export default class ComfyApp {
             state = structuredClone(blankGraph)
         }
         await this.deserialize(state)
-        uiState.update(s => {
-            s.uiUnlocked = true;
-            s.uiEditMode = "widgets";
-            return s;
-        })
     }
 
     /**
@@ -503,6 +498,11 @@ export default class ComfyApp {
         layoutState.onStartConfigure();
         this.lGraph.configure(blankGraph)
         layoutState.initDefaultLayout();
+        uiState.update(s => {
+            s.uiUnlocked = true;
+            s.uiEditMode = "widgets";
+            return s;
+        })
     }
 
     runDefaultQueueAction() {
