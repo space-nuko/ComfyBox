@@ -1,6 +1,7 @@
 import { BuiltInSlotType, LiteGraph, type ITextWidget, type SlotLayout, clamp, type PropertyLayout, type IComboWidget, type SerializedLGraphNode } from "@litegraph-ts/core";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 import type { GalleryOutput } from "./ComfyWidgetNodes";
+import { uploadImageToComfyUI, type ComfyUploadImageAPIResponse } from "$lib/utils";
 
 export interface ComfyImageCacheNodeProperties extends ComfyGraphNodeProperties {
     images: GalleryOutput | null,
@@ -11,10 +12,6 @@ export interface ComfyImageCacheNodeProperties extends ComfyGraphNodeProperties 
 }
 
 type ImageCacheState = "none" | "uploading" | "failed" | "cached"
-
-interface ComfyUploadImageAPIResponse {
-    name: string
-}
 
 /*
  * A node that can act as both an input and output image node by uploading
@@ -174,23 +171,7 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
             this.properties.filenames[newIndex] = { filename: null, status: "uploading" }
             this.onPropertyChanged("filenames", this.properties.filenames)
 
-            const url = `http://${location.hostname}:8188` // TODO make configurable
-            const params = new URLSearchParams(data)
-
-            const promise = fetch(url + "/view?" + params)
-                .then((r) => r.blob())
-                .then((blob) => {
-                    console.debug("Fetchin", url, params)
-                    const formData = new FormData();
-                    formData.append("image", blob, data.filename);
-                    return fetch(
-                        new Request(url + "/upload/image", {
-                            body: formData,
-                            method: 'POST'
-                        })
-                    )
-                })
-                .then((r) => r.json())
+            const promise = uploadImageToComfyUI(data)
                 .then((json: ComfyUploadImageAPIResponse) => {
                     console.debug("Gottem", json)
                     if (lastGenNumber === this.properties.genNumber) {

@@ -61,6 +61,10 @@
 
      return tabName
  }
+
+ function handleSelect() {
+     navigator.vibrate(20)
+ }
 </script>
 
 {#if container && children}
@@ -106,17 +110,17 @@
                     {/each}
                 </div>
                 {#if isHidden(container) && edit}
-                    <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>
+                    <div class="handle handle-hidden" style="z-index: {zIndex+100}" class:hidden={!edit} />
                 {/if}
                 {#if showHandles}
                     <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
                 {/if}
             </Block>
         {:else}
-            <Tabs elem_classes={["gradio-tabs"]}>
+            <Tabs elem_classes={["gradio-tabs"]} on:select={handleSelect}>
                 {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item, i(item.id)}
                     {@const tabName = getTabName(container, i)}
-                    <TabItem name={tabName} on:select={() => console.log("tab " + i)}>
+                    <TabItem name={tabName}>
                         <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
                     </TabItem>
                 {/each}

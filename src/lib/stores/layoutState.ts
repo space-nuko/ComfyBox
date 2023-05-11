@@ -28,13 +28,15 @@ type DragItemEntry = {
  */
 export type LayoutAttributes = {
     /*
-     * Default subgraph to run when the "Queue Prompt" button in the bottom bar
-     * is pressed.
-     *
-     * If it's an empty string, all backend nodes will be included in the prompt
-     * instead.
+     * Name of the "Queue Prompt" button. Set to blank to hide the button.
      */
-    defaultSubgraph: string
+    queuePromptButtonName: string,
+
+    /*
+     * If true, clicking the "Queue Prompt" button will run the default subgraph.
+     * Set this to false if you need special behavior before running any subgraphs.
+     */
+    queuePromptButtonRunWorkflow: boolean,
 }
 
 /*
@@ -90,6 +92,8 @@ export type LayoutState = {
      * Global workflow attributes
      */
     attrs: LayoutAttributes
+
+    refreshPropsPanel: Writable<number>
 }
 
 /**
@@ -222,6 +226,11 @@ export type AttributesSpec = {
      * If `type` is "number", max for the slider
      */
     max?: number,
+
+    /*
+     * If `type` is "string", display as a textarea.
+     */
+    multiline?: boolean,
 
     /*
      * Valid `LGraphNode.type`s this property applies to if it's located in a node.
@@ -390,6 +399,17 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: "large"
             },
 
+            // Combo
+            {
+                name: "convertValueToLabelCode",
+                type: "string",
+                location: "nodeProps",
+                editable: true,
+                multiline: true,
+                validNodeTypes: ["ui/combo"],
+                defaultValue: ""
+            },
+
             // Gallery
             {
                 name: "variant",
@@ -522,11 +542,18 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
 
             // Workflow
             {
-                name: "defaultSubgraph",
+                name: "queuePromptButtonName",
                 type: "string",
                 location: "workflow",
                 editable: true,
-                defaultValue: ""
+                defaultValue: "Queue Prompt"
+            },
+            {
+                name: "queuePromptButtonRunWorkflow",
+                type: "boolean",
+                location: "workflow",
+                editable: true,
+                defaultValue: true
             }
         ]
     }
@@ -544,10 +571,16 @@ for (const cat of Object.values(ALL_ATTRIBUTES)) {
 export { ALL_ATTRIBUTES };
 
 const defaultWidgetAttributes: Attributes = {} as any
+const defaultWorkflowAttributes: LayoutAttributes = {} as any
 for (const cat of Object.values(ALL_ATTRIBUTES)) {
     for (const spec of Object.values(cat.specs)) {
-        if (spec.location === "widget" && spec.defaultValue != null) {
-            defaultWidgetAttributes[spec.name] = spec.defaultValue;
+        if (spec.defaultValue != null) {
+            if (spec.location === "widget") {
+                defaultWidgetAttributes[spec.name] = spec.defaultValue;
+            }
+            else if (spec.location === "workflow") {
+                defaultWorkflowAttributes[spec.name] = spec.defaultValue;
+            }
         }
     }
 }
@@ -589,6 +622,12 @@ export interface IDragItem {
  */
 export interface ContainerLayout extends IDragItem {
     type: "container",
+
+    // Ephemeral state to preserve when the component gets recreated by Svelte
+    // (not serialized)
+
+    // Accordion
+    isOpen?: Writable<boolean>,
 }
 
 /*
@@ -603,7 +642,7 @@ export interface WidgetLayout extends IDragItem {
     node: ComfyWidgetNode
 }
 
-type DragItemID = string;
+export type DragItemID = string;
 
 type LayoutStateOps = {
     addContainer: (parent: ContainerLayout | null, attrs: Partial<Attributes>, index?: number) => ContainerLayout,
@@ -633,8 +672,9 @@ const store: Writable<LayoutState> = writable({
     currentSelectionNodes: [],
     isMenuOpen: false,
     isConfiguring: true,
+    refreshPropsPanel: writable(0),
     attrs: {
-        defaultSubgraph: ""
+        ...defaultWorkflowAttributes
     }
 })
 
@@ -889,8 +929,9 @@ function initDefaultLayout() {
         currentSelectionNodes: [],
         isMenuOpen: false,
         isConfiguring: false,
+        refreshPropsPanel: writable(0),
         attrs: {
-            defaultSubgraph: ""
+            ...defaultWorkflowAttributes
         }
     })
 
@@ -1004,12 +1045,16 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
         currentSelectionNodes: [],
         isMenuOpen: false,
         isConfiguring: false,
-        attrs: data.attrs
+        refreshPropsPanel: writable(0),
+        attrs: { ...defaultWorkflowAttributes, ...data.attrs }
     }
 
-    console.debug("[layoutState] deserialize", data, state)
+    console.debug("[layoutState] deserialize", data, state, defaultWorkflowAttributes)
 
     store.set(state)
+
+    // Ensure properties panel is updated with new state
+    state.refreshPropsPanel.set(get(state.refreshPropsPanel) + 1)
 }
 
 function onStartConfigure() {

@@ -1,6 +1,6 @@
 <script lang="ts">
  import { Block, BlockTitle } from "@gradio/atoms";
- import { Accordion } from "@gradio/accordion";
+ import Accordion from "$lib/components/gradio/app/Accordion.svelte";
  import uiState from "$lib/stores/uiState";
  import WidgetContainer from "./WidgetContainer.svelte"
 
@@ -12,7 +12,7 @@
  import { flip } from 'svelte/animate';
  import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
  import { startDrag, stopDrag } from "$lib/utils"
- import type { Writable } from "svelte/store";
+ import { writable, type Writable } from "svelte/store";
  import { isHidden } from "$lib/widgets/utils";
 
  export let container: ContainerLayout | null = null;
@@ -22,20 +22,26 @@
  export let edit: boolean = false;
  export let dragDisabled: boolean = false;
  export let isMobile: boolean = false;
+ let isOpen: Writable<boolean> | null = null;
 
- let attrsChanged: Writable<boolean> | null = null;
  let children: IDragItem[] | null = null;
  const flipDurationMs = 100;
 
  let selectedIndex: number = 0;
 
  $: if (container) {
-     children = $layoutState.allItems[container.id].children;
-     attrsChanged = container.attrsChanged
+     setupState()
  }
  else {
      children = null;
-     attrsChanged = null
+ }
+
+ function setupState() {
+     children = $layoutState.allItems[container.id].children;
+     if (container.isOpen == null) {
+         container.isOpen = writable(container.attrs.openOnStartup)
+     }
+     isOpen = container.isOpen
  }
 
  function handleConsider(evt: any) {
@@ -47,6 +53,11 @@
      children = layoutState.updateChildren(container, evt.detail.items)
      // Ensure dragging is stopped on drag finish
  };
+
+ function handleClick(e: CustomEvent<boolean>) {
+     navigator.vibrate(20)
+     $isOpen = e.detail
+ }
 </script>
 
 {#if container && children}
@@ -88,7 +99,7 @@
                         {/each}
                     </div>
                     {#if isHidden(container) && edit}
-                        <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>
+                        <div class="handle handle-hidden" style="z-index: {zIndex+100}" class:hidden={!edit} />
                     {/if}
                     {#if showHandles}
                         <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
@@ -97,7 +108,7 @@
             </Block>
         {:else}
             <Block elem_classes={["gradio-accordion"]}>
-                <Accordion label={container.attrs.title} open={container.attrs.openOnStartup}>
+                <Accordion label={container.attrs.title} open={$isOpen} on:click={handleClick}>
                     {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
                         <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
                     {/each}
@@ -117,12 +128,15 @@
          height: fit-content;
      }
 
-     .edit > :global(.v-pane > .block) {
+     &.edit {
          border-color: var(--color-pink-500);
          border-width: 2px;
          border-style: dashed !important;
-         margin: 0.2em;
-         padding: 1.4em;
+         margin: 2em 0.2em;
+
+         :global(> .v-pane) {
+             padding: 1.4em;
+         }
      }
 
      /* :global(.hide-block > .v-pane > .block) {

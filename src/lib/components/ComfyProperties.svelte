@@ -11,8 +11,11 @@
 
  let target: IDragItem | null = null;
  let node: LGraphNode | null = null;
- let attrsChanged: Writable<boolean> | null = null;
- let refreshPanel: Writable<number> = writable(0);
+ let attrsChanged: Writable<number> | null = null;
+
+ let refreshPropsPanel: Writable<number> | null
+
+ $: refreshPropsPanel = $layoutState.refreshPropsPanel;
 
  $: if ($layoutState.currentSelection.length > 0) {
      const targetId = $layoutState.currentSelection.slice(-1)[0]
@@ -50,7 +53,7 @@
                  let value = spec.defaultValue;
                  target.attrs[spec.name] = value;
                  if (spec.refreshPanelOnChange)
-                     $refreshPanel += 1;
+                     $refreshPropsPanel += 1;
              }
          }
      }
@@ -218,9 +221,14 @@
      }
  }
 
- function doRefreshPanel() {
-     console.warn("[ComfyProperties] doRefreshPanel")
-     $refreshPanel += 1;
+ function getWorkflowAttribute(spec: AttributesSpec): any {
+     let value = $layoutState.attrs[spec.name]
+     if (value == null)
+         value = spec.defaultValue
+     else if (spec.serialize)
+         value = spec.serialize(value)
+     console.debug("[ComfyProperties] getWorkflowAttribute", spec.name, value, spec, $layoutState.attrs[spec.name])
+     return value
  }
 
  function updateWorkflowAttribute(spec: AttributesSpec, value: any) {
@@ -235,6 +243,11 @@
 
      if (spec.refreshPanelOnChange)
          doRefreshPanel()
+ }
+
+ function doRefreshPanel() {
+     console.warn("[ComfyProperties] doRefreshPanel")
+     $refreshPropsPanel += 1;
  }
 </script>
 
@@ -251,7 +264,7 @@
         </div>
     </div>
     <div class="props-entries">
-        {#key $refreshPanel}
+        {#key $refreshPropsPanel}
             {#each ALL_ATTRIBUTES as category(category.categoryName)}
                 <div class="category-name">
                     <span>
@@ -268,7 +281,7 @@
                                     on:input={(e) => updateAttribute(spec, target, e.detail)}
                                     disabled={!$uiState.uiUnlocked || !spec.editable}
                                     label={spec.name}
-                                    max_lines={1}
+                                    max_lines={spec.multiline ? 5 : 1}
                                     />
                             {:else if spec.type === "boolean"}
                                     <Checkbox
@@ -307,7 +320,7 @@
                                         on:input={(e) => updateProperty(spec, e.detail)}
                                         label={spec.name}
                                         disabled={!$uiState.uiUnlocked || !spec.editable}
-                                        max_lines={1}
+                                    max_lines={spec.multiline ? 5 : 1}
                                         />
                                 {:else if spec.type === "boolean"}
                                         <Checkbox
@@ -345,7 +358,7 @@
                                         on:input={(e) => updateVar(spec, e.detail)}
                                         label={spec.name}
                                         disabled={!$uiState.uiUnlocked || !spec.editable}
-                                        max_lines={1}
+                                    max_lines={spec.multiline ? 5 : 1}
                                         />
                                 {:else if spec.type === "boolean"}
                                         <Checkbox
@@ -379,16 +392,16 @@
                         <div class="props-entry">
                             {#if spec.type === "string"}
                                 <TextBox
-                                    value={$layoutState.attrs[spec.name] || spec.defaultValue}
+                                    value={getWorkflowAttribute(spec)}
                                     on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
                                     on:input={(e) => updateWorkflowAttribute(spec, e.detail)}
                                     label={spec.name}
                                     disabled={!$uiState.uiUnlocked || !spec.editable}
-                                    max_lines={1}
+                                    max_lines={spec.multiline ? 5 : 1}
                                     />
                             {:else if spec.type === "boolean"}
                                     <Checkbox
-                                        value={$layoutState.attrs[spec.name] || spec.defaultValue}
+                                        value={getWorkflowAttribute(spec)}
                                         on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
                                         disabled={!$uiState.uiUnlocked || !spec.editable}
                                         label={spec.name}
@@ -396,7 +409,7 @@
                             {:else if spec.type === "number"}
                                         <ComfyNumberProperty
                                             name={spec.name}
-                                            value={$layoutState.attrs[spec.name] || spec.defaultValue}
+                                            value={getWorkflowAttribute(spec)}
                                             step={spec.step || 1}
                                             min={spec.min || -1024}
                                             max={spec.max || 1024}
@@ -406,7 +419,7 @@
                             {:else if spec.type === "enum"}
                                             <ComfyComboProperty
                                                 name={spec.name}
-                                                value={$layoutState.attrs[spec.name] || spec.defaultValue}
+                                                value={getWorkflowAttribute(spec)}
                                                 values={spec.values}
                                                 disabled={!$uiState.uiUnlocked || !spec.editable}
                                                 on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
@@ -464,5 +477,12 @@
         position: absolute;
         bottom: 0;
         padding: 0.5em; */
+ }
+
+ :global(input[type=text]:disabled) {
+     @include disable-input;
+ }
+ :global(textarea:disabled) {
+     @include disable-input;
  }
 </style>

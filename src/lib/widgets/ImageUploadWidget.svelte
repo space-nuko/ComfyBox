@@ -52,16 +52,13 @@
  }
 
  function onChange() {
-     console.warn("CHANGED", _value)
      $nodeValue = _value || []
  }
 
  function onUpload() {
-     console.warn("UPLOADED", _value)
  }
 
  function onClear() {
-     console.warn("CLEARED", _value)
  }
 
  interface GradioUploadResponse {
@@ -70,7 +67,7 @@
  }
 
  async function upload_files(root: string, files: Array<File>): Promise<GradioUploadResponse> {
-     console.warn("UPLOADILFES", root, files);
+     console.debug("UPLOADILFES", root, files);
 
      const url = `http://${location.hostname}:8188` // TODO make configurable
 
@@ -113,7 +110,6 @@
          pending_upload = true;
 
          old_value = _value;
-         console.warn(_value)
 
          if (_value == null)
              _value = []
@@ -156,7 +152,7 @@
                  );
 
                  if (response.error) {
-                     notify(response.error, null, "error")
+                     notify(response.error, { type: "error" })
                  }
 
                  $nodeValue = normalise_file(_value, root, root_url) as GradioFileData[];
@@ -182,7 +178,6 @@
 
  function getImageUrl(image: GradioFileData) {
      const baseUrl = `http://${location.hostname}:8188` // TODO make configurable
-     console.warn(image)
      const params = new URLSearchParams({ filename: image.name, subfolder: "", type: "input" })
      return `${baseUrl}/view?${params}`
  }

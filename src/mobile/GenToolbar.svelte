@@ -2,6 +2,7 @@
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
 	import notify from "$lib/notify";
  import uiState from "$lib/stores/uiState";
+ import layoutState from "$lib/stores/layoutState";
  import queueState from "$lib/stores/queueState";
  import { getNodeInfo } from "$lib/utils"
 
@@ -16,14 +17,28 @@
  let fileInput: HTMLInputElement = undefined;
 
  function queuePrompt() {
-     app.queuePrompt(0, 1);
-     notify("Prompt was queued", "Queued");
+     navigator.vibrate(20)
+     app.runDefaultQueueAction()
+ }
+
+ function refreshCombos() {
+     navigator.vibrate(20)
+     app.refreshComboInNodes()
+ }
+
+ function doSave(): void {
+     if (!app?.lGraph || !fileInput)
+         return;
+
+     navigator.vibrate(20)
+     app.querySave()
  }
 
  function doLoad(): void {
      if (!app?.lGraph || !fileInput)
          return;
 
+     navigator.vibrate(20)
      fileInput.click();
  }
 
@@ -31,6 +46,14 @@
      app.handleFile(fileInput.files[0]);
      fileInput.files = null;
 }
+
+ function doSaveLocal(): void {
+     if (!app?.lGraph)
+         return;
+
+     navigator.vibrate(20)
+     app.saveStateToLocalStorage();
+ }
 </script>
 
 <div class="bottom">
@@ -51,7 +74,14 @@
     {/if}
 </div>
 <Toolbar bottom>
-    <Link on:click={() => app.refreshComboInNodes()}>🔄</Link>
+    {#if $layoutState.attrs.queuePromptButtonName != ""}
+        <Link on:click={queuePrompt}>
+            {$layoutState.attrs.queuePromptButtonName}
+        </Link>
+    {/if}
+    <Link on:click={refreshCombos}>🔄</Link>
+    <Link on:click={doSave}>Save</Link>
+    <Link on:click={doSaveLocal}>Save Local</Link>
     <Link on:click={doLoad}>Load</Link>
     <input bind:this={fileInput} id="comfy-file-input" type="file" accept=".json" on:change={loadWorkflow} />
 </Toolbar>

@@ -1,9 +1,11 @@
-import { BuiltInSlotShape, LGraph, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type MouseEventExt, type Vector2, type Vector4, TitleMode } from "@litegraph-ts/core";
+import { BuiltInSlotShape, LGraph, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type MouseEventExt, type Vector2, type Vector4, TitleMode, type ContextMenuItem, type IContextMenuItem } from "@litegraph-ts/core";
 import type ComfyApp from "./components/ComfyApp";
 import queueState from "./stores/queueState";
 import { get } from "svelte/store";
 import uiState from "./stores/uiState";
 import layoutState from "./stores/layoutState";
+import { Watch } from "@litegraph-ts/nodes-basic";
+import { ComfyReroute } from "./nodes";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
@@ -249,5 +251,89 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
                 this.selected_nodes[id].alignToGrid();
             }
         }
+    }
+
+    private reinstantiate(_value: IContextMenuItem, _options, mouseEvent, prevMenu, node?: LGraphNode) {
+        if ((node as any).isBackendNode)
+            return
+
+        const newNode = LiteGraph.createNode(node.type);
+
+        for (let index = 0; index < newNode.inputs.length; index++) {
+            const newInput = newNode.inputs[index];
+            const oldInput = node.inputs[index]
+
+            if (oldInput && newInput.type === oldInput.type) {
+                continue;
+            }
+
+            let link: LLink | null = null;
+
+            if (oldInput) {
+                link = node.getInputLink(index);
+                node.disconnectInput(index)
+                oldInput.type = newInput.type
+                oldInput.name = newInput.name
+            }
+            else {
+                node.addInput(newInput.name, newInput.type, newInput)
+            }
+
+            const reroute = LiteGraph.createNode(ComfyReroute);
+            reroute.properties.ignoreTypes = true;
+            node.graph.add(reroute)
+            const inputPos = node.getConnectionPos(true, index);
+            reroute.pos = [inputPos[0] - 140, inputPos[1] + LiteGraph.NODE_SLOT_HEIGHT / 2];
+            reroute.connect(0, node, index);
+            if (link != null)
+                node.graph.getNodeById(link.target_id).connect(link.target_slot, reroute, 0)
+        }
+
+        for (let index = 0; index < newNode.outputs.length; index++) {
+            const newOutput = newNode.outputs[index];
+            const oldOutput = node.outputs[index]
+
+            if (oldOutput && newOutput.type === oldOutput.type) {
+                continue;
+            }
+
+            let links = []
+
+            if (oldOutput) {
+                links = node.getOutputLinks(index)
+                node.disconnectOutput(index)
+                oldOutput.type = newOutput.type
+                oldOutput.name = newOutput.name
+            }
+            else {
+                node.addOutput(newOutput.name, newOutput.type, newOutput)
+            }
+
+            const reroute = LiteGraph.createNode(ComfyReroute);
+            reroute.properties.ignoreTypes = true;
+            node.graph.add(reroute)
+            const rerouteSize = reroute.computeSize();
+            const outputPos = node.getConnectionPos(false, index);
+            reroute.pos = [outputPos[0] + rerouteSize[0] + 20, outputPos[1] + LiteGraph.NODE_SLOT_HEIGHT / 2];
+            node.connect(index, reroute, 0);
+            for (const link of links) {
+                reroute.connect(0, link.target_id, link.target_slot)
+            }
+        }
+    }
+
+    override getNodeMenuOptions(node: LGraphNode): ContextMenuItem[] {
+        const options = super.getNodeMenuOptions(node);
+
+        options.push(
+            {
+                content: "Reinstantiate",
+                has_submenu: false,
+                disabled: false,
+                callback: this.reinstantiate.bind(this)
+            },
+        )
+
+        return options
     }
 }

@@ -17,6 +17,13 @@ import ButtonWidget from "$lib/widgets/ButtonWidget.svelte";
 import CheckboxWidget from "$lib/widgets/CheckboxWidget.svelte";
 import RadioWidget from "$lib/widgets/RadioWidget.svelte";
 import ImageUploadWidget from "$lib/widgets/ImageUploadWidget.svelte";
+import ImageCompareWidget from "$lib/widgets/ImageCompareWidget.svelte";
+
+export type AutoConfigOptions = {
+    includeProperties?: Set<string> | null,
+    setDefaultValue?: boolean
+    setWidgetTitle?: boolean
+}
 
 /*
  * NOTE: If you want to add a new widget but it has the same input/output type
@@ -67,6 +74,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
 
     private _aboutToChange: number = 0;
     private _aboutToChangeValue: any = null;
+    private _noChangedEvent: boolean = false;
 
     abstract defaultValue: T;
 
@@ -84,6 +92,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     // TODO these are bad, create override methods instead
     // input slots
     inputIndex: number = 0;
+    storeActionName: string | null = "store";
 
     // output slots
     outputIndex: number | null = 0;
@@ -132,37 +141,52 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     private onValueUpdated(value: any) {
-        console.debug("[Widget] valueUpdated", this, value)
+        // console.debug("[Widget] valueUpdated", this, value)
         this.displayWidget.value = this.formatValue(value)
 
         if (this.outputIndex !== null && this.outputs.length >= this.outputIndex) {
             this.setOutputData(this.outputIndex, get(this.value))
         }
 
-        if (this.changedIndex !== null && this.outputs.length >= this.changedIndex) {
+        if (this.changedIndex !== null && this.outputs.length >= this.changedIndex && !this._noChangedEvent) {
             if (!this.delayChangedEvent)
                 this.triggerChangeEvent(get(this.value))
             else {
-                this._aboutToChange = 2; // wait 1.5-2 frames, in case we're already in the middle of one
+                // console.debug("[Widget] queueChangeEvent", this, value)
+                this._aboutToChange = 2; // wait 1.5-2 frames, in case we're already in the middle of executing the graph
                 this._aboutToChangeValue = get(this.value);
             }
         }
+        this._noChangedEvent = false;
     }
 
     private triggerChangeEvent(value: any) {
+        console.debug("[Widget] trigger changed", this, value)
         const changedOutput = this.outputs[this.changedIndex]
         if (changedOutput.type === BuiltInSlotType.EVENT)
             this.triggerSlot(this.changedIndex, value)
     }
 
-    setValue(value: any) {
-        this.value.set(value)
+    parseValue(value: any): T { return value as T };
+
+    setValue(value: any, noChangedEvent: boolean = false) {
+        if (noChangedEvent)
+            this._noChangedEvent = true;
+
+        const parsed = this.parseValue(value)
+        this.value.set(parsed)
+
+        // In case value.set() does not trigger onValueUpdated, we need to reset
+        // the counter here also.
+        this._noChangedEvent = false;
     }
 
     override onPropertyChanged(property: string, value: any, prevValue?: any) {
-        const data = this.shownOutputProperties[property]
-        if (data)
-            this.setOutputData(data.index, value)
+        if (this.shownOutputProperties != null) {
+            const data = this.shownOutputProperties[property]
+            if (data)
+                this.setOutputData(data.index, value)
+        }
     }
 
     /*
@@ -198,6 +222,19 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         }
     }
 
+    override onAction(action: any, param: any, options: { action_call?: string }) {
+        if (action === this.storeActionName) {
+            let noChangedEvent = false;
+            let value = param;
+            if (param != null && typeof param === "object" && "value" in param) {
+                value = param.value
+                if ("noChangedEvent" in param)
+                    noChangedEvent = Boolean(param.noChangedEvent)
+            }
+            this.setValue(value, noChangedEvent)
+        }
+    }
+
     onConnectOutput(
         outputIndex: number,
         inputType: INodeInputSlot["type"],
@@ -214,24 +251,36 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         return true;
     }
 
-    doAutoConfig(input: IComfyInputSlot) {
+    doAutoConfig(input: IComfyInputSlot, options: AutoConfigOptions = { setDefaultValue: true, setWidgetTitle: true }) {
         // Copy properties from default config in input slot
         const comfyInput = input as IComfyInputSlot;
-        for (const key in comfyInput.config)
-            this.setProperty(key, comfyInput.config[key])
+        for (const key in comfyInput.config) {
+            if (options.includeProperties == null || options.includeProperties.has(key))
+                this.setProperty(key, comfyInput.config[key])
+        }
 
-        if ("defaultValue" in this.properties)
-            this.setValue(this.properties.defaultValue)
+        if (options.setDefaultValue) {
+            if ("defaultValue" in this.properties)
+                this.setValue(this.properties.defaultValue)
+        }
 
-        const widget = layoutState.findLayoutForNode(this.id)
-        if (widget && input.name !== "") {
-            widget.attrs.title = input.name;
+        if (options.setWidgetTitle) {
+            const widget = layoutState.findLayoutForNode(this.id)
+            if (widget && input.name !== "") {
+                widget.attrs.title = input.name;
+            }
         }
 
         console.debug("Property copy", input, this.properties)
 
         this.setValue(get(this.value))
+
+        this.onAutoConfig(input);
+
         this.notifyPropsChanged();
+    }
+
+    onAutoConfig(input: IComfyInputSlot) {
     }
 
     notifyPropsChanged() {
@@ -337,15 +386,10 @@ export class ComfySliderNode extends ComfyWidgetNode<number> {
         super(name, 0)
     }
 
-    override onAction(action: any, param: any) {
-        if (action === "store" && typeof param === "number")
-            this.setValue(param)
-    }
-
-    override setValue(value: any) {
+    override parseValue(value: any): number {
         if (typeof value !== "number")
-            return;
-        super.setValue(clamp(value, this.properties.min, this.properties.max))
+            return this.properties.min;
+        return clamp(value, this.properties.min, this.properties.max)
     }
 
     override clampOneConfig(input: IComfyInputSlot) {
@@ -365,13 +409,17 @@ LiteGraph.registerNodeType({
 
 export interface ComfyComboProperties extends ComfyWidgetProperties {
     values: string[]
+
+    /* JS Function body that takes a parameter named "value" as a parameter and returns the label for each combo entry */
+    convertValueToLabelCode: string
 }
 
 export class ComfyComboNode extends ComfyWidgetNode<string> {
     override properties: ComfyComboProperties = {
         tags: [],
         defaultValue: "A",
-        values: ["A", "B", "C", "D"]
+        values: ["A", "B", "C", "D"],
+        convertValueToLabelCode: ""
     }
 
     static slotLayout: SlotLayout = {
@@ -389,11 +437,59 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
     override defaultValue = "A";
     override saveUserState = false;
 
-    comboRefreshed: Writable<boolean>;
+    // True if at least one combo box refresh has taken place
+    // Wait until the initial graph load for combo to be valid.
+    firstLoad: Writable<boolean>;
+    valuesForCombo: Writable<any[] | null>; // Changed when the combo box has values.
 
     constructor(name?: string) {
         super(name, "A")
-        this.comboRefreshed = writable(false)
+        this.firstLoad = writable(false)
+        this.valuesForCombo = writable(null)
+    }
+
+    override onPropertyChanged(property: any, value: any) {
+        if (property === "values" || property === "convertValueToLabelCode") {
+            // this.formatValues(this.properties.values)
+        }
+    }
+
+    formatValues(values: string[]) {
+        if (values == null)
+            return;
+
+        this.properties.values = values;
+
+        let formatter: any;
+        if (this.properties.convertValueToLabelCode)
+            formatter = new Function("value", this.properties.convertValueToLabelCode) as (v: string) => string;
+        else
+            formatter = (value: any) => `${value}`;
+
+        let valuesForCombo = []
+
+        try {
+            valuesForCombo = this.properties.values.map((value, index) => {
+                return {
+                    value,
+                    label: formatter(value),
+                    index
+                }
+            })
+        }
+        catch (err) {
+            console.error("Failed formatting!", err)
+            valuesForCombo = this.properties.values.map((value, index) => {
+                return {
+                    value,
+                    label: `${value}`,
+                    index
+                }
+            })
+        }
+
+        this.firstLoad.set(true)
+        this.valuesForCombo.set(valuesForCombo);
     }
 
     onConnectOutput(
@@ -422,15 +518,10 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
         return true;
     }
 
-    override onAction(action: any, param: any) {
-        if (action === "store" && typeof param === "string")
-            this.setValue(param)
-    }
-
-    override setValue(value: any) {
+    override parseValue(value: any): string {
         if (typeof value !== "string" || this.properties.values.indexOf(value) === -1)
-            return;
-        super.setValue(value)
+            return this.properties.values[0]
+        return value
     }
 
     override clampOneConfig(input: IComfyInputSlot) {
@@ -442,6 +533,12 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
             else
                 this.setValue(input.config.defaultValue || input.config.values[0])
         }
+    }
+
+    override onSerialize(o: SerializedLGraphNode) {
+        super.onSerialize(o);
+        // TODO fix saving combo nodes with huge values lists
+        o.properties.values = []
     }
 
     override stripUserState(o: SerializedLGraphNode) {
@@ -469,7 +566,7 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
     }
 
     static slotLayout: SlotLayout = {
-        inputs: [
+        inputs: [
             { name: "value", type: "string" },
             { name: "store", type: BuiltInSlotType.ACTION }
         ],
@@ -486,13 +583,8 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
         super(name, "")
     }
 
-    override onAction(action: any, param: any) {
-        if (action === "store")
-            this.setValue(param)
-    }
-
-    override setValue(value: any) {
-        super.setValue(`${value}`)
+    override parseValue(value: any): string {
+        return `${value}`
     }
 }
 
@@ -517,7 +609,7 @@ export type GalleryOutputEntry = {
 
 export interface ComfyGalleryProperties extends ComfyWidgetProperties {
     index: number,
-    updateMode: "replace" | "append"
+    updateMode: "replace" | "append",
 }
 
 export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
@@ -525,7 +617,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
         tags: [],
         defaultValue: [],
         index: 0,
-        updateMode: "replace"
+        updateMode: "replace",
     }
 
     static slotLayout: SlotLayout = {
@@ -538,7 +630,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
             { name: "selected_index", type: "number" },
             { name: "width", type: "number" },
             { name: "height", type: "number" },
-            { name: "any_selected", type: "boolean" },
+            { name: "filename", type: "string" },
         ]
     }
 
@@ -553,12 +645,15 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     override outputIndex = null;
     override changedIndex = null;
 
-    anyImageSelected: boolean = false;
+    selectedFilename: string | null = null;
 
+    selectedIndexWidget: ITextWidget;
     modeWidget: IComboWidget;
 
     constructor(name?: string) {
         super(name, [])
+        this.selectedIndexWidget = this.addWidget("text", "Selected", String(this.properties.index), "index")
+        this.selectedIndexWidget.disabled = true;
         this.modeWidget = this.addWidget("combo", "Mode", this.properties.updateMode, null, { property: "updateMode", values: ["replace", "append"] })
     }
 
@@ -571,33 +666,27 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     imageSize: Vector2 = [1, 1]
 
     override onExecute() {
-        this.setOutputData(0, this.properties.index)
+        const index = this.properties.index;
+
+        this.setOutputData(0, index)
         this.setOutputData(1, this.imageSize[0])
         this.setOutputData(2, this.imageSize[1])
-        this.setOutputData(3, this.anyImageSelected)
+
+        let filename: string | null = null;
+        if (index != null) {
+            const entry = get(this.value)[index];
+            if (entry)
+                filename = entry.name
+        }
+
+        this.setOutputData(3, filename)
     }
 
     override onAction(action: any, param: any, options: { action_call?: string }) {
+        super.onAction(action, param, options)
+
         if (action === "clear") {
             this.setValue([])
-        }
-        else if (action === "store") {
-            if (param && "images" in param) {
-                const data = param as GalleryOutput
-                console.debug("[ComfyGalleryNode] Received output!", data)
-
-                const galleryItems: GradioFileData[] = convertComfyOutputToGradio(data)
-
-                if (this.properties.updateMode === "append") {
-                    const currentValue = get(this.value)
-                    this.setValue(currentValue.concat(galleryItems))
-                }
-                else {
-                    this.setValue(galleryItems)
-                }
-            }
-            this.setProperty("index", 0)
-            this.anyImageSelected = false;
         }
     }
 
@@ -605,22 +694,28 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
         return `Images: ${value?.length || 0}`
     }
 
-    override setValue(value: any) {
-        console.warn("SETVALUE", value)
-        if (Array.isArray(value)) {
-            super.setValue(value)
+    override parseValue(param: any): GradioFileData[] {
+        if (!(typeof param === "object" && "images" in param)) {
+            return []
+        }
+
+        const data = param as GalleryOutput
+        console.debug("[ComfyGalleryNode] Received output!", data)
+
+        const galleryItems: GradioFileData[] = convertComfyOutputToGradio(data)
+
+        if (this.properties.updateMode === "append") {
+            const currentValue = get(this.value)
+            return currentValue.concat(galleryItems)
         }
         else {
-            super.setValue([])
+            return galleryItems;
         }
+    }
 
-        if (!get(this.value))
-            this.anyImageSelected = false
-
-        const len = get(this.value).length
-        if (this.properties.index < 0 || this.properties.index >= len) {
-            this.setProperty("index", clamp(this.properties.index, 0, len))
-        }
+    override setValue(value: any, noChangedEvent: boolean = false) {
+        super.setValue(value, noChangedEvent)
+        this.setProperty("index", null)
     }
 }
 
@@ -657,8 +752,8 @@ export class ComfyButtonNode extends ComfyWidgetNode<boolean> {
         super(name, false)
     }
 
-    override setValue(value: any) {
-        super.setValue(Boolean(value))
+    override parseValue(param: any): boolean {
+        return Boolean(param);
     }
 
     onClick() {
@@ -697,22 +792,14 @@ export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
 
     override svelteComponentType = CheckboxWidget;
     override defaultValue = false;
+    override changedIndex = 1;
 
     constructor(name?: string) {
         super(name, false)
     }
 
-    override setValue(value: any) {
-        value = Boolean(value)
-        const changed = value != get(this.value);
-        super.setValue(Boolean(value))
-        if (changed)
-            this.triggerSlot(1, value)
-    }
-
-    override onAction(action: any, param: any) {
-        if (action === "store")
-            this.setValue(Boolean(param))
+    override parseValue(param: any) {
+        return Boolean(param);
     }
 }
 
@@ -735,6 +822,10 @@ export class ComfyRadioNode extends ComfyWidgetNode<string> {
     }
 
     static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "value", type: "string,number" },
+            { name: "store", type: BuiltInSlotType.ACTION }
+        ],
         outputs: [
             { name: "value", type: "string" },
             { name: "index", type: "number" },
@@ -761,16 +852,30 @@ export class ComfyRadioNode extends ComfyWidgetNode<string> {
         this.setOutputData(1, this.index)
     }
 
-    override setValue(value: string) {
+    override setValue(value: string, noChangedEvent: boolean = false) {
+        super.setValue(value, noChangedEvent)
+
+        value = get(this.value);
+
         const index = this.properties.choices.indexOf(value)
-        if (index == -1)
+        if (index === -1)
             return;
 
         this.index = index;
         this.indexWidget.value = index;
         this.setOutputData(1, this.index)
+    }
 
-        super.setValue(value)
+    override parseValue(param: any): string {
+        if (typeof param === "string") {
+            if (this.properties.choices.indexOf(param) === -1)
+                return this.properties.choices[0]
+            return param
+        }
+        else {
+            const index = clamp(parseInt(param), 0, this.properties.choices.length - 1)
+            return this.properties.choices[index] || this.properties.defaultValue
+        }
     }
 }
 
@@ -793,10 +898,14 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
     }
 
     static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "store", type: BuiltInSlotType.ACTION }
+        ],
         outputs: [
             { name: "filename", type: "string" }, // TODO support batches
             { name: "width", type: "number" },
             { name: "height", type: "number" },
+            { name: "image_count", type: "number" },
             { name: "changed", type: BuiltInSlotType.EVENT },
         ]
     }
@@ -805,12 +914,25 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
     override defaultValue = [];
     override outputIndex = null;
     override changedIndex = 3;
+    override storeActionName = "store";
     override saveUserState = false;
 
     imageSize: Vector2 = [1, 1];
 
     constructor(name?: string) {
         super(name, [])
+    }
+
+    override parseValue(value: any): GradioFileData[] {
+        if (value == null)
+            return []
+
+        if (typeof value === "string" && value !== "") { // Single filename
+            return [{ name: value, data: value, orig_name: value, is_file: true }]
+        }
+        else {
+            return []
+        }
     }
 
     override onExecute(param: any, options: object) {
@@ -821,11 +943,13 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
             this.setOutputData(0, value[0].name) // TODO when ComfyUI LoadImage supports loading an image batch
             this.setOutputData(1, this.imageSize[0])
             this.setOutputData(2, this.imageSize[1])
+            this.setOutputData(3, value.length)
         }
         else {
             this.setOutputData(0, "")
             this.setOutputData(1, 1)
             this.setOutputData(2, 1)
+            this.setOutputData(3, 0)
         }
     }
 
@@ -839,4 +963,93 @@ LiteGraph.registerNodeType({
     title: "UI.ImageUpload",
     desc: "Widget that lets you upload images into ComfyUI's input folder",
     type: "ui/image_upload"
+})
+
+export interface ComfyImageCompareNodeProperties extends ComfyWidgetProperties {
+}
+
+export type FileNameOrGalleryData = string | GalleryOutputEntry;
+export type ImageCompareData = [FileNameOrGalleryData, FileNameOrGalleryData]
+
+export class ComfyImageCompareNode extends ComfyWidgetNode<ImageCompareData> {
+    override properties: ComfyImageCompareNodeProperties = {
+        defaultValue: [],
+        tags: [],
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "store", type: BuiltInSlotType.ACTION },
+            { name: "left_image", type: "string" },
+            { name: "right_image", type: "string" },
+        ],
+        outputs: [
+        ]
+    }
+
+    override svelteComponentType = ImageCompareWidget;
+    override defaultValue: ImageCompareData = ["", ""];
+    override outputIndex = null;
+    override changedIndex = 3;
+    override storeActionName = "store";
+    override saveUserState = false;
+
+    constructor(name?: string) {
+        super(name, ["", ""])
+    }
+
+    override onExecute() {
+        const valueA = this.getInputData(1)
+        const valueB = this.getInputData(2)
+        let current = get(this.value)
+        let changed = false;
+        if (valueA != null && current[0] != valueA) {
+            current[0] = valueA
+            changed = true;
+        }
+        if (valueB != null && current[1] != valueB) {
+            current[1] = valueB
+            changed = true;
+        }
+        if (changed)
+            this.value.set(current)
+    }
+
+    override parseValue(value: any): ImageCompareData {
+        if (value == null) {
+            return ["", ""]
+        }
+        else if (typeof value === "string" && value !== "") { // Single filename
+            const prevValue = get(this.value)
+            prevValue.push(value)
+            if (prevValue.length > 2)
+                prevValue.splice(0, 1)
+            return prevValue as ImageCompareData
+        }
+        else if (typeof value === "object" && "images" in value && value.images.length > 0) {
+            const output = value as GalleryOutput
+            const prevValue = get(this.value)
+            prevValue.push(output.images[0].filename)
+            if (prevValue.length > 2)
+                prevValue.splice(0, 1)
+            return prevValue as ImageCompareData
+        }
+        else if (Array.isArray(value) && typeof value[0] === "string" && typeof value[1] === "string") {
+            return value as ImageCompareData
+        }
+        else {
+            return ["", ""]
+        }
+    }
+
+    override formatValue(value: GradioFileData[]): string {
+        return `Images: ${value?.length || 0}`
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyImageCompareNode,
+    title: "UI.ImageCompare",
+    desc: "Widget that lets you compare two images",
+    type: "ui/image_compare"
 })

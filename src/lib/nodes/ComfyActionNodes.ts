@@ -1,29 +1,32 @@
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
 import notify from "$lib/notify";
-import layoutState from "$lib/stores/layoutState";
+import layoutState, { type DragItemID } from "$lib/stores/layoutState";
 import queueState from "$lib/stores/queueState";
-import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWidget, type SerializedLGraphNode, type SlotLayout } from "@litegraph-ts/core";
+import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWidget, type SerializedLGraphNode, type SlotLayout, type PropertyLayout } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
-import type { ComfyWidgetNode, GalleryOutput } from "./ComfyWidgetNodes";
+import type { ComfyWidgetNode, GalleryOutput, GalleryOutputEntry } from "./ComfyWidgetNodes";
+import type { NotifyOptions } from "$lib/notify";
+import { convertComfyOutputToGradio, uploadImageToComfyUI, type ComfyUploadImageAPIResponse } from "$lib/utils";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
         outputs: [
             { name: "beforeQueued", type: BuiltInSlotType.EVENT },
-            { name: "afterQueued", type: BuiltInSlotType.EVENT }
+            { name: "afterQueued", type: BuiltInSlotType.EVENT },
+            { name: "onDefaultQueueAction", type: BuiltInSlotType.EVENT },
         ],
     }
 
     private getActionParams(subgraph: string | null): any {
         let queue = get(queueState)
-        let remaining = 0;
+        let queueRemaining = 0;
 
         if (typeof queue.queueRemaining === "number")
-            remaining = queue.queueRemaining
+            queueRemaining = queue.queueRemaining
 
         return {
-            queueRemaining: remaining,
+            queueRemaining,
             subgraph
         }
     }
@@ -34,6 +37,16 @@ export class ComfyQueueEvents extends ComfyGraphNode {
 
     override afterQueued(p: SerializedPrompt, subgraph: string | null) {
         this.triggerSlot(1, this.getActionParams(subgraph))
+    }
+
+    override onDefaultQueueAction() {
+        let queue = get(queueState)
+        let queueRemaining = 0;
+
+        if (typeof queue.queueRemaining === "number")
+            queueRemaining = queue.queueRemaining
+
+        this.triggerSlot(2, { queueRemaining })
     }
 
     override onSerialize(o: SerializedLGraphNode) {
@@ -54,6 +67,7 @@ export interface ComfyStoreImagesActionProperties extends ComfyGraphNodeProperti
 
 export class ComfyStoreImagesAction extends ComfyGraphNode {
     override properties: ComfyStoreImagesActionProperties = {
+        tags: [],
         images: null
     }
 
@@ -175,13 +189,15 @@ LiteGraph.registerNodeType({
 })
 
 export interface ComfyNotifyActionProperties extends ComfyGraphNodeProperties {
-    message: string
+    message: string,
+    type: string
 }
 
 export class ComfyNotifyAction extends ComfyGraphNode {
     override properties: ComfyNotifyActionProperties = {
+        tags: [],
         message: "Nya.",
-        tags: []
+        type: "info"
     }
 
     static slotLayout: SlotLayout = {
@@ -192,10 +208,28 @@ export class ComfyNotifyAction extends ComfyGraphNode {
     }
 
     override onAction(action: any, param: any) {
-        const message = this.getInputData(0);
-        if (message) {
-            notify(message);
+        const message = this.getInputData(0) || this.properties.message;
+        if (!message)
+            return;
+
+        const options: NotifyOptions = {
+            type: this.properties.type,
+            showOn: "all"
         }
+
+        // Check if this event was triggered from a backend node and has the
+        // onExecuted arguments. If so then use the first image as the icon for
+        // native notifications.
+        if (param != null && typeof param === "object") {
+            if ("images" in param) {
+                const output = param as GalleryOutput;
+                const converted = convertComfyOutputToGradio(output);
+                if (converted.length > 0)
+                    options.imageUrl = converted[0].data;
+            }
+        }
+
+        notify(message, options);
     };
 }
 
@@ -204,6 +238,40 @@ LiteGraph.registerNodeType({
     title: "Comfy.NotifyAction",
     desc: "Displays a message.",
     type: "actions/notify"
+})
+
+export interface ComfyPlaySoundActionProperties extends ComfyGraphNodeProperties {
+    sound: string,
+}
+
+export class ComfyPlaySoundAction extends ComfyGraphNode {
+    override properties: ComfyPlaySoundActionProperties = {
+        tags: [],
+        sound: "notification.mp3"
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "sound", type: "string" },
+            { name: "trigger", type: BuiltInSlotType.ACTION }
+        ],
+    }
+
+    override onAction(action: any, param: any) {
+        const sound = this.getInputData(0) || this.properties.sound;
+        if (sound) {
+            const url = `${location.origin}/sound/${sound}`;
+            const audio = new Audio(url);
+            audio.play();
+        }
+    };
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyPlaySoundAction,
+    title: "Comfy.PlaySoundAction",
+    desc: "Plays a sound located under the sound/ directory.",
+    type: "actions/play_sound"
 })
 
 export interface ComfyExecuteSubgraphActionProperties extends ComfyGraphNodeProperties {
@@ -279,16 +347,21 @@ export class ComfySetNodeModeAction extends ComfyGraphNode {
     constructor(title?: string) {
         super(title)
         this.displayWidget = this.addWidget("text", "Tags", this.properties.targetTags, "targetTags")
+        this.enableWidget = this.addWidget("toggle", "Enable", this.properties.enable, "enable");
     }
 
     override onPropertyChanged(property: any, value: any) {
-        if (property === "enabled") {
+        if (property === "enable") {
             this.enableWidget.value = value
         }
     }
 
     override onAction(action: any, param: any) {
-        let enabled = this.getInputData(0)
+        let input = this.getInputData(0)
+        if (input == null)
+            input = this.properties.enable
+
+        let enabled = Boolean(input)
 
         if (typeof param === "object" && "enabled" in param)
             enabled = param["enabled"]
@@ -331,4 +404,258 @@ LiteGraph.registerNodeType({
     title: "Comfy.SetNodeModeAction",
     desc: "Sets a group of nodes/UI containers as enabled/disabled based on their tags (comma-separated)",
     type: "actions/set_node_mode"
+})
+
+export type TagAction = {
+    tag: string,
+    enable: boolean
+}
+
+export interface ComfySetNodeModeAdvancedActionProperties extends ComfyGraphNodeProperties {
+    targetTags: TagAction[],
+    enable: boolean,
+}
+
+export class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
+    override properties: ComfySetNodeModeAdvancedActionProperties = {
+        targetTags: [{ tag: "myTag", enable: true }, { tag: "anotherTag", enable: false }],
+        enable: true,
+        tags: []
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "enabled", type: "boolean" },
+            { name: "set", type: BuiltInSlotType.ACTION },
+        ],
+    }
+
+    static propertyLayout: PropertyLayout = [
+        { name: "enable", defaultValue: true, type: "boolean", },
+        { name: "targetTags", defaultValue: [{ tag: "myTag", enable: true }, { tag: "anotherTag", enable: false }], type: "array", options: { multiline: true, inputStyle: { fontFamily: "monospace" } } }
+    ]
+
+    displayWidget: ITextWidget;
+    enableWidget: IToggleWidget;
+
+    constructor(title?: string) {
+        super(title)
+        this.displayWidget = this.addWidget("text", "Tags", this.formatTags(), null);
+        this.displayWidget.disabled = true;
+        this.enableWidget = this.addWidget("toggle", "Enable", this.properties.enable, "enable");
+    }
+
+    override onPropertyChanged(property: any, value: any) {
+        if (property === "enable") {
+            this.enableWidget.value = value
+        }
+        else if (property === "targetTags") {
+            this.displayWidget.value = this.formatTags()
+        }
+    }
+
+    private formatTags(): string {
+        if (!Array.isArray(this.properties.targetTags) || this.properties.targetTags.length === 0)
+            return "(No tags)";
+        return this.properties.targetTags.map(t => {
+            let s = t.tag
+            if (t.enable)
+                s = "+" + s
+            else
+                s = "!" + s
+            return s
+        }).join(", ")
+    }
+
+    private getModeChanges(action: TagAction, enable: boolean, nodeChanges: Record<string, NodeMode>, widgetChanges: Record<DragItemID, boolean>) {
+        for (const node of this.graph._nodes) {
+            if ("tags" in node.properties) {
+                const comfyNode = node as ComfyGraphNode;
+                const hasTag = comfyNode.properties.tags.indexOf(action.tag) != -1;
+
+                if (hasTag) {
+                    let newMode: NodeMode;
+                    if (enable && action.enable) {
+                        newMode = NodeMode.ALWAYS;
+                    } else {
+                        newMode = NodeMode.NEVER;
+                    }
+                    nodeChanges[node.id] = newMode
+                    node.changeMode(newMode);
+                    if ("notifyPropsChanged" in node)
+                        (node as ComfyWidgetNode).notifyPropsChanged();
+                }
+            }
+        }
+
+        for (const entry of Object.values(get(layoutState).allItems)) {
+            if (entry.dragItem.type === "container") {
+                const container = entry.dragItem;
+                const hasTag = container.attrs.tags.indexOf(action.tag) != -1;
+                if (hasTag) {
+                    const hidden = !(enable && action.enable)
+                    widgetChanges[container.id] = hidden
+                }
+            }
+        }
+    }
+
+    override onExecute() {
+        this.boxcolor = LiteGraph.NODE_DEFAULT_BOXCOLOR;
+
+        for (const action of this.properties.targetTags) {
+            if (typeof action !== "object" || !("tag" in action) || !("enable" in action)) {
+                this.boxcolor = "red";
+                break;
+            }
+        }
+    }
+
+    override onAction(action: any, param: any) {
+        let input = this.getInputData(0)
+        if (input == null)
+            input = this.properties.enable
+
+        let enabled = Boolean(input)
+
+        if (typeof param === "object" && "enabled" in param)
+            enabled = param["enabled"]
+
+        const nodeChanges: Record<string, NodeMode> = {}  // nodeID => newState
+        const widgetChanges: Record<string, boolean> = {} // dragItemID => isHidden
+
+        for (const action of this.properties.targetTags) {
+            this.getModeChanges(action, enabled, nodeChanges, widgetChanges)
+        }
+
+        for (const [nodeId, newMode] of Object.entries(nodeChanges)) {
+            this.graph.getNodeById(parseInt(nodeId)).changeMode(newMode);
+        }
+
+        const layout = get(layoutState);
+        for (const [dragItemID, isHidden] of Object.entries(widgetChanges)) {
+            const container = layout.allItems[dragItemID].dragItem
+            container.attrs.hidden = isHidden;
+            container.attrsChanged.set(get(container.attrsChanged) + 1)
+        }
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfySetNodeModeAdvancedAction,
+    title: "Comfy.SetNodeModeAdvancedAction",
+    desc: "Turns multiple groups of nodes on/off at once based on an array of rules [{ tag: string, enable: boolean }, ...]",
+    type: "actions/set_node_mode_advanced"
+})
+
+export class ComfyNoChangeEvent extends ComfyGraphNode {
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "in", type: BuiltInSlotType.ACTION },
+        ],
+        outputs: [
+            { name: "out", type: BuiltInSlotType.EVENT },
+        ],
+    }
+
+    override onAction(action: any, param: any, options: { action_call?: string }) {
+        if (param && typeof param === "object" && "noChangedEvent" in param) {
+            param.noChangedEvent = true;
+        }
+        else {
+            param = {
+                value: param,
+                noChangedEvent: true
+            }
+        }
+
+        this.triggerSlot(0, param, null, options);
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyNoChangeEvent,
+    title: "Comfy.NoChangeEvent",
+    desc: "Wraps an event's parameter such that passing it into a ComfyWidgetNode's 'store' action will not trigger its 'changed' event",
+    type: "events/no_change"
+})
+
+export interface ComfyUploadImageActionProperties extends ComfyGraphNodeProperties {
+    folderType: "output" | "temp"
+    lastUploadedImageFile: string | null
+}
+
+export class ComfyUploadImageAction extends ComfyGraphNode {
+    override properties: ComfyUploadImageActionProperties = {
+        tags: [],
+        folderType: "output",
+        lastUploadedImageFile: null
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "filename", type: "string" },
+            { name: "trigger", type: BuiltInSlotType.ACTION }
+        ],
+        outputs: [
+            { name: "input_filename", type: "string" },
+            { name: "uploaded", type: BuiltInSlotType.EVENT }
+        ],
+    }
+
+    private _promise = null;
+
+    displayWidget: ITextWidget;
+
+    constructor(title?: string) {
+        super(title);
+        this.displayWidget = this.addWidget<ITextWidget>(
+            "text",
+            "File",
+            this.properties.lastUploadedImageFile,
+            "lastUploadedImageFile"
+        );
+        this.displayWidget.disabled = true;
+    }
+
+    override onExecute() {
+        this.setOutputData(0, this.properties.lastUploadedImageFile)
+    }
+
+    override onAction(action: any, param: any) {
+        if (action !== "trigger" || this._promise != null)
+            return;
+
+        const filename = this.getInputData(0)
+        if (typeof filename !== "string" || !filename) {
+            return;
+        }
+
+        const data: GalleryOutputEntry = {
+            filename,
+            subfolder: "",
+            type: this.properties.folderType || "output"
+        }
+
+        this._promise = uploadImageToComfyUI(data)
+            .then((json: ComfyUploadImageAPIResponse) => {
+                console.debug("[UploadImageAction] Succeeded", json)
+                this.properties.lastUploadedImageFile = json.name;
+                this.triggerSlot(1, this.properties.lastUploadedImageFile);
+                this._promise = null;
+            })
+            .catch((e) => {
+                console.error("Error uploading:", e)
+                notify(`Error uploading image to ComfyUi: ${e}`, { type: "error", timeout: 10000 })
+                this.properties.lastUploadedImageFile = null;
+                this._promise = null;
+            })
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfyUploadImageAction,
+    title: "Comfy.UploadImageAction",
+    desc: "Uploads an image from the specified ComfyUI folder into its input folder",
+    type: "actions/store_images"
 })

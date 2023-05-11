@@ -8,7 +8,7 @@ import { get } from "svelte/store";
 import type ComfyGraphNode from "./nodes/ComfyGraphNode";
 import type IComfyInputSlot from "./IComfyInputSlot";
 import type { ComfyBackendNode } from "./nodes/ComfyBackendNode";
-import type { ComfyWidgetNode } from "./nodes";
+import type { ComfyComboNode, ComfyWidgetNode } from "./nodes";
 
 type ComfyGraphEvents = {
     configured: (graph: LGraph) => void
@@ -82,15 +82,17 @@ export default class ComfyGraph extends LGraph {
                         const [index, spec] = pair
                         const input = comfyNode.inputs[index] as IComfyInputSlot;
                         input.defaultWidgetNode = spec.defaultWidgetNode;
-                        if (spec.config)
+                        if (spec.config) {
                             input.config = spec.config
+                        }
                     }
                 }
             }
         }
 
         if (get(uiState).autoAddUI) {
-            if (!("svelteComponentType" in node) && !options.addedByDeserialize) {
+            console.warn("ADD", node.type, options)
+            if (!("svelteComponentType" in node) && options.addedByDeserialize == null) {
                 console.debug("[ComfyGraph] AutoAdd UI")
                 const comfyNode = node as ComfyGraphNode;
                 const widgetNodesAdded = []
@@ -106,6 +108,11 @@ export default class ComfyGraph extends LGraph {
                             widgetNode.collapse();
                             widgetNode.pos = [inputPos[0] - 140, inputPos[1] + LiteGraph.NODE_SLOT_HEIGHT / 2];
                             widgetNodesAdded.push(widgetNode)
+
+                            // Set combo box as loaded
+                            if (widgetNode.type === "ui/combo" && widgetNode.properties.values != null) {
+                                (widgetNode as ComfyComboNode).formatValues(widgetNode.properties.values);
+                            }
                         }
                     }
                 }

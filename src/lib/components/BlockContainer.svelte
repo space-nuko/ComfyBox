@@ -54,6 +54,7 @@
          class:selected={$uiState.uiUnlocked && $layoutState.currentSelection.includes(container.id)}
          class:root-container={zIndex === 0}
          class:is-executing={container.isNodeExecuting}
+         class:mobile={isMobile}
          class:edit={edit}>
         <Block>
             {#if container.attrs.title && container.attrs.title !== ""}
@@ -90,7 +91,7 @@
                 {/each}
             </div>
             {#if isHidden(container) && edit}
-                <div class="handle handle-hidden" class:hidden={!edit} style="z-index: {zIndex+100}"/>
+                <div class="handle handle-hidden" style="z-index: {zIndex+100}" class:hidden={!edit} />
             {/if}
             {#if showHandles}
                 <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
@@ -105,6 +106,8 @@
      width: 100%;
      overflow: visible;
      display: flex;
+     flex: 1 1 0%;
+     flex-wrap: wrap;
 
      .edit {
          min-width: 200px;
@@ -194,12 +197,6 @@
          > :global(.block > .v-pane) {
              flex-direction: row;
          }
-
-         > :global(*), > :global(.form > *) {
-             flex: 1 1 0%;
-             flex-wrap: wrap;
-             min-width: min(160px, 100%);
-         }
      }
 
      &.vertical {
@@ -207,10 +204,6 @@
 
          > :global(.block > .v-pane) {
              flex-direction: column;
-         }
-
-         > :global(*), > :global(.form > *), .v-pane {
-             width: var(--size-full);
          }
      }
  }
@@ -238,7 +231,6 @@
  .animation-wrapper {
      position: relative;
      flex-grow: 100;
-     flex-basis: 0;
  }
 
  .handle-hidden {

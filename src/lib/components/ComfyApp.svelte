@@ -1,6 +1,6 @@
 <script lang="ts">
  import { onMount } from "svelte";
- import { get } from "svelte/store";
+ import { get, writable, type Writable } from "svelte/store";
  import { Pane, Splitpanes } from 'svelte-splitpanes';
  import { Button } from "@gradio/button";
  import { BlockTitle } from "@gradio/atoms";
@@ -12,7 +12,6 @@
  import { ImageViewer } from "$lib/ImageViewer";
  import type { ComfyAPIStatus } from "$lib/api";
  import { SvelteToast, toast } from '@zerodevx/svelte-toast'
- import defaultGraph from "$lib/defaultGraph"
 
  import { LGraph } from "@litegraph-ts/core";
  import LightboxModal from "./LightboxModal.svelte";
@@ -65,6 +64,10 @@
  let graphSize = 0;
  let graphTransitioning = false;
 
+ function queuePrompt() {
+     app.runDefaultQueueAction()
+ }
+
  function toggleGraph() {
      if (graphSize == 0) {
          graphSize = 50;
@@ -103,26 +106,7 @@
      if (!app?.lGraph)
          return;
 
-     const promptFilename = true; // TODO
-
-     let filename = "workflow.json";
-     if (promptFilename) {
-         filename = prompt("Save workflow as:", filename);
-         if (!filename) return;
-         if (!filename.toLowerCase().endsWith(".json")) {
-             filename += ".json";
-         }
-     }
-     else {
-         const date = new Date();
-         const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
-         filename = `workflow-${formattedDate}.json`
-     }
-
-     const indent = 2
-     const json = JSON.stringify(app.serialize(), null, indent)
-
-     download(filename, json, "application/json")
+     app.querySave()
  }
 
  function doLoad(): void {
@@ -142,19 +126,12 @@
          return;
 
      app.saveStateToLocalStorage();
-     notify("Saved to local storage.")
-     console.debug(jsonToJsObject(JSON.stringify(app.serialize(), null, 2)))
-     //
-     //      const date = new Date();
-     //      const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
-     //
-     //      download(`workflow-${formattedDate}.json`, JSON.stringify(app.serialize()), "application/json")
  }
 
- async function doLoadDefault(): void {
+ async function doLoadDefault() {
      var confirmed = confirm("Are you sure you want to clear the current workflow and load the default graph?");
      if (confirmed) {
-         await app.deserialize(defaultGraph)
+         await app.initDefaultGraph();
      }
  }
 
@@ -241,6 +218,11 @@
     </div>
     <div id="bottombar">
         <div class="left">
+            {#if $layoutState.attrs.queuePromptButtonName != ""}
+                <Button variant="primary" on:click={queuePrompt}>
+                    {$layoutState.attrs.queuePromptButtonName}
+                </Button>
+            {/if}
             <Button variant="secondary" on:click={toggleGraph}>
                 Toggle Graph
             </Button>
@@ -313,13 +295,13 @@
  #bottombar {
      padding-top: 0.5em;
      display: flex;
-     align-items: center;
      width: 100%;
      gap: var(--layout-gap);
      padding-left: 1em;
      padding-right: 1em;
      margin-top: auto;
      overflow-x: auto;
+     height: 70px;
 
      > .left {
          flex-shrink: 0;

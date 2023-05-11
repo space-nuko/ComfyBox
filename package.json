@@ -28,6 +28,7 @@
     "typescript": "^5.0.3",
     "vite": "^4.3.1",
     "vite-plugin-static-copy": "^0.14.0",
+    "vite-plugin-svelte-console-remover": "^1.0.10",
     "vite-tsconfig-paths": "^4.0.8",
     "vitest": "^0.25.8"
   },
@@ -58,11 +59,13 @@
     "events": "^3.3.0",
     "framework7": "^8.0.3",
     "framework7-svelte": "^8.0.3",
+    "img-comparison-slider": "^8.0.0",
     "pollen-css": "^4.6.2",
     "radix-icons-svelte": "^1.2.1",
     "svelte-preprocess": "^5.0.3",
     "svelte-select": "^5.5.3",
     "svelte-splitpanes": "^0.7.13",
+    "svelte-tiny-virtual-list": "^2.0.5",
     "tailwindcss": "^3.3.1",
     "typed-emitter": "github:andywer/typed-emitter",
     "vite-plugin-full-reload": "^1.0.5"

@@ -46,10 +46,17 @@
     {/if}
 </div>
 
-<style>
+<style lang="scss">
  .wrapper {
      padding: 2px;
      width: 100%;
+
+     :global(input[type=text]:disabled) {
+         @include disable-input;
+     }
+     :global(textarea:disabled) {
+         @include disable-input;
+     }
  }
 
  :global(span.hide) {

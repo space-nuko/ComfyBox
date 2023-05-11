@@ -1,0 +1,838 @@
+{
+  "createdBy": "ComfyBox",
+  "version": 1,
+  "workflow": {
+    "last_node_id": 13,
+    "last_link_id": 11,
+    "nodes": [
+      {
+        "id": 2,
+        "type": "ui/combo",
+        "pos": [
+          1957.9086484470572,
+          1203.438046544425
+        ],
+        "size": [
+          210,
+          78
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 0,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "string",
+            "link": null
+          },
+          {
+            "name": "store",
+            "type": -1,
+            "link": null,
+            "shape": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "value",
+            "type": "string",
+            "links": [
+              1
+            ]
+          },
+          {
+            "name": "changed",
+            "type": -2,
+            "links": null,
+            "shape": 1
+          }
+        ],
+        "title": "UI.Combo",
+        "properties": {
+          "tags": [],
+          "defaultValue": null,
+          "values": [],
+          "convertValueToLabelCode": ""
+        },
+        "widgets_values": [],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": "A",
+        "shownOutputProperties": {},
+        "saveUserState": false
+      },
+      {
+        "id": 3,
+        "type": "ui/image_upload",
+        "pos": [
+          1925.8925619834713,
+          1247.7851239669424
+        ],
+        "size": [
+          210,
+          138
+        ],
+        "flags": {},
+        "order": 1,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "store",
+            "type": -1,
+            "link": null,
+            "shape": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "filename",
+            "type": "string",
+            "links": [
+              4
+            ]
+          },
+          {
+            "name": "width",
+            "type": "number",
+            "links": null
+          },
+          {
+            "name": "height",
+            "type": "number",
+            "links": null
+          },
+          {
+            "name": "image_count",
+            "type": "number",
+            "links": null
+          },
+          {
+            "name": "changed",
+            "type": -2,
+            "links": null,
+            "shape": 1
+          }
+        ],
+        "title": "UI.ImageUpload",
+        "properties": {
+          "defaultValue": null,
+          "tags": [],
+          "fileCount": "single"
+        },
+        "widgets_values": [],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": [],
+        "shownOutputProperties": {},
+        "saveUserState": false
+      },
+      {
+        "id": 5,
+        "type": "ImageUpscaleWithModel",
+        "pos": [
+          2322,
+          1204
+        ],
+        "size": [
+          176.4,
+          46
+        ],
+        "flags": {},
+        "order": 6,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "upscale_model",
+            "type": "UPSCALE_MODEL",
+            "link": 2,
+            "config": {}
+          },
+          {
+            "name": "image",
+            "type": "IMAGE",
+            "link": 5,
+            "config": {}
+          }
+        ],
+        "outputs": [
+          {
+            "name": "IMAGE",
+            "type": "IMAGE",
+            "links": [
+              7
+            ],
+            "slot_index": 0
+          }
+        ],
+        "title": "ImageUpscaleWithModel",
+        "properties": {
+          "tags": []
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": 10,
+        "type": "ui/button",
+        "pos": [
+          2657,
+          1335
+        ],
+        "size": [
+          210,
+          78
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 2,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "clicked",
+            "type": -2,
+            "links": [
+              9
+            ],
+            "shape": 1,
+            "slot_index": 0
+          },
+          {
+            "name": "isClicked",
+            "type": "boolean",
+            "links": null
+          }
+        ],
+        "title": "UI.Button",
+        "properties": {
+          "tags": [],
+          "defaultValue": false,
+          "param": "bang"
+        },
+        "widgets_values": [
+          "false"
+        ],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": false,
+        "shownOutputProperties": {},
+        "saveUserState": true
+      },
+      {
+        "id": 8,
+        "type": "SaveImage",
+        "pos": [
+          2542,
+          1254
+        ],
+        "size": [
+          220,
+          46
+        ],
+        "flags": {},
+        "order": 7,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "images",
+            "type": "IMAGE",
+            "link": 7,
+            "config": {}
+          },
+          {
+            "name": "filename_prefix",
+            "type": "string",
+            "link": 11,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/text",
+            "serialize": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "onExecuted",
+            "type": -2,
+            "links": [
+              8
+            ],
+            "color_off": "rebeccapurple",
+            "color_on": "rebeccapurple",
+            "shape": 1,
+            "slot_index": 0
+          }
+        ],
+        "title": "SaveImage",
+        "properties": {
+          "tags": []
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": 6,
+        "type": "LoadImage",
+        "pos": [
+          2160,
+          1264
+        ],
+        "size": [
+          140,
+          46
+        ],
+        "flags": {},
+        "order": 5,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "image",
+            "type": "string",
+            "link": 4,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/combo",
+            "serialize": true,
+            "slot_index": 0
+          }
+        ],
+        "outputs": [
+          {
+            "name": "IMAGE",
+            "type": "IMAGE",
+            "links": [
+              5
+            ],
+            "slot_index": 0
+          },
+          {
+            "name": "MASK",
+            "type": "MASK",
+            "links": null
+          }
+        ],
+        "title": "LoadImage",
+        "properties": {
+          "tags": []
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": 9,
+        "type": "ui/text",
+        "pos": [
+          2445,
+          1300
+        ],
+        "size": [
+          210,
+          78
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 3,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "string",
+            "link": null
+          },
+          {
+            "name": "store",
+            "type": -1,
+            "link": null,
+            "shape": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "value",
+            "type": "string",
+            "links": [
+              11
+            ],
+            "slot_index": 0
+          },
+          {
+            "name": "changed",
+            "type": -2,
+            "links": null,
+            "shape": 1
+          }
+        ],
+        "title": "UI.Text",
+        "properties": {
+          "tags": [],
+          "defaultValue": "ComfyUI",
+          "multiline": false
+        },
+        "widgets_values": [
+          "ComfyUI"
+        ],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": "ComfyUI",
+        "shownOutputProperties": {},
+        "saveUserState": true
+      },
+      {
+        "id": 4,
+        "type": "ui/gallery",
+        "pos": [
+          2819,
+          1259
+        ],
+        "size": [
+          210,
+          166
+        ],
+        "flags": {},
+        "order": 8,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "images",
+            "type": "OUTPUT",
+            "link": null,
+            "slot_index": 0
+          },
+          {
+            "name": "store",
+            "type": -1,
+            "link": 8,
+            "color_off": "rebeccapurple",
+            "color_on": "rebeccapurple",
+            "shape": 1
+          },
+          {
+            "name": "clear",
+            "type": -1,
+            "link": 9,
+            "shape": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "selected_index",
+            "type": "number",
+            "links": null
+          },
+          {
+            "name": "width",
+            "type": "number",
+            "links": null
+          },
+          {
+            "name": "height",
+            "type": "number",
+            "links": null
+          },
+          {
+            "name": "filename",
+            "type": "string",
+            "links": null
+          }
+        ],
+        "title": "UI.Gallery",
+        "properties": {
+          "tags": [],
+          "defaultValue": null,
+          "index": 0,
+          "updateMode": "replace"
+        },
+        "widgets_values": [],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": [],
+        "shownOutputProperties": {},
+        "saveUserState": false
+      },
+      {
+        "id": 1,
+        "type": "UpscaleModelLoader",
+        "pos": [
+          2088,
+          1179
+        ],
+        "size": [
+          203.2,
+          26
+        ],
+        "flags": {},
+        "order": 4,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "model_name",
+            "type": "string",
+            "link": 1,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/combo",
+            "serialize": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "UPSCALE_MODEL",
+            "type": "UPSCALE_MODEL",
+            "links": [
+              2
+            ],
+            "slot_index": 0
+          }
+        ],
+        "title": "UpscaleModelLoader",
+        "properties": {
+          "tags": []
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      }
+    ],
+    "links": [
+      [
+        1,
+        2,
+        0,
+        1,
+        0,
+        "string"
+      ],
+      [
+        2,
+        1,
+        0,
+        5,
+        0,
+        "UPSCALE_MODEL"
+      ],
+      [
+        4,
+        3,
+        0,
+        6,
+        0,
+        "string"
+      ],
+      [
+        5,
+        6,
+        0,
+        5,
+        1,
+        "IMAGE"
+      ],
+      [
+        7,
+        5,
+        0,
+        8,
+        0,
+        "IMAGE"
+      ],
+      [
+        8,
+        8,
+        0,
+        4,
+        1,
+        -1
+      ],
+      [
+        9,
+        10,
+        0,
+        4,
+        2,
+        -1
+      ],
+      [
+        11,
+        9,
+        0,
+        8,
+        1,
+        "string"
+      ]
+    ],
+    "groups": [],
+    "config": {},
+    "extra": {},
+    "version": 10
+  },
+  "layout": {
+    "root": "0",
+    "allItems": {
+      "0": {
+        "dragItem": {
+          "type": "container",
+          "id": "0",
+          "attrs": {
+            "title": "",
+            "hidden": false,
+            "disabled": false,
+            "direction": "horizontal",
+            "classes": "",
+            "style": "",
+            "nodeDisabledState": "disabled",
+            "variant": "gallery",
+            "containerVariant": "block",
+            "openOnStartup": false,
+            "buttonVariant": "primary",
+            "buttonSize": "large",
+            "tags": []
+          }
+        },
+        "children": [
+          "1",
+          "2"
+        ]
+      },
+      "1": {
+        "dragItem": {
+          "type": "container",
+          "id": "1",
+          "attrs": {
+            "title": "",
+            "hidden": false,
+            "disabled": false,
+            "direction": "vertical",
+            "classes": "",
+            "style": "",
+            "nodeDisabledState": "disabled",
+            "variant": "gallery",
+            "containerVariant": "block",
+            "openOnStartup": false,
+            "buttonVariant": "primary",
+            "buttonSize": "large",
+            "tags": []
+          }
+        },
+        "children": [
+          "5",
+          "4"
+        ],
+        "parent": "0"
+      },
+      "2": {
+        "dragItem": {
+          "type": "container",
+          "id": "2",
+          "attrs": {
+            "title": "",
+            "hidden": false,
+            "disabled": false,
+            "direction": "vertical",
+            "classes": "",
+            "style": "",
+            "nodeDisabledState": "disabled",
+            "variant": "gallery",
+            "containerVariant": "block",
+            "openOnStartup": false,
+            "buttonVariant": "primary",
+            "buttonSize": "large",
+            "tags": []
+          }
+        },
+        "children": [
+          "6",
+          "12"
+        ],
+        "parent": "0"
+      },
+      "3": {
+        "dragItem": {
+          "type": "widget",
+          "id": "3",
+          "nodeId": 2,
+          "attrs": {
+            "title": "Model Name",
+            "hidden": false,
+            "disabled": false,
+            "direction": "vertical",
+            "classes": "",
+            "style": "",
+            "nodeDisabledState": "disabled",
+            "variant": "gallery",
+            "containerVariant": "block",
+            "openOnStartup": false,
+            "buttonVariant": "primary",
+            "buttonSize": "large",
+            "tags": []
+          }
+        },
+        "children": [],
+        "parent": "4"
+      },
+      "4": {
+        "dragItem": {
+          "type": "container",
+          "id": "4",
+          "attrs": {
+            "title": "UpscaleModelLoader",
+            "hidden": false,
+            "disabled": false,
+            "direction": "vertical",
+            "classes": "",
+            "style": "",
+            "nodeDisabledState": "disabled",
+            "variant": "gallery",
+            "containerVariant": "block",
+            "openOnStartup": false,
+            "buttonVariant": "primary",
+            "buttonSize": "large",
+            "tags": []
+          }
+        },
+        "children": [
+          "3"
+        ],
+        "parent": "1"
+      },
+      "5": {
+        "dragItem": {
+          "type": "widget",
+          "id": "5",
+          "nodeId": 3,
+          "attrs": {
+            "title": "Image",
+            "hidden": false,
+            "disabled": false,
+            "direction": "vertical",
+            "classes": "",
+            "style": "",
+            "nodeDisabledState": "disabled",
+            "variant": "gallery",
+            "containerVariant": "block",
+            "openOnStartup": false,
+            "buttonVariant": "primary",
+            "buttonSize": "large",
+            "tags": []
+          }
+        },
+        "children": [],
+        "parent": "1"
+      },
+      "6": {
+        "dragItem": {
+          "type": "widget",
+          "id": "6",
+          "nodeId": 4,
+          "attrs": {
+            "title": "Result",
+            "hidden": false,
+            "disabled": false,
+            "direction": "vertical",
+            "classes": "",
+            "style": "",
+            "nodeDisabledState": "disabled",
+            "variant": "gallery",
+            "containerVariant": "block",
+            "openOnStartup": false,
+            "buttonVariant": "primary",
+            "buttonSize": "large",
+            "tags": []
+          }
+        },
+        "children": [],
+        "parent": "2"
+      },
+      "9": {
+        "dragItem": {
+          "type": "widget",
+          "id": "9",
+          "nodeId": 9,
+          "attrs": {
+            "title": "Filename Prefix",
+            "hidden": false,
+            "disabled": false,
+            "direction": "vertical",
+            "classes": "",
+            "style": "",
+            "nodeDisabledState": "disabled",
+            "variant": "gallery",
+            "containerVariant": "block",
+            "openOnStartup": false,
+            "buttonVariant": "primary",
+            "buttonSize": "large",
+            "tags": []
+          }
+        },
+        "children": [],
+        "parent": "12"
+      },
+      "11": {
+        "dragItem": {
+          "type": "widget",
+          "id": "11",
+          "nodeId": 10,
+          "attrs": {
+            "title": "Clear Outputs",
+            "hidden": false,
+            "disabled": false,
+            "direction": "vertical",
+            "classes": "",
+            "style": "",
+            "nodeDisabledState": "disabled",
+            "variant": "gallery",
+            "containerVariant": "block",
+            "openOnStartup": false,
+            "buttonVariant": "secondary",
+            "buttonSize": "large",
+            "tags": []
+          }
+        },
+        "children": [],
+        "parent": "12"
+      },
+      "12": {
+        "dragItem": {
+          "type": "container",
+          "id": "12",
+          "attrs": {
+            "title": "",
+            "hidden": false,
+            "disabled": false,
+            "direction": "horizontal",
+            "classes": "",
+            "style": "",
+            "nodeDisabledState": "disabled",
+            "variant": "gallery",
+            "containerVariant": "block",
+            "openOnStartup": false,
+            "buttonVariant": "primary",
+            "buttonSize": "large",
+            "tags": []
+          }
+        },
+        "children": [
+          "9",
+          "11"
+        ],
+        "parent": "2"
+      }
+    },
+    "currentId": 15,
+    "attrs": {
+      "queuePromptButtonName": "Queue Prompt",
+      "queuePromptButtonRunWorkflow": true
+    }
+  },
+  "canvas": {
+    "offset": [
+      -1717.3714583644114,
+      -1017.6529225774816
+    ],
+    "scale": 1
+  }
+}
