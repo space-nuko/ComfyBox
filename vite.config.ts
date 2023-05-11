@@ -11,6 +11,7 @@ console.log("Production build: " + isProduction)
 
 export default defineConfig({
     clearScreen: false,
+    base: "./",
     plugins: [
         // FullReload([
         //     // "src/**/*.{js,ts,scss,svelte}"
