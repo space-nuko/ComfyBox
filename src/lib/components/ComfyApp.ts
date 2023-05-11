@@ -875,8 +875,8 @@ export default class ComfyApp {
             comboNode.doAutoConfig(inputSlot, { includeProperties: new Set(["values"]), setWidgetTitle: false })
 
             comboNode.formatValues(rawValues)
-            if (!inputSlot.config.values?.includes(get(comboNode.value))) {
-                comboNode.setValue(inputSlot.config.defaultValue || inputSlot.config.values[0])
+            if (!rawValues?.includes(get(comboNode.value))) {
+                comboNode.setValue(rawValues[0])
             }
         }
     }

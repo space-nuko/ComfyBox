@@ -2,8 +2,8 @@
   "createdBy": "ComfyBox",
   "version": 1,
   "workflow": {
-    "last_node_id": 459,
-    "last_link_id": 700,
+    "last_node_id": 465,
+    "last_link_id": 719,
     "nodes": [
       {
         "id": 35,
@@ -299,11 +299,11 @@
           "hidden": false
         },
         "widgets_values": [
-          "karras"
+          "normal"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "karras",
+        "comfyValue": "normal",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -464,11 +464,11 @@
           "hidden": false
         },
         "widgets_values": [
-          "dpmpp_2s_ancestral"
+          "euler"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "dpmpp_2s_ancestral",
+        "comfyValue": "euler",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -648,11 +648,11 @@
           "precision": 0
         },
         "widgets_values": [
-          "20.000"
+          "26.000"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": 20,
+        "comfyValue": 26,
         "shownOutputProperties": {
           "min": {
             "type": "number",
@@ -687,14 +687,14 @@
         "flags": {
           "collapsed": true
         },
-        "order": 241,
+        "order": 245,
         "mode": 0,
         "inputs": [
           {
             "name": "value",
             "type": 0,
             "link": 87,
-            "label": "1.000"
+            "label": "5.000"
           }
         ],
         "outputs": [],
@@ -781,7 +781,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 121,
+        "order": 123,
         "mode": 0,
         "inputs": [
           {
@@ -971,7 +971,7 @@
           66
         ],
         "flags": {},
-        "order": 240,
+        "order": 244,
         "mode": 0,
         "inputs": [
           {
@@ -1071,7 +1071,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 78,
+        "order": 79,
         "mode": 0,
         "inputs": [
           {
@@ -1117,7 +1117,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 75,
+        "order": 76,
         "mode": 0,
         "inputs": [
           {
@@ -1202,7 +1202,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 133,
+        "order": 135,
         "mode": 0,
         "inputs": [
           {
@@ -1240,7 +1240,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 131,
+        "order": 133,
         "mode": 0,
         "inputs": [
           {
@@ -1297,7 +1297,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 134,
+        "order": 136,
         "mode": 0,
         "inputs": [
           {
@@ -1335,7 +1335,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 132,
+        "order": 134,
         "mode": 0,
         "inputs": [
           {
@@ -1392,7 +1392,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 135,
+        "order": 137,
         "mode": 0,
         "inputs": [
           {
@@ -1431,7 +1431,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 136,
+        "order": 138,
         "mode": 0,
         "inputs": [
           {
@@ -1616,7 +1616,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 76,
+        "order": 77,
         "mode": 0,
         "inputs": [
           {
@@ -1661,8 +1661,8 @@
         "id": 152,
         "type": "basic/integer",
         "pos": [
-          -1182.3021221452946,
-          -604.6813949850745
+          -1527.9403550359198,
+          -586.9563245358555
         ],
         "size": [
           210,
@@ -1974,7 +1974,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 87,
+        "order": 88,
         "mode": 0,
         "inputs": [
           {
@@ -2136,7 +2136,7 @@
           66
         ],
         "flags": {},
-        "order": 193,
+        "order": 195,
         "mode": 0,
         "inputs": [
           {
@@ -2196,7 +2196,7 @@
           106
         ],
         "flags": {},
-        "order": 246,
+        "order": 250,
         "mode": 0,
         "inputs": [
           {
@@ -2274,7 +2274,7 @@
           46
         ],
         "flags": {},
-        "order": 247,
+        "order": 251,
         "mode": 0,
         "inputs": [
           {
@@ -2322,7 +2322,7 @@
           46
         ],
         "flags": {},
-        "order": 123,
+        "order": 125,
         "mode": 0,
         "inputs": [
           {
@@ -2372,7 +2372,7 @@
           46
         ],
         "flags": {},
-        "order": 118,
+        "order": 120,
         "mode": 0,
         "inputs": [
           {
@@ -2420,7 +2420,7 @@
           46
         ],
         "flags": {},
-        "order": 220,
+        "order": 222,
         "mode": 0,
         "inputs": [
           {
@@ -2476,7 +2476,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 77,
+        "order": 78,
         "mode": 0,
         "inputs": [
           {
@@ -2531,7 +2531,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 99,
+        "order": 101,
         "mode": 0,
         "inputs": [
           {
@@ -2721,7 +2721,7 @@
           122
         ],
         "flags": {},
-        "order": 100,
+        "order": 102,
         "mode": 0,
         "inputs": [
           {
@@ -2778,7 +2778,7 @@
           26
         ],
         "flags": {},
-        "order": 79,
+        "order": 80,
         "mode": 0,
         "inputs": [
           {
@@ -2827,7 +2827,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 98,
+        "order": 100,
         "mode": 0,
         "inputs": [
           {
@@ -2881,7 +2881,7 @@
           46
         ],
         "flags": {},
-        "order": 142,
+        "order": 144,
         "mode": 2,
         "inputs": [
           {
@@ -2930,7 +2930,7 @@
           126
         ],
         "flags": {},
-        "order": 239,
+        "order": 243,
         "mode": 0,
         "inputs": [
           {
@@ -2994,7 +2994,7 @@
         "title": "Comfy.ValueControl",
         "properties": {
           "tags": [],
-          "value": 762517310285296,
+          "value": 149773913879886,
           "action": "randomize",
           "min": 0,
           "max": 18446744073709552000,
@@ -3016,7 +3016,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 141,
+        "order": 143,
         "mode": 0,
         "inputs": [
           {
@@ -3091,11 +3091,11 @@
           "hidden": false
         },
         "widgets_values": [
-          "0.000"
+          "149773913879886.000"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": 0,
+        "comfyValue": 149773913879886,
         "shownOutputProperties": {
           "min": {
             "type": "number",
@@ -3128,7 +3128,7 @@
           46
         ],
         "flags": {},
-        "order": 140,
+        "order": 142,
         "mode": 2,
         "inputs": [
           {
@@ -3181,7 +3181,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 80,
+        "order": 81,
         "mode": 0,
         "inputs": [
           {
@@ -3203,7 +3203,7 @@
         "outputs": [
           {
             "name": "",
-            "type": "*",
+            "type": "number",
             "links": [
               299
             ],
@@ -3236,7 +3236,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 144,
+        "order": 146,
         "mode": 0,
         "inputs": [
           {
@@ -3352,7 +3352,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 81,
+        "order": 82,
         "mode": 0,
         "inputs": [
           {
@@ -3488,7 +3488,7 @@
           66
         ],
         "flags": {},
-        "order": 145,
+        "order": 147,
         "mode": 0,
         "inputs": [
           {
@@ -3602,7 +3602,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 209,
+        "order": 211,
         "mode": 0,
         "inputs": [
           {
@@ -3704,7 +3704,7 @@
           106
         ],
         "flags": {},
-        "order": 143,
+        "order": 145,
         "mode": 2,
         "inputs": [
           {
@@ -3785,7 +3785,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 200,
+        "order": 202,
         "mode": 0,
         "inputs": [
           {
@@ -3890,7 +3890,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 151,
+        "order": 153,
         "mode": 2,
         "inputs": [
           {
@@ -3928,11 +3928,11 @@
           "multiline": false
         },
         "widgets_values": [
-          "2048"
+          "1740"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "2048",
+        "comfyValue": "1740",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -3950,7 +3950,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 152,
+        "order": 154,
         "mode": 2,
         "inputs": [
           {
@@ -3988,11 +3988,11 @@
           "multiline": false
         },
         "widgets_values": [
-          "2048"
+          "1740"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "2048",
+        "comfyValue": "1740",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -4010,7 +4010,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 154,
+        "order": 156,
         "mode": 2,
         "inputs": [
           {
@@ -4051,7 +4051,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 153,
+        "order": 155,
         "mode": 2,
         "inputs": [
           {
@@ -4092,7 +4092,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 156,
+        "order": 158,
         "mode": 2,
         "inputs": [
           {
@@ -4134,7 +4134,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 130,
+        "order": 132,
         "mode": 0,
         "inputs": [
           {
@@ -4180,7 +4180,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 129,
+        "order": 131,
         "mode": 0,
         "inputs": [
           {
@@ -4226,7 +4226,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 125,
+        "order": 127,
         "mode": 0,
         "inputs": [
           {
@@ -4255,7 +4255,7 @@
           66
         ],
         "flags": {},
-        "order": 148,
+        "order": 150,
         "mode": 2,
         "inputs": [
           {
@@ -4318,7 +4318,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 146,
+        "order": 148,
         "mode": 2,
         "inputs": [
           {
@@ -4386,11 +4386,11 @@
           "hidden": false
         },
         "widgets_values": [
-          "832.000"
+          "512.000"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": 832,
+        "comfyValue": 512,
         "shownOutputProperties": {
           "min": {
             "type": "number",
@@ -4425,7 +4425,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 147,
+        "order": 149,
         "mode": 2,
         "inputs": [
           {
@@ -4492,11 +4492,11 @@
           "hidden": false
         },
         "widgets_values": [
-          "704.000"
+          "512.000"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": 704,
+        "comfyValue": 512,
         "shownOutputProperties": {
           "min": {
             "type": "number",
@@ -4531,7 +4531,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 155,
+        "order": 157,
         "mode": 2,
         "inputs": [
           {
@@ -4638,11 +4638,11 @@
           "precision": 0
         },
         "widgets_values": [
-          "2.000"
+          "1.700"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": 2,
+        "comfyValue": 1.7,
         "shownOutputProperties": {
           "min": {
             "type": "number",
@@ -4675,7 +4675,7 @@
           122
         ],
         "flags": {},
-        "order": 157,
+        "order": 159,
         "mode": 0,
         "inputs": [
           {
@@ -4697,7 +4697,7 @@
         "outputs": [
           {
             "name": "",
-            "type": "*",
+            "type": "number",
             "links": [
               353
             ],
@@ -4725,7 +4725,7 @@
           122
         ],
         "flags": {},
-        "order": 158,
+        "order": 160,
         "mode": 0,
         "inputs": [
           {
@@ -4747,7 +4747,7 @@
         "outputs": [
           {
             "name": "",
-            "type": "*",
+            "type": "number",
             "links": [
               354
             ],
@@ -4859,7 +4859,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 162,
+        "order": 164,
         "mode": 0,
         "inputs": [
           {
@@ -4902,7 +4902,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 164,
+        "order": 166,
         "mode": 0,
         "inputs": [
           {
@@ -4973,7 +4973,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 82,
+        "order": 83,
         "mode": 0,
         "inputs": [
           {
@@ -5003,118 +5003,6 @@
         }
       },
       {
-        "id": 16,
-        "type": "KSampler",
-        "pos": [
-          188,
-          150
-        ],
-        "size": [
-          161.2,
-          206
-        ],
-        "flags": {},
-        "order": 139,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "model",
-            "type": "MODEL",
-            "link": 601,
-            "color_off": "orange",
-            "color_on": "orange",
-            "config": {}
-          },
-          {
-            "name": "seed",
-            "type": "number",
-            "link": 80,
-            "config": {},
-            "serialize": true
-          },
-          {
-            "name": "steps",
-            "type": "number",
-            "link": 17,
-            "config": {},
-            "serialize": true
-          },
-          {
-            "name": "cfg",
-            "type": "number",
-            "link": 18,
-            "config": {},
-            "serialize": true
-          },
-          {
-            "name": "sampler_name",
-            "type": "string",
-            "link": 19,
-            "config": {},
-            "serialize": true
-          },
-          {
-            "name": "scheduler",
-            "type": "string",
-            "link": 20,
-            "config": {},
-            "serialize": true
-          },
-          {
-            "name": "positive",
-            "type": "CONDITIONING",
-            "link": 664,
-            "color_off": "orange",
-            "color_on": "orange",
-            "config": {}
-          },
-          {
-            "name": "negative",
-            "type": "CONDITIONING",
-            "link": 663,
-            "color_off": "orange",
-            "color_on": "orange",
-            "config": {}
-          },
-          {
-            "name": "latent_image",
-            "type": "LATENT",
-            "link": 288,
-            "color_off": "orange",
-            "color_on": "orange",
-            "config": {}
-          },
-          {
-            "name": "denoise",
-            "type": "number",
-            "link": 299,
-            "config": {},
-            "serialize": true
-          }
-        ],
-        "outputs": [
-          {
-            "name": "LATENT",
-            "type": "LATENT",
-            "links": [
-              40
-            ],
-            "color_off": "orange",
-            "color_on": "orange",
-            "slot_index": 0
-          }
-        ],
-        "title": "KSampler",
-        "properties": {
-          "tags": [
-            "txt2img"
-          ]
-        },
-        "color": "#432",
-        "bgColor": "#653",
-        "saveUserState": true
-      },
-      {
         "id": 110,
         "type": "actions/execute_subgraph",
         "pos": [
@@ -5126,7 +5014,7 @@
           78
         ],
         "flags": {},
-        "order": 122,
+        "order": 124,
         "mode": 0,
         "inputs": [
           {
@@ -5195,7 +5083,7 @@
           102
         ],
         "flags": {},
-        "order": 117,
+        "order": 119,
         "mode": 0,
         "inputs": [
           {
@@ -5349,7 +5237,7 @@
           98
         ],
         "flags": {},
-        "order": 85,
+        "order": 86,
         "mode": 0,
         "inputs": [
           {
@@ -5398,7 +5286,7 @@
           66
         ],
         "flags": {},
-        "order": 104,
+        "order": 106,
         "mode": 0,
         "inputs": [
           {
@@ -5448,7 +5336,7 @@
           150
         ],
         "flags": {},
-        "order": 83,
+        "order": 84,
         "mode": 0,
         "inputs": [
           {
@@ -5504,7 +5392,7 @@
         "flags": {
           "collapsed": false
         },
-        "order": 84,
+        "order": 85,
         "mode": 0,
         "inputs": [
           {
@@ -5558,7 +5446,7 @@
           102
         ],
         "flags": {},
-        "order": 101,
+        "order": 103,
         "mode": 0,
         "inputs": [
           {
@@ -5604,7 +5492,7 @@
           102
         ],
         "flags": {},
-        "order": 103,
+        "order": 105,
         "mode": 0,
         "inputs": [
           {
@@ -5697,7 +5585,7 @@
         "flags": {
           "collapsed": false
         },
-        "order": 115,
+        "order": 117,
         "mode": 0,
         "inputs": [
           {
@@ -5755,7 +5643,7 @@
         "flags": {
           "collapsed": false
         },
-        "order": 111,
+        "order": 113,
         "mode": 0,
         "inputs": [
           {
@@ -5783,7 +5671,7 @@
           78
         ],
         "flags": {},
-        "order": 102,
+        "order": 104,
         "mode": 0,
         "inputs": [
           {
@@ -5832,7 +5720,7 @@
         "flags": {
           "collapsed": false
         },
-        "order": 110,
+        "order": 112,
         "mode": 2,
         "inputs": [
           {
@@ -5987,7 +5875,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 86,
+        "order": 87,
         "mode": 0,
         "inputs": [
           {
@@ -6045,7 +5933,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 165,
+        "order": 167,
         "mode": 0,
         "inputs": [
           {
@@ -6117,7 +6005,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 127,
+        "order": 129,
         "mode": 0,
         "inputs": [
           {
@@ -6156,7 +6044,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 242,
+        "order": 246,
         "mode": 0,
         "inputs": [
           {
@@ -6195,7 +6083,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 167,
+        "order": 169,
         "mode": 0,
         "inputs": [
           {
@@ -6234,7 +6122,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 160,
+        "order": 162,
         "mode": 0,
         "inputs": [
           {
@@ -6370,7 +6258,7 @@
           46
         ],
         "flags": {},
-        "order": 138,
+        "order": 140,
         "mode": 0,
         "inputs": [
           {
@@ -6427,7 +6315,7 @@
           46
         ],
         "flags": {},
-        "order": 168,
+        "order": 170,
         "mode": 0,
         "inputs": [
           {
@@ -6462,7 +6350,7 @@
           46
         ],
         "flags": {},
-        "order": 137,
+        "order": 139,
         "mode": 0,
         "inputs": [
           {
@@ -6519,7 +6407,7 @@
           46
         ],
         "flags": {},
-        "order": 169,
+        "order": 171,
         "mode": 0,
         "inputs": [
           {
@@ -6607,8 +6495,8 @@
         "id": 80,
         "type": "ui/combo",
         "pos": [
-          -852.9751221452975,
-          -565.4453949850752
+          -1198.613355035923,
+          -547.7203245358562
         ],
         "size": [
           210,
@@ -6618,7 +6506,7 @@
           "collapsed": true
         },
         "order": 44,
-        "mode": 0,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -6649,7 +6537,9 @@
         ],
         "title": "UI.Combo",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": null,
           "values": [],
           "convertValueToLabelCode": "return value.split('\\\\').pop().split('/').pop();"
@@ -6665,8 +6555,8 @@
         "id": 150,
         "type": "ui/button",
         "pos": [
-          -1236.265122145295,
-          -579.6653949850739
+          -1581.9033550359202,
+          -561.940324535855
         ],
         "size": [
           210,
@@ -6676,7 +6566,7 @@
           "collapsed": true
         },
         "order": 45,
-        "mode": 0,
+        "mode": 2,
         "inputs": [],
         "outputs": [
           {
@@ -6696,7 +6586,9 @@
         ],
         "title": "UI.Button",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": false,
           "param": "bang"
         },
@@ -6713,8 +6605,8 @@
         "id": 81,
         "type": "ui/slider",
         "pos": [
-          -835.41064453125,
-          -547.365478515625
+          -1181.0488774218754,
+          -529.640408066406
         ],
         "size": [
           210,
@@ -6723,8 +6615,8 @@
         "flags": {
           "collapsed": true
         },
-        "order": 244,
-        "mode": 0,
+        "order": 248,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -6778,7 +6670,9 @@
         ],
         "title": "UI.Slider",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": 1,
           "min": -1,
           "max": 2,
@@ -6815,8 +6709,8 @@
         "id": 82,
         "type": "ui/slider",
         "pos": [
-          -838.41064453125,
-          -526.365478515625
+          -1184.0488774218754,
+          -508.64040806640605
         ],
         "size": [
           210,
@@ -6825,8 +6719,8 @@
         "flags": {
           "collapsed": true
         },
-        "order": 245,
-        "mode": 0,
+        "order": 249,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -6880,7 +6774,9 @@
         ],
         "title": "UI.Slider",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": 1,
           "min": -1,
           "max": 2,
@@ -6917,8 +6813,8 @@
         "id": 318,
         "type": "events/sequence",
         "pos": [
-          -964.41064453125,
-          -546.365478515625
+          -1310.0488774218754,
+          -528.640408066406
         ],
         "size": [
           140,
@@ -6927,7 +6823,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 173,
+        "order": 175,
         "mode": 0,
         "inputs": [
           {
@@ -6975,8 +6871,8 @@
         "id": 316,
         "type": "events/sequence",
         "pos": [
-          -962.41064453125,
-          -519.365478515625
+          -1308.0488774218754,
+          -501.64040806640605
         ],
         "size": [
           140,
@@ -6985,7 +6881,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 171,
+        "order": 173,
         "mode": 0,
         "inputs": [
           {
@@ -7033,8 +6929,8 @@
         "id": 319,
         "type": "events/branch",
         "pos": [
-          -1267.4606445312504,
-          -512.8354785156248
+          -1613.0988774218756,
+          -495.11040806640585
         ],
         "size": [
           140,
@@ -7043,7 +6939,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 174,
+        "order": 176,
         "mode": 0,
         "inputs": [
           {
@@ -7084,8 +6980,8 @@
         "id": 315,
         "type": "events/branch",
         "pos": [
-          -1266.41064453125,
-          -540.365478515625
+          -1612.0488774218752,
+          -522.640408066406
         ],
         "size": [
           140,
@@ -7094,7 +6990,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 170,
+        "order": 172,
         "mode": 0,
         "inputs": [
           {
@@ -7134,8 +7030,8 @@
         "id": 317,
         "type": "events/no_change",
         "pos": [
-          -1157.41064453125,
-          -545.365478515625
+          -1503.0488774218752,
+          -527.640408066406
         ],
         "size": [
           159.6,
@@ -7144,7 +7040,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 172,
+        "order": 174,
         "mode": 0,
         "inputs": [
           {
@@ -7176,8 +7072,8 @@
         "id": 151,
         "type": "actions/copy",
         "pos": [
-          -1116.41064453125,
-          -594.365478515625
+          -1462.0488774218752,
+          -576.640408066406
         ],
         "size": [
           210,
@@ -7186,7 +7082,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 88,
+        "order": 89,
         "mode": 0,
         "inputs": [
           {
@@ -7224,8 +7120,8 @@
         "id": 320,
         "type": "events/no_change",
         "pos": [
-          -1155.41064453125,
-          -520.365478515625
+          -1501.0488774218752,
+          -502.64040806640605
         ],
         "size": [
           159.6,
@@ -7234,7 +7130,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 176,
+        "order": 178,
         "mode": 0,
         "inputs": [
           {
@@ -7266,8 +7162,8 @@
         "id": 336,
         "type": "ui/combo",
         "pos": [
-          -854.0548037537221,
-          -421.2182846433528
+          -1199.6930366443476,
+          -403.49321419413394
         ],
         "size": [
           210,
@@ -7277,7 +7173,7 @@
           "collapsed": true
         },
         "order": 46,
-        "mode": 0,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -7308,7 +7204,9 @@
         ],
         "title": "UI.Combo",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": null,
           "values": [],
           "convertValueToLabelCode": "return value.split('\\\\').pop().split('/').pop();"
@@ -7324,8 +7222,8 @@
         "id": 337,
         "type": "ui/slider",
         "pos": [
-          -836.4903261396746,
-          -403.1383681739026
+          -1182.1285590303,
+          -385.4132977246838
         ],
         "size": [
           210,
@@ -7334,8 +7232,8 @@
         "flags": {
           "collapsed": true
         },
-        "order": 178,
-        "mode": 0,
+        "order": 180,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -7389,7 +7287,9 @@
         ],
         "title": "UI.Slider",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": 1,
           "min": -1,
           "max": 2,
@@ -7426,8 +7326,8 @@
         "id": 338,
         "type": "ui/slider",
         "pos": [
-          -839.4903261396746,
-          -382.13836817390256
+          -1185.1285590303,
+          -364.41329772468373
         ],
         "size": [
           210,
@@ -7436,8 +7336,8 @@
         "flags": {
           "collapsed": true
         },
-        "order": 179,
-        "mode": 0,
+        "order": 181,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -7491,7 +7391,9 @@
         ],
         "title": "UI.Slider",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": 1,
           "min": -1,
           "max": 2,
@@ -7528,8 +7430,8 @@
         "id": 339,
         "type": "ui/button",
         "pos": [
-          -1237.3448037537198,
-          -435.43828464335155
+          -1582.983036644345,
+          -417.7132141941327
         ],
         "size": [
           210,
@@ -7539,7 +7441,7 @@
           "collapsed": true
         },
         "order": 47,
-        "mode": 0,
+        "mode": 2,
         "inputs": [],
         "outputs": [
           {
@@ -7559,7 +7461,9 @@
         ],
         "title": "UI.Button",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": false,
           "param": "bang"
         },
@@ -7576,8 +7480,8 @@
         "id": 340,
         "type": "actions/copy",
         "pos": [
-          -1117.490326139675,
-          -450.1383681739026
+          -1463.1285590303003,
+          -432.4132977246838
         ],
         "size": [
           210,
@@ -7586,7 +7490,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 89,
+        "order": 90,
         "mode": 0,
         "inputs": [
           {
@@ -7624,8 +7528,8 @@
         "id": 341,
         "type": "basic/integer",
         "pos": [
-          -1183.3818037537194,
-          -460.4542846433521
+          -1529.0200366443446,
+          -442.72921419413325
         ],
         "size": [
           210,
@@ -7658,8 +7562,8 @@
         "id": 344,
         "type": "events/sequence",
         "pos": [
-          -963.4903261396746,
-          -375.13836817390256
+          -1309.1285590303,
+          -357.41329772468373
         ],
         "size": [
           140,
@@ -7668,7 +7572,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 182,
+        "order": 184,
         "mode": 0,
         "inputs": [
           {
@@ -7716,8 +7620,8 @@
         "id": 345,
         "type": "events/no_change",
         "pos": [
-          -1158.4903261396748,
-          -401.1383681739026
+          -1504.1285590303,
+          -383.4132977246838
         ],
         "size": [
           159.6,
@@ -7726,7 +7630,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 183,
+        "order": 185,
         "mode": 0,
         "inputs": [
           {
@@ -7758,8 +7662,8 @@
         "id": 346,
         "type": "events/sequence",
         "pos": [
-          -965.4903261396746,
-          -402.1383681739026
+          -1311.1285590303,
+          -384.4132977246838
         ],
         "size": [
           140,
@@ -7768,7 +7672,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 184,
+        "order": 186,
         "mode": 0,
         "inputs": [
           {
@@ -7816,8 +7720,8 @@
         "id": 348,
         "type": "events/no_change",
         "pos": [
-          -1156.4903261396748,
-          -376.13836817390256
+          -1502.1285590303,
+          -358.41329772468373
         ],
         "size": [
           159.6,
@@ -7826,7 +7730,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 186,
+        "order": 188,
         "mode": 0,
         "inputs": [
           {
@@ -7858,8 +7762,8 @@
         "id": 350,
         "type": "ui/combo",
         "pos": [
-          -858.134485362147,
-          -281.0255907710794
+          -1203.7727182527724,
+          -263.3005203218606
         ],
         "size": [
           210,
@@ -7869,7 +7773,7 @@
           "collapsed": true
         },
         "order": 49,
-        "mode": 0,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -7900,7 +7804,9 @@
         ],
         "title": "UI.Combo",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": null,
           "values": [],
           "convertValueToLabelCode": "return value.split('\\\\').pop().split('/').pop();"
@@ -7916,8 +7822,8 @@
         "id": 351,
         "type": "ui/slider",
         "pos": [
-          -840.5700077480994,
-          -262.9456743016291
+          -1186.2082406387249,
+          -245.22060385241033
         ],
         "size": [
           210,
@@ -7926,8 +7832,8 @@
         "flags": {
           "collapsed": true
         },
-        "order": 188,
-        "mode": 0,
+        "order": 190,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -7981,7 +7887,9 @@
         ],
         "title": "UI.Slider",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": 1,
           "min": -1,
           "max": 2,
@@ -8018,8 +7926,8 @@
         "id": 352,
         "type": "ui/slider",
         "pos": [
-          -843.5700077480994,
-          -241.94567430162894
+          -1189.2082406387249,
+          -224.22060385241028
         ],
         "size": [
           210,
@@ -8028,8 +7936,8 @@
         "flags": {
           "collapsed": true
         },
-        "order": 189,
-        "mode": 0,
+        "order": 191,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -8083,7 +7991,9 @@
         ],
         "title": "UI.Slider",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": 1,
           "min": -1,
           "max": 2,
@@ -8120,8 +8030,8 @@
         "id": 353,
         "type": "ui/button",
         "pos": [
-          -1241.424485362144,
-          -295.2455907710783
+          -1587.0627182527692,
+          -277.52052032185946
         ],
         "size": [
           210,
@@ -8131,7 +8041,7 @@
           "collapsed": true
         },
         "order": 50,
-        "mode": 0,
+        "mode": 2,
         "inputs": [],
         "outputs": [
           {
@@ -8151,7 +8061,9 @@
         ],
         "title": "UI.Button",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": false,
           "param": "bang"
         },
@@ -8168,8 +8080,8 @@
         "id": 354,
         "type": "actions/copy",
         "pos": [
-          -1121.5700077480994,
-          -309.94567430162937
+          -1467.2082406387246,
+          -292.22060385241053
         ],
         "size": [
           210,
@@ -8178,7 +8090,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 90,
+        "order": 91,
         "mode": 0,
         "inputs": [
           {
@@ -8216,8 +8128,8 @@
         "id": 355,
         "type": "basic/integer",
         "pos": [
-          -1187.4614853621438,
-          -320.26159077107883
+          -1533.099718252769,
+          -302.53652032186
         ],
         "size": [
           210,
@@ -8250,8 +8162,8 @@
         "id": 358,
         "type": "events/sequence",
         "pos": [
-          -967.5700077480994,
-          -234.94567430162894
+          -1313.2082406387249,
+          -217.22060385241028
         ],
         "size": [
           140,
@@ -8260,7 +8172,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 191,
+        "order": 193,
         "mode": 0,
         "inputs": [
           {
@@ -8308,8 +8220,8 @@
         "id": 359,
         "type": "events/no_change",
         "pos": [
-          -1162.5700077480992,
-          -260.945674301629
+          -1508.2082406387244,
+          -243.22060385241028
         ],
         "size": [
           159.6,
@@ -8318,7 +8230,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 192,
+        "order": 194,
         "mode": 0,
         "inputs": [
           {
@@ -8350,8 +8262,8 @@
         "id": 360,
         "type": "events/sequence",
         "pos": [
-          -969.5700077480994,
-          -261.9456743016291
+          -1315.2082406387249,
+          -244.22060385241033
         ],
         "size": [
           140,
@@ -8360,7 +8272,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 194,
+        "order": 196,
         "mode": 0,
         "inputs": [
           {
@@ -8408,8 +8320,8 @@
         "id": 362,
         "type": "events/no_change",
         "pos": [
-          -1160.5700077480992,
-          -235.94567430162894
+          -1506.2082406387244,
+          -218.22060385241028
         ],
         "size": [
           159.6,
@@ -8418,7 +8330,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 196,
+        "order": 198,
         "mode": 0,
         "inputs": [
           {
@@ -8450,8 +8362,8 @@
         "id": 364,
         "type": "ui/combo",
         "pos": [
-          -866.9344853621461,
-          -143.5255907710794
+          -1212.5727182527717,
+          -125.80052032186072
         ],
         "size": [
           210,
@@ -8461,7 +8373,7 @@
           "collapsed": true
         },
         "order": 52,
-        "mode": 0,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -8492,7 +8404,9 @@
         ],
         "title": "UI.Combo",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": null,
           "values": [],
           "convertValueToLabelCode": "return value.split('\\\\').pop().split('/').pop();"
@@ -8508,8 +8422,8 @@
         "id": 365,
         "type": "ui/slider",
         "pos": [
-          -849.3700077480986,
-          -125.44567430162923
+          -1195.0082406387241,
+          -107.72060385241052
         ],
         "size": [
           210,
@@ -8518,8 +8432,8 @@
         "flags": {
           "collapsed": true
         },
-        "order": 198,
-        "mode": 0,
+        "order": 200,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -8573,7 +8487,9 @@
         ],
         "title": "UI.Slider",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": 1,
           "min": -1,
           "max": 2,
@@ -8610,8 +8526,8 @@
         "id": 366,
         "type": "ui/slider",
         "pos": [
-          -852.3700077480986,
-          -104.44567430162917
+          -1198.0082406387241,
+          -86.72060385241048
         ],
         "size": [
           210,
@@ -8620,8 +8536,8 @@
         "flags": {
           "collapsed": true
         },
-        "order": 199,
-        "mode": 0,
+        "order": 201,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -8675,7 +8591,9 @@
         ],
         "title": "UI.Slider",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": 1,
           "min": -1,
           "max": 2,
@@ -8712,8 +8630,8 @@
         "id": 367,
         "type": "ui/button",
         "pos": [
-          -1250.2244853621448,
-          -157.74559077107818
+          -1595.86271825277,
+          -140.0205203218595
         ],
         "size": [
           210,
@@ -8723,7 +8641,7 @@
           "collapsed": true
         },
         "order": 53,
-        "mode": 0,
+        "mode": 2,
         "inputs": [],
         "outputs": [
           {
@@ -8743,7 +8661,9 @@
         ],
         "title": "UI.Button",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": false,
           "param": "bang"
         },
@@ -8760,8 +8680,8 @@
         "id": 368,
         "type": "actions/copy",
         "pos": [
-          -1130.3700077481,
-          -172.44567430162925
+          -1476.0082406387253,
+          -154.72060385241056
         ],
         "size": [
           210,
@@ -8770,7 +8690,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 91,
+        "order": 92,
         "mode": 0,
         "inputs": [
           {
@@ -8808,8 +8728,8 @@
         "id": 369,
         "type": "basic/integer",
         "pos": [
-          -1196.2614853621444,
-          -182.76159077107872
+          -1541.8997182527696,
+          -165.03652032186002
         ],
         "size": [
           210,
@@ -8842,8 +8762,8 @@
         "id": 372,
         "type": "events/sequence",
         "pos": [
-          -976.3700077480986,
-          -97.44567430162918
+          -1322.008240638724,
+          -79.72060385241049
         ],
         "size": [
           140,
@@ -8852,7 +8772,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 202,
+        "order": 204,
         "mode": 0,
         "inputs": [
           {
@@ -8900,8 +8820,8 @@
         "id": 373,
         "type": "events/no_change",
         "pos": [
-          -1171.3700077480999,
-          -123.44567430162923
+          -1517.008240638725,
+          -105.72060385241055
         ],
         "size": [
           159.6,
@@ -8910,7 +8830,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 203,
+        "order": 205,
         "mode": 0,
         "inputs": [
           {
@@ -8942,8 +8862,8 @@
         "id": 374,
         "type": "events/sequence",
         "pos": [
-          -978.3700077480986,
-          -124.44567430162923
+          -1324.008240638724,
+          -106.72060385241055
         ],
         "size": [
           140,
@@ -8952,7 +8872,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 204,
+        "order": 206,
         "mode": 0,
         "inputs": [
           {
@@ -9000,8 +8920,8 @@
         "id": 376,
         "type": "events/no_change",
         "pos": [
-          -1169.3700077480999,
-          -98.44567430162918
+          -1515.008240638725,
+          -80.72060385241049
         ],
         "size": [
           159.6,
@@ -9010,7 +8930,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 206,
+        "order": 208,
         "mode": 0,
         "inputs": [
           {
@@ -9042,8 +8962,8 @@
         "id": 378,
         "type": "ui/combo",
         "pos": [
-          -870.2344853621465,
-          -0.5255907710793659
+          -1215.872718252772,
+          17.19947967813936
         ],
         "size": [
           210,
@@ -9100,8 +9020,8 @@
         "id": 379,
         "type": "ui/slider",
         "pos": [
-          -852.670007748099,
-          17.554325698370793
+          -1198.3082406387246,
+          35.279396147589516
         ],
         "size": [
           210,
@@ -9110,8 +9030,8 @@
         "flags": {
           "collapsed": true
         },
-        "order": 208,
-        "mode": 0,
+        "order": 210,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -9165,7 +9085,9 @@
         ],
         "title": "UI.Slider",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": 1,
           "min": -1,
           "max": 2,
@@ -9202,8 +9124,8 @@
         "id": 380,
         "type": "ui/slider",
         "pos": [
-          -855.670007748099,
-          38.55432569837085
+          -1201.3082406387246,
+          56.27939614758959
         ],
         "size": [
           210,
@@ -9212,8 +9134,8 @@
         "flags": {
           "collapsed": true
         },
-        "order": 210,
-        "mode": 0,
+        "order": 212,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -9267,7 +9189,9 @@
         ],
         "title": "UI.Slider",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": 1,
           "min": -1,
           "max": 2,
@@ -9304,8 +9228,8 @@
         "id": 381,
         "type": "ui/button",
         "pos": [
-          -1253.524485362144,
-          -14.745590771078136
+          -1599.1627182527693,
+          2.9794796781405886
         ],
         "size": [
           210,
@@ -9315,7 +9239,7 @@
           "collapsed": true
         },
         "order": 56,
-        "mode": 0,
+        "mode": 2,
         "inputs": [],
         "outputs": [
           {
@@ -9335,7 +9259,9 @@
         ],
         "title": "UI.Button",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": false,
           "param": "bang"
         },
@@ -9352,8 +9278,8 @@
         "id": 382,
         "type": "actions/copy",
         "pos": [
-          -1133.6700077480994,
-          -29.445674301629197
+          -1479.3082406387246,
+          -11.720603852410463
         ],
         "size": [
           210,
@@ -9362,7 +9288,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 92,
+        "order": 93,
         "mode": 0,
         "inputs": [
           {
@@ -9400,8 +9326,8 @@
         "id": 383,
         "type": "basic/integer",
         "pos": [
-          -1199.5614853621437,
-          -39.76159077107865
+          -1545.199718252769,
+          -22.036520321859925
         ],
         "size": [
           210,
@@ -9434,8 +9360,8 @@
         "id": 386,
         "type": "events/sequence",
         "pos": [
-          -979.670007748099,
-          45.55432569837086
+          -1325.3082406387243,
+          63.2793961475896
         ],
         "size": [
           140,
@@ -9444,7 +9370,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 212,
+        "order": 214,
         "mode": 0,
         "inputs": [
           {
@@ -9492,8 +9418,8 @@
         "id": 387,
         "type": "events/no_change",
         "pos": [
-          -1174.6700077480991,
-          19.554325698370796
+          -1520.3082406387243,
+          37.27939614758952
         ],
         "size": [
           159.6,
@@ -9502,7 +9428,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 213,
+        "order": 215,
         "mode": 0,
         "inputs": [
           {
@@ -9534,8 +9460,8 @@
         "id": 388,
         "type": "events/sequence",
         "pos": [
-          -981.670007748099,
-          18.554325698370793
+          -1327.3082406387243,
+          36.279396147589516
         ],
         "size": [
           140,
@@ -9544,7 +9470,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 214,
+        "order": 216,
         "mode": 0,
         "inputs": [
           {
@@ -9592,8 +9518,8 @@
         "id": 390,
         "type": "events/no_change",
         "pos": [
-          -1172.6700077480991,
-          44.55432569837086
+          -1518.3082406387243,
+          62.2793961475896
         ],
         "size": [
           159.6,
@@ -9602,7 +9528,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 216,
+        "order": 218,
         "mode": 0,
         "inputs": [
           {
@@ -9634,8 +9560,8 @@
         "id": 343,
         "type": "events/branch",
         "pos": [
-          -1257.41064453125,
-          -398.365478515625
+          -1603.0488774218752,
+          -380.64040806640617
         ],
         "size": [
           140,
@@ -9644,7 +9570,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 181,
+        "order": 183,
         "mode": 0,
         "inputs": [
           {
@@ -9684,8 +9610,8 @@
         "id": 347,
         "type": "events/branch",
         "pos": [
-          -1263.41064453125,
-          -372.365478515625
+          -1609.0488774218752,
+          -354.64040806640617
         ],
         "size": [
           140,
@@ -9694,7 +9620,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 185,
+        "order": 187,
         "mode": 0,
         "inputs": [
           {
@@ -9735,8 +9661,8 @@
         "id": 361,
         "type": "events/branch",
         "pos": [
-          -1263.9560990767047,
-          -233.09275124289772
+          -1609.59433196733,
+          -215.36768079367906
         ],
         "size": [
           140,
@@ -9745,7 +9671,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 195,
+        "order": 197,
         "mode": 0,
         "inputs": [
           {
@@ -9787,8 +9713,8 @@
         "id": 371,
         "type": "events/branch",
         "pos": [
-          -1269.774280894886,
-          -123.00184215198863
+          -1615.4125137855112,
+          -105.27677170276995
         ],
         "size": [
           140,
@@ -9797,7 +9723,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 201,
+        "order": 203,
         "mode": 0,
         "inputs": [
           {
@@ -9838,8 +9764,8 @@
         "id": 357,
         "type": "events/branch",
         "pos": [
-          -1264.41064453125,
-          -261.365478515625
+          -1610.0488774218752,
+          -243.64040806640625
         ],
         "size": [
           140,
@@ -9848,7 +9774,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 190,
+        "order": 192,
         "mode": 0,
         "inputs": [
           {
@@ -9889,8 +9815,8 @@
         "id": 375,
         "type": "events/branch",
         "pos": [
-          -1273.41064453125,
-          -97.365478515625
+          -1619.0488774218752,
+          -79.64040806640631
         ],
         "size": [
           140,
@@ -9899,7 +9825,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 205,
+        "order": 207,
         "mode": 0,
         "inputs": [
           {
@@ -9941,8 +9867,8 @@
         "id": 389,
         "type": "events/branch",
         "pos": [
-          -1276.41064453125,
-          46.634521484375
+          -1622.0488774218752,
+          64.35959193359373
         ],
         "size": [
           140,
@@ -9951,7 +9877,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 215,
+        "order": 217,
         "mode": 0,
         "inputs": [
           {
@@ -9992,8 +9918,8 @@
         "id": 385,
         "type": "events/branch",
         "pos": [
-          -1279.41064453125,
-          19.634521484375
+          -1625.0488774218752,
+          37.35959193359373
         ],
         "size": [
           140,
@@ -10002,7 +9928,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 211,
+        "order": 213,
         "mode": 0,
         "inputs": [
           {
@@ -10042,8 +9968,8 @@
         "id": 313,
         "type": "ui/checkbox",
         "pos": [
-          -1569.41064453125,
-          -238.365478515625
+          -1915.0488774218752,
+          -220.6404080664063
         ],
         "size": [
           210,
@@ -10053,7 +9979,7 @@
           "collapsed": true
         },
         "order": 58,
-        "mode": 0,
+        "mode": 2,
         "inputs": [
           {
             "name": "value",
@@ -10095,7 +10021,9 @@
         ],
         "title": "UI.Checkbox",
         "properties": {
-          "tags": [],
+          "tags": [
+            "lora"
+          ],
           "defaultValue": false
         },
         "widgets_values": [
@@ -10105,578 +10033,6 @@
         "bgColor": "#335",
         "comfyValue": true,
         "shownOutputProperties": {},
-        "saveUserState": true
-      },
-      {
-        "id": 363,
-        "type": "LoraLoader",
-        "pos": [
-          -736.41064453125,
-          -209.365478515625
-        ],
-        "size": [
-          254.39999999999998,
-          106
-        ],
-        "flags": {},
-        "order": 197,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "model",
-            "type": "MODEL",
-            "link": 588,
-            "config": {}
-          },
-          {
-            "name": "clip",
-            "type": "CLIP",
-            "link": 581,
-            "config": {}
-          },
-          {
-            "name": "lora_name",
-            "type": "string",
-            "link": 537,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/combo",
-            "serialize": true
-          },
-          {
-            "name": "strength_model",
-            "type": "number",
-            "link": 538,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          },
-          {
-            "name": "strength_clip",
-            "type": "number",
-            "link": 539,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          }
-        ],
-        "outputs": [
-          {
-            "name": "MODEL",
-            "type": "MODEL",
-            "links": [
-              587
-            ],
-            "slot_index": 0
-          },
-          {
-            "name": "CLIP",
-            "type": "CLIP",
-            "links": [
-              582
-            ],
-            "slot_index": 1
-          }
-        ],
-        "title": "LoraLoader",
-        "properties": {
-          "tags": [
-            "txt2img",
-            "hr"
-          ]
-        },
-        "color": "#432",
-        "bgColor": "#653",
-        "saveUserState": true
-      },
-      {
-        "id": 349,
-        "type": "LoraLoader",
-        "pos": [
-          -727.41064453125,
-          -347.365478515625
-        ],
-        "size": [
-          254.39999999999998,
-          106
-        ],
-        "flags": {},
-        "order": 187,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "model",
-            "type": "MODEL",
-            "link": 589,
-            "config": {}
-          },
-          {
-            "name": "clip",
-            "type": "CLIP",
-            "link": 580,
-            "config": {}
-          },
-          {
-            "name": "lora_name",
-            "type": "string",
-            "link": 520,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/combo",
-            "serialize": true
-          },
-          {
-            "name": "strength_model",
-            "type": "number",
-            "link": 521,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          },
-          {
-            "name": "strength_clip",
-            "type": "number",
-            "link": 522,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          }
-        ],
-        "outputs": [
-          {
-            "name": "MODEL",
-            "type": "MODEL",
-            "links": [
-              588
-            ],
-            "slot_index": 0
-          },
-          {
-            "name": "CLIP",
-            "type": "CLIP",
-            "links": [
-              581
-            ],
-            "slot_index": 1
-          }
-        ],
-        "title": "LoraLoader",
-        "properties": {
-          "tags": [
-            "txt2img",
-            "hr"
-          ]
-        },
-        "color": "#432",
-        "bgColor": "#653",
-        "saveUserState": true
-      },
-      {
-        "id": 335,
-        "type": "LoraLoader",
-        "pos": [
-          -723.41064453125,
-          -487.365478515625
-        ],
-        "size": [
-          254.39999999999998,
-          106
-        ],
-        "flags": {},
-        "order": 177,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "model",
-            "type": "MODEL",
-            "link": 590,
-            "config": {}
-          },
-          {
-            "name": "clip",
-            "type": "CLIP",
-            "link": 579,
-            "config": {}
-          },
-          {
-            "name": "lora_name",
-            "type": "string",
-            "link": 503,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/combo",
-            "serialize": true
-          },
-          {
-            "name": "strength_model",
-            "type": "number",
-            "link": 504,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          },
-          {
-            "name": "strength_clip",
-            "type": "number",
-            "link": 505,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          }
-        ],
-        "outputs": [
-          {
-            "name": "MODEL",
-            "type": "MODEL",
-            "links": [
-              589
-            ],
-            "slot_index": 0
-          },
-          {
-            "name": "CLIP",
-            "type": "CLIP",
-            "links": [
-              580
-            ],
-            "slot_index": 1
-          }
-        ],
-        "title": "LoraLoader",
-        "properties": {
-          "tags": [
-            "txt2img",
-            "hr"
-          ]
-        },
-        "color": "#432",
-        "bgColor": "#653",
-        "saveUserState": true
-      },
-      {
-        "id": 79,
-        "type": "LoraLoader",
-        "pos": [
-          -721.41064453125,
-          -631.365478515625
-        ],
-        "size": [
-          254.39999999999998,
-          106
-        ],
-        "flags": {},
-        "order": 243,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "model",
-            "type": "MODEL",
-            "link": 292,
-            "config": {}
-          },
-          {
-            "name": "clip",
-            "type": "CLIP",
-            "link": 109,
-            "config": {}
-          },
-          {
-            "name": "lora_name",
-            "type": "string",
-            "link": 105,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/combo",
-            "serialize": true
-          },
-          {
-            "name": "strength_model",
-            "type": "number",
-            "link": 106,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          },
-          {
-            "name": "strength_clip",
-            "type": "number",
-            "link": 107,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          }
-        ],
-        "outputs": [
-          {
-            "name": "MODEL",
-            "type": "MODEL",
-            "links": [
-              590
-            ],
-            "slot_index": 0
-          },
-          {
-            "name": "CLIP",
-            "type": "CLIP",
-            "links": [
-              579
-            ],
-            "slot_index": 1
-          }
-        ],
-        "title": "LoraLoader",
-        "properties": {
-          "tags": [
-            "txt2img",
-            "hr"
-          ]
-        },
-        "color": "#432",
-        "bgColor": "#653",
-        "saveUserState": true
-      },
-      {
-        "id": 391,
-        "type": "utils/reroute",
-        "pos": [
-          -435,
-          16
-        ],
-        "size": [
-          75,
-          26
-        ],
-        "flags": {},
-        "order": 217,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "",
-            "type": "*",
-            "link": 583
-          }
-        ],
-        "outputs": [
-          {
-            "name": "",
-            "type": "CLIP",
-            "links": [
-              584,
-              585
-            ],
-            "slot_index": 0
-          }
-        ],
-        "title": "Comfy.Reroute",
-        "properties": {
-          "tags": [
-            "txt2img",
-            "hr"
-          ],
-          "showOutputText": false,
-          "horizontal": false,
-          "ignoreTypes": false
-        },
-        "saveUserState": true
-      },
-      {
-        "id": 377,
-        "type": "LoraLoader",
-        "pos": [
-          -739.41064453125,
-          -66.365478515625
-        ],
-        "size": [
-          254.39999999999998,
-          106
-        ],
-        "flags": {},
-        "order": 207,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "model",
-            "type": "MODEL",
-            "link": 587,
-            "config": {}
-          },
-          {
-            "name": "clip",
-            "type": "CLIP",
-            "link": 582,
-            "config": {}
-          },
-          {
-            "name": "lora_name",
-            "type": "string",
-            "link": 554,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/combo",
-            "serialize": true
-          },
-          {
-            "name": "strength_model",
-            "type": "number",
-            "link": 555,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          },
-          {
-            "name": "strength_clip",
-            "type": "number",
-            "link": 556,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          }
-        ],
-        "outputs": [
-          {
-            "name": "MODEL",
-            "type": "MODEL",
-            "links": [
-              599,
-              601,
-              602
-            ],
-            "slot_index": 0
-          },
-          {
-            "name": "CLIP",
-            "type": "CLIP",
-            "links": [
-              583
-            ],
-            "slot_index": 1
-          }
-        ],
-        "title": "LoraLoader",
-        "properties": {
-          "tags": [
-            "txt2img",
-            "hr"
-          ]
-        },
-        "color": "#432",
-        "bgColor": "#653",
-        "saveUserState": true
-      },
-      {
-        "id": 392,
-        "type": "utils/reroute",
-        "pos": [
-          -432,
-          -63
-        ],
-        "size": [
-          75,
-          26
-        ],
-        "flags": {},
-        "order": 218,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "",
-            "type": "*",
-            "link": 599,
-            "slot_index": 0
-          }
-        ],
-        "outputs": [
-          {
-            "name": "",
-            "type": "MODEL",
-            "links": [
-              600
-            ],
-            "slot_index": 0
-          }
-        ],
-        "title": "Comfy.Reroute",
-        "properties": {
-          "tags": [
-            "txt2img",
-            "hr"
-          ],
-          "showOutputText": false,
-          "horizontal": false,
-          "ignoreTypes": false
-        },
-        "saveUserState": true
-      },
-      {
-        "id": 74,
-        "type": "CheckpointLoaderSimple",
-        "pos": [
-          -139,
-          -36
-        ],
-        "size": [
-          184.79999999999998,
-          66
-        ],
-        "flags": {},
-        "order": 74,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "ckpt_name",
-            "type": "string",
-            "link": 97,
-            "config": {},
-            "widgetNodeType": "ui/combo",
-            "serialize": true,
-            "defaultWidgetNode": null
-          }
-        ],
-        "outputs": [
-          {
-            "name": "MODEL",
-            "type": "MODEL",
-            "links": [
-              292
-            ],
-            "slot_index": 0
-          },
-          {
-            "name": "CLIP",
-            "type": "CLIP",
-            "links": [
-              109
-            ],
-            "slot_index": 1
-          },
-          {
-            "name": "VAE",
-            "type": "VAE",
-            "links": [
-              274
-            ],
-            "slot_index": 2
-          }
-        ],
-        "title": "CheckpointLoaderSimple",
-        "properties": {
-          "tags": [
-            "txt2img",
-            "hr"
-          ]
-        },
-        "color": "#432",
-        "bgColor": "#653",
         "saveUserState": true
       },
       {
@@ -10897,7 +10253,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 93,
+        "order": 94,
         "mode": 0,
         "inputs": [
           {
@@ -10942,7 +10298,7 @@
           102
         ],
         "flags": {},
-        "order": 105,
+        "order": 107,
         "mode": 0,
         "inputs": [
           {
@@ -10982,7 +10338,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 106,
+        "order": 108,
         "mode": 2,
         "inputs": [
           {
@@ -11118,7 +10474,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 163,
+        "order": 165,
         "mode": 0,
         "inputs": [
           {
@@ -11161,7 +10517,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 149,
+        "order": 151,
         "mode": 2,
         "inputs": [
           {
@@ -11187,7 +10543,7 @@
         ],
         "title": "Operation",
         "properties": {
-          "A": 2,
+          "A": 1.7,
           "B": 1024,
           "OP": "*",
           "tags": [
@@ -11210,7 +10566,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 150,
+        "order": 152,
         "mode": 2,
         "inputs": [
           {
@@ -11236,7 +10592,7 @@
         ],
         "title": "Operation",
         "properties": {
-          "A": 2,
+          "A": 1.7,
           "B": 1024,
           "OP": "*",
           "tags": [
@@ -11364,7 +10720,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 112,
+        "order": 114,
         "mode": 0,
         "inputs": [
           {
@@ -11400,7 +10756,7 @@
           46
         ],
         "flags": {},
-        "order": 161,
+        "order": 163,
         "mode": 0,
         "inputs": [
           {
@@ -11454,7 +10810,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 166,
+        "order": 168,
         "mode": 0,
         "inputs": [
           {
@@ -11491,7 +10847,7 @@
           78
         ],
         "flags": {},
-        "order": 128,
+        "order": 130,
         "mode": 0,
         "inputs": [
           {
@@ -11529,7 +10885,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 95,
+        "order": 96,
         "mode": 0,
         "inputs": [
           {
@@ -11581,7 +10937,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 225,
+        "order": 227,
         "mode": 0,
         "inputs": [
           {
@@ -11607,178 +10963,6 @@
         "saveUserState": true
       },
       {
-        "id": 119,
-        "type": "KSampler",
-        "pos": [
-          1569,
-          -90
-        ],
-        "size": [
-          241.79999999999998,
-          206
-        ],
-        "flags": {},
-        "order": 126,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "model",
-            "type": "MODEL",
-            "link": 602,
-            "config": {},
-            "slot_index": 0
-          },
-          {
-            "name": "seed",
-            "type": "number",
-            "link": 175,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          },
-          {
-            "name": "steps",
-            "type": "number",
-            "link": 180,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          },
-          {
-            "name": "cfg",
-            "type": "number",
-            "link": 177,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          },
-          {
-            "name": "sampler_name",
-            "type": "string",
-            "link": 173,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/combo",
-            "serialize": true
-          },
-          {
-            "name": "scheduler",
-            "type": "string",
-            "link": 174,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/combo",
-            "serialize": true
-          },
-          {
-            "name": "positive",
-            "type": "CONDITIONING",
-            "link": 647,
-            "slot_index": 6,
-            "config": {}
-          },
-          {
-            "name": "negative",
-            "type": "CONDITIONING",
-            "link": 646,
-            "slot_index": 7,
-            "config": {}
-          },
-          {
-            "name": "latent_image",
-            "type": "LATENT",
-            "link": 170,
-            "config": {}
-          },
-          {
-            "name": "denoise",
-            "type": "number",
-            "link": 169,
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/slider",
-            "serialize": true
-          }
-        ],
-        "outputs": [
-          {
-            "name": "LATENT",
-            "type": "LATENT",
-            "links": [
-              179
-            ],
-            "slot_index": 0
-          }
-        ],
-        "title": "KSampler",
-        "properties": {
-          "tags": [
-            "hr"
-          ]
-        },
-        "color": "#432",
-        "bgColor": "#653",
-        "saveUserState": true
-      },
-      {
-        "id": 32,
-        "type": "CLIPTextEncode",
-        "pos": [
-          -202.11029999999997,
-          89.88860000000001
-        ],
-        "size": [
-          212.10067125600108,
-          46
-        ],
-        "flags": {},
-        "order": 175,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "text",
-            "type": "string",
-            "link": 30,
-            "config": {},
-            "serialize": true
-          },
-          {
-            "name": "clip",
-            "type": "CLIP",
-            "link": 584,
-            "color_off": "orange",
-            "color_on": "orange",
-            "config": {}
-          }
-        ],
-        "outputs": [
-          {
-            "name": "CONDITIONING",
-            "type": "CONDITIONING",
-            "links": [
-              610,
-              648
-            ],
-            "color_off": "orange",
-            "color_on": "orange",
-            "slot_index": 0
-          }
-        ],
-        "title": "CLIPTextEncode",
-        "properties": {
-          "tags": [
-            "txt2img",
-            "hr"
-          ]
-        },
-        "color": "#432",
-        "bgColor": "#653",
-        "saveUserState": true
-      },
-      {
         "id": 34,
         "type": "CLIPTextEncode",
         "pos": [
@@ -11790,7 +10974,7 @@
           46
         ],
         "flags": {},
-        "order": 180,
+        "order": 182,
         "mode": 0,
         "inputs": [
           {
@@ -11906,7 +11090,7 @@
           102
         ],
         "flags": {},
-        "order": 96,
+        "order": 97,
         "mode": 0,
         "inputs": [
           {
@@ -11942,7 +11126,7 @@
           46
         ],
         "flags": {},
-        "order": 219,
+        "order": 221,
         "mode": 2,
         "inputs": [
           {
@@ -11999,7 +11183,7 @@
         "flags": {
           "collapsed": false
         },
-        "order": 94,
+        "order": 95,
         "mode": 2,
         "inputs": [
           {
@@ -12087,7 +11271,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 107,
+        "order": 109,
         "mode": 0,
         "inputs": [
           {
@@ -12132,7 +11316,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 97,
+        "order": 98,
         "mode": 0,
         "inputs": [
           {
@@ -12183,7 +11367,7 @@
           46
         ],
         "flags": {},
-        "order": 224,
+        "order": 226,
         "mode": 0,
         "inputs": [
           {
@@ -12270,7 +11454,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 109,
+        "order": 111,
         "mode": 0,
         "inputs": [
           {
@@ -12320,7 +11504,7 @@
           166
         ],
         "flags": {},
-        "order": 119,
+        "order": 121,
         "mode": 0,
         "inputs": [
           {
@@ -12395,7 +11579,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 108,
+        "order": 110,
         "mode": 0,
         "inputs": [
           {
@@ -12446,7 +11630,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 114,
+        "order": 116,
         "mode": 0,
         "inputs": [
           {
@@ -12562,7 +11746,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 113,
+        "order": 115,
         "mode": 0,
         "inputs": [
           {
@@ -12618,7 +11802,7 @@
           86
         ],
         "flags": {},
-        "order": 221,
+        "order": 223,
         "mode": 2,
         "inputs": [
           {
@@ -12683,7 +11867,7 @@
           86
         ],
         "flags": {},
-        "order": 222,
+        "order": 224,
         "mode": 2,
         "inputs": [
           {
@@ -12750,7 +11934,7 @@
         "flags": {
           "collapsed": false
         },
-        "order": 227,
+        "order": 229,
         "mode": 0,
         "inputs": [
           {
@@ -12806,7 +11990,7 @@
         "flags": {
           "collapsed": false
         },
-        "order": 226,
+        "order": 228,
         "mode": 0,
         "inputs": [
           {
@@ -12860,7 +12044,7 @@
           46
         ],
         "flags": {},
-        "order": 159,
+        "order": 161,
         "mode": 0,
         "inputs": [
           {
@@ -12914,7 +12098,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 228,
+        "order": 230,
         "mode": 0,
         "inputs": [
           {
@@ -12954,7 +12138,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 231,
+        "order": 233,
         "mode": 0,
         "inputs": [
           {
@@ -12991,7 +12175,7 @@
           166
         ],
         "flags": {},
-        "order": 120,
+        "order": 122,
         "mode": 0,
         "inputs": [
           {
@@ -13074,7 +12258,7 @@
           166
         ],
         "flags": {},
-        "order": 124,
+        "order": 126,
         "mode": 0,
         "inputs": [
           {
@@ -13193,7 +12377,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 232,
+        "order": 234,
         "mode": 0,
         "inputs": [
           {
@@ -13237,7 +12421,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 230,
+        "order": 232,
         "mode": 0,
         "inputs": [
           {
@@ -13291,7 +12475,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 229,
+        "order": 231,
         "mode": 0,
         "inputs": [
           {
@@ -13376,7 +12560,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 234,
+        "order": 236,
         "mode": 0,
         "inputs": [
           {
@@ -13415,7 +12599,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 235,
+        "order": 237,
         "mode": 0,
         "inputs": [
           {
@@ -13487,7 +12671,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 236,
+        "order": 238,
         "mode": 0,
         "inputs": [
           {
@@ -13557,7 +12741,7 @@
           46
         ],
         "flags": {},
-        "order": 233,
+        "order": 235,
         "mode": 0,
         "inputs": [
           {
@@ -13609,7 +12793,7 @@
           102
         ],
         "flags": {},
-        "order": 116,
+        "order": 118,
         "mode": 0,
         "inputs": [
           {
@@ -13655,7 +12839,7 @@
           66
         ],
         "flags": {},
-        "order": 238,
+        "order": 240,
         "mode": 0,
         "inputs": [
           {
@@ -13711,7 +12895,7 @@
           78
         ],
         "flags": {},
-        "order": 237,
+        "order": 239,
         "mode": 0,
         "inputs": [
           {
@@ -13747,7 +12931,7 @@
         "properties": {
           "tags": [],
           "folderType": "output",
-          "lastUploadedImageFile": "ComfyUI_02801_.png"
+          "lastUploadedImageFile": "ComfyUI_02871_.png"
         },
         "saveUserState": true
       },
@@ -13763,7 +12947,7 @@
           138
         ],
         "flags": {},
-        "order": 223,
+        "order": 225,
         "mode": 2,
         "inputs": [
           {
@@ -13826,6 +13010,1077 @@
         "comfyValue": [],
         "shownOutputProperties": {},
         "saveUserState": false
+      },
+      {
+        "id": 74,
+        "type": "CheckpointLoaderSimple",
+        "pos": [
+          -139,
+          -36
+        ],
+        "size": [
+          184.79999999999998,
+          66
+        ],
+        "flags": {},
+        "order": 75,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "ckpt_name",
+            "type": "string",
+            "link": 97,
+            "config": {},
+            "widgetNodeType": "ui/combo",
+            "serialize": true,
+            "defaultWidgetNode": null
+          }
+        ],
+        "outputs": [
+          {
+            "name": "MODEL",
+            "type": "MODEL",
+            "links": [
+              292,
+              705
+            ],
+            "slot_index": 0
+          },
+          {
+            "name": "CLIP",
+            "type": "CLIP",
+            "links": [
+              109,
+              706
+            ],
+            "slot_index": 1
+          },
+          {
+            "name": "VAE",
+            "type": "VAE",
+            "links": [
+              274
+            ],
+            "slot_index": 2
+          }
+        ],
+        "title": "CheckpointLoaderSimple",
+        "properties": {
+          "tags": [
+            "txt2img",
+            "hr"
+          ]
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": 363,
+        "type": "LoraLoader",
+        "pos": [
+          -1081.72900390625,
+          -191.7061767578125
+        ],
+        "size": [
+          254.39999999999998,
+          106
+        ],
+        "flags": {},
+        "order": 199,
+        "mode": 2,
+        "inputs": [
+          {
+            "name": "model",
+            "type": "MODEL",
+            "link": 588,
+            "config": {}
+          },
+          {
+            "name": "clip",
+            "type": "CLIP",
+            "link": 581,
+            "config": {}
+          },
+          {
+            "name": "lora_name",
+            "type": "string",
+            "link": 537,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/combo",
+            "serialize": true
+          },
+          {
+            "name": "strength_model",
+            "type": "number",
+            "link": 538,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          },
+          {
+            "name": "strength_clip",
+            "type": "number",
+            "link": 539,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "MODEL",
+            "type": "MODEL",
+            "links": [
+              587
+            ],
+            "slot_index": 0
+          },
+          {
+            "name": "CLIP",
+            "type": "CLIP",
+            "links": [
+              582
+            ],
+            "slot_index": 1
+          }
+        ],
+        "title": "LoraLoader",
+        "properties": {
+          "tags": [
+            "txt2img",
+            "hr",
+            "lora"
+          ]
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": 349,
+        "type": "LoraLoader",
+        "pos": [
+          -1072.72900390625,
+          -329.7061767578125
+        ],
+        "size": [
+          254.39999999999998,
+          106
+        ],
+        "flags": {},
+        "order": 189,
+        "mode": 2,
+        "inputs": [
+          {
+            "name": "model",
+            "type": "MODEL",
+            "link": 589,
+            "config": {}
+          },
+          {
+            "name": "clip",
+            "type": "CLIP",
+            "link": 580,
+            "config": {}
+          },
+          {
+            "name": "lora_name",
+            "type": "string",
+            "link": 520,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/combo",
+            "serialize": true
+          },
+          {
+            "name": "strength_model",
+            "type": "number",
+            "link": 521,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          },
+          {
+            "name": "strength_clip",
+            "type": "number",
+            "link": 522,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "MODEL",
+            "type": "MODEL",
+            "links": [
+              588
+            ],
+            "slot_index": 0
+          },
+          {
+            "name": "CLIP",
+            "type": "CLIP",
+            "links": [
+              581
+            ],
+            "slot_index": 1
+          }
+        ],
+        "title": "LoraLoader",
+        "properties": {
+          "tags": [
+            "txt2img",
+            "hr",
+            "lora"
+          ]
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": 335,
+        "type": "LoraLoader",
+        "pos": [
+          -1067.72900390625,
+          -469.7061767578125
+        ],
+        "size": [
+          254.39999999999998,
+          106
+        ],
+        "flags": {},
+        "order": 179,
+        "mode": 2,
+        "inputs": [
+          {
+            "name": "model",
+            "type": "MODEL",
+            "link": 590,
+            "config": {}
+          },
+          {
+            "name": "clip",
+            "type": "CLIP",
+            "link": 579,
+            "config": {}
+          },
+          {
+            "name": "lora_name",
+            "type": "string",
+            "link": 503,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/combo",
+            "serialize": true
+          },
+          {
+            "name": "strength_model",
+            "type": "number",
+            "link": 504,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          },
+          {
+            "name": "strength_clip",
+            "type": "number",
+            "link": 505,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "MODEL",
+            "type": "MODEL",
+            "links": [
+              589
+            ],
+            "slot_index": 0
+          },
+          {
+            "name": "CLIP",
+            "type": "CLIP",
+            "links": [
+              580
+            ],
+            "slot_index": 1
+          }
+        ],
+        "title": "LoraLoader",
+        "properties": {
+          "tags": [
+            "txt2img",
+            "hr",
+            "lora"
+          ]
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": 79,
+        "type": "LoraLoader",
+        "pos": [
+          -1066.72900390625,
+          -613.7061767578125
+        ],
+        "size": [
+          254.39999999999998,
+          106
+        ],
+        "flags": {},
+        "order": 247,
+        "mode": 2,
+        "inputs": [
+          {
+            "name": "model",
+            "type": "MODEL",
+            "link": 292,
+            "config": {}
+          },
+          {
+            "name": "clip",
+            "type": "CLIP",
+            "link": 109,
+            "config": {}
+          },
+          {
+            "name": "lora_name",
+            "type": "string",
+            "link": 105,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/combo",
+            "serialize": true
+          },
+          {
+            "name": "strength_model",
+            "type": "number",
+            "link": 106,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          },
+          {
+            "name": "strength_clip",
+            "type": "number",
+            "link": 107,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "MODEL",
+            "type": "MODEL",
+            "links": [
+              590
+            ],
+            "slot_index": 0
+          },
+          {
+            "name": "CLIP",
+            "type": "CLIP",
+            "links": [
+              579
+            ],
+            "slot_index": 1
+          }
+        ],
+        "title": "LoraLoader",
+        "properties": {
+          "tags": [
+            "txt2img",
+            "hr",
+            "lora"
+          ]
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": 377,
+        "type": "LoraLoader",
+        "pos": [
+          -1084.8193359375,
+          -49.137451171875
+        ],
+        "size": [
+          254.39999999999998,
+          106
+        ],
+        "flags": {},
+        "order": 209,
+        "mode": 2,
+        "inputs": [
+          {
+            "name": "model",
+            "type": "MODEL",
+            "link": 587,
+            "config": {}
+          },
+          {
+            "name": "clip",
+            "type": "CLIP",
+            "link": 582,
+            "config": {}
+          },
+          {
+            "name": "lora_name",
+            "type": "string",
+            "link": 554,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/combo",
+            "serialize": true
+          },
+          {
+            "name": "strength_model",
+            "type": "number",
+            "link": 555,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          },
+          {
+            "name": "strength_clip",
+            "type": "number",
+            "link": 556,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "MODEL",
+            "type": "MODEL",
+            "links": [
+              701
+            ],
+            "slot_index": 0
+          },
+          {
+            "name": "CLIP",
+            "type": "CLIP",
+            "links": [
+              703
+            ],
+            "slot_index": 1
+          }
+        ],
+        "title": "LoraLoader",
+        "properties": {
+          "tags": [
+            "txt2img",
+            "hr",
+            "lora"
+          ]
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": 465,
+        "type": "actions/set_node_mode",
+        "pos": [
+          -657,
+          -199
+        ],
+        "size": [
+          210,
+          102
+        ],
+        "flags": {},
+        "order": 99,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "enabled",
+            "type": "boolean",
+            "link": 715
+          },
+          {
+            "name": "set",
+            "type": -1,
+            "link": 716,
+            "shape": 1
+          }
+        ],
+        "outputs": [],
+        "title": "Comfy.SetNodeModeAction",
+        "properties": {
+          "targetTags": "lora",
+          "enable": true,
+          "tags": []
+        },
+        "saveUserState": true
+      },
+      {
+        "id": 462,
+        "type": "ui/checkbox",
+        "pos": [
+          -787,
+          -166
+        ],
+        "size": [
+          210,
+          78
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 74,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "boolean",
+            "link": null
+          },
+          {
+            "name": "store",
+            "type": -1,
+            "link": null,
+            "shape": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "value",
+            "type": "boolean",
+            "links": [
+              715
+            ],
+            "slot_index": 0
+          },
+          {
+            "name": "changed",
+            "type": -2,
+            "links": [
+              716
+            ],
+            "shape": 1,
+            "slot_index": 1
+          }
+        ],
+        "title": "UI.Checkbox",
+        "properties": {
+          "tags": [],
+          "defaultValue": false
+        },
+        "widgets_values": [
+          "false"
+        ],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": false,
+        "shownOutputProperties": {},
+        "saveUserState": true
+      },
+      {
+        "id": 391,
+        "type": "utils/reroute",
+        "pos": [
+          -572,
+          12
+        ],
+        "size": [
+          75,
+          26
+        ],
+        "flags": {},
+        "order": 219,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "",
+            "type": "*",
+            "link": 707
+          }
+        ],
+        "outputs": [
+          {
+            "name": "",
+            "type": "CLIP",
+            "links": [
+              584,
+              585
+            ],
+            "slot_index": 0
+          }
+        ],
+        "title": "Comfy.Reroute",
+        "properties": {
+          "tags": [
+            "txt2img",
+            "hr"
+          ],
+          "showOutputText": false,
+          "horizontal": false,
+          "ignoreTypes": false
+        },
+        "saveUserState": true
+      },
+      {
+        "id": 461,
+        "type": "utils/pick_first",
+        "pos": [
+          -744,
+          32
+        ],
+        "size": [
+          210,
+          122
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 242,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "A",
+            "type": "*",
+            "link": 703
+          },
+          {
+            "name": "B",
+            "type": "*",
+            "link": 706
+          },
+          {
+            "name": "C",
+            "type": "*",
+            "link": null
+          }
+        ],
+        "outputs": [
+          {
+            "name": "",
+            "type": "CLIP",
+            "links": [
+              707
+            ],
+            "slot_index": 0
+          }
+        ],
+        "title": "Comfy.PickFirst",
+        "properties": {
+          "tags": [
+            "txt2img",
+            "hr"
+          ],
+          "mode": "dataNonNull"
+        },
+        "color": "#232",
+        "bgColor": "#353",
+        "saveUserState": true
+      },
+      {
+        "id": 32,
+        "type": "CLIPTextEncode",
+        "pos": [
+          -202,
+          90
+        ],
+        "size": [
+          212.10067125600108,
+          46
+        ],
+        "flags": {},
+        "order": 177,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "text",
+            "type": "string",
+            "link": 30,
+            "config": {},
+            "serialize": true
+          },
+          {
+            "name": "clip",
+            "type": "CLIP",
+            "link": 584,
+            "color_off": "orange",
+            "color_on": "orange",
+            "config": {}
+          }
+        ],
+        "outputs": [
+          {
+            "name": "CONDITIONING",
+            "type": "CONDITIONING",
+            "links": [
+              610,
+              648
+            ],
+            "color_off": "orange",
+            "color_on": "orange",
+            "slot_index": 0
+          }
+        ],
+        "title": "CLIPTextEncode",
+        "properties": {
+          "tags": [
+            "txt2img",
+            "hr"
+          ]
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": 16,
+        "type": "KSampler",
+        "pos": [
+          188,
+          150
+        ],
+        "size": [
+          161.2,
+          206
+        ],
+        "flags": {},
+        "order": 141,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "model",
+            "type": "MODEL",
+            "link": 717,
+            "color_off": "orange",
+            "color_on": "orange",
+            "config": {}
+          },
+          {
+            "name": "seed",
+            "type": "number",
+            "link": 80,
+            "config": {},
+            "serialize": true
+          },
+          {
+            "name": "steps",
+            "type": "number",
+            "link": 17,
+            "config": {},
+            "serialize": true
+          },
+          {
+            "name": "cfg",
+            "type": "number",
+            "link": 18,
+            "config": {},
+            "serialize": true
+          },
+          {
+            "name": "sampler_name",
+            "type": "string",
+            "link": 19,
+            "config": {},
+            "serialize": true
+          },
+          {
+            "name": "scheduler",
+            "type": "string",
+            "link": 20,
+            "config": {},
+            "serialize": true
+          },
+          {
+            "name": "positive",
+            "type": "CONDITIONING",
+            "link": 664,
+            "color_off": "orange",
+            "color_on": "orange",
+            "config": {}
+          },
+          {
+            "name": "negative",
+            "type": "CONDITIONING",
+            "link": 663,
+            "color_off": "orange",
+            "color_on": "orange",
+            "config": {}
+          },
+          {
+            "name": "latent_image",
+            "type": "LATENT",
+            "link": 288,
+            "color_off": "orange",
+            "color_on": "orange",
+            "config": {}
+          },
+          {
+            "name": "denoise",
+            "type": "number",
+            "link": 299,
+            "config": {},
+            "serialize": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "LATENT",
+            "type": "LATENT",
+            "links": [
+              40
+            ],
+            "color_off": "orange",
+            "color_on": "orange",
+            "slot_index": 0
+          }
+        ],
+        "title": "KSampler",
+        "properties": {
+          "tags": [
+            "txt2img"
+          ]
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": 460,
+        "type": "utils/pick_first",
+        "pos": [
+          -754,
+          -14
+        ],
+        "size": [
+          210,
+          122
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 241,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "A",
+            "type": "*",
+            "link": 701
+          },
+          {
+            "name": "B",
+            "type": "*",
+            "link": 705
+          },
+          {
+            "name": "C",
+            "type": "*",
+            "link": null
+          }
+        ],
+        "outputs": [
+          {
+            "name": "",
+            "type": "MODEL",
+            "links": [
+              708
+            ],
+            "slot_index": 0
+          }
+        ],
+        "title": "Comfy.PickFirst",
+        "properties": {
+          "tags": [
+            "txt2img",
+            "hr"
+          ],
+          "mode": "dataNonNull"
+        },
+        "color": "#232",
+        "bgColor": "#353",
+        "saveUserState": true
+      },
+      {
+        "id": 392,
+        "type": "utils/reroute",
+        "pos": [
+          -577,
+          -37
+        ],
+        "size": [
+          75,
+          26
+        ],
+        "flags": {},
+        "order": 220,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "",
+            "type": "*",
+            "link": 708,
+            "slot_index": 0
+          }
+        ],
+        "outputs": [
+          {
+            "name": "",
+            "type": "MODEL",
+            "links": [
+              600,
+              717,
+              719
+            ],
+            "slot_index": 0
+          }
+        ],
+        "title": "Comfy.Reroute",
+        "properties": {
+          "tags": [
+            "txt2img",
+            "hr"
+          ],
+          "showOutputText": false,
+          "horizontal": false,
+          "ignoreTypes": false
+        },
+        "saveUserState": true
+      },
+      {
+        "id": 119,
+        "type": "KSampler",
+        "pos": [
+          1569,
+          -90
+        ],
+        "size": [
+          241.79999999999998,
+          206
+        ],
+        "flags": {},
+        "order": 128,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "model",
+            "type": "MODEL",
+            "link": 719,
+            "config": {},
+            "slot_index": 0
+          },
+          {
+            "name": "seed",
+            "type": "number",
+            "link": 175,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          },
+          {
+            "name": "steps",
+            "type": "number",
+            "link": 180,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          },
+          {
+            "name": "cfg",
+            "type": "number",
+            "link": 177,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          },
+          {
+            "name": "sampler_name",
+            "type": "string",
+            "link": 173,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/combo",
+            "serialize": true
+          },
+          {
+            "name": "scheduler",
+            "type": "string",
+            "link": 174,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/combo",
+            "serialize": true
+          },
+          {
+            "name": "positive",
+            "type": "CONDITIONING",
+            "link": 647,
+            "slot_index": 6,
+            "config": {}
+          },
+          {
+            "name": "negative",
+            "type": "CONDITIONING",
+            "link": 646,
+            "slot_index": 7,
+            "config": {}
+          },
+          {
+            "name": "latent_image",
+            "type": "LATENT",
+            "link": 170,
+            "config": {}
+          },
+          {
+            "name": "denoise",
+            "type": "number",
+            "link": 169,
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/slider",
+            "serialize": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "LATENT",
+            "type": "LATENT",
+            "links": [
+              179
+            ],
+            "slot_index": 0
+          }
+        ],
+        "title": "KSampler",
+        "properties": {
+          "tags": [
+            "hr"
+          ]
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
       }
     ],
     "links": [
@@ -15806,14 +16061,6 @@
         "CLIP"
       ],
       [
-        583,
-        377,
-        1,
-        391,
-        0,
-        "*"
-      ],
-      [
         584,
         391,
         0,
@@ -15870,34 +16117,10 @@
         "string"
       ],
       [
-        599,
-        377,
-        0,
-        392,
-        0,
-        "*"
-      ],
-      [
         600,
         392,
         0,
         399,
-        0,
-        "MODEL"
-      ],
-      [
-        601,
-        377,
-        0,
-        16,
-        0,
-        "MODEL"
-      ],
-      [
-        602,
-        377,
-        0,
-        119,
         0,
         "MODEL"
       ],
@@ -16428,6 +16651,86 @@
         459,
         1,
         -1
+      ],
+      [
+        701,
+        377,
+        0,
+        460,
+        0,
+        "*"
+      ],
+      [
+        703,
+        377,
+        1,
+        461,
+        0,
+        "*"
+      ],
+      [
+        705,
+        74,
+        0,
+        460,
+        1,
+        "*"
+      ],
+      [
+        706,
+        74,
+        1,
+        461,
+        1,
+        "*"
+      ],
+      [
+        707,
+        461,
+        0,
+        391,
+        0,
+        "*"
+      ],
+      [
+        708,
+        460,
+        0,
+        392,
+        0,
+        "*"
+      ],
+      [
+        715,
+        462,
+        0,
+        465,
+        0,
+        "boolean"
+      ],
+      [
+        716,
+        462,
+        1,
+        465,
+        1,
+        -1
+      ],
+      [
+        717,
+        392,
+        0,
+        16,
+        0,
+        "MODEL"
+      ],
+      [
+        719,
+        392,
+        0,
+        119,
+        0,
+        "MODEL"
       ]
     ],
     "groups": [
@@ -16484,8 +16787,8 @@
       {
         "title": "LoRA",
         "bounding": [
-          -1600,
-          -693,
+          -1946,
+          -675,
           1146,
           772
         ],
@@ -17287,7 +17590,7 @@
             "direction": "horizontal",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -17315,7 +17618,7 @@
             "direction": "horizontal",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -17343,7 +17646,7 @@
             "direction": "horizontal",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -17385,6 +17688,7 @@
           }
         },
         "children": [
+          "223",
           "162",
           "157",
           "188",
@@ -17930,7 +18234,7 @@
             "direction": "horizontal",
             "classes": "",
             "style": "flex-grow: 1; min-width: unset;",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18483,7 +18787,7 @@
           "attrs": {
             "title": "Height",
             "hidden": false,
-            "disabled": false,
+            "disabled": true,
             "direction": "vertical",
             "classes": "",
             "style": "",
@@ -18508,7 +18812,7 @@
           "attrs": {
             "title": "Width",
             "hidden": false,
-            "disabled": false,
+            "disabled": true,
             "direction": "vertical",
             "classes": "",
             "style": "",
@@ -18613,7 +18917,7 @@
           "id": "157",
           "attrs": {
             "title": "LoRA 1",
-            "hidden": false,
+            "hidden": true,
             "disabled": false,
             "direction": "vertical",
             "classes": "",
@@ -18624,7 +18928,9 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": [],
+            "tags": [
+              "lora"
+            ],
             "convertValueToLabelCode": ""
           }
         },
@@ -18646,7 +18952,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18671,7 +18977,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18696,7 +19002,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18721,7 +19027,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18746,7 +19052,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "flex-grow: 1; min-width: unset;",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18771,7 +19077,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18796,7 +19102,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18821,7 +19127,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18846,7 +19152,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "flex-grow: 1; min-width: unset;",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18871,7 +19177,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18896,7 +19202,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18921,7 +19227,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18946,7 +19252,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "flex-grow: 1; min-width: unset;",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18971,7 +19277,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -18996,7 +19302,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -19021,7 +19327,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -19046,7 +19352,7 @@
             "direction": "vertical",
             "classes": "",
             "style": "flex-grow: 1; min-width: unset;",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -19065,7 +19371,7 @@
           "id": "188",
           "attrs": {
             "title": "LoRA 2",
-            "hidden": false,
+            "hidden": true,
             "disabled": false,
             "direction": "vertical",
             "classes": "",
@@ -19076,7 +19382,9 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": [],
+            "tags": [
+              "lora"
+            ],
             "convertValueToLabelCode": ""
           }
         },
@@ -19092,7 +19400,7 @@
           "id": "189",
           "attrs": {
             "title": "LoRA 3",
-            "hidden": false,
+            "hidden": true,
             "disabled": false,
             "direction": "vertical",
             "classes": "",
@@ -19103,7 +19411,9 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": [],
+            "tags": [
+              "lora"
+            ],
             "convertValueToLabelCode": ""
           }
         },
@@ -19119,7 +19429,7 @@
           "id": "190",
           "attrs": {
             "title": "LoRA 4",
-            "hidden": false,
+            "hidden": true,
             "disabled": false,
             "direction": "vertical",
             "classes": "",
@@ -19130,7 +19440,9 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": [],
+            "tags": [
+              "lora"
+            ],
             "convertValueToLabelCode": ""
           }
         },
@@ -19146,7 +19458,7 @@
           "id": "191",
           "attrs": {
             "title": "LoRA 5",
-            "hidden": false,
+            "hidden": true,
             "disabled": false,
             "direction": "vertical",
             "classes": "",
@@ -19157,7 +19469,9 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": [],
+            "tags": [
+              "lora"
+            ],
             "convertValueToLabelCode": ""
           }
         },
@@ -19490,7 +19804,7 @@
           "id": "214",
           "attrs": {
             "title": "",
-            "hidden": false,
+            "hidden": true,
             "disabled": false,
             "direction": "horizontal",
             "classes": "",
@@ -19501,7 +19815,9 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [
+              "lora"
+            ]
           }
         },
         "children": [
@@ -19517,7 +19833,7 @@
           "id": "215",
           "attrs": {
             "title": "",
-            "hidden": false,
+            "hidden": true,
             "disabled": false,
             "direction": "horizontal",
             "classes": "",
@@ -19528,7 +19844,9 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [
+              "lora"
+            ]
           }
         },
         "children": [
@@ -19544,7 +19862,7 @@
           "id": "216",
           "attrs": {
             "title": "",
-            "hidden": false,
+            "hidden": true,
             "disabled": false,
             "direction": "horizontal",
             "classes": "",
@@ -19555,7 +19873,9 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [
+              "lora"
+            ]
           }
         },
         "children": [
@@ -19571,7 +19891,7 @@
           "id": "217",
           "attrs": {
             "title": "",
-            "hidden": false,
+            "hidden": true,
             "disabled": false,
             "direction": "horizontal",
             "classes": "",
@@ -19582,7 +19902,9 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [
+              "lora"
+            ]
           }
         },
         "children": [
@@ -19598,7 +19920,7 @@
           "id": "218",
           "attrs": {
             "title": "",
-            "hidden": false,
+            "hidden": true,
             "disabled": false,
             "direction": "horizontal",
             "classes": "",
@@ -19609,7 +19931,9 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [
+              "lora"
+            ]
           }
         },
         "children": [
@@ -19692,9 +20016,33 @@
           "219"
         ],
         "parent": "109"
+      },
+      "223": {
+        "dragItem": {
+          "type": "widget",
+          "id": "223",
+          "nodeId": 462,
+          "attrs": {
+            "title": "Enable",
+            "hidden": false,
+            "disabled": false,
+            "direction": "vertical",
+            "classes": "",
+            "style": "",
+            "nodeDisabledState": "disabled",
+            "variant": "gallery",
+            "containerVariant": "block",
+            "openOnStartup": false,
+            "buttonVariant": "primary",
+            "buttonSize": "large",
+            "tags": []
+          }
+        },
+        "children": [],
+        "parent": "58"
       }
     },
-    "currentId": 223,
+    "currentId": 224,
     "attrs": {
       "queuePromptButtonName": "Queue txt2img",
       "queuePromptButtonRunWorkflow": false,
@@ -19703,9 +20051,9 @@
   },
   "canvas": {
     "offset": [
-      1216.2283145877116,
-      -966.5758686913584
+      269.1028161789952,
+      -277.9338410386712
     ],
-    "scale": 0.7513148009015783
+    "scale": 0.5644739300537776
   }
 }
