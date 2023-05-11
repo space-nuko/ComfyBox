@@ -816,11 +816,11 @@
           "multiline": false
         },
         "widgets_values": [
-          "cached"
+          "none"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "cached",
+        "comfyValue": "none",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -1275,11 +1275,11 @@
           "multiline": false
         },
         "widgets_values": [
-          "2240"
+          "2"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "2240",
+        "comfyValue": "2",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -1370,11 +1370,11 @@
           "multiline": false
         },
         "widgets_values": [
-          "2240"
+          "2"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "2240",
+        "comfyValue": "2",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -3203,7 +3203,7 @@
         "outputs": [
           {
             "name": "",
-            "type": "number",
+            "type": "*",
             "links": [
               299
             ],
@@ -3374,7 +3374,7 @@
         "outputs": [
           {
             "name": "",
-            "type": "*",
+            "type": "string",
             "links": [
               310,
               311
@@ -4161,7 +4161,7 @@
         "title": "Operation",
         "properties": {
           "A": 2,
-          "B": 1120,
+          "B": 1,
           "OP": "*",
           "tags": []
         }
@@ -4207,7 +4207,7 @@
         "title": "Operation",
         "properties": {
           "A": 2,
-          "B": 1120,
+          "B": 1,
           "OP": "*",
           "tags": []
         }
@@ -12370,7 +12370,7 @@
         "properties": {
           "tags": [],
           "defaultValue": null,
-          "index": 0,
+          "index": null,
           "updateMode": "append",
           "values": []
         },
@@ -13051,7 +13051,7 @@
         "properties": {
           "tags": [],
           "defaultValue": null,
-          "index": 5,
+          "index": null,
           "updateMode": "append",
           "values": []
         },
@@ -19697,6 +19697,7 @@
     "currentId": 223,
     "attrs": {
       "queuePromptButtonName": "Queue txt2img",
+      "queuePromptButtonRunWorkflow": false,
       "defaultSubgraph": "txt2img"
     }
   },

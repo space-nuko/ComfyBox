@@ -1,6 +1,6 @@
 <script lang="ts">
  import { onMount } from "svelte";
- import { get } from "svelte/store";
+ import { get, writable, type Writable } from "svelte/store";
  import { Pane, Splitpanes } from 'svelte-splitpanes';
  import { Button } from "@gradio/button";
  import { BlockTitle } from "@gradio/atoms";

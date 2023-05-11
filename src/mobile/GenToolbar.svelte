@@ -76,7 +76,7 @@
 <Toolbar bottom>
     {#if $layoutState.attrs.queuePromptButtonName != ""}
         <Link on:click={queuePrompt}>
-        {$layoutState.attrs.queuePromptButtonName}
+            {$layoutState.attrs.queuePromptButtonName}
         </Link>
     {/if}
     <Link on:click={refreshCombos}>🔄</Link>

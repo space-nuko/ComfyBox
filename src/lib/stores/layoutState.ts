@@ -31,6 +31,12 @@ export type LayoutAttributes = {
      * Name of the "Queue Prompt" button. Set to blank to hide the button.
      */
     queuePromptButtonName: string,
+
+    /*
+     * If true, clicking the "Queue Prompt" button will run the default subgraph.
+     * Set this to false if you need special behavior before running any subgraphs.
+     */
+    queuePromptButtonRunWorkflow: boolean,
 }
 
 /*
@@ -86,6 +92,8 @@ export type LayoutState = {
      * Global workflow attributes
      */
     attrs: LayoutAttributes
+
+    refreshPropsPanel: Writable<number>
 }
 
 /**
@@ -539,6 +547,13 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "workflow",
                 editable: true,
                 defaultValue: "Queue Prompt"
+            },
+            {
+                name: "queuePromptButtonRunWorkflow",
+                type: "boolean",
+                location: "workflow",
+                editable: true,
+                defaultValue: true
             }
         ]
     }
@@ -612,7 +627,7 @@ export interface ContainerLayout extends IDragItem {
     // (not serialized)
 
     // Accordion
-    isOpen?: boolean,
+    isOpen?: Writable<boolean>,
 }
 
 /*
@@ -657,6 +672,7 @@ const store: Writable<LayoutState> = writable({
     currentSelectionNodes: [],
     isMenuOpen: false,
     isConfiguring: true,
+    refreshPropsPanel: writable(0),
     attrs: {
         ...defaultWorkflowAttributes
     }
@@ -913,6 +929,7 @@ function initDefaultLayout() {
         currentSelectionNodes: [],
         isMenuOpen: false,
         isConfiguring: false,
+        refreshPropsPanel: writable(0),
         attrs: {
             ...defaultWorkflowAttributes
         }
@@ -1028,12 +1045,16 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
         currentSelectionNodes: [],
         isMenuOpen: false,
         isConfiguring: false,
+        refreshPropsPanel: writable(0),
         attrs: { ...defaultWorkflowAttributes, ...data.attrs }
     }
 
-    console.debug("[layoutState] deserialize", data, state)
+    console.debug("[layoutState] deserialize", data, state, defaultWorkflowAttributes)
 
     store.set(state)
+
+    // Ensure properties panel is updated with new state
+    state.refreshPropsPanel.set(get(state.refreshPropsPanel) + 1)
 }
 
 function onStartConfigure() {

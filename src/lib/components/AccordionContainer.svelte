@@ -12,7 +12,7 @@
  import { flip } from 'svelte/animate';
  import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
  import { startDrag, stopDrag } from "$lib/utils"
- import type { Writable } from "svelte/store";
+ import { writable, type Writable } from "svelte/store";
  import { isHidden } from "$lib/widgets/utils";
 
  export let container: ContainerLayout | null = null;
@@ -22,23 +22,27 @@
  export let edit: boolean = false;
  export let dragDisabled: boolean = false;
  export let isMobile: boolean = false;
+ let isOpen: Writable<boolean> | null = null;
 
- let attrsChanged: Writable<boolean> | null = null;
  let children: IDragItem[] | null = null;
  const flipDurationMs = 100;
 
  let selectedIndex: number = 0;
 
  $: if (container) {
-     children = $layoutState.allItems[container.id].children;
-     attrsChanged = container.attrsChanged
-     if (container.isOpen == null) {
-         container.isOpen = container.attrs.openOnStartup
-     }
+     setupState()
  }
  else {
      children = null;
-     attrsChanged = null
+ }
+
+ function setupState() {
+     children = $layoutState.allItems[container.id].children;
+     if (container.isOpen == null) {
+         container.isOpen = writable(container.attrs.openOnStartup)
+     }
+     isOpen = container.isOpen
+     console.warn("REBUILD", container.attrs.title, $isOpen)
  }
 
  function handleConsider(evt: any) {
@@ -51,8 +55,9 @@
      // Ensure dragging is stopped on drag finish
  };
 
- function handleClick({ clicked }: CustomEvent<boolean>) {
+ function handleClick(e: CustomEvent<boolean>) {
      navigator.vibrate(20)
+     $isOpen = e.detail
  }
 </script>
 
@@ -104,7 +109,7 @@
             </Block>
         {:else}
             <Block elem_classes={["gradio-accordion"]}>
-                <Accordion label={container.attrs.title} bind:open={container.isOpen} on:click={handleClick}>
+                <Accordion label={container.attrs.title} open={$isOpen} on:click={handleClick}>
                     {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
                         <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
                     {/each}

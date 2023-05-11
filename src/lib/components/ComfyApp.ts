@@ -383,7 +383,7 @@ export default class ComfyApp {
         }
 
         // Distinguish frontend/backend connections
-        const BACKEND_TYPES = ["CLIP", "CLIP_VISION", "CLIP_VISION_OUTPUT", "CONDITIONING", "CONTROL_NET", "LATENT", "MASK", "MODEL", "STYLE_MODEL", "VAE"]
+        const BACKEND_TYPES = ["CLIP", "CLIP_VISION", "CLIP_VISION_OUTPUT", "CONDITIONING", "CONTROL_NET", "LATENT", "MASK", "MODEL", "STYLE_MODEL", "VAE", "UPSCALE_MODEL"]
         for (const type of BACKEND_TYPES) {
             setColor(type, "orange")
         }
@@ -496,6 +496,11 @@ export default class ComfyApp {
             if ("onDefaultQueueAction" in node) {
                 (node as ComfyGraphNode).onDefaultQueueAction()
             }
+        }
+
+        if (get(layoutState).attrs.queuePromptButtonRunWorkflow) {
+            this.queuePrompt(0, 1);
+            notify("Prompt queued.");
         }
     }
 

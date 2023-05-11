@@ -41,6 +41,7 @@
          nodeValue = node.value;
          propsChanged = node.propsChanged;
          valuesForCombo = node.valuesForCombo;
+         lastConfigured = $valuesForCombo
      }
  }
 

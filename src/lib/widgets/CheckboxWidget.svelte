@@ -5,12 +5,13 @@
  import { Checkbox } from "@gradio/form";
  import { get, type Writable, writable } from "svelte/store";
  import { isDisabled } from "./utils"
+	import type { SelectData } from "@gradio/utils";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfyCheckboxNode | null = null;
  let nodeValue: Writable<boolean> | null = null;
- let attrsChanged: Writable<boolean> | null = null;
+ let attrsChanged: Writable<number> | null = null;
 
  $: widget && setNodeValue(widget);
 
@@ -22,7 +23,8 @@
      }
  };
 
- function onSelect() {
+ function onSelect(e: CustomEvent<SelectData>) {
+     $nodeValue = e.detail.selected
      navigator.vibrate(20)
  }
 </script>
@@ -35,7 +37,7 @@
                     <Checkbox
                         disabled={isDisabled(widget)}
                         label={widget.attrs.title}
-                        bind:value={$nodeValue}
+                        value={$nodeValue}
                         on:select={onSelect}
                     />
                 </Block>
