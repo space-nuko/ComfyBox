@@ -1,11 +1,4 @@
 @echo off
 
-echo Starting ComfyBox.
-echo Be sure you've started ComfyUI already using this command:
-echo[
-echo     python main.py --enable-cors-header
-echo[
-echo Serving at http://localhost:8000
-echo[
-
-python -m http.server 8000
+cd /D "%~dp0"
+python serve.py

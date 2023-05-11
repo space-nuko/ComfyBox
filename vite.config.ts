@@ -24,6 +24,10 @@ export default defineConfig({
         viteStaticCopy({
             targets: [
                 {
+                    src: 'bin/serve.py',
+                    dest: './'
+                },
+                {
                     src: 'bin/run.sh',
                     dest: './'
                 },
