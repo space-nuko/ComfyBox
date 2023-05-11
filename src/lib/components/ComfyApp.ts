@@ -1,4 +1,4 @@
-import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType } from "@litegraph-ts/core";
+import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
 import ComfyAPI, { type ComfyAPIQueueStatus } from "$lib/api"
 import { getPngMetadata, importA1111 } from "$lib/pnginfo";
@@ -788,6 +788,12 @@ export default class ComfyApp {
                 && "doAutoConfig" in node;
         }
 
+        const isComfyComboInput = (input: INodeInputSlot) => {
+            return "config" in input
+                && "widgetNodeType" in input
+                && input.widgetNodeType === "ui/combo";
+        }
+
         // Node IDs of combo widgets attached to a backend node
         let backendCombos: Set<number> = new Set()
 
@@ -807,10 +813,7 @@ export default class ComfyApp {
                     const inputNode = backendNode.getInputNode(i)
 
                     // Does this input autocreate a combo box on creation?
-                    const isComfyInput = "config" in input
-                        && "widgetNodeType" in input
-                        && input.widgetNodeType === "ui/combo";
-
+                    const isComfyInput = isComfyComboInput(input)
                     const isComfyCombo = isComfyComboNode(inputNode)
 
                     console.debug("[refreshComboInNodes] CHECK", backendNode.type, input.name, "isComfyCombo", isComfyCombo, "isComfyInput", isComfyInput)
@@ -838,7 +841,21 @@ export default class ComfyApp {
         for (const node of this.lGraph.iterateNodesInOrder()) {
             if (isComfyComboNode(node) && !backendCombos.has(node.id)) {
                 const comboNode = node as nodes.ComfyComboNode;
-                comboNode.formatValues(comboNode.properties.values);
+                let values = comboNode.properties.values;
+
+                // Frontend nodes can declare defaultWidgets which creates a
+                // config inside their own inputs slots too.
+                const foundInput = range(node.outputs.length)
+                    .flatMap(i => node.getInputSlotsConnectedTo(i))
+                    .find(inp => "config" in inp && Array.isArray((inp.config as any).values))
+
+                if (foundInput != null) {
+                    const comfyInput = foundInput as IComfyInputSlot;
+                    console.warn("[refreshComboInNodes] found frontend config:", node.title, node.type, comfyInput.config.values)
+                    values = comfyInput.config.values;
+                }
+
+                comboNode.formatValues(values);
             }
         }
 
@@ -849,11 +866,11 @@ export default class ComfyApp {
             const def = defs[backendNode.type];
             const rawValues = def["input"]["required"][inputSlot.name][0];
 
-            console.warn("[ComfyApp] Reconfiguring combo widget", backendNode.type, "=>", comboNode.type, rawValues.length)
+            console.debug("[ComfyApp] Reconfiguring combo widget", backendNode.type, "=>", comboNode.type, rawValues.length)
             comboNode.doAutoConfig(inputSlot, { includeProperties: new Set(["values"]), setWidgetTitle: false })
 
             comboNode.formatValues(rawValues)
-            if (!inputSlot.config.values.includes(get(comboNode.value))) {
+            if (!inputSlot.config.values?.includes(get(comboNode.value))) {
                 comboNode.setValue(inputSlot.config.defaultValue || inputSlot.config.values[0])
             }
         }

@@ -170,12 +170,13 @@
                         on:filter={onFilter}>
                         <div class="comfy-select-list" slot="list" let:filteredItems>
                             {#if filteredItems.length > 0}
+                                {@const itemSize = isMobile ? 50 : 25}
                                 <VirtualList
                                     items={filteredItems}
                                     width="100%"
-                                    height={isMobile ? 300 : 600}
-                                    itemCount={filteredItems?.length}
-                                    itemSize={isMobile ? 50 : 24}
+                                    height={Math.min(filteredItems.length, 10) * itemSize}
+                                    itemCount={filteredItems.length}
+                                    {itemSize}
                                     overscanCount={5}
                                     scrollToIndex={hoverItemIndex}>
                                     <div slot="item"
@@ -260,7 +261,6 @@
  }
 
  .comfy-select-list {
-     height: 300px;
      width: 30rem;
 
      > :global(.virtual-list-wrapper) {
