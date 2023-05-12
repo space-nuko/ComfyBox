@@ -1,6 +1,6 @@
 import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
-import ComfyAPI, { type ComfyAPIStatusResponse, type NodeID, type PromptID } from "$lib/api"
+import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyPromptExtraData, type ComfyPromptRequest, type NodeID, type PromptID } from "$lib/api"
 import { getPngMetadata, importA1111 } from "$lib/pnginfo";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
@@ -385,6 +385,7 @@ export default class ComfyApp {
         const queue = await this.api.getQueue();
         const history = await this.api.getHistory();
         queueState.queueUpdated(queue);
+        queueState.historyUpdated(history);
     }
 
     private requestPermissions() {
@@ -739,13 +740,24 @@ export default class ComfyApp {
                     const p = await this.graphToPrompt(tag);
                     console.debug(promptToGraphVis(p))
 
-                    const extra_data = { extra_pnginfo: { workflow: p.workflow } }
+                    const extraData: ComfyPromptExtraData = {
+                        extra_pnginfo: {
+                            workflow: p.workflow
+                        },
+                        subgraphs: [tag]
+                    }
 
                     let error = null;
                     let promptID = null;
 
+                    const request: ComfyPromptRequest = {
+                        number: num,
+                        extra_data: extraData,
+                        prompt: p.output
+                    }
+
                     try {
-                        const response = await this.api.queuePrompt(num, p, extra_data);
+                        const response = await this.api.queuePrompt(request);
                         promptID = response.promptID;
                         error = response.error;
                     } catch (error) {
@@ -768,7 +780,7 @@ export default class ComfyApp {
                     }
 
                     this.lCanvas.draw(true, true);
-                    queueState.afterQueued(promptID, num, p, extra_data)
+                    queueState.afterQueued(promptID, num, p.output, extraData)
                 }
             }
         } finally {

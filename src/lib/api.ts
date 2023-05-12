@@ -1,14 +1,15 @@
-import type { Progress, SerializedPrompt, SerializedPromptOutput, SerializedPromptOutputs } from "./components/ComfyApp";
+import type { Progress, SerializedPrompt, SerializedPromptInputs, SerializedPromptInputsAll, SerializedPromptOutput, SerializedPromptOutputs } from "./components/ComfyApp";
 import type TypedEmitter from "typed-emitter";
 import EventEmitter from "events";
 import type { GalleryOutput } from "./nodes/ComfyWidgetNodes";
+import type { SerializedLGraph } from "@litegraph-ts/core";
 
-type PromptRequestBody = {
-    client_id: string,
-    prompt: any,
-    extra_data: any,
-    front: boolean,
-    number: number | undefined
+export type ComfyPromptRequest = {
+    client_id?: string,
+    prompt: SerializedPromptInputsAll,
+    extra_data: ComfyPromptExtraData,
+    front?: boolean,
+    number?: number
 }
 
 export type QueueItemType = "queue" | "history";
@@ -34,8 +35,8 @@ export type PromptID = string; // UUID
 export type ComfyAPIHistoryItem = [
     number,   // prompt number
     PromptID,
-    SerializedPrompt,
-    any,      // extra data
+    SerializedPromptInputsAll,
+    ComfyPromptExtraData,
     NodeID[]  // good outputs
 ]
 
@@ -52,6 +53,16 @@ export type ComfyAPIHistoryEntry = {
 export type ComfyAPIHistoryResponse = {
     history: Record<PromptID, ComfyAPIHistoryEntry>,
     error?: string
+}
+
+export type ComfyPromptPNGInfo = {
+    workflow: SerializedLGraph
+}
+
+export type ComfyPromptExtraData = {
+    extra_pnginfo?: ComfyPromptPNGInfo,
+    client_id?: string, // UUID
+    subgraphs: string[]
 }
 
 type ComfyAPIEvents = {
@@ -219,19 +230,11 @@ export default class ComfyAPI {
      * @param {number} number The index at which to queue the prompt, passing -1 will insert the prompt at the front of the queue
      * @param {object} prompt The prompt data to queue
      */
-    async queuePrompt(number: number, { output, workflow }, extra_data: any): Promise<ComfyAPIPromptResponse> {
-        const body: PromptRequestBody = {
-            client_id: this.clientId,
-            prompt: output,
-            extra_data,
-            front: false,
-            number: number
-        };
+    async queuePrompt(body: ComfyPromptRequest): Promise<ComfyAPIPromptResponse> {
+        body.client_id = this.clientId;
 
-        if (number === -1) {
+        if (body.number === -1) {
             body.front = true;
-        } else if (number != 0) {
-            body.number = number;
         }
 
         let postBody = null;

@@ -1,5 +1,5 @@
-import type { ComfyAPIHistoryItem, ComfyAPIQueueResponse, ComfyAPIStatusResponse, NodeID, PromptID } from "$lib/api";
-import type { Progress, SerializedPrompt, SerializedPromptOutputs } from "$lib/components/ComfyApp";
+import type { ComfyAPIHistoryEntry, ComfyAPIHistoryItem, ComfyAPIHistoryResponse, ComfyAPIQueueResponse, ComfyAPIStatusResponse, ComfyPromptExtraData, NodeID, PromptID } from "$lib/api";
+import type { Progress, SerializedPrompt, SerializedPromptInputsAll, SerializedPromptOutputs } from "$lib/components/ComfyApp";
 import type { GalleryOutput } from "$lib/nodes/ComfyWidgetNodes";
 import { get, writable, type Writable } from "svelte/store";
 
@@ -7,33 +7,39 @@ export type QueueItem = {
     name: string
 }
 
+export type QueueEntryStatus = "success" | "error" | "all_cached" | "unknown";
+
 type QueueStateOps = {
-    queueUpdated: (queue: ComfyAPIQueueResponse) => void,
+    queueUpdated: (resp: ComfyAPIQueueResponse) => void,
+    historyUpdated: (resp: ComfyAPIHistoryResponse) => void,
     statusUpdated: (status: ComfyAPIStatusResponse | null) => void,
     executingUpdated: (promptID: PromptID | null, runningNodeID: NodeID | null) => void,
     executionCached: (promptID: PromptID, nodes: NodeID[]) => void,
     executionError: (promptID: PromptID, message: string) => void,
     progressUpdated: (progress: Progress) => void
-    afterQueued: (promptID: PromptID, number: number, prompt: SerializedPrompt, extraData: any) => void
+    afterQueued: (promptID: PromptID, number: number, prompt: SerializedPromptInputsAll, extraData: any) => void
     onExecuted: (promptID: PromptID, nodeID: NodeID, output: GalleryOutput) => void
 }
 
 export type QueueEntry = {
+    /* Data preserved on page refresh */
     number: number,
     queuedAt?: Date,
     finishedAt?: Date,
     promptID: PromptID,
-    prompt: SerializedPrompt,
-    extraData: any,
+    prompt: SerializedPromptInputsAll,
+    extraData: ComfyPromptExtraData,
     goodOutputs: NodeID[],
 
-    // Collected while the prompt is still executing
+    /* Data not sent by Comfy's API, lost on page refresh */
+    /* Prompt outputs, collected while the prompt is still executing */
     outputs: SerializedPromptOutputs,
+
 }
 
 export type CompletedQueueEntry = {
     entry: QueueEntry,
-    type: "success" | "error" | "all_cached",
+    status: QueueEntryStatus,
     error?: string,
 }
 
@@ -70,12 +76,31 @@ function toQueueEntry(resp: ComfyAPIHistoryItem): QueueEntry {
     }
 }
 
-function queueUpdated(queue: ComfyAPIQueueResponse) {
-    console.debug("[queueState] queueUpdated", queue.running.length, queue.pending.length)
+function toCompletedQueueEntry(resp: ComfyAPIHistoryEntry): CompletedQueueEntry {
+    const entry = toQueueEntry(resp.prompt)
+    entry.outputs = resp.outputs;
+    return {
+        entry,
+        status: Object.values(entry.outputs).length > 0 ? "success" : "all_cached",
+        error: null
+    }
+}
+
+function queueUpdated(resp: ComfyAPIQueueResponse) {
+    console.debug("[queueState] queueUpdated", resp.running.length, resp.pending.length)
     store.update((s) => {
-        s.queueRunning.set(queue.running.map(toQueueEntry));
-        s.queuePending.set(queue.pending.map(toQueueEntry));
-        s.queueRemaining = queue.pending.length;
+        s.queueRunning.set(resp.running.map(toQueueEntry));
+        s.queuePending.set(resp.pending.map(toQueueEntry));
+        s.queueRemaining = resp.pending.length;
+        return s
+    })
+}
+
+function historyUpdated(resp: ComfyAPIHistoryResponse) {
+    console.debug("[queueState] historyUpdated", Object.values(resp.history).length)
+    store.update((s) => {
+        const values = Object.values(resp.history) // TODO Order by prompt finished date!
+        s.queueCompleted.set(values.map(toCompletedQueueEntry));
         return s
     })
 }
@@ -115,7 +140,7 @@ function executingUpdated(promptID: PromptID | null, runningNodeID: NodeID | nul
                 s.queueCompleted.update(qc => {
                     const completed: CompletedQueueEntry = {
                         entry,
-                        type: "success",
+                        status: "success",
                     }
                     qc.push(completed)
                     return qc
@@ -142,7 +167,7 @@ function executionCached(promptID: PromptID, nodes: NodeID[]) {
                 s.queueCompleted.update(qc => {
                     const completed: CompletedQueueEntry = {
                         entry,
-                        type: "all_cached",
+                        status: "all_cached",
                     }
                     qc.push(completed)
                     return qc
@@ -167,7 +192,7 @@ function executionError(promptID: PromptID, message: string) {
             s.queueCompleted.update(qc => {
                 const completed: CompletedQueueEntry = {
                     entry,
-                    type: "error",
+                    status: "error",
                     error: message
                 }
                 qc.push(completed)
@@ -180,8 +205,8 @@ function executionError(promptID: PromptID, message: string) {
     })
 }
 
-function afterQueued(promptID: PromptID, number: number, prompt: SerializedPrompt, extraData: any) {
-    console.debug("[queueState] afterQueued", promptID, Object.keys(prompt.workflow.nodes))
+function afterQueued(promptID: PromptID, number: number, prompt: SerializedPromptInputsAll, extraData: any) {
+    console.debug("[queueState] afterQueued", promptID, Object.keys(prompt.nodes))
     store.update(s => {
         const entry: QueueEntry = {
             number,
@@ -215,6 +240,7 @@ const queueStateStore: WritableQueueStateStore =
 {
     ...store,
     queueUpdated,
+    historyUpdated,
     statusUpdated,
     progressUpdated,
     executingUpdated,

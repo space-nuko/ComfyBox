@@ -21,6 +21,12 @@ body {
     --comfy-dropdown-item-background-hover: var(--neutral-400);
     --comfy-dropdown-item-color-active: var(--neutral-100);
     --comfy-dropdown-item-background-active: var(--secondary-600);
+    --comfy-progress-bar-background: var(--secondary-300);
+    --comfy-progress-bar-foreground: #var(--body-text-color);
+    --comfy-node-name-background: var(--color-red-300);
+    --comfy-node-name-foreground: var(--body-text-color);
+    --comfy-spinner-main-color: var(--neutral-400);
+    --comfy-spinner-accent-color: var(--secondary-500);
 }
 
 .dark {
@@ -34,6 +40,17 @@ body {
     --comfy-dropdown-item-background-hover: var(--neutral-600);
     --comfy-dropdown-item-background-active: var(--secondary-600);
     --comfy-dropdown-border-color: var(--neutral-600);
+    --comfy-progress-bar-background: var(--secondary-400);
+    --comfy-progress-bar-foreground: #var(--body-text-color);
+    --comfy-node-name-background: var(--primary-500);
+    --comfy-node-name-foreground: var(--body-text-color);
+    --comfy-spinner-main-color: var(--neutral-600);
+    --comfy-spinner-accent-color: var(--secondary-600);
+}
+
+.mobile {
+    --comfy-progress-bar-background: lightgrey;
+    --comfy-progress-bar-foreground: #B3D8A9
 }
 
 @mixin disable-input {

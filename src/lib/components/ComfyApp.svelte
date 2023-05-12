@@ -78,7 +78,7 @@
      }
  }
 
- let propsSidebarSize = 15; //15;
+ let propsSidebarSize = 0;
 
  function toggleProps() {
      if (propsSidebarSize == 0) {
@@ -90,11 +90,11 @@
      }
  }
 
- let queueSidebarSize = 15;
+ let queueSidebarSize = 20;
 
  function toggleQueue() {
      if (queueSidebarSize == 0) {
-         queueSidebarSize = 15;
+         queueSidebarSize = 20;
          app.resizeCanvas();
      }
      else {

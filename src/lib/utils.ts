@@ -135,6 +135,12 @@ export function convertComfyOutputToGradio(output: GalleryOutput): GradioFileDat
     });
 }
 
+export function convertComfyOutputToComfyURL(output: GalleryOutputEntry): string {
+    const params = new URLSearchParams(output)
+    const url = `http://${location.hostname}:8188` // TODO make configurable
+    return url + "/view?" + params
+}
+
 export function convertFilenameToComfyURL(filename: string,
     subfolder: string = "",
     type: "input" | "output" | "temp" = "output"): string {
