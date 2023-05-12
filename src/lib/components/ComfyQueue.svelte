@@ -6,10 +6,10 @@
  import { convertComfyOutputToComfyURL, convertFilenameToComfyURL, getNodeInfo } from "$lib/utils"
  import type { Writable } from "svelte/store";
  import type { QueueItemType } from "$lib/api";
-	import { ImageViewer } from "$lib/ImageViewer";
-	import { Button } from "@gradio/button";
-	import type ComfyApp from "./ComfyApp";
-	import { tick } from "svelte";
+ import { ImageViewer } from "$lib/ImageViewer";
+ import { Button } from "@gradio/button";
+ import type ComfyApp from "./ComfyApp";
+ import { tick } from "svelte";
 
  let queuePending: Writable<QueueEntry[]> | null = null;
  let queueRunning: Writable<QueueEntry[]> | null = null;
@@ -22,7 +22,7 @@
      date?: string,
      status: QueueEntryStatus | "pending" | "running",
      images?: string[], // URLs
-     error?: string
+     details?: string // shown in a tooltip on hover
  }
 
  $: if ($queueState) {
@@ -80,17 +80,18 @@
          submessage,
          date,
          status: "pending",
-         images
+         images,
      }
  }
 
  function convertCompletedEntry(entry: CompletedQueueEntry): QueueUIEntry {
      const result = convertEntry(entry.entry);
      result.status = entry.status;
-     result.error = entry.error;
 
-     if (result.status === "all_cached")
-         result.submessage = "(Execution was cached)"
+     if (entry.message)
+         result.submessage = entry.message
+     if (entry.error)
+         result.details = entry.error
 
      return result;
  }
@@ -105,10 +106,10 @@
  }
 
  async function updateFromHistory() {
-     _entries = $queueCompleted.map(convertCompletedEntry);
+     _entries = $queueCompleted.map(convertCompletedEntry).reverse();
      if (queueList) {
          await tick(); // Wait for list size to be recalculated
-         queueList.scroll({ top: queueList.scrollHeight })
+         queueList.scrollTo(0, 0);
      }
      console.warn("[ComfyQueue] BUILDHISTORY", _entries, $queueCompleted)
  }
@@ -137,7 +138,7 @@
 </script>
 
 <div class="queue">
-    <div class="queue-entries" bind:this={queueList}>
+    <div class="queue-entries {mode}-mode" bind:this={queueList}>
         {#if _entries.length > 0}
             {#each _entries as entry}
                 <div class="queue-entry {entry.status}">
@@ -156,13 +157,13 @@
                             {entry.submessage}
                         </div>
                     </div>
-                    <div class="queue-entry-rest">
-                        {#if entry.date != null}
-                            <span class="queue-entry-queued-at">
-                                {entry.date}
-                            </span>
-                        {/if}
-                    </div>
+                </div>
+                <div class="queue-entry-rest">
+                    {#if entry.date != null}
+                        <span class="queue-entry-queued-at">
+                            {entry.date}
+                        </span>
+                    {/if}
                 </div>
             {/each}
         {:else}
@@ -230,9 +231,17 @@
  }
 
  .queue-entries {
-     overflow-y: scroll;
      height: $queue-height;
      max-height: $queue-height;
+     display: flex;
+     overflow-y: auto;
+     flex-flow: column nowrap;
+
+     &.queue-mode > :first-child {
+         // elements stick to bottom in queue mode only
+         // next element in queue is on the bottom
+         margin-top: auto !important;
+     }
 
      > .queue-empty {
          display: flex;
@@ -328,11 +337,11 @@
 
  .queue-entry-queued-at {
      width: auto;
-     font-size: 10px;
+     font-size: 12px;
      position:absolute;
      right: 0px;
      bottom: 0px;
-     padding: 0.0rem 0.4rem;
+     padding: 0.4rem 0.6rem;
      color: var(--body-text-color);
  }
 

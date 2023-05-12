@@ -43,11 +43,12 @@ export class ImageViewer {
     }
 
     static selected_gallery_button(gallery: HTMLDivElement): [HTMLButtonElement | null, number] {
-        var allCurrentButtons = gallery.querySelectorAll('.preview > .thumbnails > .thumbnail-item.thumbnail-small.selected');
+        var allCurrentButtons = gallery.querySelectorAll('.preview > .thumbnails > .thumbnail-item.thumbnail-small');
+        console.log(allCurrentButtons)
         var visibleCurrentButton = null;
         let index = -1;
         allCurrentButtons.forEach((elem, i) => {
-            if (elem.parentElement.offsetParent) {
+            if (elem.parentElement.offsetParent && elem.classList.contains("selected")) {
                 visibleCurrentButton = elem;
                 index = i;
             }
@@ -104,11 +105,9 @@ export class ImageViewer {
         this.setModalImageSrc(selectedImageUrl)
 
         if (this.currentGallery) {
-            var galleryButtons = ImageViewer.all_gallery_buttons(this.currentGallery);
-            var [_currentButton, index] = ImageViewer.selected_gallery_button(this.currentGallery);
-
-            if (index != -1) {
-                const nextButton = galleryButtons[negmod((index + offset), galleryButtons.length)]
+            const galleryButtons = ImageViewer.all_gallery_buttons(this.currentGallery);
+            const nextButton = galleryButtons[this.selectedIndex];
+            if (nextButton) {
                 nextButton.click()
             }
         }
@@ -173,6 +172,7 @@ export class ImageViewer {
 
             let urls = ImageViewer.get_gallery_urls(galleryElem)
             const [_currentButton, index] = ImageViewer.selected_gallery_button(galleryElem)
+            console.warn("Gallery!", index, urls, galleryElem)
 
             this.showModal(urls, index, galleryElem)
             evt.stopPropagation();

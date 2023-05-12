@@ -373,7 +373,7 @@ export default class ComfyApp {
 
             // Queue prompt using ctrl or command + enter
             if ((e.ctrlKey || e.metaKey) && (e.key === "Enter" || e.keyCode === 13 || e.keyCode === 10)) {
-                this.queuePrompt(e.shiftKey ? -1 : 0);
+                this.runDefaultQueueAction();
             }
         });
         window.addEventListener("keyup", (e) => {
@@ -525,7 +525,6 @@ export default class ComfyApp {
 
         if (get(layoutState).attrs.queuePromptButtonRunWorkflow) {
             this.queuePrompt(0, 1);
-            notify("Prompt queued.");
         }
     }
 
@@ -757,7 +756,13 @@ export default class ComfyApp {
 
                     try {
                         const response = await this.api.queuePrompt(request);
+
+                        // BUG: This can cause race conditions updating frontend state
+                        // since we don't have a prompt ID until the backend
+                        // returns!
                         promptID = response.promptID;
+                        queueState.afterQueued(promptID, num, p.output, extraData)
+
                         error = response.error;
                     } catch (error) {
                         error = error.toString();
@@ -779,7 +784,6 @@ export default class ComfyApp {
                     }
 
                     this.lCanvas.draw(true, true);
-                    queueState.afterQueued(promptID, num, p.output, extraData)
                 }
             }
         } finally {

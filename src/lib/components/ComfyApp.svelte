@@ -284,7 +284,6 @@
     <LightboxModal />
     <input bind:this={fileInput} id="comfy-file-input" type="file" accept=".json" on:change={loadWorkflow} />
 </div>
-
 <SvelteToast options={toastOptions} />
 
 <style lang="scss">

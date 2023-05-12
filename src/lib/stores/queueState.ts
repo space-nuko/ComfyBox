@@ -1,13 +1,14 @@
 import type { ComfyAPIHistoryEntry, ComfyAPIHistoryItem, ComfyAPIHistoryResponse, ComfyAPIQueueResponse, ComfyAPIStatusResponse, ComfyPromptExtraData, NodeID, PromptID } from "$lib/api";
-import type { Progress, SerializedPrompt, SerializedPromptInputsAll, SerializedPromptOutputs } from "$lib/components/ComfyApp";
+import type { Progress, SerializedPromptInputsAll, SerializedPromptOutputs } from "$lib/components/ComfyApp";
 import type { GalleryOutput } from "$lib/nodes/ComfyWidgetNodes";
+import notify from "$lib/notify";
 import { get, writable, type Writable } from "svelte/store";
 
 export type QueueItem = {
     name: string
 }
 
-export type QueueEntryStatus = "success" | "error" | "all_cached" | "unknown";
+export type QueueEntryStatus = "success" | "error" | "interrupted" | "all_cached" | "unknown";
 
 type QueueStateOps = {
     queueUpdated: (resp: ComfyAPIQueueResponse) => void,
@@ -35,11 +36,15 @@ export type QueueEntry = {
     /* Prompt outputs, collected while the prompt is still executing */
     outputs: SerializedPromptOutputs,
 
+    /* Nodes in of the workflow that have finished running so far. */
+    nodesRan: Set<NodeID>,
+    cachedNodes: Set<NodeID>
 }
 
 export type CompletedQueueEntry = {
     entry: QueueEntry,
     status: QueueEntryStatus,
+    message?: string,
     error?: string,
 }
 
@@ -72,7 +77,9 @@ function toQueueEntry(resp: ComfyAPIHistoryItem): QueueEntry {
         prompt,
         extraData,
         goodOutputs,
-        outputs: {}
+        outputs: {},
+        nodesRan: new Set(), // TODO can ComfyUI send this too?
+        cachedNodes: new Set()
     }
 }
 
@@ -122,27 +129,28 @@ function statusUpdated(status: ComfyAPIStatusResponse | null) {
     })
 }
 
-function findEntryInPending(promptID: PromptID): [number, QueueEntry, Writable<QueueEntry[]>] | null {
+function findEntryInPending(promptID: PromptID): [number, QueueEntry | null, Writable<QueueEntry[]> | null] {
     const state = get(store);
     let index = get(state.queuePending).findIndex(e => e.promptID === promptID)
-    if (index)
+    if (index !== -1)
         return [index, get(state.queuePending)[index], state.queuePending]
 
     index = get(state.queueRunning).findIndex(e => e.promptID === promptID)
-    if (index)
+    if (index !== -1)
         return [index, get(state.queueRunning)[index], state.queueRunning]
 
-    return null
+    return [-1, null, null]
 }
 
-function moveToCompleted(index: number, queue: Writable<QueueEntry[]>, status: QueueEntryStatus, error?: string) {
+function moveToCompleted(index: number, queue: Writable<QueueEntry[]>, status: QueueEntryStatus, message?: string, error?: string) {
     const state = get(store)
 
     const entry = get(queue)[index];
+    console.debug("[queueState] Move to completed", entry.promptID, index, status, message, error)
     entry.finishedAt = new Date() // Now
     queue.update(qp => { qp.splice(index, 1); return qp });
     state.queueCompleted.update(qc => {
-        const completed: CompletedQueueEntry = { entry, status, error }
+        const completed: CompletedQueueEntry = { entry, status, message, error }
         qc.push(completed)
         return qc
     })
@@ -150,21 +158,36 @@ function moveToCompleted(index: number, queue: Writable<QueueEntry[]>, status: Q
     store.set(state)
 }
 
-function executingUpdated(promptID: PromptID | null, runningNodeID: NodeID | null) {
+function executingUpdated(promptID: PromptID, runningNodeID: NodeID | null) {
     console.debug("[queueState] executingUpdated", promptID, runningNodeID)
     store.update((s) => {
         s.progress = null;
+
+        const [index, entry, queue] = findEntryInPending(promptID);
         if (runningNodeID != null) {
+            if (entry != null) {
+                entry.nodesRan.add(runningNodeID)
+            }
             s.runningNodeID = parseInt(runningNodeID);
         }
-        else if (promptID != null) {
+        else {
             // Prompt finished executing.
-            const [index, entry, queue] = findEntryInPending(promptID);
-            if (entry) {
-                moveToCompleted(index, queue, "success")
+            if (entry != null) {
+                const totalNodesInPrompt = Object.keys(entry.prompt).length
+                if (entry.cachedNodes.size >= Object.keys(entry.prompt).length) {
+                    notify("Prompt was cached, nothing to run.", { type: "warning" })
+                    moveToCompleted(index, queue, "all_cached", "(Execution was cached)");
+                }
+                else if (entry.nodesRan.size >= totalNodesInPrompt) {
+                    moveToCompleted(index, queue, "success")
+                }
+                else {
+                    notify("Interrupted prompt.")
+                    moveToCompleted(index, queue, "interrupted", `Interrupted after ${entry.nodesRan.size}/${totalNodesInPrompt} nodes`)
+                }
             }
             else {
-                console.error("[queueState] Could not find in pending! (executingUpdated)", promptID)
+                console.debug("[queueState] Could not find in pending! (executingUpdated)", promptID)
             }
             s.progress = null;
             s.runningNodeID = null;
@@ -177,13 +200,14 @@ function executionCached(promptID: PromptID, nodes: NodeID[]) {
     console.debug("[queueState] executionCached", promptID, nodes)
     store.update(s => {
         const [index, entry, queue] = findEntryInPending(promptID);
-        if (entry) {
-            if (nodes.length >= Object.keys(entry.prompt).length) {
-                moveToCompleted(index, queue, "all_cached");
+        if (entry != null) {
+            for (const nodeID of nodes) {
+                entry.nodesRan.add(nodeID);
+                entry.cachedNodes.add(nodeID);
             }
         }
         else {
-            console.error("[queueState] Could not find in pending! (executionCached)", promptID)
+            console.error("[queueState] Could not find in pending! (executionCached)", promptID, "pending", JSON.stringify(get(get(store).queuePending).map(p => p.promptID)), "running", JSON.stringify(get(get(store).queueRunning).map(p => p.promptID)))
         }
         s.progress = null;
         s.runningNodeID = null;
@@ -195,8 +219,8 @@ function executionError(promptID: PromptID, message: string) {
     console.debug("[queueState] executionError", promptID, message)
     store.update(s => {
         const [index, entry, queue] = findEntryInPending(promptID);
-        if (entry) {
-            moveToCompleted(index, queue, "error", message)
+        if (entry != null) {
+            moveToCompleted(index, queue, "error", "Error executing", message)
         }
         else {
             console.error("[queueState] Could not find in pending! (executionError)", promptID)
@@ -218,9 +242,12 @@ function afterQueued(promptID: PromptID, number: number, prompt: SerializedPromp
             prompt,
             extraData,
             goodOutputs: [],
-            outputs: {}
+            outputs: {},
+            nodesRan: new Set(),
+            cachedNodes: new Set()
         }
         s.queuePending.update(qp => { qp.push(entry); return qp })
+        console.debug("[queueState] ADD PROMPT", promptID)
         return s
     })
 }
@@ -229,7 +256,7 @@ function onExecuted(promptID: PromptID, nodeID: NodeID, output: GalleryOutput) {
     console.debug("[queueState] onExecuted", promptID, nodeID, output)
     store.update(s => {
         const [index, entry, queue] = findEntryInPending(promptID)
-        if (entry) {
+        if (entry != null) {
             entry.outputs[nodeID] = output;
             queue.set(get(queue))
         }

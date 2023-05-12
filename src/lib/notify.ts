@@ -45,6 +45,11 @@ function notifyToast(text: string, options: NotifyOptions) {
             '--toastBackground': 'var(--color-blue-500)',
         }
     }
+    else if (options.type === "warning") {
+        toastOptions.theme = {
+            '--toastBackground': 'var(--color-yellow-500)',
+        }
+    }
     else if (options.type === "error") {
         toastOptions.theme = {
             '--toastBackground': 'var(--color-red-500)',
