@@ -154,7 +154,7 @@ export default class ComfyAPI {
                             this.clientId = msg.data.sid;
                             sessionStorage["Comfy.SessionId"] = this.clientId;
                         }
-                        this.eventBus.emit("status", msg.data.status);
+                        this.eventBus.emit("status", { execInfo: { queueRemaining: msg.data.status.exec_info.queue_remaining } });
                         break;
                     case "progress":
                         this.eventBus.emit("progress", msg.data as Progress);
@@ -172,10 +172,10 @@ export default class ComfyAPI {
                         this.eventBus.emit("execution_error", msg.data.prompt_id, msg.data.message);
                         break;
                     default:
-                        throw new Error(`Unknown message type: ${msg.type} ${msg}`);
+                        console.warn("Unhandled message:", event.data);
                 }
             } catch (error) {
-                console.warn("Unhandled message:", event.data);
+                console.error("Error handling message", event.data, error);
             }
         });
     }

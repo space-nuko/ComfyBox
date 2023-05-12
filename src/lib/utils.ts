@@ -104,7 +104,7 @@ export function promptToGraphVis(prompt: SerializedPrompt): string {
 
 export function getNodeInfo(nodeId: number): string {
     let app = (window as any).app;
-    if (!app)
+    if (!app || !app.lGraph)
         return String(nodeId);
 
     const title = app.lGraph.getNodeById(nodeId)?.title || String(nodeId);

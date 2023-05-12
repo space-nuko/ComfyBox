@@ -1,7 +1,7 @@
 import type { ComfyAPIHistoryItem, ComfyAPIQueueResponse, ComfyAPIStatusResponse, NodeID, PromptID } from "$lib/api";
 import type { Progress, SerializedPrompt, SerializedPromptOutputs } from "$lib/components/ComfyApp";
 import type { GalleryOutput } from "$lib/nodes/ComfyWidgetNodes";
-import { writable, type Writable } from "svelte/store";
+import { get, writable, type Writable } from "svelte/store";
 
 export type QueueItem = {
     name: string
@@ -20,6 +20,8 @@ type QueueStateOps = {
 
 export type QueueEntry = {
     number: number,
+    queuedAt?: Date,
+    finishedAt?: Date,
     promptID: PromptID,
     prompt: SerializedPrompt,
     extraData: any,
@@ -36,9 +38,9 @@ export type CompletedQueueEntry = {
 }
 
 export type QueueState = {
-    queueRunning: QueueEntry[],
-    queuePending: QueueEntry[],
-    queueCompleted: CompletedQueueEntry[],
+    queueRunning: Writable<QueueEntry[]>,
+    queuePending: Writable<QueueEntry[]>,
+    queueCompleted: Writable<CompletedQueueEntry[]>,
     queueRemaining: number | "X" | null;
     runningNodeID: number | null;
     progress: Progress | null
@@ -46,9 +48,9 @@ export type QueueState = {
 type WritableQueueStateStore = Writable<QueueState> & QueueStateOps;
 
 const store: Writable<QueueState> = writable({
-    queueRunning: [],
-    queuePending: [],
-    queueCompleted: [],
+    queueRunning: writable([]),
+    queuePending: writable([]),
+    queueCompleted: writable([]),
     queueRemaining: null,
     runningNodeID: null,
     progress: null
@@ -58,6 +60,8 @@ function toQueueEntry(resp: ComfyAPIHistoryItem): QueueEntry {
     const [num, promptID, prompt, extraData, goodOutputs] = resp
     return {
         number: num,
+        queuedAt: null, // TODO when ComfyUI passes the date
+        finishedAt: null,
         promptID,
         prompt,
         extraData,
@@ -67,15 +71,17 @@ function toQueueEntry(resp: ComfyAPIHistoryItem): QueueEntry {
 }
 
 function queueUpdated(queue: ComfyAPIQueueResponse) {
+    console.debug("[queueState] queueUpdated", queue.running.length, queue.pending.length)
     store.update((s) => {
-        s.queueRunning = queue.running.map(toQueueEntry);
-        s.queuePending = queue.pending.map(toQueueEntry);
-        s.queueRemaining = s.queuePending.length;
+        s.queueRunning.set(queue.running.map(toQueueEntry));
+        s.queuePending.set(queue.pending.map(toQueueEntry));
+        s.queueRemaining = queue.pending.length;
         return s
     })
 }
 
 function progressUpdated(progress: Progress) {
+    // console.debug("[queueState] progressUpdated", progress)
     store.update((s) => {
         s.progress = progress;
         return s
@@ -83,6 +89,7 @@ function progressUpdated(progress: Progress) {
 }
 
 function statusUpdated(status: ComfyAPIStatusResponse | null) {
+    console.debug("[queueState] statusUpdated", status)
     store.update((s) => {
         if (status !== null)
             s.queueRemaining = status.execInfo.queueRemaining;
@@ -99,9 +106,20 @@ function executingUpdated(promptID: PromptID | null, runningNodeID: NodeID | nul
         }
         else if (promptID != null) {
             // Prompt finished executing.
-            const index = s.queuePending.findIndex(e => e.promptID === promptID)
+            const queuePending = get(s.queuePending)
+            const index = queuePending.findIndex(e => e.promptID === promptID)
             if (index) {
-                s.queuePending = s.queuePending.splice(index, 1);
+                const entry = queuePending[index]
+                entry.finishedAt = new Date() // Now
+                s.queuePending.update(qp => { qp.splice(index, 1); return qp });
+                s.queueCompleted.update(qc => {
+                    const completed: CompletedQueueEntry = {
+                        entry,
+                        type: "success",
+                    }
+                    qc.push(completed)
+                    return qc
+                })
             }
             s.progress = null;
             s.runningNodeID = null;
@@ -113,17 +131,22 @@ function executingUpdated(promptID: PromptID | null, runningNodeID: NodeID | nul
 function executionCached(promptID: PromptID, nodes: NodeID[]) {
     console.debug("[queueState] executionCached", promptID, nodes)
     store.update(s => {
-        const index = s.queuePending.findIndex(e => e.promptID === promptID)
+        const queuePending = get(s.queuePending)
+        const index = queuePending.findIndex(e => e.promptID === promptID)
         if (index) {
-            const entry = s.queuePending[index]
+            const entry = queuePending[index]
 
             if (nodes.length >= Object.keys(entry.prompt.output).length) {
-                s.queuePending = s.queuePending.splice(index, 1);
-                const completed: CompletedQueueEntry = {
-                    entry,
-                    type: "all_cached"
-                }
-                s.queueCompleted.push(completed)
+                entry.finishedAt = new Date() // Now
+                s.queuePending.update(qp => { qp.splice(index, 1); return qp });
+                s.queueCompleted.update(qc => {
+                    const completed: CompletedQueueEntry = {
+                        entry,
+                        type: "all_cached",
+                    }
+                    qc.push(completed)
+                    return qc
+                })
             }
         }
         s.progress = null;
@@ -135,16 +158,21 @@ function executionCached(promptID: PromptID, nodes: NodeID[]) {
 function executionError(promptID: PromptID, message: string) {
     console.debug("[queueState] executionError", promptID, message)
     store.update(s => {
-        const index = s.queuePending.findIndex(e => e.promptID === promptID)
+        const queuePending = get(s.queuePending)
+        const index = queuePending.findIndex(e => e.promptID === promptID)
         if (index) {
             const entry = s.queuePending[index]
-            s.queuePending = s.queuePending.splice(index, 1);
-            const completed: CompletedQueueEntry = {
-                entry,
-                type: "error",
-                error: message
-            }
-            s.queueCompleted.push(completed)
+            entry.finishedAt = new Date() // Now
+            s.queuePending.update(qp => { qp.splice(index, 1); return qp });
+            s.queueCompleted.update(qc => {
+                const completed: CompletedQueueEntry = {
+                    entry,
+                    type: "error",
+                    error: message
+                }
+                qc.push(completed)
+                return qc
+            })
         }
         s.progress = null;
         s.runningNodeID = null;
@@ -157,13 +185,15 @@ function afterQueued(promptID: PromptID, number: number, prompt: SerializedPromp
     store.update(s => {
         const entry: QueueEntry = {
             number,
+            queuedAt: new Date(), // Now
+            finishedAt: null,
             promptID,
             prompt,
             extraData,
             goodOutputs: [],
             outputs: {}
         }
-        s.queuePending.push(entry)
+        s.queuePending.update(qp => { qp.push(entry); return qp })
         return s
     })
 }
@@ -171,10 +201,11 @@ function afterQueued(promptID: PromptID, number: number, prompt: SerializedPromp
 function onExecuted(promptID: PromptID, nodeID: NodeID, output: GalleryOutput) {
     console.debug("[queueState] onExecuted", promptID, nodeID, output)
     store.update(s => {
-        const entry = s.queuePending.find(e => e.promptID === promptID)
+        const queuePending = get(s.queuePending)
+        const entry = queuePending.find(e => e.promptID === promptID)
         if (entry) {
             entry.outputs[nodeID] = output;
-            s.queuePending.push(entry)
+            s.queuePending.update(qp => { qp.push(entry); return qp; })
         }
         return s
     })

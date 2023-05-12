@@ -7,8 +7,33 @@ body {
     overscroll-behavior-y: contain;
 }
 
+#app {
+    background: var(--body-background-fill);
+}
+
 :root {
     --color-blue-500: #3985f5;
+
+    --comfy-splitpanes-background-fill: var(--secondary-100);
+    --comfy-splitpanes-background-fill-hover: var(--secondary-300);
+    --comfy-splitpanes-background-fill-active: var(--secondary-400);
+    --comfy-dropdown-item-color-hover: white;
+    --comfy-dropdown-item-background-hover: var(--neutral-400);
+    --comfy-dropdown-item-color-active: var(--neutral-100);
+    --comfy-dropdown-item-background-active: var(--secondary-600);
+}
+
+.dark {
+    color-scheme: dark;
+
+    --comfy-splitpanes-background-fill: var(--panel-border-color);
+    --comfy-splitpanes-background-fill-hover: var(--secondary-500);
+    --comfy-splitpanes-background-fill-active: var(--secondary-300);
+    --comfy-dropdown-list-background: var(--neutral-800);
+    --comfy-dropdown-item-color-hover: var(--neutral-400);
+    --comfy-dropdown-item-background-hover: var(--neutral-600);
+    --comfy-dropdown-item-background-active: var(--secondary-600);
+    --comfy-dropdown-border-color: var(--neutral-600);
 }
 
 @mixin disable-input {
@@ -17,4 +42,49 @@ body {
     border-color: var(--neutral-300);
     box-shadow: 0 0 0 var(--shadow-spread) transparent, rgba(0, 0, 0, 0.08) 0px 2px 4px 0px inset;
     cursor: not-allowed;
+}
+
+select {
+    color: var(--body-text-color);
+    background: var(--block-background-fill);
+}
+
+.container {
+    background: var(--body-background-fill) !important;
+    &.selected {
+        background: var(--ae-primary-color) !important;
+        > .block.padded {
+            background: var(--ae-primary-color) !important;
+        }
+    }
+    > .block {
+        background: var(--body-background-fill) !important;
+        // border-radius: var(--ae-panel-border-radius) !important;
+    }
+    &.z-index0 {
+        > .block {
+            background: var(--panel-background-fill) !important;
+        }
+    }
+
+    // &:not(.edit) {
+    //     &.z-index1 > .block {
+    //         padding: calc(var(--ae-outside-gap-size) / 2) !important;
+    //         border-width: 0px !important;
+    //     }
+
+    //     > .block {
+    //         border: solid var(--ae-panel-border-width) var(--ae-panel-border-color) !important;
+    //     }
+    // }
+}
+
+.widget {
+    // padding: var(--ae-outside-gap-size);
+    // border: 1px solid var(--ae-panel-border-color);
+    .block {
+        // background: var(--ae-frame-bg-color) !important;
+        background: var(--block-background-fill) !important;
+    }
+
 }

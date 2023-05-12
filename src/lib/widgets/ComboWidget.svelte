@@ -246,6 +246,22 @@
      width: auto;
      --font-size: 13px;
      --height: 32px;
+     --background: var(--input-background-fill);
+     --selected-item-color: var(--body-text-color);
+     --input-color: var(--body-text-color);
+     --chevron-color: var(--body-text-color);
+     --border: 1px solid var(--input-border-color);
+     --border-hover: 1px solid var(--input-border-color-hover);
+     --border-focused: 1px solid var(--input-border-color-focus);
+     --border-radius-focused: 0px;
+     --border-radius: 0px;
+     --list-background: var(--comfy-dropdown-list-background);
+     --item-border: var(--comfy-dropdown-border-color);
+     --item-color: var(--body-text-color);
+     --item-color-hover: var(--comfy-dropdown-item-color-hover);
+     --item-background-hover: var(--comfy-dropdown-item-background-hover);
+     --item-color-active: var(--comfy-dropdown-item-color-active);
+     --item-background-active: var(--comfy-dropdown-item-background-active);
  }
 
  :global(.svelte-select-list) {
@@ -263,10 +279,11 @@
 
  .comfy-select-list {
      width: 30rem;
+     color: var(--item-color);
 
      > :global(.virtual-list-wrapper) {
          box-shadow: var(--block-shadow);
-         background-color: white;
+         background-color: var(--list-background);
      }
 
      .comfy-empty-list {
@@ -279,17 +296,20 @@
      }
 
      .comfy-select-item {
-         border: 1px solid var(--neutral-300);
+         border: 1px solid var(--item-border);
          border-top: none;
          white-space: nowrap;
          overflow: hidden;
          text-overflow: ellipsis;
          display: flex;
          align-items: center;
-         background-color: white;
+         background-color: var(--list-background);
 
          font-size: 14px;
          padding: 0.2rem;
+
+         .comfy-select-label {
+         }
 
          &.mobile {
              font-size: 16px;
@@ -297,17 +317,13 @@
          }
 
          &.hover {
-             color: white;
-             background: var(--neutral-400);
+             color: var(--item-color-hover);
+             background: var(--item-background-hover);
              cursor: pointer;
          }
          &.active {
-             color: white;
-             background: var(--color-blue-500);
-         }
-
-         .comfy-select-label {
-
+             color: var(--item-color-active);
+             background: var(--item-background-active);
          }
      }
 

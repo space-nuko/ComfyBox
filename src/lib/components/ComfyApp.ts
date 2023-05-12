@@ -346,10 +346,6 @@ export default class ComfyApp {
             this.lGraph.setDirtyCanvas(true, false);
         });
 
-        this.api.addEventListener("status", (status: ComfyAPIStatusResponse | null) => {
-            queueState.statusUpdated(status);
-        });
-
         this.api.addEventListener("executed", (promptID: PromptID, nodeID: NodeID, output: GalleryOutput) => {
             this.nodeOutputs[nodeID] = output;
             const node = this.lGraph.getNodeById(parseInt(nodeID)) as ComfyGraphNode;
@@ -388,8 +384,7 @@ export default class ComfyApp {
     private async updateHistoryAndQueue() {
         const queue = await this.api.getQueue();
         const history = await this.api.getHistory();
-        console.warn("QUEUE", queue)
-        console.warn("HISTORY", history)
+        queueState.queueUpdated(queue);
     }
 
     private requestPermissions() {
