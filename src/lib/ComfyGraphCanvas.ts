@@ -60,7 +60,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         let state = get(queueState);
 
         let color = null;
-        if (node.id === +state.runningNodeId) {
+        if (node.id === +state.runningNodeID) {
             color = "#0f0";
             // this.app can be null inside the constructor if rendering is taking place already
         } else if (this.app && this.app.dragOverNode && node.id === this.app.dragOverNode.id) {

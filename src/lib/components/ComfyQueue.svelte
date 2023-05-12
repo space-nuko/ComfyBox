@@ -49,18 +49,18 @@
 
  $: if (entries) {
      _entries = []
-     // for (const entry of entries) {
-     //     for (const outputs of Object.values(entry.outputs)) {
-     //         const allImages = outputs.images.map(r => {
-     //             // TODO configure backend URL
-     //             const url = "http://localhost:8188/view?"
-     //             const params = new URLSearchParams(r)
-     //             return url + params
-     //         });
-     //
-     //         _entries.push({ allImages, name: "Output" })
-     //     }
-     // }
+     for (const entry of entries) {
+         for (const outputs of Object.values(entry.outputs)) {
+             const allImages = outputs.images.map(r => {
+                 // TODO configure backend URL
+                 const url = "http://localhost:8188/view?"
+                 const params = new URLSearchParams(r)
+                 return url + params
+             });
+
+             _entries.push({ allImages, name: "Output" })
+         }
+     }
  }
 </script>
 
@@ -76,9 +76,9 @@
         {/each}
     </div>
     <div class="bottom">
-        {#if $queueState.runningNodeId || $queueState.progress}
+        {#if $queueState.runningNodeID || $queueState.progress}
             <div class="node-name">
-                <span>Node: {getNodeInfo($queueState.runningNodeId)}</span>
+                <span>Node: {getNodeInfo($queueState.runningNodeID)}</span>
             </div>
             <div>
                 <ProgressBar value={$queueState.progress?.value} max={$queueState.progress?.max} styles="height: 30px;" />

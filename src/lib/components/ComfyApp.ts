@@ -1,6 +1,6 @@
 import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
-import ComfyAPI, { type ComfyAPIQueueStatus } from "$lib/api"
+import ComfyAPI, { type ComfyAPIStatusResponse, type NodeID, type PromptID } from "$lib/api"
 import { getPngMetadata, importA1111 } from "$lib/pnginfo";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
@@ -32,6 +32,7 @@ import { download, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis }
 import notify from "$lib/notify";
 import configState from "$lib/stores/configState";
 import { blankGraph } from "$lib/defaultGraph";
+import type { GalleryOutput } from "$lib/nodes/ComfyWidgetNodes";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -55,19 +56,21 @@ export type SerializedAppState = {
 }
 
 /** [link origin, link index] | value */
-export type SerializedPromptInput = [string, number] | any
+export type SerializedPromptInput = [NodeID, number] | any
 
 export type SerializedPromptInputs = {
-    inputs: Record<string, SerializedPromptInput>,
+    inputs: Record<NodeID, SerializedPromptInput>,
     class_type: string
 }
 
-export type SerializedPromptOutput = Record<string, SerializedPromptInputs>
+export type SerializedPromptInputsAll = Record<NodeID, SerializedPromptInputs>
 
 export type SerializedPrompt = {
     workflow: SerializedLGraph,
-    output: SerializedPromptOutput
+    output: SerializedPromptInputsAll
 }
+
+export type SerializedPromptOutputs = Record<NodeID, GalleryOutput>
 
 export type Progress = {
     value: number,
@@ -175,6 +178,8 @@ export default class ComfyApp {
         this.addDropHandler();
         this.addPasteHandler();
         this.addKeyboardHandler();
+
+        await this.updateHistoryAndQueue();
 
         // await this.#invokeExtensionsAsync("setup");
 
@@ -319,47 +324,48 @@ export default class ComfyApp {
      * Handles updates from the API socket
      */
     private addApiUpdateHandlers() {
-        this.api.addEventListener("status", ({ detail: ComfyAPIStatus }: CustomEvent) => {
-            // this.ui.setStatus(detail);
+        this.api.addEventListener("status", (status: ComfyAPIStatusResponse) => {
+            queueState.statusUpdated(status);
         });
 
         this.api.addEventListener("reconnecting", () => {
-            // this.ui.dialog.show("Reconnecting...");
+            uiState.reconnecting()
         });
 
         this.api.addEventListener("reconnected", () => {
-            // this.ui.dialog.close();
+            uiState.reconnected()
         });
 
-        this.api.addEventListener("progress", ({ detail }: CustomEvent) => {
-            queueState.progressUpdated(detail);
+        this.api.addEventListener("progress", (progress: Progress) => {
+            queueState.progressUpdated(progress);
             this.lGraph.setDirtyCanvas(true, false);
         });
 
-        this.api.addEventListener("executing", ({ detail }: CustomEvent) => {
-            queueState.executingUpdated(detail.node);
+        this.api.addEventListener("executing", (promptID: PromptID | null, nodeID: NodeID | null) => {
+            queueState.executingUpdated(promptID, nodeID);
             this.lGraph.setDirtyCanvas(true, false);
         });
 
-        this.api.addEventListener("status", (ev: CustomEvent) => {
-            queueState.statusUpdated(ev.detail as ComfyAPIQueueStatus);
+        this.api.addEventListener("status", (status: ComfyAPIStatusResponse | null) => {
+            queueState.statusUpdated(status);
         });
 
-        this.api.addEventListener("executed", ({ detail }: CustomEvent) => {
-            this.nodeOutputs[detail.node] = detail.output;
-            const node = this.lGraph.getNodeById(detail.node) as ComfyGraphNode;
+        this.api.addEventListener("executed", (promptID: PromptID, nodeID: NodeID, output: GalleryOutput) => {
+            this.nodeOutputs[nodeID] = output;
+            const node = this.lGraph.getNodeById(parseInt(nodeID)) as ComfyGraphNode;
             if (node?.onExecuted) {
-                node.onExecuted(detail.output);
+                node.onExecuted(output);
             }
+            queueState.onExecuted(promptID, nodeID, output)
         });
 
-        this.api.addEventListener("execution_cached", ({ detail }: CustomEvent) => {
-            // TODO detail.nodes
+        this.api.addEventListener("execution_cached", (promptID: PromptID, nodes: NodeID[]) => {
+            queueState.executionCached(promptID, nodes)
         });
 
-        this.api.addEventListener("execution_error", ({ detail }: CustomEvent) => {
-            queueState.update(s => { s.progress = null; s.runningNodeId = null; return s; })
-            notify(`Execution error: ${detail.message}`, { type: "error", timeout: 10000 })
+        this.api.addEventListener("execution_error", (promptID: PromptID, message: string) => {
+            queueState.executionError(promptID, message)
+            notify(`Execution error: ${message}`, { type: "error", timeout: 10000 })
         });
 
         this.api.init();
@@ -377,6 +383,13 @@ export default class ComfyApp {
         window.addEventListener("keyup", (e) => {
             this.shiftDown = e.shiftKey;
         });
+    }
+
+    private async updateHistoryAndQueue() {
+        const queue = await this.api.getQueue();
+        const history = await this.api.getHistory();
+        console.warn("QUEUE", queue)
+        console.warn("HISTORY", history)
     }
 
     private requestPermissions() {
@@ -443,6 +456,8 @@ export default class ComfyApp {
 
         this.lGraph.start();
         this.lGraph.eventBus.on("afterExecute", () => this.lCanvas.draw(true))
+
+        uiState.update(s => { s.uiUnlocked = this.lGraph._nodes.length === 0; return s; })
     }
 
     async initDefaultGraph() {
@@ -729,10 +744,20 @@ export default class ComfyApp {
                     const p = await this.graphToPrompt(tag);
                     console.debug(promptToGraphVis(p))
 
+                    const extra_data = { extra_pnginfo: { workflow: p.workflow } }
+
+                    let error = null;
+                    let promptID = null;
+
                     try {
-                        await this.api.queuePrompt(num, p);
+                        const response = await this.api.queuePrompt(num, p, extra_data);
+                        promptID = response.promptID;
+                        error = response.error;
                     } catch (error) {
-                        // this.ui.dialog.show(error.response || error.toString());
+                        error = error.toString();
+                    }
+
+                    if (error != null) {
                         const mes = error.response || error.toString()
                         notify(`Error queuing prompt:\n${mes}`, { type: "error" })
                         console.error(promptToGraphVis(p))
@@ -748,7 +773,7 @@ export default class ComfyApp {
                     }
 
                     this.lCanvas.draw(true, true);
-                    // await this.ui.queue.update();
+                    queueState.afterQueued(promptID, num, p, extra_data)
                 }
             }
         } finally {
@@ -767,7 +792,7 @@ export default class ComfyApp {
                 if (pngInfo.comfyBoxConfig) {
                     this.deserialize(JSON.parse(pngInfo.comfyBoxConfig));
                 } else if (pngInfo.parameters) {
-                    throw "TODO import A111 import!"
+                    throw "TODO A111 import!"
                     // importA1111(this.lGraph, pngInfo.parameters, this.api);
                 }
                 else {

@@ -24,10 +24,6 @@ type ComfyGraphEvents = {
 export default class ComfyGraph extends LGraph {
     eventBus: TypedEmitter<ComfyGraphEvents> = new EventEmitter() as TypedEmitter<ComfyGraphEvents>;
 
-    constructor() {
-        super();
-    }
-
     override onConfigure() {
         console.debug("Configured");
         this.eventBus.emit("configured", this);
