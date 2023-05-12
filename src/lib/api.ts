@@ -298,7 +298,7 @@ export default class ComfyAPI {
             return Promise.reject(error)
         }
 
-        return fetch("/" + type, {
+        return fetch(this.getBackendUrl() + "/" + type, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -328,6 +328,6 @@ export default class ComfyAPI {
      * Interrupts the execution of the running prompt
      */
     async interrupt(): Promise<Response> {
-        return fetch("/interrupt", { method: "POST" });
+        return fetch(this.getBackendUrl() + "/interrupt", { method: "POST" });
     }
 }

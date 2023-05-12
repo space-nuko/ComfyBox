@@ -88,6 +88,9 @@ importers:
       radix-icons-svelte:
         specifier: ^1.2.1
         version: 1.2.1
+      svelte-feather-icons:
+        specifier: ^4.0.0
+        version: 4.0.0
       svelte-preprocess:
         specifier: ^5.0.3
         version: 5.0.3(sass@1.61.0)(svelte@3.58.0)(typescript@5.0.3)
@@ -6096,6 +6099,12 @@ packages:
     dependencies:
       svelte: 3.58.0
     dev: true
+
+  /svelte-feather-icons@4.0.0:
+    resolution: {integrity: sha512-4ieUsjp+VYa1r6y80jDt9zRiRUZyJNbESpRdHdJJhiBubyuXX96A7f1UZSK4olxzP6Qsg5ZAuyZlnmvD+/swAA==}
+    dependencies:
+      svelte: 3.58.0
+    dev: false
 
   /svelte-floating-ui@1.2.8:
     resolution: {integrity: sha512-8Ifi5CD2Ui7FX7NjJRmutFtXjrB8T/FMNoS2H8P81t5LHK4I9G4NIs007rLWG/nRl7y+zJUXa3tWuTjYXw/O5A==}

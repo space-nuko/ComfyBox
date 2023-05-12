@@ -122,14 +122,14 @@
      // the event might fire too early
 
      const callback = isMobile ? setupImageForMobileLightbox
-                    : ImageViewer.instance.setupImageForLightbox.bind(ImageViewer.instance)
+                    : ImageViewer.instance.setupGalleryImageForLightbox.bind(ImageViewer.instance)
 
      setTimeout(() => {
          const images = element.querySelectorAll<HTMLImageElement>('div.block div > img')
          if (images != null) {
              images.forEach(callback);
          }
-         ImageViewer.instance.updateOnBackgroundChange();
+         ImageViewer.instance.refreshImages();
      }, 200)
 
      // Update index

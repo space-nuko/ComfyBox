@@ -161,7 +161,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     private triggerChangeEvent(value: any) {
-        console.debug("[Widget] trigger changed", this, value)
+        // console.debug("[Widget] trigger changed", this, value)
         const changedOutput = this.outputs[this.changedIndex]
         if (changedOutput.type === BuiltInSlotType.EVENT)
             this.triggerSlot(this.changedIndex, value)
@@ -271,7 +271,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
             }
         }
 
-        console.debug("Property copy", input, this.properties)
+        // console.debug("Property copy", input, this.properties)
 
         this.setValue(get(this.value))
 
@@ -288,7 +288,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         if (layoutEntry && layoutEntry.parent) {
             layoutEntry.parent.attrsChanged.set(get(layoutEntry.parent.attrsChanged) + 1)
         }
-        console.debug("propsChanged", this)
+        // console.debug("propsChanged", this)
         this.propsChanged.set(get(this.propsChanged) + 1)
 
     }

@@ -122,6 +122,34 @@ function statusUpdated(status: ComfyAPIStatusResponse | null) {
     })
 }
 
+function findEntryInPending(promptID: PromptID): [number, QueueEntry, Writable<QueueEntry[]>] | null {
+    const state = get(store);
+    let index = get(state.queuePending).findIndex(e => e.promptID === promptID)
+    if (index)
+        return [index, get(state.queuePending)[index], state.queuePending]
+
+    index = get(state.queueRunning).findIndex(e => e.promptID === promptID)
+    if (index)
+        return [index, get(state.queueRunning)[index], state.queueRunning]
+
+    return null
+}
+
+function moveToCompleted(index: number, queue: Writable<QueueEntry[]>, status: QueueEntryStatus, error?: string) {
+    const state = get(store)
+
+    const entry = get(queue)[index];
+    entry.finishedAt = new Date() // Now
+    queue.update(qp => { qp.splice(index, 1); return qp });
+    state.queueCompleted.update(qc => {
+        const completed: CompletedQueueEntry = { entry, status, error }
+        qc.push(completed)
+        return qc
+    })
+
+    store.set(state)
+}
+
 function executingUpdated(promptID: PromptID | null, runningNodeID: NodeID | null) {
     console.debug("[queueState] executingUpdated", promptID, runningNodeID)
     store.update((s) => {
@@ -131,20 +159,12 @@ function executingUpdated(promptID: PromptID | null, runningNodeID: NodeID | nul
         }
         else if (promptID != null) {
             // Prompt finished executing.
-            const queuePending = get(s.queuePending)
-            const index = queuePending.findIndex(e => e.promptID === promptID)
-            if (index) {
-                const entry = queuePending[index]
-                entry.finishedAt = new Date() // Now
-                s.queuePending.update(qp => { qp.splice(index, 1); return qp });
-                s.queueCompleted.update(qc => {
-                    const completed: CompletedQueueEntry = {
-                        entry,
-                        status: "success",
-                    }
-                    qc.push(completed)
-                    return qc
-                })
+            const [index, entry, queue] = findEntryInPending(promptID);
+            if (entry) {
+                moveToCompleted(index, queue, "success")
+            }
+            else {
+                console.error("[queueState] Could not find in pending! (executingUpdated)", promptID)
             }
             s.progress = null;
             s.runningNodeID = null;
@@ -156,23 +176,14 @@ function executingUpdated(promptID: PromptID | null, runningNodeID: NodeID | nul
 function executionCached(promptID: PromptID, nodes: NodeID[]) {
     console.debug("[queueState] executionCached", promptID, nodes)
     store.update(s => {
-        const queuePending = get(s.queuePending)
-        const index = queuePending.findIndex(e => e.promptID === promptID)
-        if (index) {
-            const entry = queuePending[index]
-
-            if (nodes.length >= Object.keys(entry.prompt.output).length) {
-                entry.finishedAt = new Date() // Now
-                s.queuePending.update(qp => { qp.splice(index, 1); return qp });
-                s.queueCompleted.update(qc => {
-                    const completed: CompletedQueueEntry = {
-                        entry,
-                        status: "all_cached",
-                    }
-                    qc.push(completed)
-                    return qc
-                })
+        const [index, entry, queue] = findEntryInPending(promptID);
+        if (entry) {
+            if (nodes.length >= Object.keys(entry.prompt).length) {
+                moveToCompleted(index, queue, "all_cached");
             }
+        }
+        else {
+            console.error("[queueState] Could not find in pending! (executionCached)", promptID)
         }
         s.progress = null;
         s.runningNodeID = null;
@@ -183,21 +194,12 @@ function executionCached(promptID: PromptID, nodes: NodeID[]) {
 function executionError(promptID: PromptID, message: string) {
     console.debug("[queueState] executionError", promptID, message)
     store.update(s => {
-        const queuePending = get(s.queuePending)
-        const index = queuePending.findIndex(e => e.promptID === promptID)
-        if (index) {
-            const entry = s.queuePending[index]
-            entry.finishedAt = new Date() // Now
-            s.queuePending.update(qp => { qp.splice(index, 1); return qp });
-            s.queueCompleted.update(qc => {
-                const completed: CompletedQueueEntry = {
-                    entry,
-                    status: "error",
-                    error: message
-                }
-                qc.push(completed)
-                return qc
-            })
+        const [index, entry, queue] = findEntryInPending(promptID);
+        if (entry) {
+            moveToCompleted(index, queue, "error", message)
+        }
+        else {
+            console.error("[queueState] Could not find in pending! (executionError)", promptID)
         }
         s.progress = null;
         s.runningNodeID = null;
@@ -206,7 +208,7 @@ function executionError(promptID: PromptID, message: string) {
 }
 
 function afterQueued(promptID: PromptID, number: number, prompt: SerializedPromptInputsAll, extraData: any) {
-    console.debug("[queueState] afterQueued", promptID, Object.keys(prompt.nodes))
+    console.debug("[queueState] afterQueued", promptID, Object.keys(prompt))
     store.update(s => {
         const entry: QueueEntry = {
             number,
@@ -226,11 +228,13 @@ function afterQueued(promptID: PromptID, number: number, prompt: SerializedPromp
 function onExecuted(promptID: PromptID, nodeID: NodeID, output: GalleryOutput) {
     console.debug("[queueState] onExecuted", promptID, nodeID, output)
     store.update(s => {
-        const queuePending = get(s.queuePending)
-        const entry = queuePending.find(e => e.promptID === promptID)
+        const [index, entry, queue] = findEntryInPending(promptID)
         if (entry) {
             entry.outputs[nodeID] = output;
-            s.queuePending.update(qp => { qp.push(entry); return qp; })
+            queue.set(get(queue))
+        }
+        else {
+            console.error("[queueState] Could not find in pending! (onExecuted)", promptID)
         }
         return s
     })

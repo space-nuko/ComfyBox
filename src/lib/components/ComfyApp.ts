@@ -452,8 +452,6 @@ export default class ComfyApp {
 
         this.lGraph.start();
         this.lGraph.eventBus.on("afterExecute", () => this.lCanvas.draw(true))
-
-        uiState.update(s => { s.uiUnlocked = this.lGraph._nodes.length === 0; return s; })
     }
 
     async initDefaultGraph() {
@@ -468,6 +466,7 @@ export default class ComfyApp {
             state = structuredClone(blankGraph)
         }
         await this.deserialize(state)
+        uiState.update(s => { s.uiUnlocked = true; return s; })
     }
 
     /**

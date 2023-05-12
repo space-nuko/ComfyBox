@@ -2,13 +2,19 @@
  import queueState, { type CompletedQueueEntry, type QueueEntry, type QueueEntryStatus } from "$lib/stores/queueState";
  import ProgressBar from "./ProgressBar.svelte";
  import Spinner from "./Spinner.svelte";
+ import { ListIcon as List } from "svelte-feather-icons";
  import { convertComfyOutputToComfyURL, convertFilenameToComfyURL, getNodeInfo } from "$lib/utils"
  import type { Writable } from "svelte/store";
  import type { QueueItemType } from "$lib/api";
+	import { ImageViewer } from "$lib/ImageViewer";
+	import { Button } from "@gradio/button";
+	import type ComfyApp from "./ComfyApp";
+	import { tick } from "svelte";
 
  let queuePending: Writable<QueueEntry[]> | null = null;
  let queueRunning: Writable<QueueEntry[]> | null = null;
  let queueCompleted: Writable<CompletedQueueEntry[]> | null = null;
+ let queueList: HTMLDivElement | null = null;
 
  type QueueUIEntry = {
      message: string,
@@ -28,7 +34,6 @@
  let mode: QueueItemType = "queue";
 
  function switchMode(newMode: QueueItemType) {
-     console.warn("SwitchMode", newMode)
      const changed = mode !== newMode
      mode = newMode
      if (changed)
@@ -66,6 +71,9 @@
          message = `Prompt: ${entry.extraData.subgraphs.join(', ')}`
 
      let submessage = `Nodes: ${Object.keys(entry.prompt).length}`
+     if (Object.keys(entry.outputs).length > 0) {
+         submessage = `Images: ${Object.keys(entry.outputs).length}`
+     }
 
      return {
          message,
@@ -80,17 +88,45 @@
      const result = convertEntry(entry.entry);
      result.status = entry.status;
      result.error = entry.error;
+
+     if (result.status === "all_cached")
+         result.submessage = "(Execution was cached)"
+
      return result;
  }
 
- function updateFromQueue() {
-     _entries = $queuePending.map(convertEntry);
+ async function updateFromQueue() {
+     _entries = $queuePending.map(convertEntry).reverse(); // newest entries appear at the top
+     if (queueList) {
+         await tick(); // Wait for list size to be recalculated
+         queueList.scroll({ top: queueList.scrollHeight })
+     }
      console.warn("[ComfyQueue] BUILDQUEUE", _entries, $queuePending)
  }
 
- function updateFromHistory() {
+ async function updateFromHistory() {
      _entries = $queueCompleted.map(convertCompletedEntry);
+     if (queueList) {
+         await tick(); // Wait for list size to be recalculated
+         queueList.scroll({ top: queueList.scrollHeight })
+     }
      console.warn("[ComfyQueue] BUILDHISTORY", _entries, $queueCompleted)
+ }
+
+ function showLightbox(entry: QueueUIEntry, e: Event) {
+     e.preventDefault()
+     if (!entry.images)
+         return
+
+     ImageViewer.instance.showModal(entry.images, 0)
+ }
+
+ async function interrupt() {
+     const app = (window as any).app as ComfyApp;
+     if (!app || !app.api)
+         return;
+
+     await app.api.interrupt();
  }
 
  let queued = false
@@ -101,39 +137,54 @@
 </script>
 
 <div class="queue">
-    <div class="queue-entries">
-        {#each _entries as entry}
-            <div class="queue-entry {entry.status}">
-                {#if entry.images.length > 0}
-                    <img class="queue-entry-image" src={entry.images[0]} alt="thumbnail" />
-                {:else}
-                    <!-- <div class="queue-entry-image-placeholder" /> -->
-                {/if}
-                <div class="queue-entry-details">
-                    <div class="queue-entry-message">
-                        {entry.message}
+    <div class="queue-entries" bind:this={queueList}>
+        {#if _entries.length > 0}
+            {#each _entries as entry}
+                <div class="queue-entry {entry.status}">
+                    {#if entry.images.length > 0}
+                        <div class="queue-entry-images" on:click={(e) => showLightbox(entry, e)}>
+                            <img class="queue-entry-image" src={entry.images[0]} alt="thumbnail" />
+                        </div>
+                    {:else}
+                        <!-- <div class="queue-entry-image-placeholder" /> -->
+                    {/if}
+                    <div class="queue-entry-details">
+                        <div class="queue-entry-message">
+                            {entry.message}
+                        </div>
+                        <div class="queue-entry-submessage">
+                            {entry.submessage}
+                        </div>
                     </div>
-                    <div class="queue-entry-submessage">
-                        {entry.submessage}
+                    <div class="queue-entry-rest">
+                        {#if entry.date != null}
+                            <span class="queue-entry-queued-at">
+                                {entry.date}
+                            </span>
+                        {/if}
                     </div>
                 </div>
-                <div class="queue-entry-rest">
-                    {#if entry.date != null}
-                        <span class="queue-entry-queued-at">
-                            {entry.date}
-                        </span>
-                    {/if}
+            {/each}
+        {:else}
+            <div class="queue-empty">
+                <div class="queue-empty-container">
+                    <div class="queue-empty-icon">
+                        <List size="120rem" />
+                    </div>
+                    <div class="queue-empty-message">
+                        (No entries)
+                    </div>
                 </div>
             </div>
-        {/each}
+        {/if}
     </div>
     <div class="mode-buttons">
-        <div class="mode-button"
+        <div class="mode-button secondary"
              on:click={() => switchMode("queue")}
             class:mode-selected={mode === "queue"}>
             Queue
         </div>
-        <div class="mode-button"
+        <div class="mode-button secondary"
              on:click={() => switchMode("history")}
             class:mode-selected={mode === "history"}>
             History
@@ -159,6 +210,11 @@
             <div>
                 <ProgressBar value={$queueState.progress?.value} max={$queueState.progress?.max} />
             </div>
+            <div class="queue-action-buttons">
+                <Button variant="secondary" on:click={interrupt} style={{ full_width: true }}>
+                    Interrupt
+                </Button>
+            </div>
         {/if}
     </div>
 </div>
@@ -177,13 +233,37 @@
      overflow-y: scroll;
      height: $queue-height;
      max-height: $queue-height;
+
+     > .queue-empty {
+         display: flex;
+         color: var(--comfy-accent-soft);
+         flex-direction: row;
+         margin: auto;
+         height: 100%;
+
+         > .queue-empty-container {
+             margin: auto;
+             display: flex;
+             flex-direction: column;
+
+             > .queue-empty-icon {
+                 margin: auto;
+             }
+             > .queue-empty-message {
+                 margin: auto;
+                 font-size: 32px;
+                 font-weight: bolder;
+             }
+         }
+     }
  }
 
  .queue-entry {
      padding: 1.0rem;
      display: flex;
      flex-direction: row;
-     border-bottom: 1px solid var(--panel-border-color);
+     border-bottom: 1px solid var(--block-border-color);
+     border-top: 1px solid var(--table-border-color);
      background: var(--panel-background-fill);
 
      &.success {
@@ -193,7 +273,9 @@
          background: red;
      }
      &.all_cached {
-         background: grey;
+         filter: brightness(80%);
+         background: var(--neutral-600);
+         color: var(--neutral-300);
      }
      &.running {
          /* background: lightblue; */
@@ -203,8 +285,17 @@
      }
  }
 
- .queue-entry-image {
-     width: var(--size-20);
+ .queue-entry-images {
+     height: 100%;
+     aspect-ratio: 1/1;
+     margin: auto;
+
+     > .queue-entry-image {
+         filter: none;
+         &:hover {
+             filter: brightness(120%) contrast(120%);
+         }
+     }
  }
 
  .queue-entry-image-placeholder {
@@ -240,36 +331,52 @@
      font-size: 10px;
      position:absolute;
      right: 0px;
-     bottom:0px;
+     bottom: 0px;
      padding: 0.0rem 0.4rem;
      color: var(--body-text-color);
  }
 
  .mode-buttons {
-     height: calc($mode-buttons-height);
      display: flex;
      flex-direction: row;
-     text-align: center;
      justify-content: center;
+     height: 100%;
 
-     .mode-button {
-         padding: 0.2rem;
+     > .mode-button {
          width: 100%;
-         height: 100%;
-         border: 1px solid var(--panel-border-color);
-         font-weight: bold;
-         background: var(--button-secondary-background-fill);
+     }
+ }
 
+ .mode-button {
+     height: calc($mode-buttons-height);
+     padding: 0.2rem;
+     border: 1px solid var(--panel-border-color);
+     font-weight: bold;
+     text-align: center;
+     margin: auto;
+
+     &.primary {
+         background: var(--button-primary-background-fill);
+         &:hover {
+             background: var(--button-primary-background-fill-hover);
+         }
+     }
+
+     &.secondary {
+         background: var(--button-secondary-background-fill);
          &:hover {
              background: var(--button-secondary-background-fill-hover);
-             filter: brightness(120%);
          }
-         &:active {
-             filter: brightness(50%)
-         }
-         &.mode-selected {
-             filter: brightness(150%)
-         }
+     }
+
+     &:hover {
+         filter: brightness(120%);
+     }
+     &:active {
+         filter: brightness(50%)
+     }
+     &.mode-selected {
+         filter: brightness(150%)
      }
  }
 
@@ -277,12 +384,12 @@
      width: 100%;
      height: calc($pending-height);
      position: absolute;
-     border: 2px solid var(--panel-border-color);
 
      .node-name {
          background-color: var(--comfy-node-name-background);
          color: var(--comfy-node-name-foreground);
          padding: 0.2em;
+         margin: 5px;
          display: flex;
          justify-content: center;
          align-items: center;
@@ -302,7 +409,16 @@
          }
 
          &.queued {
-             height: calc($pending-height - $bottom-bar-height);
+             height: calc($pending-height - $mode-buttons-height - $bottom-bar-height - 16px);
+         }
+     }
+
+     .queue-action-buttons {
+         margin: 5px;
+         height: 20px;
+
+         :global(button) {
+             border-radius: 0px !important;
          }
      }
  }

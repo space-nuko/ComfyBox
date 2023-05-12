@@ -1,6 +1,10 @@
+import { clamp, negmod } from "./utils";
+
 export class ImageViewer {
     root: HTMLDivElement;
     lightboxModal: HTMLDivElement;
+    currentImages: string[] = []
+    selectedIndex: number = -1;
     currentGallery: HTMLDivElement | null = null;
     private static _instance: ImageViewer;
 
@@ -22,6 +26,8 @@ export class ImageViewer {
     // A full size 'lightbox' preview modal shown when left clicking on gallery previews
     closeModal() {
         this.lightboxModal.style.display = "none";
+        this.currentImages = []
+        this.selectedIndex = -1;
         this.currentGallery = null;
     }
 
@@ -36,30 +42,24 @@ export class ImageViewer {
         return visibleGalleryButtons;
     }
 
-    static selected_gallery_button(gallery: HTMLDivElement): HTMLButtonElement | null {
+    static selected_gallery_button(gallery: HTMLDivElement): [HTMLButtonElement | null, number] {
         var allCurrentButtons = gallery.querySelectorAll('.preview > .thumbnails > .thumbnail-item.thumbnail-small.selected');
         var visibleCurrentButton = null;
-        allCurrentButtons.forEach((elem) => {
+        let index = -1;
+        allCurrentButtons.forEach((elem, i) => {
             if (elem.parentElement.offsetParent) {
                 visibleCurrentButton = elem;
+                index = i;
             }
         })
-        return visibleCurrentButton;
+        return [visibleCurrentButton, index];
     }
 
-    showModal(event: Event) {
-        const source = (event.target || event.srcElement) as HTMLImageElement;
-        const galleryElem = source.closest<HTMLDivElement>("div.block")
-        console.debug("[ImageViewer] showModal", event, source, galleryElem);
-        if (!galleryElem || ImageViewer.all_gallery_buttons(galleryElem).length === 0) {
-            console.error("No buttons found on gallery element!", galleryElem)
-            return;
-        }
+    showModal(imageUrls: string[], index: number, galleryElem?: HTMLDivElement) {
+        this.currentImages = imageUrls
+        this.selectedIndex = index
         this.currentGallery = galleryElem;
-        this.modalImage.src = source.src
-        if (this.modalImage.style.display === 'none') {
-            this.lightboxModal.style.setProperty('background-image', 'url(' + source.src + ')');
-        }
+        this.setModalImageSrc(imageUrls[index])
         this.lightboxModal.style.display = "flex";
         setTimeout(() => {
             this.modalImage.focus()
@@ -68,52 +68,52 @@ export class ImageViewer {
         event.stopPropagation()
     }
 
-    static negmod(n: number, m: number) {
-        return ((n % m) + m) % m;
+    static get_gallery_urls(galleryElem: HTMLDivElement): string[] {
+        return ImageViewer.all_gallery_buttons(galleryElem)
+            .map(b => (b.children[0] as HTMLImageElement).src)
     }
 
-    updateOnBackgroundChange() {
-        const modalImage = this.modalImage
-        if (modalImage && modalImage.offsetParent && this.currentGallery) {
-            let currentButton = ImageViewer.selected_gallery_button(this.currentGallery);
+    refreshImages() {
+        if (this.currentGallery) {
+            this.currentImages = ImageViewer.get_gallery_urls(this.currentGallery)
+            let [_currentButton, index] = ImageViewer.selected_gallery_button(this.currentGallery);
+            this.selectedIndex = index;
+        }
 
-            if (currentButton?.children?.length > 0 && modalImage.src != currentButton.children[0].src) {
-                modalImage.src = currentButton.children[0].src;
-                if (modalImage.style.display === 'none') {
-                    this.lightboxModal.style.setProperty('background-image', `url(${modalImage.src})`)
-                }
-            }
+        const selectedImageUrl = this.currentImages[this.selectedIndex];
+        this.setModalImageSrc(selectedImageUrl)
+    }
+
+    private setModalImageSrc(src: string, isTiling: boolean = false) {
+        const modalImage = this.modalImage
+        const modal = this.lightboxModal
+        modalImage.src = src;
+        if (isTiling) {
+            modalImage.style.display = 'none';
+            modal.style.setProperty('background-image', `url(${modalImage.src})`)
+        } else {
+            modalImage.style.display = 'block';
+            modal.style.setProperty('background-image', 'none')
         }
     }
 
     modalImageSwitch(offset: number) {
-        if (!this.currentGallery)
-            return
+        this.selectedIndex = negmod(this.selectedIndex + offset, this.currentImages.length - 1);
+        const selectedImageUrl = this.currentImages[this.selectedIndex];
 
-        var galleryButtons = ImageViewer.all_gallery_buttons(this.currentGallery);
+        this.setModalImageSrc(selectedImageUrl)
 
-        if (galleryButtons.length > 1) {
-            var currentButton = ImageViewer.selected_gallery_button(this.currentGallery);
+        if (this.currentGallery) {
+            var galleryButtons = ImageViewer.all_gallery_buttons(this.currentGallery);
+            var [_currentButton, index] = ImageViewer.selected_gallery_button(this.currentGallery);
 
-            var result = -1
-            galleryButtons.forEach((v, i) => {
-                if (v == currentButton) {
-                    result = i
-                }
-            })
-
-            if (result != -1) {
-                const nextButton = galleryButtons[ImageViewer.negmod((result + offset), galleryButtons.length)]
+            if (index != -1) {
+                const nextButton = galleryButtons[negmod((index + offset), galleryButtons.length)]
                 nextButton.click()
-                const modalImage = this.modalImage;
-                const modal = this.lightboxModal
-                modalImage.src = nextButton.children[0].src;
-                if (modalImage.style.display === 'none') {
-                    modal.style.setProperty('background-image', `url(${modalImage.src})`)
-                }
-                setTimeout(() => { modal.focus() }, 10)
             }
         }
+
+        setTimeout(() => { this.lightboxModal.focus() }, 10)
     }
 
     modalNextImage(event) {
@@ -140,7 +140,7 @@ export class ImageViewer {
         }
     }
 
-    setupImageForLightbox(e: HTMLImageElement) {
+    setupGalleryImageForLightbox(e: HTMLImageElement) {
         if (e.dataset.modded === "true")
             return;
 
@@ -161,7 +161,21 @@ export class ImageViewer {
             const initiallyZoomed = true
             this.modalZoomSet(this.modalImage, initiallyZoomed)
             evt.preventDefault()
-            this.showModal(evt)
+
+            const source = evt.target as HTMLImageElement;
+
+            const galleryElem = source.closest<HTMLDivElement>("div.block")
+            console.debug("[ImageViewer] showModal", event, source, galleryElem);
+            if (!galleryElem || ImageViewer.all_gallery_buttons(galleryElem).length === 0) {
+                console.error("No buttons found on gallery element!", galleryElem)
+                return;
+            }
+
+            let urls = ImageViewer.get_gallery_urls(galleryElem)
+            const [_currentButton, index] = ImageViewer.selected_gallery_button(galleryElem)
+
+            this.showModal(urls, index, galleryElem)
+            evt.stopPropagation();
         }, true);
 
     }
@@ -181,17 +195,8 @@ export class ImageViewer {
     }
 
     modalTileImageToggle(event: Event) {
-        const modalImage = this.modalImage
-        const modal = this.lightboxModal
-        const isTiling = modalImage.style.display === 'none';
-        if (isTiling) {
-            modalImage.style.display = 'block';
-            modal.style.setProperty('background-image', 'none')
-        } else {
-            modalImage.style.display = 'none';
-            modal.style.setProperty('background-image', `url(${modalImage.src})`)
-        }
-
+        const isTiling = this.modalImage.style.display === 'none';
+        this.setModalImageSrc(this.modalImage.src, isTiling)
         event.stopPropagation()
     }
 }

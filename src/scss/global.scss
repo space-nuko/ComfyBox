@@ -14,6 +14,7 @@ body {
 :root {
     --color-blue-500: #3985f5;
 
+    --comfy-accent-soft: var(--neutral-400);
     --comfy-splitpanes-background-fill: var(--secondary-100);
     --comfy-splitpanes-background-fill-hover: var(--secondary-300);
     --comfy-splitpanes-background-fill-active: var(--secondary-400);
@@ -21,8 +22,8 @@ body {
     --comfy-dropdown-item-background-hover: var(--neutral-400);
     --comfy-dropdown-item-color-active: var(--neutral-100);
     --comfy-dropdown-item-background-active: var(--secondary-600);
-    --comfy-progress-bar-background: var(--secondary-300);
-    --comfy-progress-bar-foreground: #var(--body-text-color);
+    --comfy-progress-bar-background: var(--neutral-300);
+    --comfy-progress-bar-foreground: var(--secondary-300);
     --comfy-node-name-background: var(--color-red-300);
     --comfy-node-name-foreground: var(--body-text-color);
     --comfy-spinner-main-color: var(--neutral-400);
@@ -32,6 +33,7 @@ body {
 .dark {
     color-scheme: dark;
 
+    --comfy-accent-soft: var(--neutral-600);
     --comfy-splitpanes-background-fill: var(--panel-border-color);
     --comfy-splitpanes-background-fill-hover: var(--secondary-500);
     --comfy-splitpanes-background-fill-active: var(--secondary-300);
@@ -40,9 +42,9 @@ body {
     --comfy-dropdown-item-background-hover: var(--neutral-600);
     --comfy-dropdown-item-background-active: var(--secondary-600);
     --comfy-dropdown-border-color: var(--neutral-600);
-    --comfy-progress-bar-background: var(--secondary-400);
-    --comfy-progress-bar-foreground: #var(--body-text-color);
-    --comfy-node-name-background: var(--primary-500);
+    --comfy-progress-bar-background: var(--neutral-500);
+    --comfy-progress-bar-foreground: var(--secondary-400);
+    --comfy-node-name-background: var(--neutral-700);
     --comfy-node-name-foreground: var(--body-text-color);
     --comfy-spinner-main-color: var(--neutral-600);
     --comfy-spinner-accent-color: var(--secondary-600);
@@ -94,6 +96,30 @@ select {
     //         border: solid var(--ae-panel-border-width) var(--ae-panel-border-color) !important;
     //     }
     // }
+}
+
+// button {
+//     filter: none;
+//     &.primary:active {
+//         filter: brightness(80%)
+//     }
+//     &.secondary:active {
+//         filter: brightness(80%)
+//     }
+// }
+
+
+button {
+    &.primary:active {
+        border-color: var(--button-primary-border-color-active) !important;
+        background: var(--button-primary-background-fill-active) !important;
+        color: var(--button-primary-text-color-active) !important;
+    }
+    &.secondary:active {
+        border-color: var(--button-secondary-border-color-active) !important;
+        background: var(--button-secondary-background-fill-active) !important;
+        color: var(--button-secondary-text-color-active) !important;
+    }
 }
 
 .widget {

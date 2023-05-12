@@ -13,6 +13,10 @@ export function clamp(n: number, min: number, max: number): number {
     return Math.min(Math.max(n, min), max)
 }
 
+export function negmod(n: number, m: number): number {
+    return ((n % m) + m) % m;
+}
+
 export function range(size: number, startAt: number = 0): ReadonlyArray<number> {
     return [...Array(size).keys()].map(i => i + startAt);
 }

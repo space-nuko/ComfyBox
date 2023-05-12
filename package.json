@@ -63,6 +63,7 @@
     "img-comparison-slider": "^8.0.0",
     "pollen-css": "^4.6.2",
     "radix-icons-svelte": "^1.2.1",
+    "svelte-feather-icons": "^4.0.0",
     "svelte-preprocess": "^5.0.3",
     "svelte-select": "^5.5.3",
     "svelte-splitpanes": "^0.7.13",
