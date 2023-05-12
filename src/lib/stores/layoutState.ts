@@ -782,6 +782,10 @@ function nodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
 
     if (options.addedBy === "moveIntoSubgraph" || options.addedBy === "moveOutOfSubgraph") {
         // All we need to do is update the nodeID linked to this node.
+        const item = state.allItemsByNode[options.prevNodeId]
+        delete state.allItemsByNode[options.prevNodeId]
+        state.allItemsByNode[node.id] = item
+        return;
     }
 
     const parent = findDefaultContainerForInsertion();
