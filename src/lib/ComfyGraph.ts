@@ -1,4 +1,4 @@
-import { LConnectionKind, LGraph, LGraphNode, type INodeSlot, type SlotIndex, LiteGraph, getStaticProperty, type LGraphAddNodeOptions, LGraphCanvas } from "@litegraph-ts/core";
+import { LConnectionKind, LGraph, LGraphNode, type INodeSlot, type SlotIndex, LiteGraph, getStaticProperty, type LGraphAddNodeOptions, LGraphCanvas, type LGraphRemoveNodeOptions } from "@litegraph-ts/core";
 import GraphSync from "./GraphSync";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
@@ -22,12 +22,10 @@ type ComfyGraphEvents = {
 }
 
 export default class ComfyGraph extends LGraph {
-    graphSync: GraphSync;
     eventBus: TypedEmitter<ComfyGraphEvents> = new EventEmitter() as TypedEmitter<ComfyGraphEvents>;
 
     constructor() {
         super();
-        this.graphSync = new GraphSync(this)
     }
 
     override onConfigure() {
@@ -50,8 +48,7 @@ export default class ComfyGraph extends LGraph {
     }
 
     override onNodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
-        layoutState.nodeAdded(node)
-        this.graphSync.onNodeAdded(node);
+        layoutState.nodeAdded(node, options)
 
         // All nodes whether they come from base litegraph or ComfyBox should
         // have tags added to them. Can't override serialization for existing
@@ -92,7 +89,7 @@ export default class ComfyGraph extends LGraph {
 
         if (get(uiState).autoAddUI) {
             console.warn("ADD", node.type, options)
-            if (!("svelteComponentType" in node) && options.addedByDeserialize == null) {
+            if (!("svelteComponentType" in node) && options.addedBy == null) {
                 console.debug("[ComfyGraph] AutoAdd UI")
                 const comfyNode = node as ComfyGraphNode;
                 const widgetNodesAdded = []
@@ -127,9 +124,8 @@ export default class ComfyGraph extends LGraph {
         this.eventBus.emit("nodeAdded", node);
     }
 
-    override onNodeRemoved(node: LGraphNode) {
-        layoutState.nodeRemoved(node);
-        this.graphSync.onNodeRemoved(node);
+    override onNodeRemoved(node: LGraphNode, options: LGraphRemoveNodeOptions) {
+        layoutState.nodeRemoved(node, options);
 
         console.debug("Removed", node);
         this.eventBus.emit("nodeRemoved", node);

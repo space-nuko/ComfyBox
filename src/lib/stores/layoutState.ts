@@ -1,7 +1,7 @@
 import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
 import type ComfyApp from "$lib/components/ComfyApp"
-import { type LGraphNode, type IWidget, type LGraph, NodeMode } from "@litegraph-ts/core"
+import { type LGraphNode, type IWidget, type LGraph, NodeMode, type LGraphRemoveNodeOptions, type LGraphAddNodeOptions } from "@litegraph-ts/core"
 import { dndzone, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 import type { ComfyWidgetNode } from '$lib/nodes';
 
@@ -79,7 +79,7 @@ export type LayoutState = {
      * If true, a saved workflow is being deserialized, so ignore any
      * nodeAdded/nodeRemoved events.
      *
-     * TODO: instead use LGraphAddNodeOptions.addedByDeserialize
+     * TODO: instead use LGraphAddNodeOptions.addedBy
      */
     isConfiguring: boolean,
 
@@ -649,8 +649,8 @@ type LayoutStateOps = {
     addWidget: (parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes>, index?: number) => WidgetLayout,
     findDefaultContainerForInsertion: () => ContainerLayout | null,
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
-    nodeAdded: (node: LGraphNode) => void,
-    nodeRemoved: (node: LGraphNode) => void,
+    nodeAdded: (node: LGraphNode, options: LGraphAddNodeOptions) => void,
+    nodeRemoved: (node: LGraphNode, options: LGraphRemoveNodeOptions) => void,
     groupItems: (dragItems: IDragItem[], attrs?: Partial<Attributes>) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
     getCurrentSelection: () => IDragItem[],
@@ -757,19 +757,6 @@ function updateChildren(parent: IDragItem, newChildren?: IDragItem[]): IDragItem
     return state.allItems[parent.id].children
 }
 
-function nodeAdded(node: LGraphNode) {
-    const state = get(store)
-    if (state.isConfiguring)
-        return;
-
-    const parent = findDefaultContainerForInsertion();
-
-    console.debug("[layoutState] nodeAdded", node)
-    if ("svelteComponentType" in node) {
-        addWidget(parent, node as ComfyWidgetNode);
-    }
-}
-
 function removeEntry(state: LayoutState, id: DragItemID) {
     const entry = state.allItems[id]
     if (entry.children && entry.children.length > 0) {
@@ -788,7 +775,30 @@ function removeEntry(state: LayoutState, id: DragItemID) {
     delete state.allItems[id]
 }
 
-function nodeRemoved(node: LGraphNode) {
+function nodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
+    const state = get(store)
+    if (state.isConfiguring)
+        return;
+
+    if (options.addedBy === "moveIntoSubgraph" || options.addedBy === "moveOutOfSubgraph") {
+        // All we need to do is update the nodeID linked to this node.
+    }
+
+    const parent = findDefaultContainerForInsertion();
+
+    console.debug("[layoutState] nodeAdded", node)
+    if ("svelteComponentType" in node) {
+        addWidget(parent, node as ComfyWidgetNode);
+    }
+}
+
+function nodeRemoved(node: LGraphNode, options: LGraphRemoveNodeOptions) {
+    if (options.removedBy === "moveIntoSubgraph" || options.removedBy === "moveOutOfSubgraph") {
+        // This node is being moved into a subgraph, so it will be readded under
+        // a new node ID shortly.
+        return
+    }
+
     const state = get(store)
 
     console.debug("[layoutState] nodeRemoved", node)

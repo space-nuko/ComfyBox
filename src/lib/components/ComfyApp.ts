@@ -37,6 +37,7 @@ export const COMFYBOX_SERIAL_VERSION = 1;
 
 LiteGraph.catch_exceptions = false;
 LiteGraph.CANVAS_GRID_SIZE = 32;
+LiteGraph.default_subgraph_lgraph_factory = () => new ComfyGraph();
 
 if (typeof window !== "undefined") {
     // Load default visibility
