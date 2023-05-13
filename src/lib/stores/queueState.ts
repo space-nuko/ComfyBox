@@ -1,4 +1,4 @@
-import type { ComfyAPIHistoryEntry, ComfyAPIHistoryItem, ComfyAPIHistoryResponse, ComfyAPIQueueResponse, ComfyAPIStatusResponse, ComfyPromptExtraData, NodeID, PromptID } from "$lib/api";
+import type { ComfyAPIHistoryEntry, ComfyAPIHistoryItem, ComfyAPIHistoryResponse, ComfyAPIQueueResponse, ComfyAPIStatusResponse, ComfyBoxPromptExtraData, NodeID, PromptID } from "$lib/api";
 import type { Progress, SerializedPromptInputsAll, SerializedPromptOutputs } from "$lib/components/ComfyApp";
 import type { GalleryOutput } from "$lib/nodes/ComfyWidgetNodes";
 import notify from "$lib/notify";
@@ -29,10 +29,11 @@ export type QueueEntry = {
     finishedAt?: Date,
     promptID: PromptID,
     prompt: SerializedPromptInputsAll,
-    extraData: ComfyPromptExtraData,
+    extraData: ComfyBoxPromptExtraData,
     goodOutputs: NodeID[],
 
-    /* Data not sent by Comfy's API, lost on page refresh */
+    /* Data not sent by ComfyUI's API, lost on page refresh */
+
     /* Prompt outputs, collected while the prompt is still executing */
     outputs: SerializedPromptOutputs,
 
@@ -53,7 +54,7 @@ export type QueueState = {
     queuePending: Writable<QueueEntry[]>,
     queueCompleted: Writable<CompletedQueueEntry[]>,
     queueRemaining: number | "X" | null;
-    runningNodeID: number | null;
+    runningNodeID: NodeID | null;
     progress: Progress | null,
     isInterrupting: boolean
 }
@@ -170,7 +171,7 @@ function executingUpdated(promptID: PromptID, runningNodeID: NodeID | null) {
             if (entry != null) {
                 entry.nodesRan.add(runningNodeID)
             }
-            s.runningNodeID = parseInt(runningNodeID);
+            s.runningNodeID = runningNodeID;
         }
         else {
             // Prompt finished executing.
