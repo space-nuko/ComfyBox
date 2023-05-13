@@ -2,27 +2,30 @@
  import ImageUpload from "$lib/components/ImageUpload.svelte"
  import type { WidgetLayout } from "$lib/stores/layoutState";
  import type { Writable } from "svelte/store";
- import type { ComfyGalleryNode, ComfyImageUploadNode, GalleryOutputEntry, MultiImageData } from "$lib/nodes/ComfyWidgetNodes";
+ import type { ComfyGalleryNode, ComfyImageUploadNode, ComfyImageLocation, MultiImageData } from "$lib/nodes/ComfyWidgetNodes";
 	import notify from "$lib/notify";
+	import { comfyFileToComfyBoxMetadata, type ComfyBoxImageMetadata } from "$lib/utils";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfyImageUploadNode | null = null;
- let nodeValue: Writable<GalleryOutputEntry[]> | null = null;
+ let nodeValue: Writable<ComfyBoxImageMetadata[]> | null = null;
  let propsChanged: Writable<number> | null = null;
  let imgWidth: number = 1;
  let imgHeight: number = 1;
 
  $: widget && setNodeValue(widget);
 
- $: if (!(node && $nodeValue && $nodeValue.length > 0)) {
-     node.imageSize = [0, 0]
- }
- else if (imgWidth > 0 && imgHeight > 0) {
-     node.imageSize = [imgWidth, imgHeight]
- }
- else {
-     node.imageSize = [0, 0]
+ $: if ($nodeValue && $nodeValue.length > 0) {
+     // TODO improve
+     if (imgWidth > 0 && imgHeight > 0) {
+         $nodeValue[0].width = imgWidth
+         $nodeValue[0].height = imgHeight
+     }
+     else {
+         $nodeValue[0].width = 0
+         $nodeValue[0].height = 0
+     }
  }
 
  function setNodeValue(widget: WidgetLayout) {
@@ -38,14 +41,14 @@
      $nodeValue = []
  }
 
- function onChange(e: CustomEvent<GalleryOutputEntry[]>) {
+ function onChange(e: CustomEvent<ComfyImageLocation[]>) {
      console.warn("ONCHANGE!!!", e.detail)
-     $nodeValue = e.detail || []
+     $nodeValue = (e.detail || []).map(comfyFileToComfyBoxMetadata)
  }
 
- function onUploaded(e: CustomEvent<GalleryOutputEntry[]>) {
+ function onUploaded(e: CustomEvent<ComfyImageLocation[]>) {
      console.warn("ONUPLOADED!!!", e.detail)
-     $nodeValue = e.detail || []
+     $nodeValue = (e.detail || []).map(comfyFileToComfyBoxMetadata)
  }
 
  function onUploadError(e: CustomEvent<any>) {
@@ -54,7 +57,7 @@
      $nodeValue = []
  }
 
- function onClear(e: CustomEvent<GalleryOutputEntry[]>) {
+ function onClear(e: CustomEvent<ComfyImageLocation[]>) {
      console.warn("ONCLEAR!!!", e.detail)
      $nodeValue = []
  }

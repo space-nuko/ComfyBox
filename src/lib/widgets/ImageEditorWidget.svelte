@@ -4,19 +4,19 @@
  import { get, type Writable, writable } from "svelte/store";
  import Modal from "$lib/components/Modal.svelte";
  import { Button } from "@gradio/button";
- import type { ComfyImageEditorNode, GalleryOutputEntry, MultiImageData } from "$lib/nodes/ComfyWidgetNodes";
+ import type { ComfyImageEditorNode, ComfyImageLocation, MultiImageData } from "$lib/nodes/ComfyWidgetNodes";
  import { Embed as Klecks, KL, KlApp, klHistory, type KlAppOptionsEmbed } from "klecks";
  import type { FileData as GradioFileData } from "@gradio/upload";
 
  import "klecks/style/style.scss";
 	import ImageUpload from "$lib/components/ImageUpload.svelte";
-	import { uploadImageToComfyUI, type ComfyUploadImageAPIResponse, convertComfyOutputToComfyURL } from "$lib/utils";
+	import { uploadImageToComfyUI, type ComfyUploadImageAPIResponse, convertComfyOutputToComfyURL, type ComfyBoxImageMetadata, comfyFileToComfyBoxMetadata } from "$lib/utils";
 	import notify from "$lib/notify";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfyImageEditorNode | null = null;
- let nodeValue: Writable<GalleryOutputEntry[]> | null = null;
+ let nodeValue: Writable<ComfyBoxImageMetadata[]> | null = null;
  let attrsChanged: Writable<number> | null = null;
 
  let imgWidth: number = 0;
@@ -24,14 +24,16 @@
 
  $: widget && setNodeValue(widget);
 
- $: if (!(node && $nodeValue && $nodeValue.length > 0)) {
-     node.imageSize = [0, 0]
- }
- else if (imgWidth > 0 && imgHeight > 0) {
-     node.imageSize = [imgWidth, imgHeight]
- }
- else {
-     node.imageSize = [0, 0]
+ $: if ($nodeValue && $nodeValue.length > 0) {
+     // TODO improve
+     if (imgWidth > 0 && imgHeight > 0) {
+         $nodeValue[0].width = imgWidth
+         $nodeValue[0].height = imgHeight
+     }
+     else {
+         $nodeValue[0].width = 0
+         $nodeValue[0].height = 0
+     }
  }
 
  function setNodeValue(widget: WidgetLayout) {
@@ -125,8 +127,9 @@
      const blob = kl.getPNG();
 
      await uploadImageToComfyUI(blob, FILENAME, "input")
-         .then((entry: GalleryOutputEntry) => {
-             $nodeValue = [entry] // TODO more than one image
+         .then((entry: ComfyImageLocation) => {
+             const meta: ComfyBoxImageMetadata = comfyFileToComfyBoxMetadata(entry);
+             $nodeValue = [meta] // TODO more than one image
              notify("Saved image to ComfyUI!", { type: "success" })
              onSuccess();
          })
@@ -191,7 +194,7 @@
      status = "uploading"
  }
 
- function onUploaded(e: CustomEvent<GalleryOutputEntry[]>) {
+ function onUploaded(e: CustomEvent<ComfyImageLocation[]>) {
      uploadError = null;
      status = "uploaded"
      $nodeValue = e.detail;
@@ -207,7 +210,7 @@
      uploadError = e.detail
  }
 
- function onChange(e: CustomEvent<GalleryOutputEntry[]>) {
+ function onChange(e: CustomEvent<ComfyImageLocation[]>) {
      // $nodeValue = e.detail;
  }
 

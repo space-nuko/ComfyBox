@@ -1,7 +1,7 @@
 import LGraphCanvas from "@litegraph-ts/core/src/LGraphCanvas";
 import ComfyGraphNode from "./ComfyGraphNode";
 import ComfyWidgets from "$lib/widgets"
-import type { ComfyWidgetNode, GalleryOutput } from "./ComfyWidgetNodes";
+import type { ComfyWidgetNode, ComfyExecutionResult } from "./ComfyWidgetNodes";
 import { BuiltInSlotType, type SerializedLGraphNode } from "@litegraph-ts/core";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import type { ComfyInputConfig } from "$lib/IComfyInputSlot";
@@ -110,7 +110,7 @@ export class ComfyBackendNode extends ComfyGraphNode {
         }
     }
 
-    override onExecuted(outputData: GalleryOutput) {
+    override onExecuted(outputData: ComfyExecutionResult) {
         console.warn("onExecuted outputs", outputData)
         this.triggerSlot(0, outputData)
     }

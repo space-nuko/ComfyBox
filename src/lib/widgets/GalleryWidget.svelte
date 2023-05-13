@@ -10,13 +10,13 @@
  import type { ComfyGalleryNode } from "$lib/nodes/ComfyWidgetNodes";
  import type { FileData as GradioFileData } from "@gradio/upload";
  import type { SelectData as GradioSelectData } from "@gradio/utils";
- import { clamp } from "$lib/utils";
+ import { clamp, comfyBoxImageToComfyURL, type ComfyBoxImageMetadata } from "$lib/utils";
  import { f7 } from "framework7-svelte";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfyGalleryNode | null = null;
- let nodeValue: Writable<GradioFileData[]> | null = null;
+ let nodeValue: Writable<ComfyBoxImageMetadata[]> | null = null;
  let propsChanged: Writable<number> | null = null;
  let option: number | null = null;
  let imageWidth: number = 1;
@@ -154,8 +154,10 @@
         <div class="wrapper comfy-image-widget" style={widget.attrs.style || ""} bind:this={element}>
             <Block variant="solid" padding={false}>
                 {#if $nodeValue && $nodeValue.length > 0}
+                    {@const value = $nodeValue[$nodeValue.length-1]}
+                    {@const url = comfyBoxImageToComfyURL(value)}
                     <StaticImage
-                        value={$nodeValue[$nodeValue.length-1].data}
+                        value={url}
                         show_label={widget.attrs.title != ""}
                         label={widget.attrs.title}
                         bind:imageWidth
@@ -167,11 +169,12 @@
             </Block>
         </div>
     {:else}
+        {@const images = $nodeValue.map(comfyBoxImageToComfyURL)}
         <div class="wrapper comfy-gallery-widget gradio-gallery" style={widget.attrs.style || ""} bind:this={element}>
             <Block variant="solid" padding={false}>
                 <div class="padding">
                     <Gallery
-                        bind:value={$nodeValue}
+                        value={images}
                         label={widget.attrs.title}
                         show_label={widget.attrs.title !== ""}
                         {style}

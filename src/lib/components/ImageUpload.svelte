@@ -1,6 +1,6 @@
 <script lang="ts">
  import UploadText from "$lib/components/gradio/app/UploadText.svelte";
- import type { GalleryOutputEntry } from "$lib/nodes/ComfyWidgetNodes";
+ import type { ComfyImageLocation } from "$lib/nodes/ComfyWidgetNodes";
  import notify from "$lib/notify";
  import { convertComfyOutputEntryToGradio, convertComfyOutputToComfyURL, type ComfyUploadImageAPIResponse } from "$lib/utils";
  import { Block, BlockLabel } from "@gradio/atoms";
@@ -9,7 +9,7 @@
  import { ModifyUpload, Upload } from "@gradio/upload";
  import { createEventDispatcher, tick } from "svelte";
 
- export let value: GalleryOutputEntry[] | null = null;
+ export let value: ComfyImageLocation[] | null = null;
  export let imgWidth: number = 0;
  export let imgHeight: number = 0;
  export let imgElem: HTMLImageElement | null = null
@@ -28,9 +28,9 @@
  let uploaded: boolean = false;
 
 	const dispatch = createEventDispatcher<{
-		change: GalleryOutputEntry[];
+		change: ComfyImageLocation[];
         uploading: undefined;
-		uploaded: GalleryOutputEntry[];
+		uploaded: ComfyImageLocation[];
 		upload_error: any;
 		clear: undefined;
 	}>();
@@ -60,7 +60,7 @@
 
  interface GradioUploadResponse {
      error?: string;
-     files?: Array<GalleryOutputEntry>;
+     files?: Array<ComfyImageLocation>;
  }
 
  async function upload_files(root: string, files: Array<File>): Promise<GradioUploadResponse> {

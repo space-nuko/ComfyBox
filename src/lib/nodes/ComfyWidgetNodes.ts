@@ -1,10 +1,10 @@
-import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot, type SerializedLGraphNode, BuiltInSlotType, type PropertyLayout, type IComboWidget, NodeMode, type INumberWidget } from "@litegraph-ts/core";
+import { LiteGraph, type ContextMenuItem, type LGraphNode, type Vector2, LConnectionKind, LLink, LGraphCanvas, type SlotType, TitleMode, type SlotLayout, LGraph, type INodeInputSlot, type ITextWidget, type INodeOutputSlot, type SerializedLGraphNode, BuiltInSlotType, type PropertyLayout, type IComboWidget, NodeMode, type INumberWidget, type UUID } from "@litegraph-ts/core";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 import type { SvelteComponentDev } from "svelte/internal";
 import { Watch } from "@litegraph-ts/nodes-basic";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import { writable, type Unsubscriber, type Writable, get } from "svelte/store";
-import { clamp, convertComfyOutputToGradio, range, type ComfyUploadImageType } from "$lib/utils"
+import { clamp, convertComfyOutputToGradio, range, type ComfyUploadImageType, isComfyBoxImageMetadata, filenameToComfyBoxMetadata, type ComfyBoxImageMetadata, isComfyExecutionResult, executionResultToImageMetadata, parseWhateverIntoImageMetadata } from "$lib/utils"
 import layoutState from "$lib/stores/layoutState";
 import type { FileData as GradioFileData } from "@gradio/upload";
 import queueState from "$lib/stores/queueState";
@@ -18,6 +18,7 @@ import CheckboxWidget from "$lib/widgets/CheckboxWidget.svelte";
 import RadioWidget from "$lib/widgets/RadioWidget.svelte";
 import ImageUploadWidget from "$lib/widgets/ImageUploadWidget.svelte";
 import ImageEditorWidget from "$lib/widgets/ImageEditorWidget.svelte";
+import type { NodeID } from "$lib/api";
 
 export type AutoConfigOptions = {
     includeProperties?: Set<string> | null,
@@ -91,7 +92,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
 
     // TODO these are bad, create override methods instead
     // input slots
-    inputIndex: number = 0;
+    inputIndex: number | null = null;
     storeActionName: string | null = "store";
 
     // output slots
@@ -193,7 +194,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
      * Logic to run if this widget can be treated as output (slider, combo, text)
      */
     override onExecute(param: any, options: object) {
-        if (this.copyFromInputLink) {
+        if (this.inputIndex != null) {
             if (this.inputs.length >= this.inputIndex) {
                 const data = this.getInputData(this.inputIndex)
                 if (data != null) { // TODO can "null" be a legitimate value here?
@@ -201,8 +202,10 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
                 }
             }
         }
-        if (this.outputs.length >= this.outputIndex) {
-            this.setOutputData(this.outputIndex, get(this.value))
+        if (this.outputIndex != null) {
+            if (this.outputs.length >= this.outputIndex) {
+                this.setOutputData(this.outputIndex, get(this.value))
+            }
         }
         for (const propName in this.shownOutputProperties) {
             const data = this.shownOutputProperties[propName]
@@ -265,7 +268,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         }
 
         if (options.setWidgetTitle) {
-            const widget = layoutState.findLayoutForNode(this.id)
+            const widget = layoutState.findLayoutForNode(this.id as NodeID)
             if (widget && input.name !== "") {
                 widget.attrs.title = input.name;
             }
@@ -284,7 +287,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     notifyPropsChanged() {
-        const layoutEntry = layoutState.findLayoutEntryForNode(this.id)
+        const layoutEntry = layoutState.findLayoutEntryForNode(this.id as NodeID)
         if (layoutEntry && layoutEntry.parent) {
             layoutEntry.parent.attrsChanged.set(get(layoutEntry.parent.attrsChanged) + 1)
         }
@@ -596,14 +599,20 @@ LiteGraph.registerNodeType({
 })
 
 /** Raw output as received from ComfyUI's backend */
-export type GalleryOutput = {
-    images: GalleryOutputEntry[]
+export interface ComfyExecutionResult {
+    // Technically this response can contain arbitrary data, but "images" is the
+    // most frequently used as it's output by LoadImage and PreviewImage, the
+    // only two output nodes in base ComfyUI.
+    images: ComfyImageLocation[] | null,
 }
 
 /** Raw output entry as received from ComfyUI's backend */
-export type GalleryOutputEntry = {
+export type ComfyImageLocation = {
+    /* Filename with extension in the subfolder. */
     filename: string,
+    /* Subfolder in the containing folder. */
     subfolder: string,
+    /* Base ComfyUI folder where the image is located. */
     type: ComfyUploadImageType
 }
 
@@ -612,7 +621,7 @@ export interface ComfyGalleryProperties extends ComfyWidgetProperties {
     updateMode: "replace" | "append",
 }
 
-export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
+export class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetadata[]> {
     override properties: ComfyGalleryProperties = {
         tags: [],
         defaultValue: [],
@@ -623,14 +632,11 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
     static slotLayout: SlotLayout = {
         inputs: [
             { name: "images", type: "OUTPUT" },
-            { name: "store", type: BuiltInSlotType.ACTION, options: { color_off: "rebeccapurple", color_on: "rebeccapurple" } },
-            { name: "clear", type: BuiltInSlotType.ACTION }
+            { name: "store", type: BuiltInSlotType.ACTION, options: { color_off: "rebeccapurple", color_on: "rebeccapurple" } }
         ],
         outputs: [
+            { name: "images", type: "COMFYBOX_IMAGES" },
             { name: "selected_index", type: "number" },
-            { name: "width", type: "number" },
-            { name: "height", type: "number" },
-            { name: "filename", type: "string" },
         ]
     }
 
@@ -640,7 +646,7 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
 
     override svelteComponentType = GalleryWidget
     override defaultValue = []
-    override copyFromInputLink = false;
+    override inputIndex = null;
     override saveUserState = false;
     override outputIndex = null;
     override changedIndex = null;
@@ -663,53 +669,30 @@ export class ComfyGalleryNode extends ComfyWidgetNode<GradioFileData[]> {
         }
     }
 
-    imageSize: Vector2 = [1, 1]
-
     override onExecute() {
-        const index = this.properties.index;
-
-        this.setOutputData(0, index)
-        this.setOutputData(1, this.imageSize[0])
-        this.setOutputData(2, this.imageSize[1])
-
-        let filename: string | null = null;
-        if (index != null) {
-            const entry = get(this.value)[index];
-            if (entry)
-                filename = entry.name
-        }
-
-        this.setOutputData(3, filename)
+        this.setOutputData(0, get(this.value))
+        this.setOutputData(1, this.properties.index)
     }
 
     override onAction(action: any, param: any, options: { action_call?: string }) {
         super.onAction(action, param, options)
-
-        if (action === "clear") {
-            this.setValue([])
-        }
     }
 
-    override formatValue(value: GradioFileData[] | null): string {
+    override formatValue(value: ComfyBoxImageMetadata[] | null): string {
         return `Images: ${value?.length || 0}`
     }
 
-    override parseValue(param: any): GradioFileData[] {
-        if (!(typeof param === "object" && "images" in param)) {
-            return []
-        }
+    override parseValue(param: any): ComfyBoxImageMetadata[] {
+        const meta = parseWhateverIntoImageMetadata(param) || [];
 
-        const data = param as GalleryOutput
-        console.debug("[ComfyGalleryNode] Received output!", data)
-
-        const galleryItems: GradioFileData[] = convertComfyOutputToGradio(data)
+        console.debug("[ComfyGalleryNode] Received output!", param)
 
         if (this.properties.updateMode === "append") {
             const currentValue = get(this.value)
-            return currentValue.concat(galleryItems)
+            return currentValue.concat(meta)
         }
         else {
-            return galleryItems;
+            return meta;
         }
     }
 
@@ -890,7 +873,7 @@ export interface ComfyImageUploadProperties extends ComfyWidgetProperties {
     fileCount: "single" | "multiple" // gradio File component format
 }
 
-export class ComfyImageUploadNode extends ComfyWidgetNode<GalleryOutputEntry[]> {
+export class ComfyImageUploadNode extends ComfyWidgetNode<ComfyBoxImageMetadata[]> {
     override properties: ComfyImageUploadProperties = {
         defaultValue: [],
         tags: [],
@@ -902,72 +885,27 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<GalleryOutputEntry[]> 
             { name: "store", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
-            { name: "filename", type: "string" }, // TODO support batches
-            { name: "width", type: "number" },
-            { name: "height", type: "number" },
-            { name: "image_count", type: "number" },
+            { name: "images", type: "COMFYBOX_IMAGES" }, // TODO support batches
             { name: "changed", type: BuiltInSlotType.EVENT },
         ]
     }
 
     override svelteComponentType = ImageUploadWidget;
     override defaultValue = [];
-    override outputIndex = null;
-    override changedIndex = 4;
+    override outputIndex = 0;
+    override changedIndex = 1;
     override storeActionName = "store";
     override saveUserState = false;
-
-    imageSize: Vector2 = [0, 0];
 
     constructor(name?: string) {
         super(name, [])
     }
 
-    override onExecute(param: any, options: object) {
-        super.onExecute(param, options);
-
-        const value = get(this.value)
-        if (value.length > 0) {
-            this.setOutputData(0, value[0].filename) // TODO when ComfyUI LoadImage supports loading an image batch
-            this.setOutputData(1, this.imageSize[0])
-            this.setOutputData(2, this.imageSize[1])
-            this.setOutputData(3, value.length)
-        }
-        else {
-            this.setOutputData(0, "")
-            this.setOutputData(1, 0)
-            this.setOutputData(2, 0)
-            this.setOutputData(3, 0)
-        }
+    override parseValue(value: any): ComfyBoxImageMetadata[] {
+        return parseWhateverIntoImageMetadata(value) || []
     }
 
-    override parseValue(value: any): GalleryOutputEntry[] {
-        if (value == null)
-            return []
-
-        const isComfyImageSpec = (value: any): boolean => {
-            return value && typeof value === "object" && "filename" in value && "type" in value
-        }
-
-        if (typeof value === "string") {
-            // Single filename
-            return [{ filename: value, subfolder: "", type: "input" }]
-        }
-        else if (isComfyImageSpec(value)) {
-            // Single ComfyUI file
-            return [value]
-        }
-        else if (Array.isArray(value)) {
-            if (value.every(v => typeof v === "string"))
-                return value.map(filename => { return { filename, subfolder: "", type: "input" } })
-            else if (value.every(isComfyImageSpec))
-                return value
-        }
-
-        return []
-    }
-
-    override formatValue(value: GalleryOutputEntry[]): string {
+    override formatValue(value: ComfyImageLocation[]): string {
         return `Images: ${value?.length || 0}`
     }
 }
@@ -979,13 +917,13 @@ LiteGraph.registerNodeType({
     type: "ui/image_upload"
 })
 
-export type FileNameOrGalleryData = string | GalleryOutputEntry;
+export type FileNameOrGalleryData = string | ComfyImageLocation;
 export type MultiImageData = FileNameOrGalleryData[];
 
 export interface ComfyImageEditorNodeProperties extends ComfyWidgetProperties {
 }
 
-export class ComfyImageEditorNode extends ComfyWidgetNode<GalleryOutputEntry[]> {
+export class ComfyImageEditorNode extends ComfyWidgetNode<ComfyBoxImageMetadata[]> {
     override properties: ComfyImageEditorNodeProperties = {
         defaultValue: [],
         tags: [],
@@ -996,18 +934,16 @@ export class ComfyImageEditorNode extends ComfyWidgetNode<GalleryOutputEntry[]> 
             { name: "store", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
-            { name: "filename", type: "string" }, // TODO support batches
-            { name: "width", type: "number" },
-            { name: "height", type: "number" },
-            { name: "image_count", type: "number" },
+            { name: "images", type: "COMFYBOX_IMAGES" }, // TODO support batches
             { name: "changed", type: BuiltInSlotType.EVENT },
         ]
     }
 
     override svelteComponentType = ImageEditorWidget;
-    override defaultValue: GalleryOutputEntry[] = [];
+    override defaultValue = [];
     override outputIndex = null;
-    override changedIndex = 4;
+    override inputIndex = null;
+    override changedIndex = 1;
     override storeActionName = "store";
     override saveUserState = false;
 
@@ -1015,50 +951,8 @@ export class ComfyImageEditorNode extends ComfyWidgetNode<GalleryOutputEntry[]> 
         super(name, [])
     }
 
-    imageSize: Vector2 = [0, 0];
-
-    override onExecute(param: any, options: object) {
-        super.onExecute(param, options);
-
-        const value = get(this.value)
-        if (value.length > 0) {
-            this.setOutputData(0, value[0].filename) // TODO when ComfyUI LoadImage supports loading an image batch
-            this.setOutputData(1, this.imageSize[0])
-            this.setOutputData(2, this.imageSize[1])
-            this.setOutputData(3, value.length)
-        }
-        else {
-            this.setOutputData(0, "")
-            this.setOutputData(1, 0)
-            this.setOutputData(2, 0)
-            this.setOutputData(3, 0)
-        }
-    }
-
-    override parseValue(value: any): GalleryOutputEntry[] {
-        if (value == null)
-            return []
-
-        const isComfyImageSpec = (value: any): boolean => {
-            return value && typeof value === "object" && "filename" in value && "type" in value
-        }
-
-        if (typeof value === "string") {
-            // Single filename
-            return [{ filename: value, subfolder: "", type: "input" }]
-        }
-        else if (isComfyImageSpec(value)) {
-            // Single ComfyUI file
-            return [value]
-        }
-        else if (Array.isArray(value)) {
-            if (value.every(v => typeof v === "string"))
-                return value.map(filename => { return { filename, subfolder: "", type: "input" } })
-            else if (value.every(isComfyImageSpec))
-                return value
-        }
-
-        return []
+    override parseValue(value: any): ComfyBoxImageMetadata[] {
+        return parseWhateverIntoImageMetadata(value) || [];
     }
 
     override formatValue(value: GradioFileData[]): string {

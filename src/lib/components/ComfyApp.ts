@@ -32,7 +32,7 @@ import { download, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis }
 import notify from "$lib/notify";
 import configState from "$lib/stores/configState";
 import { blankGraph } from "$lib/defaultGraph";
-import type { GalleryOutput } from "$lib/nodes/ComfyWidgetNodes";
+import type { ComfyExecutionResult } from "$lib/nodes/ComfyWidgetNodes";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -71,7 +71,7 @@ export type SerializedPrompt = {
     output: SerializedPromptInputsAll
 }
 
-export type SerializedPromptOutputs = Record<NodeID, GalleryOutput>
+export type SerializedPromptOutputs = Record<NodeID, ComfyExecutionResult>
 
 export type Progress = {
     value: number,
@@ -347,7 +347,7 @@ export default class ComfyApp {
             this.lGraph.setDirtyCanvas(true, false);
         });
 
-        this.api.addEventListener("executed", (promptID: PromptID, nodeID: NodeID, output: GalleryOutput) => {
+        this.api.addEventListener("executed", (promptID: PromptID, nodeID: NodeID, output: ComfyExecutionResult) => {
             this.nodeOutputs[nodeID] = output;
             const node = this.lGraph.getNodeById(nodeID) as ComfyGraphNode;
             if (node?.onExecuted) {
@@ -409,7 +409,8 @@ export default class ComfyApp {
         }
 
         setColor("IMAGE", "rebeccapurple")
-        setColor("COMFY_IMAGE_FILE", "chartreuse")
+        setColor("COMFYBOX_IMAGES", "lime")
+        setColor("COMFYBOX_IMAGE", "green")
         setColor(BuiltInSlotType.EVENT, "lightseagreen")
         setColor(BuiltInSlotType.ACTION, "lightseagreen")
     }

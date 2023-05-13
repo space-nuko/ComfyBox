@@ -5,10 +5,10 @@ import queueState from "$lib/stores/queueState";
 import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWidget, type SerializedLGraphNode, type SlotLayout, type PropertyLayout } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
-import type { ComfyWidgetNode, GalleryOutput, GalleryOutputEntry } from "./ComfyWidgetNodes";
+import type { ComfyWidgetNode, ComfyExecutionResult, ComfyImageLocation } from "./ComfyWidgetNodes";
 import type { NotifyOptions } from "$lib/notify";
 import type { FileData as GradioFileData } from "@gradio/upload";
-import { convertComfyOutputToGradio, reuploadImageToComfyUI, type ComfyUploadImageAPIResponse } from "$lib/utils";
+import { convertComfyOutputToGradio, type ComfyUploadImageAPIResponse } from "$lib/utils";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
@@ -63,7 +63,7 @@ LiteGraph.registerNodeType({
 })
 
 export interface ComfyStoreImagesActionProperties extends ComfyGraphNodeProperties {
-    images: GalleryOutput | null
+    images: ComfyExecutionResult | null
 }
 
 export class ComfyStoreImagesAction extends ComfyGraphNode {
@@ -90,7 +90,7 @@ export class ComfyStoreImagesAction extends ComfyGraphNode {
         if (action !== "store" || !param || !("images" in param))
             return;
 
-        this.setProperty("images", param as GalleryOutput)
+        this.setProperty("images", param as ComfyExecutionResult)
         this.setOutputData(0, this.properties.images)
     }
 }
@@ -223,7 +223,7 @@ export class ComfyNotifyAction extends ComfyGraphNode {
         // native notifications.
         if (param != null && typeof param === "object") {
             if ("images" in param) {
-                const output = param as GalleryOutput;
+                const output = param as ComfyExecutionResult;
                 const converted = convertComfyOutputToGradio(output);
                 if (converted.length > 0)
                     options.imageUrl = converted[0].data;
@@ -581,86 +581,6 @@ LiteGraph.registerNodeType({
     type: "events/no_change"
 })
 
-export interface ComfyUploadImageActionProperties extends ComfyGraphNodeProperties {
-    folderType: "output" | "temp"
-    lastUploadedImageFile: string | null
-}
-
-export class ComfyUploadImageAction extends ComfyGraphNode {
-    override properties: ComfyUploadImageActionProperties = {
-        tags: [],
-        folderType: "output",
-        lastUploadedImageFile: null
-    }
-
-    static slotLayout: SlotLayout = {
-        inputs: [
-            { name: "filename", type: "string" },
-            { name: "trigger", type: BuiltInSlotType.ACTION }
-        ],
-        outputs: [
-            { name: "input_filename", type: "string" },
-            { name: "uploaded", type: BuiltInSlotType.EVENT }
-        ],
-    }
-
-    private _promise = null;
-
-    displayWidget: ITextWidget;
-
-    constructor(title?: string) {
-        super(title);
-        this.displayWidget = this.addWidget<ITextWidget>(
-            "text",
-            "File",
-            this.properties.lastUploadedImageFile,
-            "lastUploadedImageFile"
-        );
-        this.displayWidget.disabled = true;
-    }
-
-    override onExecute() {
-        this.setOutputData(0, this.properties.lastUploadedImageFile)
-    }
-
-    override onAction(action: any, param: any) {
-        if (action !== "trigger" || this._promise != null)
-            return;
-
-        const filename = this.getInputData(0)
-        if (typeof filename !== "string" || !filename) {
-            return;
-        }
-
-        const data: GalleryOutputEntry = {
-            filename,
-            subfolder: "",
-            type: this.properties.folderType || "output"
-        }
-
-        this._promise = reuploadImageToComfyUI(data, "input")
-            .then((entry: GalleryOutputEntry) => {
-                console.debug("[UploadImageAction] Succeeded", entry)
-                this.properties.lastUploadedImageFile = entry.filename;
-                this.triggerSlot(1, this.properties.lastUploadedImageFile);
-                this._promise = null;
-            })
-            .catch((e) => {
-                console.error("Error uploading:", e)
-                notify(`Error uploading image to ComfyUi: ${e}`, { type: "error", timeout: 10000 })
-                this.properties.lastUploadedImageFile = null;
-                this._promise = null;
-            })
-    }
-}
-
-LiteGraph.registerNodeType({
-    class: ComfyUploadImageAction,
-    title: "Comfy.UploadImageAction",
-    desc: "Uploads an image from the specified ComfyUI folder into its input folder",
-    type: "actions/store_images"
-})
-
 export interface ComfySetPromptThumbnailsActionProperties extends ComfyGraphNodeProperties {
     defaultFolderType: string | null
 }
@@ -679,12 +599,12 @@ export class ComfySetPromptThumbnailsAction extends ComfyGraphNode {
 
     _value: any = null;
 
-    override getPromptThumbnails(): GalleryOutputEntry[] | null {
+    override getPromptThumbnails(): ComfyImageLocation[] | null {
         const data = this.getInputData(0)
 
         const folderType = this.properties.folderType || "input";
 
-        const convertString = (s: string): GalleryOutputEntry => {
+        const convertString = (s: string): ComfyImageLocation => {
             return { filename: data, subfolder: "", type: folderType }
         }
 
@@ -693,13 +613,13 @@ export class ComfySetPromptThumbnailsAction extends ComfyGraphNode {
         }
         else if (data != null && typeof data === "object") {
             if ("filename" in data && "type" in data)
-                return [data as GalleryOutputEntry];
+                return [data as ComfyImageLocation];
         }
         else if (Array.isArray(data) && data.length > 0) {
             if (typeof data[0] === "string")
                 return data.map(convertString)
             else if (typeof data[0] === "object" && "filename" in data[0] && "type" in data[0])
-                return data as GalleryOutputEntry[]
+                return data as ComfyImageLocation[]
         }
         return null;
     }

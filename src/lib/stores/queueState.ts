@@ -1,6 +1,6 @@
 import type { ComfyAPIHistoryEntry, ComfyAPIHistoryItem, ComfyAPIHistoryResponse, ComfyAPIQueueResponse, ComfyAPIStatusResponse, ComfyBoxPromptExtraData, NodeID, PromptID } from "$lib/api";
 import type { Progress, SerializedPromptInputsAll, SerializedPromptOutputs } from "$lib/components/ComfyApp";
-import type { GalleryOutput } from "$lib/nodes/ComfyWidgetNodes";
+import type { ComfyExecutionResult } from "$lib/nodes/ComfyWidgetNodes";
 import notify from "$lib/notify";
 import { get, writable, type Writable } from "svelte/store";
 
@@ -19,7 +19,7 @@ type QueueStateOps = {
     executionError: (promptID: PromptID, message: string) => void,
     progressUpdated: (progress: Progress) => void
     afterQueued: (promptID: PromptID, number: number, prompt: SerializedPromptInputsAll, extraData: any) => void
-    onExecuted: (promptID: PromptID, nodeID: NodeID, output: GalleryOutput) => void
+    onExecuted: (promptID: PromptID, nodeID: NodeID, output: ComfyExecutionResult) => void
 }
 
 export type QueueEntry = {
@@ -257,7 +257,7 @@ function afterQueued(promptID: PromptID, number: number, prompt: SerializedPromp
     })
 }
 
-function onExecuted(promptID: PromptID, nodeID: NodeID, output: GalleryOutput) {
+function onExecuted(promptID: PromptID, nodeID: NodeID, output: ComfyExecutionResult) {
     console.debug("[queueState] onExecuted", promptID, nodeID, output)
     store.update(s => {
         const [index, entry, queue] = findEntryInPending(promptID)

@@ -6,7 +6,7 @@ import { get } from "svelte/store"
 import layoutState from "$lib/stores/layoutState"
 import type { SvelteComponentDev } from "svelte/internal";
 import type { SerializedLGraph } from "@litegraph-ts/core";
-import type { FileNameOrGalleryData, GalleryOutput, GalleryOutputEntry } from "./nodes/ComfyWidgetNodes";
+import type { FileNameOrGalleryData, ComfyExecutionResult, ComfyImageLocation } from "./nodes/ComfyWidgetNodes";
 import type { FileData as GradioFileData } from "@gradio/upload";
 
 export function clamp(n: number, min: number, max: number): number {
@@ -125,11 +125,11 @@ export const debounce = (callback: Function, wait = 250) => {
     };
 };
 
-export function convertComfyOutputToGradio(output: GalleryOutput): GradioFileData[] {
+export function convertComfyOutputToGradio(output: ComfyExecutionResult): GradioFileData[] {
     return output.images.map(convertComfyOutputEntryToGradio);
 }
 
-export function convertComfyOutputEntryToGradio(r: GalleryOutputEntry): GradioFileData {
+export function convertComfyOutputEntryToGradio(r: ComfyImageLocation): GradioFileData {
     const url = `http://${location.hostname}:8188` // TODO make configurable
     const params = new URLSearchParams(r)
     const fileData: GradioFileData = {
@@ -156,7 +156,7 @@ export function convertGradioFileDataToComfyURL(image: GradioFileData, type: Com
     return `${baseUrl}/view?${params}`
 }
 
-export function convertGradioFileDataToComfyOutput(fileData: GradioFileData, type: ComfyUploadImageType = "input"): GalleryOutputEntry {
+export function convertGradioFileDataToComfyOutput(fileData: GradioFileData, type: ComfyUploadImageType = "input"): ComfyImageLocation {
     if (!fileData.is_file)
         throw "Can't convert blob data to comfy output!"
 
@@ -204,7 +204,7 @@ export interface ComfyUploadImageAPIResponse {
 /*
  * Uploads an image into ComfyUI's `input` folder.
  */
-export async function uploadImageToComfyUI(blob: Blob, filename: string, type: ComfyUploadImageType, subfolder: string = "", overwrite: boolean = false): Promise<GalleryOutputEntry> {
+export async function uploadImageToComfyUI(blob: Blob, filename: string, type: ComfyUploadImageType, subfolder: string = "", overwrite: boolean = false): Promise<ComfyImageLocation> {
     console.debug("[utils] Uploading image to ComfyUI", filename, blob.size)
 
     const url = `http://${location.hostname}:8188` // TODO make configurable
@@ -232,19 +232,90 @@ export async function uploadImageToComfyUI(blob: Blob, filename: string, type: C
 }
 
 /*
- * Copies an *EXISTING* image in a ComfyUI image folder into a different folder,
- * for use with LoadImage etc.
+ * Convenient type for passing around image filepaths and their metadata with
+ * wires. Needs to be converted to a filename for use with LoadImage.
+ *
+ * Litegraph type is COMFYBOX_IMAGE. The array type is COMFYBOX_IMAGES.
  */
-export async function reuploadImageToComfyUI(data: GalleryOutputEntry, type: ComfyUploadImageType): Promise<GalleryOutputEntry> {
-    if (data.type === type)
-        return data
+export type ComfyBoxImageMetadata = {
+    /* For easy structural type detection */
+    isComfyBoxImageMetadata: true,
+    /* Pointer to where this image resides in ComfyUI. */
+    comfyUIFile: ComfyImageLocation,
+    /* Readable name of the image. */
+    name: string
+    /* Tags applicable to this image, like ["mask"]. */
+    tags: string[],
+    /* Image width. */
+    width?: number,
+    /* Image height. */
+    height?: number,
+}
 
-    const url = `http://${location.hostname}:8188` // TODO make configurable
-    const params = new URLSearchParams(data)
+export function isComfyBoxImageMetadata(value: any): value is ComfyBoxImageMetadata {
+    return value && typeof value === "object" && (value as any).isComfyBoxImageMetadata;
+}
 
-    console.debug("[utils] Reuploading image into to ComfyUI input folder", data)
+export function isComfyExecutionResult(value: any): value is ComfyExecutionResult {
+    return value && typeof value === "object" && Array.isArray(value.images)
+}
 
-    return fetch(url + "/view?" + params)
-        .then((r) => r.blob())
-        .then((blob) => uploadImageToComfyUI(blob, data.filename, type))
+export function filenameToComfyBoxMetadata(filename: string, type: ComfyUploadImageType, subfolder: string = ""): ComfyBoxImageMetadata {
+    return {
+        isComfyBoxImageMetadata: true,
+        comfyUIFile: {
+            filename,
+            subfolder,
+            type
+        },
+        name: "Filename",
+        tags: [],
+    }
+}
+
+export function comfyFileToComfyBoxMetadata(comfyUIFile: ComfyImageLocation): ComfyBoxImageMetadata {
+    return {
+        isComfyBoxImageMetadata: true,
+        comfyUIFile,
+        name: "File",
+        tags: [],
+    }
+}
+
+/*
+ * Converts a ComfyUI file into an annotated filepath. Backend nodes like
+ * LoadImage support syntax like "subfolder/image.png[output]" to specify which
+ * image folder to load from.
+ */
+export function comfyFileToAnnotatedFilepath(comfyUIFile: ComfyImageLocation): string {
+    let path = ""
+    if (comfyUIFile.subfolder != "")
+        path = comfyUIFile.subfolder + "/";
+
+    path += `${comfyUIFile.filename}[${comfyUIFile.type}]`
+    return path;
+}
+
+export function executionResultToImageMetadata(result: ComfyExecutionResult): ComfyBoxImageMetadata[] {
+    return result.images.map(comfyFileToComfyBoxMetadata)
+}
+
+export function parseWhateverIntoImageMetadata(param: any): ComfyBoxImageMetadata[] | null {
+    let meta: ComfyBoxImageMetadata[] | null = null
+
+    if (isComfyBoxImageMetadata(param)) {
+        meta = [param];
+    }
+    if (Array.isArray(param) && !param.every(isComfyBoxImageMetadata)) {
+        meta = param
+    }
+    else if (isComfyExecutionResult(param)) {
+        meta = executionResultToImageMetadata(param)
+    }
+
+    return meta;
+}
+
+export function comfyBoxImageToComfyURL(image: ComfyBoxImageMetadata): string {
+    return convertComfyOutputToComfyURL(image.comfyUIFile)
 }
