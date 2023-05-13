@@ -1,4 +1,4 @@
-import { clamp, negmod } from "./utils";
+import { negmod } from "./utils";
 
 export class ImageViewer {
     root: HTMLDivElement;
