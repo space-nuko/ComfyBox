@@ -339,6 +339,7 @@
      background: var(--panel-background-fill);
 
      &:hover:not(:has(img:hover)) {
+         cursor: pointer;
          background: var(--block-background-fill);
      }
 
@@ -390,6 +391,7 @@
          object-fit: cover;
 
          &:hover {
+             cursor: pointer;
              filter: brightness(120%) contrast(120%);
          }
      }
