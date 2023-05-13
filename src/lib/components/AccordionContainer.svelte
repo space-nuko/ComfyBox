@@ -179,8 +179,8 @@
      }
  }
 
- :global(.label-wrap > span:not(.icon)) {
-     /* color: var(--block-title-text-color); */
+ :global(.label-wrap > span) {
+     color: var(--block-title-text-color);
      font-size: 16px;
  }
 

@@ -6,8 +6,8 @@ on:
       - master
 
 jobs:
-  build_and_publish:
-    name: Build
+  build_and_test:
+    name: Build and Test
 
     runs-on: ubuntu-latest
 
@@ -54,3 +54,7 @@ jobs:
         run: |
           pnpm build:css
           pnpm build
+
+      - name: Test
+        run: |
+          pnpm test

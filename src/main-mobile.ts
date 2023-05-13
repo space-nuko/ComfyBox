@@ -5,6 +5,7 @@ import { f7 } from 'framework7-svelte';
 import ComfyApp from '$lib/components/ComfyApp';
 import uiState from '$lib/stores/uiState';
 import { LiteGraph } from '@litegraph-ts/core';
+import ComfyGraph from '$lib/ComfyGraph';
 
 Framework7.use(Framework7Svelte);
 

@@ -51,12 +51,7 @@
      padding: 2px;
      width: 100%;
 
-     :global(input[type=text]:disabled) {
-         @include disable-input;
-     }
-     :global(textarea:disabled) {
-         @include disable-input;
-     }
+     @include disable-inputs;
  }
 
  :global(span.hide) {

@@ -50,7 +50,7 @@
 
 
  $: if ($queueState && widget && widget.node) {
-     dragItem.isNodeExecuting = $queueState.runningNodeId === widget.node.id;
+     dragItem.isNodeExecuting = $queueState.runningNodeID === widget.node.id;
  }
 
  function getWidgetClass() {
@@ -72,7 +72,7 @@
             <div class="widget {widget.attrs.classes} {getWidgetClass()}"
                  class:edit={edit}
                 class:selected={$uiState.uiUnlocked && $layoutState.currentSelection.includes(widget.id)}
-                class:is-executing={$queueState.runningNodeId && $queueState.runningNodeId == widget.node.id}
+                class:is-executing={$queueState.runningNodeID && $queueState.runningNodeId == widget.node.id}
                 class:hidden={hidden}
                 >
                 <svelte:component this={widget.node.svelteComponentType} {widget} {isMobile} />

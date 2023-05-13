@@ -13,6 +13,10 @@ export function clamp(n: number, min: number, max: number): number {
     return Math.min(Math.max(n, min), max)
 }
 
+export function negmod(n: number, m: number): number {
+    return ((n % m) + m) % m;
+}
+
 export function range(size: number, startAt: number = 0): ReadonlyArray<number> {
     return [...Array(size).keys()].map(i => i + startAt);
 }
@@ -104,7 +108,7 @@ export function promptToGraphVis(prompt: SerializedPrompt): string {
 
 export function getNodeInfo(nodeId: number): string {
     let app = (window as any).app;
-    if (!app)
+    if (!app || !app.lGraph)
         return String(nodeId);
 
     const title = app.lGraph.getNodeById(nodeId)?.title || String(nodeId);
@@ -133,6 +137,12 @@ export function convertComfyOutputToGradio(output: GalleryOutput): GradioFileDat
         }
         return fileData
     });
+}
+
+export function convertComfyOutputToComfyURL(output: GalleryOutputEntry): string {
+    const params = new URLSearchParams(output)
+    const url = `http://${location.hostname}:8188` // TODO make configurable
+    return url + "/view?" + params
 }
 
 export function convertFilenameToComfyURL(filename: string,

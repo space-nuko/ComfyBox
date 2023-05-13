@@ -1,4 +1,4 @@
-import { BuiltInSlotShape, LGraph, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type MouseEventExt, type Vector2, type Vector4, TitleMode, type ContextMenuItem, type IContextMenuItem } from "@litegraph-ts/core";
+import { BuiltInSlotShape, LGraph, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type MouseEventExt, type Vector2, type Vector4, TitleMode, type ContextMenuItem, type IContextMenuItem, Subgraph } from "@litegraph-ts/core";
 import type ComfyApp from "./components/ComfyApp";
 import queueState from "./stores/queueState";
 import { get } from "svelte/store";
@@ -60,7 +60,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         let state = get(queueState);
 
         let color = null;
-        if (node.id === +state.runningNodeId) {
+        if (node.id === +state.runningNodeID) {
             color = "#0f0";
             // this.app can be null inside the constructor if rendering is taking place already
         } else if (this.app && this.app.dragOverNode && node.id === this.app.dragOverNode.id) {
@@ -320,6 +320,34 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
                 reroute.connect(0, link.target_id, link.target_slot)
             }
         }
+    }
+
+    private convertToSubgraph(_value: IContextMenuItem, _options, mouseEvent, prevMenu, callback?: (node: LGraphNode) => void) {
+        if (Object.keys(this.selected_nodes).length === 0)
+            return
+
+        const selected = Object.values(this.selected_nodes).filter(n => n != null);
+        this.selected_nodes = {}
+
+        const subgraph = LiteGraph.createNode(Subgraph);
+        subgraph.buildFromNodes(selected)
+
+        this.graph.add(subgraph)
+    }
+
+    override getCanvasMenuOptions(): ContextMenuItem[] {
+        const options = super.getCanvasMenuOptions();
+
+        options.push(
+            {
+                content: "Convert to Subgraph",
+                has_submenu: false,
+                disabled: Object.keys(this.selected_nodes).length === 0,
+                callback: this.convertToSubgraph.bind(this)
+            },
+        )
+
+        return options
     }
 
     override getNodeMenuOptions(node: LGraphNode): ContextMenuItem[] {

@@ -57,9 +57,9 @@
 </script>
 
 <div class="bottom">
-    {#if $queueState.runningNodeId || $queueState.progress}
+    {#if $queueState.runningNodeID || $queueState.progress}
         <div class="node-name">
-            <span>Node: {getNodeInfo($queueState.runningNodeId)}</span>
+            <span>Node: {getNodeInfo($queueState.runningNodeID)}</span>
         </div>
         <div class="progress-bar">
             <ProgressBar value={$queueState.progress?.value} max={$queueState.progress?.max} />

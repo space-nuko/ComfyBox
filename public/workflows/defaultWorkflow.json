@@ -2,8 +2,8 @@
   "createdBy": "ComfyBox",
   "version": 1,
   "workflow": {
-    "last_node_id": 465,
-    "last_link_id": 719,
+    "last_node_id": 467,
+    "last_link_id": 721,
     "nodes": [
       {
         "id": 35,
@@ -57,11 +57,11 @@
           "hidden": false
         },
         "widgets_values": [
-          "worst quality"
+          "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, deformed, disfigured, poorly drawn face, mutation, mutated, extra limb, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, out of focus, long neck, long body, fuzzy, abstract"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "worst quality",
+        "comfyValue": "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, deformed, disfigured, poorly drawn face, mutation, mutated, extra limb, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, out of focus, long neck, long body, fuzzy, abstract",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -299,11 +299,11 @@
           "hidden": false
         },
         "widgets_values": [
-          "normal"
+          "karras"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "normal",
+        "comfyValue": "karras",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -464,11 +464,11 @@
           "hidden": false
         },
         "widgets_values": [
-          "euler"
+          "dpmpp_2s_ancestral"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "euler",
+        "comfyValue": "dpmpp_2s_ancestral",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -548,11 +548,11 @@
           "hidden": true
         },
         "widgets_values": [
-          "0.650"
+          "0.630"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": 0.65,
+        "comfyValue": 0.63,
         "shownOutputProperties": {
           "min": {
             "type": "number",
@@ -687,14 +687,14 @@
         "flags": {
           "collapsed": true
         },
-        "order": 245,
+        "order": 247,
         "mode": 0,
         "inputs": [
           {
             "name": "value",
             "type": 0,
             "link": 87,
-            "label": "5.000"
+            "label": "1.000"
           }
         ],
         "outputs": [],
@@ -816,11 +816,11 @@
           "multiline": false
         },
         "widgets_values": [
-          "none"
+          "cached"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "none",
+        "comfyValue": "cached",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -971,7 +971,7 @@
           66
         ],
         "flags": {},
-        "order": 244,
+        "order": 246,
         "mode": 0,
         "inputs": [
           {
@@ -1275,11 +1275,11 @@
           "multiline": false
         },
         "widgets_values": [
-          "2"
+          "1536"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "2",
+        "comfyValue": "1536",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -1370,11 +1370,11 @@
           "multiline": false
         },
         "widgets_values": [
-          "2"
+          "1024"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "2",
+        "comfyValue": "1024",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -2196,7 +2196,7 @@
           106
         ],
         "flags": {},
-        "order": 250,
+        "order": 252,
         "mode": 0,
         "inputs": [
           {
@@ -2274,7 +2274,7 @@
           46
         ],
         "flags": {},
-        "order": 251,
+        "order": 253,
         "mode": 0,
         "inputs": [
           {
@@ -2930,7 +2930,7 @@
           126
         ],
         "flags": {},
-        "order": 243,
+        "order": 245,
         "mode": 0,
         "inputs": [
           {
@@ -2994,7 +2994,7 @@
         "title": "Comfy.ValueControl",
         "properties": {
           "tags": [],
-          "value": 149773913879886,
+          "value": 485829053103511,
           "action": "randomize",
           "min": 0,
           "max": 18446744073709552000,
@@ -3091,11 +3091,11 @@
           "hidden": false
         },
         "widgets_values": [
-          "149773913879886.000"
+          "485829053103511.000"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": 149773913879886,
+        "comfyValue": 485829053103511,
         "shownOutputProperties": {
           "min": {
             "type": "number",
@@ -3203,7 +3203,7 @@
         "outputs": [
           {
             "name": "",
-            "type": "number",
+            "type": "*",
             "links": [
               299
             ],
@@ -3851,11 +3851,11 @@
           "hidden": false
         },
         "widgets_values": [
-          "512.000"
+          "768.000"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": 512,
+        "comfyValue": 768,
         "shownOutputProperties": {
           "min": {
             "type": "number",
@@ -4161,7 +4161,7 @@
         "title": "Operation",
         "properties": {
           "A": 2,
-          "B": 1,
+          "B": 768,
           "OP": "*",
           "tags": []
         }
@@ -4207,7 +4207,7 @@
         "title": "Operation",
         "properties": {
           "A": 2,
-          "B": 1,
+          "B": 512,
           "OP": "*",
           "tags": []
         }
@@ -4233,7 +4233,7 @@
             "name": "value",
             "type": 0,
             "link": 184,
-            "label": "null"
+            "label": "22.000"
           }
         ],
         "outputs": [],
@@ -4697,7 +4697,7 @@
         "outputs": [
           {
             "name": "",
-            "type": "number",
+            "type": "*",
             "links": [
               353
             ],
@@ -4747,7 +4747,7 @@
         "outputs": [
           {
             "name": "",
-            "type": "number",
+            "type": "*",
             "links": [
               354
             ],
@@ -6044,7 +6044,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 246,
+        "order": 248,
         "mode": 0,
         "inputs": [
           {
@@ -6615,7 +6615,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 248,
+        "order": 250,
         "mode": 2,
         "inputs": [
           {
@@ -6719,7 +6719,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 249,
+        "order": 251,
         "mode": 2,
         "inputs": [
           {
@@ -10087,11 +10087,11 @@
           "hidden": false
         },
         "widgets_values": [
-          "a fluffy corgi wearing sunglasses"
+          "masterpiece, hyper detailed background, 1girl, solo a fluffy corgi girl wearing sunglasses, dark theme, baggy nylon jacket, gyaru, cyberpunk, airy, futuristic city, animal ear fluff, animal ears, smile, v, trees, leaves, nature, forest, overgrowth"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "a fluffy corgi wearing sunglasses",
+        "comfyValue": "masterpiece, hyper detailed background, 1girl, solo a fluffy corgi girl wearing sunglasses, dark theme, baggy nylon jacket, gyaru, cyberpunk, airy, futuristic city, animal ear fluff, animal ears, smile, v, trees, leaves, nature, forest, overgrowth",
         "shownOutputProperties": {},
         "saveUserState": true
       },
@@ -11554,7 +11554,7 @@
         "properties": {
           "tags": [],
           "defaultValue": null,
-          "index": null,
+          "index": 4,
           "updateMode": "append",
           "values": []
         },
@@ -12162,89 +12162,6 @@
           "type": "error"
         },
         "saveUserState": true
-      },
-      {
-        "id": 104,
-        "type": "ui/gallery",
-        "pos": [
-          862.248693361997,
-          640.4778575549986
-        ],
-        "size": [
-          210,
-          166
-        ],
-        "flags": {},
-        "order": 122,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "images",
-            "type": "OUTPUT",
-            "link": null
-          },
-          {
-            "name": "store",
-            "type": -1,
-            "link": 243,
-            "shape": 1
-          },
-          {
-            "name": "clear",
-            "type": -1,
-            "link": 657,
-            "shape": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "selected_index",
-            "type": "number",
-            "links": [
-              168,
-              184
-            ],
-            "slot_index": 0
-          },
-          {
-            "name": "width",
-            "type": "number",
-            "links": [
-              356
-            ],
-            "slot_index": 1
-          },
-          {
-            "name": "height",
-            "type": "number",
-            "links": [
-              357
-            ],
-            "slot_index": 2
-          },
-          {
-            "name": "filename",
-            "type": "string",
-            "links": [
-              670
-            ],
-            "slot_index": 3
-          }
-        ],
-        "title": "UI.Gallery",
-        "properties": {
-          "tags": [],
-          "defaultValue": null,
-          "index": null,
-          "updateMode": "append",
-          "values": []
-        },
-        "widgets_values": [],
-        "color": "#223",
-        "bgColor": "#335",
-        "comfyValue": [],
-        "shownOutputProperties": {},
-        "saveUserState": false
       },
       {
         "id": 116,
@@ -12936,82 +12853,6 @@
         "saveUserState": true
       },
       {
-        "id": 418,
-        "type": "ui/image_upload",
-        "pos": [
-          -555,
-          1286
-        ],
-        "size": [
-          210,
-          138
-        ],
-        "flags": {},
-        "order": 225,
-        "mode": 2,
-        "inputs": [
-          {
-            "name": "store",
-            "type": -1,
-            "link": 699,
-            "shape": 1,
-            "slot_index": 0
-          }
-        ],
-        "outputs": [
-          {
-            "name": "filename",
-            "type": "string",
-            "links": [
-              627,
-              628
-            ],
-            "slot_index": 0
-          },
-          {
-            "name": "width",
-            "type": "number",
-            "links": [
-              630
-            ],
-            "slot_index": 1
-          },
-          {
-            "name": "height",
-            "type": "number",
-            "links": [
-              629
-            ],
-            "slot_index": 2
-          },
-          {
-            "name": "image_count",
-            "type": "number",
-            "links": null
-          },
-          {
-            "name": "changed",
-            "type": -2,
-            "links": null,
-            "shape": 1
-          }
-        ],
-        "title": "UI.ImageUpload",
-        "properties": {
-          "defaultValue": null,
-          "tags": [
-            "i2i"
-          ],
-          "fileCount": "single"
-        },
-        "widgets_values": [],
-        "color": "#223",
-        "bgColor": "#335",
-        "comfyValue": [],
-        "shownOutputProperties": {},
-        "saveUserState": false
-      },
-      {
         "id": 74,
         "type": "CheckpointLoaderSimple",
         "pos": [
@@ -13342,7 +13183,7 @@
           106
         ],
         "flags": {},
-        "order": 247,
+        "order": 249,
         "mode": 2,
         "inputs": [
           {
@@ -14080,6 +13921,234 @@
         },
         "color": "#432",
         "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": 418,
+        "type": "ui/image_upload",
+        "pos": [
+          -555,
+          1286
+        ],
+        "size": [
+          210,
+          138
+        ],
+        "flags": {},
+        "order": 225,
+        "mode": 2,
+        "inputs": [
+          {
+            "name": "store",
+            "type": -1,
+            "link": 699,
+            "shape": 1,
+            "slot_index": 0
+          }
+        ],
+        "outputs": [
+          {
+            "name": "filename",
+            "type": "string",
+            "links": [
+              627,
+              628,
+              720
+            ],
+            "slot_index": 0
+          },
+          {
+            "name": "width",
+            "type": "number",
+            "links": [
+              630
+            ],
+            "slot_index": 1
+          },
+          {
+            "name": "height",
+            "type": "number",
+            "links": [
+              629
+            ],
+            "slot_index": 2
+          },
+          {
+            "name": "image_count",
+            "type": "number",
+            "links": null
+          },
+          {
+            "name": "changed",
+            "type": -2,
+            "links": null,
+            "shape": 1
+          }
+        ],
+        "title": "UI.ImageUpload",
+        "properties": {
+          "defaultValue": null,
+          "tags": [
+            "i2i"
+          ],
+          "fileCount": "single"
+        },
+        "widgets_values": [],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": [],
+        "shownOutputProperties": {},
+        "saveUserState": false
+      },
+      {
+        "id": 466,
+        "type": "actions/set_prompt_thumbnails",
+        "pos": [
+          -328,
+          1334
+        ],
+        "size": [
+          260.4,
+          26
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 243,
+        "mode": 2,
+        "inputs": [
+          {
+            "name": "filenames",
+            "type": "*",
+            "link": 720
+          }
+        ],
+        "outputs": [],
+        "title": "Comfy.SetPromptThumbnailsAction",
+        "properties": {
+          "tags": [
+            "txt2img",
+            "i2i"
+          ],
+          "defaultFolderType": "input"
+        },
+        "saveUserState": true
+      },
+      {
+        "id": 104,
+        "type": "ui/gallery",
+        "pos": [
+          862.248693361997,
+          640.4778575549986
+        ],
+        "size": [
+          210,
+          166
+        ],
+        "flags": {},
+        "order": 122,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "images",
+            "type": "OUTPUT",
+            "link": null
+          },
+          {
+            "name": "store",
+            "type": -1,
+            "link": 243,
+            "shape": 1
+          },
+          {
+            "name": "clear",
+            "type": -1,
+            "link": 657,
+            "shape": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "selected_index",
+            "type": "number",
+            "links": [
+              168,
+              184
+            ],
+            "slot_index": 0
+          },
+          {
+            "name": "width",
+            "type": "number",
+            "links": [
+              356
+            ],
+            "slot_index": 1
+          },
+          {
+            "name": "height",
+            "type": "number",
+            "links": [
+              357
+            ],
+            "slot_index": 2
+          },
+          {
+            "name": "filename",
+            "type": "string",
+            "links": [
+              670,
+              721
+            ],
+            "slot_index": 3
+          }
+        ],
+        "title": "UI.Gallery",
+        "properties": {
+          "tags": [],
+          "defaultValue": null,
+          "index": 22,
+          "updateMode": "append",
+          "values": []
+        },
+        "widgets_values": [],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": [],
+        "shownOutputProperties": {},
+        "saveUserState": false
+      },
+      {
+        "id": 467,
+        "type": "actions/set_prompt_thumbnails",
+        "pos": [
+          1116,
+          772
+        ],
+        "size": [
+          260.4,
+          26
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 244,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "filenames",
+            "type": "*",
+            "link": 721
+          }
+        ],
+        "outputs": [],
+        "title": "Comfy.SetPromptThumbnailsAction",
+        "properties": {
+          "tags": [
+            "hr"
+          ],
+          "defaultFolderType": "input"
+        },
         "saveUserState": true
       }
     ],
@@ -16731,6 +16800,22 @@
         119,
         0,
         "MODEL"
+      ],
+      [
+        720,
+        418,
+        0,
+        466,
+        0,
+        "*"
+      ],
+      [
+        721,
+        104,
+        3,
+        467,
+        0,
+        "*"
       ]
     ],
     "groups": [
@@ -20051,9 +20136,9 @@
   },
   "canvas": {
     "offset": [
-      269.1028161789952,
-      -277.9338410386712
+      55.778573178994975,
+      -62.68933903867331
     ],
-    "scale": 0.5644739300537776
+    "scale": 0.6209213230591556
   }
 }

@@ -443,8 +443,8 @@
  }
 
  .target-name {
-     border-color: var(--neutral-400);
-     background: var(--neutral-300);
+     background: var(--input-background-fill);
+     border-color: var(--input-border-color);
      padding: 0.8rem 1.0rem;
 
      .title {
@@ -458,13 +458,14 @@
  }
 
  .category-name {
+     background: var(--panel-background-fill);
+     border-color: var(--panel-border-color);
      padding: 0.4rem 1.0rem;
-     border-color: var(--neutral-300);
-     background: var(--neutral-200);
  }
 
  .target-name, .category-name {
      border-width: var(--block-border-width);
+     color: var(--body-text-color);
 
      .type {
          color: var(--neutral-500);
@@ -479,10 +480,5 @@
         padding: 0.5em; */
  }
 
- :global(input[type=text]:disabled) {
-     @include disable-input;
- }
- :global(textarea:disabled) {
-     @include disable-input;
- }
+ @include disable-inputs;
 </style>

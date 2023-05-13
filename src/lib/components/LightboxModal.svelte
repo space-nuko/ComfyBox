@@ -95,12 +95,12 @@
      position: absolute;
      top: 50%;
      width: auto;
-     padding: 16px;
+     padding: 60px;
      margin-top: -50px;
      color: white;
      font-weight: bold;
-     font-size: 20px;
-     transition: 0.6s ease;
+     font-size: 40px;
+     transition: 0.3s ease;
      border-radius: 0 3px 3px 0;
      user-select: none;
      -webkit-user-select: none;
@@ -113,6 +113,6 @@
 
  .modalPrev:hover,
  .modalNext:hover {
-     background-color: rgba(0, 0, 0, 0.8);
+     background-color: rgba(180, 180, 180, 0.8);
  }
 </style>

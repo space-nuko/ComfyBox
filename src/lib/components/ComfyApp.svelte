@@ -31,7 +31,7 @@
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
  let hasShownUIHelpToast: boolean = false;
- let uiTheme: string = "";
+ let uiTheme: string = "gradio-dark";
  let fileInput: HTMLInputElement = undefined;
 
  let debugLayout: boolean = false;
@@ -78,7 +78,7 @@
      }
  }
 
- let propsSidebarSize = 15; //15;
+ let propsSidebarSize = 0;
 
  function toggleProps() {
      if (propsSidebarSize == 0) {
@@ -90,11 +90,11 @@
      }
  }
 
- let queueSidebarSize = 15;
+ let queueSidebarSize = 20;
 
  function toggleQueue() {
      if (queueSidebarSize == 0) {
-         queueSidebarSize = 15;
+         queueSidebarSize = 20;
          app.resizeCanvas();
      }
      else {
@@ -182,6 +182,13 @@
  async function doRefreshCombos() {
      await app.refreshComboInNodes(true)
  }
+
+ $: if (uiTheme === "gradio-dark") {
+     document.getElementById("app").classList.add("dark")
+ }
+ else {
+     document.getElementById("app").classList.remove("dark")
+ }
 </script>
 
 <svelte:head>
@@ -190,7 +197,7 @@
     {/if}
 </svelte:head>
 
-<div id="main">
+<div id="main" class:dark={uiTheme === "gradio-dark"}>
     <div id="dropzone" class="dropzone"></div>
     <div id="container" bind:this={containerElem}>
         <Splitpanes theme="comfy" on:resize={refreshView}>
@@ -264,7 +271,8 @@
             <span class="label" for="ui-theme">
                 <BlockTitle>Theme</BlockTitle>
                 <select id="ui-theme" name="ui-theme" bind:value={uiTheme}>
-                    <option value="">None</option>
+                    <option value="gradio-dark">Gradio Dark</option>
+                    <option value="gradio-light">Gradio Light</option>
                     <option value="anapnoe">Anapnoe</option>
                 </select>
             </span>
@@ -276,12 +284,13 @@
     <LightboxModal />
     <input bind:this={fileInput} id="comfy-file-input" type="file" accept=".json" on:change={loadWorkflow} />
 </div>
-
 <SvelteToast options={toastOptions} />
 
 <style lang="scss">
+ $bottom-bar-height: 70px;
+
  #container {
-     height: calc(100vh - 70px);
+     height: calc(100vh - $bottom-bar-height);
      max-width: 100vw;
      display: grid;
      width: 100%;
@@ -301,7 +310,7 @@
      padding-right: 1em;
      margin-top: auto;
      overflow-x: auto;
-     height: 70px;
+     height: $bottom-bar-height;
 
      > .left {
          flex-shrink: 0;
@@ -338,28 +347,30 @@
  }
 
  :global(.splitpanes.comfy>.splitpanes__splitter) {
-     background-color: var(--secondary-100);
+     background: var(--comfy-splitpanes-background-fill);
 
      &:hover:not([disabled]) {
-         background-color: var(--secondary-300);
+         background: var(--comfy-splitpanes-background-fill-hover);
      }
      &:active:not([disabled]) {
-         background-color: var(--secondary-400);
+         background: var(--comfy-splitpanes-background-fill-active);
      }
  }
 
+ $splitter-size: 1rem;
+
  :global(.splitpanes.comfy.splitpanes--horizontal>.splitpanes__splitter) {
-     min-height: 20px;
+     min-height: $splitter-size;
      cursor: row-resize;
  }
 
  :global(.splitpanes.comfy.splitpanes--vertical>.splitpanes__splitter) {
-     min-width: 20px;
+     min-width: $splitter-size;
      cursor: col-resize;
  }
 
  :global(.splitpanes.comfy) {
-     max-height: calc(100vh - 70px);
+     max-height: calc(100vh - $bottom-bar-height);
      max-width: 100vw;
  }
 

@@ -23,17 +23,17 @@
 
 <style>
  .progress {
-     width: 100%;
-     height: 100%;
+     height: 30px;
+     margin: 5px;
      text-align: center;
-     background-color: lightgrey;
+     background: var(--comfy-progress-bar-background);
      padding: 0px;
      position: relative;
  }
 
  .bar {
      height: 100%;
-     background-color: #B3D8A9;
+     background: var(--comfy-progress-bar-foreground);
  }
 
  .label {
