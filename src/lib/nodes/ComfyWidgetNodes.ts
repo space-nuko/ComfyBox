@@ -17,7 +17,7 @@ import ButtonWidget from "$lib/widgets/ButtonWidget.svelte";
 import CheckboxWidget from "$lib/widgets/CheckboxWidget.svelte";
 import RadioWidget from "$lib/widgets/RadioWidget.svelte";
 import ImageUploadWidget from "$lib/widgets/ImageUploadWidget.svelte";
-import ImageCompareWidget from "$lib/widgets/ImageCompareWidget.svelte";
+import ImageEditorWidget from "$lib/widgets/ImageEditorWidget.svelte";
 
 export type AutoConfigOptions = {
     includeProperties?: Set<string> | null,
@@ -33,7 +33,7 @@ export type AutoConfigOptions = {
  * - Go to layoutState, look for `ALL_ATTRIBUTES,` insert or find a "variant"
  *   attribute and set `validNodeTypes` to the type of the litegraph node
  * - Add a new entry in the `values` array, like "knob" or "dial" for ComfySliderWidget
- * - Add an {#if widget.attrs.variant === <...>} statement in the corresponding Svelte component
+ * - Add an {#if widget.attrs.variant === <...>} statement in the existing Svelte component
  *
  * Also, BEWARE of calling setOutputData() and triggerSlot() on the same frame!
  * You will have to either implement an internal delay on the event triggering
@@ -965,80 +965,59 @@ LiteGraph.registerNodeType({
     type: "ui/image_upload"
 })
 
-export interface ComfyImageCompareNodeProperties extends ComfyWidgetProperties {
+export type FileNameOrGalleryData = string | GalleryOutputEntry;
+export type MultiImageData = FileNameOrGalleryData[];
+
+export interface ComfyImageEditorNodeProperties extends ComfyWidgetProperties {
 }
 
-export type FileNameOrGalleryData = string | GalleryOutputEntry;
-export type ImageCompareData = [FileNameOrGalleryData, FileNameOrGalleryData]
-
-export class ComfyImageCompareNode extends ComfyWidgetNode<ImageCompareData> {
-    override properties: ComfyImageCompareNodeProperties = {
+export class ComfyImageEditorNode extends ComfyWidgetNode<MultiImageData> {
+    override properties: ComfyImageEditorNodeProperties = {
         defaultValue: [],
         tags: [],
     }
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "store", type: BuiltInSlotType.ACTION },
-            { name: "left_image", type: "string" },
-            { name: "right_image", type: "string" },
+            { name: "store", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
         ]
     }
 
-    override svelteComponentType = ImageCompareWidget;
-    override defaultValue: ImageCompareData = ["", ""];
+    override svelteComponentType = ImageEditorWidget;
+    override defaultValue: MultiImageData = [];
     override outputIndex = null;
-    override changedIndex = 3;
+    override changedIndex = null;
     override storeActionName = "store";
     override saveUserState = false;
 
     constructor(name?: string) {
-        super(name, ["", ""])
+        super(name, [])
     }
 
-    override onExecute() {
-        const valueA = this.getInputData(1)
-        const valueB = this.getInputData(2)
-        let current = get(this.value)
-        let changed = false;
-        if (valueA != null && current[0] != valueA) {
-            current[0] = valueA
-            changed = true;
-        }
-        if (valueB != null && current[1] != valueB) {
-            current[1] = valueB
-            changed = true;
-        }
-        if (changed)
-            this.value.set(current)
-    }
+    _value = null;
 
-    override parseValue(value: any): ImageCompareData {
+    override parseValue(value: any): MultiImageData {
         if (value == null) {
-            return ["", ""]
+            return []
         }
         else if (typeof value === "string" && value !== "") { // Single filename
             const prevValue = get(this.value)
             prevValue.push(value)
             if (prevValue.length > 2)
                 prevValue.splice(0, 1)
-            return prevValue as ImageCompareData
+            return prevValue as MultiImageData
         }
         else if (typeof value === "object" && "images" in value && value.images.length > 0) {
             const output = value as GalleryOutput
-            const prevValue = get(this.value)
-            prevValue.push(output.images[0].filename)
-            if (prevValue.length > 2)
-                prevValue.splice(0, 1)
-            return prevValue as ImageCompareData
+            return [value]
         }
-        else if (Array.isArray(value) && typeof value[0] === "string" && typeof value[1] === "string") {
-            return value as ImageCompareData
+        else if (Array.isArray(value) && value.every(s => typeof s === "string")) {
+            return value as MultiImageData
         }
         else {
-            return ["", ""]
+            return []
         }
     }
 
@@ -1048,8 +1027,8 @@ export class ComfyImageCompareNode extends ComfyWidgetNode<ImageCompareData> {
 }
 
 LiteGraph.registerNodeType({
-    class: ComfyImageCompareNode,
-    title: "UI.ImageCompare",
-    desc: "Widget that lets you compare two images",
-    type: "ui/image_compare"
+    class: ComfyImageEditorNode,
+    title: "UI.ImageEditor",
+    desc: "Widget that lets edit a multi-layered image",
+    type: "ui/image_editor"
 })

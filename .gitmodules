@@ -5,3 +5,7 @@
 [submodule "litegraph"]
 	path = litegraph
 	url = https://github.com/space-nuko/litegraph.ts
+[submodule "klecks"]
+	path = klecks
+	url = https://github.com/space-nuko/klecks
+	branch = comfybox
