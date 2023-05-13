@@ -530,7 +530,7 @@ export class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
         }
 
         for (const [nodeId, newMode] of Object.entries(nodeChanges)) {
-            this.graph.getNodeById(parseInt(nodeId)).changeMode(newMode);
+            this.graph.getNodeById(nodeId).changeMode(newMode);
         }
 
         const layout = get(layoutState);

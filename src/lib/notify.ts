@@ -47,7 +47,7 @@ function notifyToast(text: string, options: NotifyOptions) {
     }
     else if (options.type === "warning") {
         toastOptions.theme = {
-            '--toastBackground': 'var(--color-yellow-500)',
+            '--toastBackground': 'var(--color-yellow-600)',
         }
     }
     else if (options.type === "error") {

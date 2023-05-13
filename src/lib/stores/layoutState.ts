@@ -1,9 +1,10 @@
 import { get, writable } from 'svelte/store';
-import type { Readable, Writable } from 'svelte/store';
+import type { Writable } from 'svelte/store';
 import type ComfyApp from "$lib/components/ComfyApp"
-import { type LGraphNode, type IWidget, type LGraph, NodeMode, type LGraphRemoveNodeOptions, type LGraphAddNodeOptions } from "@litegraph-ts/core"
-import { dndzone, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
+import { type LGraphNode, type IWidget, type LGraph, NodeMode, type LGraphRemoveNodeOptions, type LGraphAddNodeOptions, type UUID } from "@litegraph-ts/core"
+import { SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 import type { ComfyWidgetNode } from '$lib/nodes';
+import type { NodeID } from '$lib/api';
 
 type DragItemEntry = {
     /*
@@ -58,12 +59,12 @@ export type LayoutState = {
      * Items indexed by the litegraph node they're bound to
      * Only contains drag items of type "widget"
      */
-    allItemsByNode: Record<number, DragItemEntry>,
+    allItemsByNode: Record<NodeID, DragItemEntry>,
 
     /*
      * Next ID to use for instantiating a new drag item
      */
-    currentId: number,
+    currentId: UUID,
 
     /*
      * Selected drag items.
@@ -642,7 +643,7 @@ export interface WidgetLayout extends IDragItem {
     node: ComfyWidgetNode
 }
 
-export type DragItemID = string;
+export type DragItemID = UUID;
 
 type LayoutStateOps = {
     addContainer: (parent: ContainerLayout | null, attrs: Partial<Attributes>, index?: number) => ContainerLayout,
@@ -654,8 +655,8 @@ type LayoutStateOps = {
     groupItems: (dragItems: IDragItem[], attrs?: Partial<Attributes>) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
     getCurrentSelection: () => IDragItem[],
-    findLayoutEntryForNode: (nodeId: number) => DragItemEntry | null,
-    findLayoutForNode: (nodeId: number) => IDragItem | null,
+    findLayoutEntryForNode: (nodeId: NodeID) => DragItemEntry | null,
+    findLayoutForNode: (nodeId: NodeID) => IDragItem | null,
     serialize: () => SerializedLayoutState,
     deserialize: (data: SerializedLayoutState, graph: LGraph) => void,
     initDefaultLayout: () => void,
@@ -916,7 +917,7 @@ function ungroup(container: ContainerLayout) {
     store.set(state)
 }
 
-function findLayoutEntryForNode(nodeId: number): DragItemEntry | null {
+function findLayoutEntryForNode(nodeId: NodeID): DragItemEntry | null {
     const state = get(store)
     const found = Object.entries(state.allItems).find(pair =>
         pair[1].dragItem.type === "widget"
@@ -926,7 +927,7 @@ function findLayoutEntryForNode(nodeId: number): DragItemEntry | null {
     return null;
 }
 
-function findLayoutForNode(nodeId: number): WidgetLayout | null {
+function findLayoutForNode(nodeId: NodeID): WidgetLayout | null {
     const found = findLayoutEntryForNode(nodeId);
     if (!found)
         return null;
@@ -963,7 +964,7 @@ function initDefaultLayout() {
 export type SerializedLayoutState = {
     root: DragItemID | null,
     allItems: Record<DragItemID, SerializedDragEntry>,
-    currentId: number,
+    currentId: UUID,
     attrs: LayoutAttributes
 }
 
@@ -976,7 +977,7 @@ export type SerializedDragEntry = {
 export type SerializedDragItem = {
     type: string,
     id: DragItemID,
-    nodeId: number | null,
+    nodeId: UUID | null,
     attrs: Attributes
 }
 

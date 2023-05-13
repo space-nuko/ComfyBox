@@ -157,8 +157,10 @@
 
  let showModal = false;
  let selectedPrompt = null;
+ let selectedImages = [];
  function showPrompt(entry: QueueUIEntry, e: MouseEvent) {
      selectedPrompt = entry.entry.prompt;
+     selectedImages = entry.images;
      showModal = true;
  }
 
@@ -178,7 +180,7 @@
         <h1 style="padding-bottom: 1rem;">Prompt Details</h1>
     </div>
     {#if selectedPrompt}
-        <PromptDisplay prompt={selectedPrompt} />
+        <PromptDisplay prompt={selectedPrompt} images={selectedImages} />
     {/if}
 </Modal>
 
@@ -495,6 +497,9 @@
          display: flex;
          justify-content: center;
          align-items: center;
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
      }
 
      .queue-remaining {

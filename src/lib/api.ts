@@ -2,12 +2,13 @@ import type { Progress, SerializedPrompt, SerializedPromptInputs, SerializedProm
 import type TypedEmitter from "typed-emitter";
 import EventEmitter from "events";
 import type { GalleryOutput, GalleryOutputEntry } from "./nodes/ComfyWidgetNodes";
-import type { SerializedLGraph } from "@litegraph-ts/core";
+import type { SerializedLGraph, UUID } from "@litegraph-ts/core";
+import type { SerializedLayoutState } from "./stores/layoutState";
 
 export type ComfyPromptRequest = {
     client_id?: string,
     prompt: SerializedPromptInputsAll,
-    extra_data: ComfyPromptExtraData,
+    extra_data: ComfyBoxPromptExtraData,
     front?: boolean,
     number?: number
 }
@@ -29,14 +30,14 @@ export type ComfyAPIQueueResponse = {
     error?: string
 }
 
-export type NodeID = string;
-export type PromptID = string; // UUID
+export type NodeID = UUID;
+export type PromptID = UUID; // UUID
 
 export type ComfyAPIHistoryItem = [
     number,   // prompt number
     PromptID,
     SerializedPromptInputsAll,
-    ComfyPromptExtraData,
+    ComfyBoxPromptExtraData,
     NodeID[]  // good outputs
 ]
 
@@ -56,14 +57,18 @@ export type ComfyAPIHistoryResponse = {
 }
 
 export type ComfyPromptPNGInfo = {
-    workflow: SerializedLGraph
+    workflow: SerializedLGraph,
+    comfyBoxLayout: SerializedLayoutState,
+    comfyBoxSubgraphs: string[],
 }
 
-export type ComfyPromptExtraData = {
+export type ComfyBoxPromptExtraData = ComfyUIPromptExtraData & {
+    thumbnails?: GalleryOutputEntry[],
+}
+
+export type ComfyUIPromptExtraData = {
     extra_pnginfo?: ComfyPromptPNGInfo,
-    client_id?: string, // UUID
-    subgraphs: string[],
-    thumbnails?: GalleryOutputEntry[]
+    client_id?: UUID, // UUID
 }
 
 type ComfyAPIEvents = {

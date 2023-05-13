@@ -1,6 +1,6 @@
 import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
-import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyPromptExtraData, type ComfyPromptRequest, type NodeID, type PromptID } from "$lib/api"
+import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyPromptRequest, type NodeID, type PromptID } from "$lib/api"
 import { getPngMetadata, importA1111 } from "$lib/pnginfo";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
@@ -349,7 +349,7 @@ export default class ComfyApp {
 
         this.api.addEventListener("executed", (promptID: PromptID, nodeID: NodeID, output: GalleryOutput) => {
             this.nodeOutputs[nodeID] = output;
-            const node = this.lGraph.getNodeById(parseInt(nodeID)) as ComfyGraphNode;
+            const node = this.lGraph.getNodeById(nodeID) as ComfyGraphNode;
             if (node?.onExecuted) {
                 node.onExecuted(output);
             }
@@ -467,7 +467,6 @@ export default class ComfyApp {
             state = structuredClone(blankGraph)
         }
         await this.deserialize(state)
-        uiState.update(s => { s.uiUnlocked = true; return s; })
     }
 
     /**
@@ -558,7 +557,7 @@ export default class ComfyApp {
      * Converts the current graph workflow for sending to the API
      * @returns The workflow and node links
      */
-    async graphToPrompt(tag: string | null = null): Promise<SerializedPrompt> {
+    graphToPrompt(tag: string | null = null): SerializedPrompt {
         // Run frontend-only logic
         this.lGraph.runStep(1)
 
@@ -754,14 +753,16 @@ export default class ComfyApp {
                         }
                     }
 
-                    const p = await this.graphToPrompt(tag);
+                    const p = this.graphToPrompt(tag);
+                    const l = layoutState.serialize();
                     console.debug(promptToGraphVis(p))
 
-                    const extraData: ComfyPromptExtraData = {
+                    const extraData: ComfyBoxPromptExtraData = {
                         extra_pnginfo: {
-                            workflow: p.workflow
+                            workflow: p.workflow,
+                            comfyBoxLayout: l,
+                            comfyBoxSubgraphs: [tag],
                         },
-                        subgraphs: [tag],
                         thumbnails
                     }
 

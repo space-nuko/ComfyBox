@@ -1,15 +1,22 @@
 <script lang="ts">
- import { fade } from "svelte/transition";
  import { TextBox } from "@gradio/form";
  import type { SerializedPromptInput, SerializedPromptInputsAll } from "./ComfyApp";
  import { Block, BlockLabel, BlockTitle } from "@gradio/atoms";
  import { JSON as JSONComponent } from "@gradio/json";
  import { JSON as JSONIcon, Copy, Check } from "@gradio/icons";
  import Accordion from "$lib/components/gradio/app/Accordion.svelte";
+ import Gallery from "$lib/components/gradio/gallery/Gallery.svelte";
+	import type { Styles } from "@gradio/utils";
 
  const splitLength = 50;
 
  export let prompt: SerializedPromptInputsAll;
+ export let images: string[] = [];
+
+ let galleryStyle: Styles = {
+     grid_cols: [2],
+     object_fit: "cover",
+ }
 
  function isInputLink(input: SerializedPromptInput): boolean {
      return Array.isArray(input)
@@ -55,62 +62,97 @@
 </script>
 
 <div class="prompt-display">
-    <Block>
-        {#each Object.entries(prompt) as [nodeID, inputs], i}
-            {@const classType = inputs.class_type}
-            {@const filtered = Object.entries(inputs.inputs).filter((i) => !isInputLink(i[1]))}
-            {#if filtered.length > 0}
-                <div class="accordion">
-                    <Block padding={true}>
-                        <Accordion label="Node {nodeID}: {classType}" open={false}>
-                            {#each filtered as [inputName, input]}
-                                <Block>
-                                    <BlockTitle>Input: {inputName}</BlockTitle>
-                                    <button class="copy-button" on:click={() => handleCopy(nodeID, inputName, input)}>
-                                        {#if copiedNodeID === nodeID && copiedInputName === inputName}
-                                            <span class="copied-icon">
-                                                <Check />
-                                            </span>
-                                        {:else}
-                                            <span class="copy-text"><Copy /></span>
-                                        {/if}
-                                    </button>
-                                    <div>
-                                        {#if isInputLink(input)}
-                                            Link {input[0]} -> {input[1]}
-                                        {:else if typeof input === "object"}
-                                            <Block>
-                                                <BlockLabel
-                                                    Icon={JSONIcon}
-                                                    show_label={true}
-                                                    label={inputName}
-                                                    float={true}
-                                                />
-                                                <JSONComponent value={input} />
-                                            </Block>
-                                        {:else if isMultiline(input)}
-                                            {@const lines = Math.max(countNewLines(input), input.length / splitLength)}
-                                            <TextBox label={inputName} value={formatInput(input)} {lines} max_lines={lines} />
-                                        {:else}
-                                            <TextBox label={inputName} value={formatInput(input)} lines={1} max_lines={1} />
-                                        {/if}
-                                    </div>
-                                </Block>
-                            {/each}
-                        </Accordion>
-                    </Block>
-                </div>
-            {/if}
-        {/each}
-    </Block>
+    <div class="scroll-container">
+        <Block>
+            {#each Object.entries(prompt) as [nodeID, inputs], i}
+                {@const classType = inputs.class_type}
+                {@const filtered = Object.entries(inputs.inputs).filter((i) => !isInputLink(i[1]))}
+                {#if filtered.length > 0}
+                    <div class="accordion">
+                        <Block padding={true}>
+                            <Accordion label="Node {i+1}: {classType}" open={false}>
+                                {#each filtered as [inputName, input]}
+                                    <Block>
+                                        <button class="copy-button" on:click={() => handleCopy(nodeID, inputName, input)}>
+                                            {#if copiedNodeID === nodeID && copiedInputName === inputName}
+                                                <span class="copied-icon">
+                                                    <Check />
+                                                </span>
+                                            {:else}
+                                                <span class="copy-text"><Copy /></span>
+                                            {/if}
+                                        </button>
+                                        <div>
+                                            {#if isInputLink(input)}
+                                                Link {input[0]} -> {input[1]}
+                                            {:else if typeof input === "object"}
+                                                <Block>
+                                                    <BlockLabel
+                                                        Icon={JSONIcon}
+                                                        show_label={true}
+                                                        label={inputName}
+                                                        float={true}
+                                                    />
+                                                    <JSONComponent value={input} />
+                                                </Block>
+                                            {:else if isMultiline(input)}
+                                                {@const lines = Math.max(countNewLines(input), input.length / splitLength)}
+                                                <TextBox label={inputName} value={formatInput(input)} {lines} max_lines={lines} />
+                                            {:else}
+                                                <TextBox label={inputName} value={formatInput(input)} lines={1} max_lines={1} />
+                                            {/if}
+                                        </div>
+                                    </Block>
+                                {/each}
+                            </Accordion>
+                        </Block>
+                    </div>
+                {/if}
+            {/each}
+        </Block>
+    </div>
+    {#if images.length > 0}
+        <div class="image-container">
+            <Block>
+                <Gallery
+                    value={images}
+                    label=""
+                    show_label={false}
+                    style={galleryStyle}
+                    root={""}
+                    root_url={""}
+                />
+            </Block>
+        </div>
+    {/if}
 </div>
 
 <style lang="scss">
  .prompt-display {
-     overflow-y: scroll;
-     width: 50vw;
+     width: 70vw;
      height: 60vh;
      color: none;
+
+     display: flex;
+     flex-wrap: nowrap;
+     overflow-y: auto;
+
+     flex-direction: column;
+     @media (min-width: 1600px) {
+         flex-direction: row;
+     }
+
+     .scroll-container {
+         position: relative;
+         /* overflow-y: auto; */
+         flex: 1 1 0%;
+     }
+
+     .image-container {
+         position: relative;
+         flex: 1 1 0%;
+         max-width: 30vw;
+     }
 
      .copy-button {
          display: flex;
