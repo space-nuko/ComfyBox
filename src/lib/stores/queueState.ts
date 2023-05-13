@@ -54,7 +54,8 @@ export type QueueState = {
     queueCompleted: Writable<CompletedQueueEntry[]>,
     queueRemaining: number | "X" | null;
     runningNodeID: number | null;
-    progress: Progress | null
+    progress: Progress | null,
+    isInterrupting: boolean
 }
 type WritableQueueStateStore = Writable<QueueState> & QueueStateOps;
 
@@ -64,7 +65,8 @@ const store: Writable<QueueState> = writable({
     queueCompleted: writable([]),
     queueRemaining: null,
     runningNodeID: null,
-    progress: null
+    progress: null,
+    isInterrupting: false
 })
 
 function toQueueEntry(resp: ComfyAPIHistoryItem): QueueEntry {
@@ -209,6 +211,7 @@ function executionCached(promptID: PromptID, nodes: NodeID[]) {
         else {
             console.error("[queueState] Could not find in pending! (executionCached)", promptID, "pending", JSON.stringify(get(get(store).queuePending).map(p => p.promptID)), "running", JSON.stringify(get(get(store).queueRunning).map(p => p.promptID)))
         }
+        s.isInterrupting = false; // TODO move to start
         s.progress = null;
         s.runningNodeID = null;
         return s
@@ -248,6 +251,7 @@ function afterQueued(promptID: PromptID, number: number, prompt: SerializedPromp
         }
         s.queuePending.update(qp => { qp.push(entry); return qp })
         console.debug("[queueState] ADD PROMPT", promptID)
+        s.isInterrupting = false;
         return s
     })
 }

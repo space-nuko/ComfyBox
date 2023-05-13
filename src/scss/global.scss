@@ -14,7 +14,11 @@ body {
 :root {
     --color-blue-500: #3985f5;
 
-    --comfy-accent-soft: var(--neutral-400);
+    --comfy-accent-soft: var(--neutral-300);
+    --comfy-disabled-label-color: var(--neutral-400);
+    --comfy-disabled-textbox-background-fill: var(--neutral-200);
+    --comfy-disabled-textbox-border-color: var(--neutral-300);
+    --comfy-disabled-textbox-text-color: var(--neutral-500);
     --comfy-splitpanes-background-fill: var(--secondary-100);
     --comfy-splitpanes-background-fill-hover: var(--secondary-300);
     --comfy-splitpanes-background-fill-active: var(--secondary-400);
@@ -34,6 +38,10 @@ body {
     color-scheme: dark;
 
     --comfy-accent-soft: var(--neutral-600);
+    --comfy-disabled-label-color: var(--neutral-500);
+    --comfy-disabled-textbox-background-fill: var(--neutral-800);
+    --comfy-disabled-textbox-border-color: var(--neutral-700);
+    --comfy-disabled-textbox-text-color: var(--neutral-500);
     --comfy-splitpanes-background-fill: var(--panel-border-color);
     --comfy-splitpanes-background-fill-hover: var(--secondary-500);
     --comfy-splitpanes-background-fill-active: var(--secondary-300);
@@ -56,11 +64,30 @@ body {
 }
 
 @mixin disable-input {
-    -webkit-text-fill-color: var(--neutral-500);
-    background-color: var(--neutral-200);
-    border-color: var(--neutral-300);
+    -webkit-text-fill-color: var(--comfy-disabled-textbox-text-color);
+    background-color: var(--comfy-disabled-textbox-background-fill);
+    border-color: var(--comfy-disabled-textbox-border-color);
     box-shadow: 0 0 0 var(--shadow-spread) transparent, rgba(0, 0, 0, 0.08) 0px 2px 4px 0px inset;
     cursor: not-allowed;
+}
+
+@mixin disable-inputs {
+    :global(input[type=text]:disabled) {
+        @include disable-input;
+    }
+    :global(textarea:disabled) {
+        @include disable-input;
+    }
+    :global(label:has(input:disabled) > span) {
+        color: var(--comfy-disabled-label-color);
+    }
+    :global(label:has(textarea:disabled) > span) {
+        color: var(--comfy-disabled-label-color);
+    }
+}
+
+hr {
+    color: var(--panel-border-color);
 }
 
 select {

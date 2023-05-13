@@ -44,6 +44,7 @@
     "@gradio/gallery": "workspace:*",
     "@gradio/icons": "workspace:*",
     "@gradio/image": "workspace:*",
+    "@gradio/json": "workspace:*",
     "@gradio/tabs": "workspace:*",
     "@gradio/theme": "workspace:*",
     "@gradio/upload": "workspace:*",

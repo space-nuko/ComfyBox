@@ -65,8 +65,6 @@ export class ImageViewer {
         setTimeout(() => {
             this.modalImage.focus()
         }, 200)
-
-        event.stopPropagation()
     }
 
     static get_gallery_urls(galleryElem: HTMLDivElement): string[] {

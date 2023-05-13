@@ -7,6 +7,7 @@ import { get } from "svelte/store";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 import type { ComfyWidgetNode, GalleryOutput, GalleryOutputEntry } from "./ComfyWidgetNodes";
 import type { NotifyOptions } from "$lib/notify";
+import type { FileData as GradioFileData } from "@gradio/upload";
 import { convertComfyOutputToGradio, uploadImageToComfyUI, type ComfyUploadImageAPIResponse } from "$lib/utils";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
@@ -658,4 +659,55 @@ LiteGraph.registerNodeType({
     title: "Comfy.UploadImageAction",
     desc: "Uploads an image from the specified ComfyUI folder into its input folder",
     type: "actions/store_images"
+})
+
+export interface ComfySetPromptThumbnailsActionProperties extends ComfyGraphNodeProperties {
+    defaultFolderType: string | null
+}
+
+export class ComfySetPromptThumbnailsAction extends ComfyGraphNode {
+    override properties: ComfySetPromptThumbnailsActionProperties = {
+        tags: [],
+        defaultFolderType: "input",
+    }
+
+    static slotLayout: SlotLayout = {
+        inputs: [
+            { name: "filenames", type: "*" },
+        ]
+    }
+
+    _value: any = null;
+
+    override getPromptThumbnails(): GalleryOutputEntry[] | null {
+        const data = this.getInputData(0)
+
+        const folderType = this.properties.folderType || "input";
+
+        const convertString = (s: string): GalleryOutputEntry => {
+            return { filename: data, subfolder: "", type: folderType }
+        }
+
+        if (typeof data === "string") {
+            return [convertString(data)]
+        }
+        else if (data != null && typeof data === "object") {
+            if ("filename" in data && "type" in data)
+                return [data as GalleryOutputEntry];
+        }
+        else if (Array.isArray(data) && data.length > 0) {
+            if (typeof data[0] === "string")
+                return data.map(convertString)
+            else if (typeof data[0] === "object" && "filename" in data[0] && "type" in data[0])
+                return data as GalleryOutputEntry[]
+        }
+        return null;
+    }
+}
+
+LiteGraph.registerNodeType({
+    class: ComfySetPromptThumbnailsAction,
+    title: "Comfy.SetPromptThumbnailsAction",
+    desc: "When a subgraph containing this node is executed, sets the thumbnails in the queue sidebar to the input filename(s).",
+    type: "actions/set_prompt_thumbnails"
 })

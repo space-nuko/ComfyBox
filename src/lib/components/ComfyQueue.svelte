@@ -2,6 +2,7 @@
  import queueState, { type CompletedQueueEntry, type QueueEntry, type QueueEntryStatus } from "$lib/stores/queueState";
  import ProgressBar from "./ProgressBar.svelte";
  import Spinner from "./Spinner.svelte";
+ import PromptDisplay from "./PromptDisplay.svelte";
  import { ListIcon as List } from "svelte-feather-icons";
  import { convertComfyOutputToComfyURL, convertFilenameToComfyURL, getNodeInfo } from "$lib/utils"
  import type { Writable } from "svelte/store";
@@ -10,6 +11,7 @@
  import { Button } from "@gradio/button";
  import type ComfyApp from "./ComfyApp";
  import { tick } from "svelte";
+	import Modal from "./Modal.svelte";
 
  let queuePending: Writable<QueueEntry[]> | null = null;
  let queueRunning: Writable<QueueEntry[]> | null = null;
@@ -17,6 +19,7 @@
  let queueList: HTMLDivElement | null = null;
 
  type QueueUIEntry = {
+     entry: QueueEntry,
      message: string,
      submessage: string,
      date?: string,
@@ -49,21 +52,17 @@
      updateFromHistory();
  }
 
- function convertEntry(entry: QueueEntry): QueueUIEntry {
-     const images = Object.values(entry.outputs).flatMap(o => o.images)
-         .map(convertComfyOutputToComfyURL);
+ function formatDate(date: Date): string {
+     const time = date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+     const day = date.toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(',', '');
+     return [time, day].join(", ")
+ }
 
-     let date = null;
-     if (entry.queuedAt) {
-         const options: Intl.DateTimeFormatOptions = {
-             year: 'numeric',
-             month: '2-digit',
-             day: '2-digit',
-             hour: 'numeric',
-             minute: 'numeric'
-         };
-         const dateTimeFormat = new Intl.DateTimeFormat('en-US', options);
-         date = dateTimeFormat.format(entry.queuedAt);
+ function convertEntry(entry: QueueEntry): QueueUIEntry {
+     let date = entry.finishedAt || entry.queuedAt;
+     let dateStr = null;
+     if (date) {
+         dateStr = formatDate(date);
      }
 
      let message = "Prompt";
@@ -72,24 +71,43 @@
 
      let submessage = `Nodes: ${Object.keys(entry.prompt).length}`
      if (Object.keys(entry.outputs).length > 0) {
-         submessage = `Images: ${Object.keys(entry.outputs).length}`
+         const imageCount = Object.values(entry.outputs).flatMap(o => o.images).length
+         submessage = `Images: ${imageCount}`
      }
 
      return {
+         entry,
          message,
          submessage,
-         date,
+         dateStr,
          status: "pending",
-         images,
+         images: []
      }
+ }
+
+ function convertPendingEntry(entry: QueueEntry): QueueUIEntry {
+     const result = convertEntry(entry);
+
+     const thumbnails = entry.extraData?.thumbnails
+     if (thumbnails) {
+         result.images = thumbnails.map(convertComfyOutputToComfyURL);
+     }
+
+     return result;
  }
 
  function convertCompletedEntry(entry: CompletedQueueEntry): QueueUIEntry {
      const result = convertEntry(entry.entry);
      result.status = entry.status;
 
+     const images = Object.values(entry.entry.outputs).flatMap(o => o.images)
+         .map(convertComfyOutputToComfyURL);
+     result.images = images
+
      if (entry.message)
          result.submessage = entry.message
+     else if (entry.status === "interrupted" || entry.status === "all_cached")
+         result.submessage = "Prompt was interrupted."
      if (entry.error)
          result.details = entry.error
 
@@ -97,7 +115,7 @@
  }
 
  async function updateFromQueue() {
-     _entries = $queuePending.map(convertEntry).reverse(); // newest entries appear at the top
+     _entries = $queuePending.map(convertPendingEntry).reverse(); // newest entries appear at the top
      if (queueList) {
          await tick(); // Wait for list size to be recalculated
          queueList.scroll({ top: queueList.scrollHeight })
@@ -108,27 +126,44 @@
  async function updateFromHistory() {
      _entries = $queueCompleted.map(convertCompletedEntry).reverse();
      if (queueList) {
-         await tick(); // Wait for list size to be recalculated
          queueList.scrollTo(0, 0);
      }
      console.warn("[ComfyQueue] BUILDHISTORY", _entries, $queueCompleted)
  }
 
- function showLightbox(entry: QueueUIEntry, e: Event) {
+ function showLightbox(entry: QueueUIEntry, index: number, e: Event) {
      e.preventDefault()
      if (!entry.images)
          return
 
-     ImageViewer.instance.showModal(entry.images, 0)
+     ImageViewer.instance.showModal(entry.images, index);
+
+     e.stopPropagation()
  }
 
  async function interrupt() {
+     if ($queueState.isInterrupting)
+         return
+
      const app = (window as any).app as ComfyApp;
      if (!app || !app.api)
          return;
 
-     await app.api.interrupt();
+     await app.api.interrupt()
+              .then(() => {
+                  queueState.update(s => { s.isInterrupting = true; return s })
+              });
  }
+
+ let showModal = false;
+ let selectedPrompt = null;
+ function showPrompt(entry: QueueUIEntry, e: MouseEvent) {
+     selectedPrompt = entry.entry.prompt;
+     showModal = true;
+ }
+
+ $: if(!showModal)
+     selectedPrompt = null;
 
  let queued = false
  $: queued = Boolean($queueState.runningNodeID || $queueState.progress);
@@ -137,14 +172,32 @@
  $: inProgress = typeof $queueState.queueRemaining === "number" && $queueState.queueRemaining > 0;
 </script>
 
+
+<Modal bind:showModal>
+    <div slot="header" class="prompt-modal-header">
+        <h1 style="padding-bottom: 1rem;">Prompt Details</h1>
+    </div>
+    {#if selectedPrompt}
+        <PromptDisplay prompt={selectedPrompt} />
+    {/if}
+</Modal>
+
 <div class="queue">
     <div class="queue-entries {mode}-mode" bind:this={queueList}>
         {#if _entries.length > 0}
             {#each _entries as entry}
-                <div class="queue-entry {entry.status}">
+                <div class="queue-entry {entry.status}" on:click={(e) => showPrompt(entry, e)}>
                     {#if entry.images.length > 0}
-                        <div class="queue-entry-images" on:click={(e) => showLightbox(entry, e)}>
-                            <img class="queue-entry-image" src={entry.images[0]} alt="thumbnail" />
+                         <div class="queue-entry-images"
+                              style="--cols: {Math.ceil(Math.sqrt(Math.min(entry.images.length, 4)))}" >
+                            {#each entry.images.slice(0, 4) as image, i}
+                                <div>
+                                    <img class="queue-entry-image"
+                                         on:click={(e) => showLightbox(entry, i, e)}
+                                         src={image}
+                                         alt="thumbnail" />
+                                </div>
+                            {/each}
                         </div>
                     {:else}
                         <!-- <div class="queue-entry-image-placeholder" /> -->
@@ -158,7 +211,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="queue-entry-rest">
+                <div class="queue-entry-rest {entry.status}">
                     {#if entry.date != null}
                         <span class="queue-entry-queued-at">
                             {entry.date}
@@ -212,7 +265,10 @@
                 <ProgressBar value={$queueState.progress?.value} max={$queueState.progress?.max} />
             </div>
             <div class="queue-action-buttons">
-                <Button variant="secondary" on:click={interrupt} style={{ full_width: true }}>
+                <Button variant="secondary"
+                        disabled={$queueState.isInterrupting}
+                        on:click={interrupt}
+                        style={{ full_width: true }}>
                     Interrupt
                 </Button>
             </div>
@@ -226,6 +282,13 @@
  $mode-buttons-height: 30px;
  $queue-height: calc(100vh - #{$pending-height} - #{$mode-buttons-height} - #{$bottom-bar-height});
 
+ .prompt-modal-header {
+     padding-left: 0.2rem;
+
+     h1 {
+         font-size: large;
+     }
+}
  .queue {
      color: var(--body-text-color);
  }
@@ -275,16 +338,20 @@
      border-top: 1px solid var(--table-border-color);
      background: var(--panel-background-fill);
 
+     &:hover:not(:has(img:hover)) {
+         background: var(--block-background-fill);
+     }
+
      &.success {
          /* background: green; */
      }
      &.error {
          background: red;
      }
-     &.all_cached {
+     &.all_cached, &.interrupted {
          filter: brightness(80%);
-         background: var(--neutral-600);
-         color: var(--neutral-300);
+         background: var(--comfy-disabled-textbox-background-fill);
+         color: var(--comfy-disable-textbox-text-color);
      }
      &.running {
          /* background: lightblue; */
@@ -294,27 +361,38 @@
      }
  }
 
- .queue-entry-images {
-     height: 100%;
-     aspect-ratio: 1/1;
-     margin: auto;
+ .queue-entry-rest {
+     width: 100%;
+     position: relative;
 
-     > .queue-entry-image {
-         filter: none;
+     &.all_cached, &.interrupted {
+         filter: brightness(80%);
+         color: var(--neutral-300);
+     }
+ }
+
+ $thumbnails-size: 12rem;
+
+ .queue-entry-images {
+     --cols: 1;
+     margin: auto;
+     width: calc($thumbnails-size * 2);
+     display: grid;
+     display: inline-grid;
+     grid-template-columns: repeat(var(--cols), 1fr);
+     grid-template-rows: repeat(var(--cols), 1fr);
+     column-gap: 1px;
+     row-gap: 1px;
+     vertical-align: top;
+
+     img {
+         aspect-ratio: 1 / 1;
+         object-fit: cover;
+
          &:hover {
              filter: brightness(120%) contrast(120%);
          }
      }
- }
-
- .queue-entry-image-placeholder {
-     width: var(--size-20);
-     background: grey;
- }
-
- .queue-entry-rest {
-     width: 100%;
-     position: relative;
  }
 
  .queue-entry-details {
@@ -378,6 +456,19 @@
          }
      }
 
+     &:hover {
+         filter: brightness(85%);
+     }
+     &:active {
+         filter: brightness(50%)
+     }
+     &.mode-selected {
+         filter: brightness(80%)
+     }
+ }
+
+ :global(.dark) .mode-button {
+     filter: none;
      &:hover {
          filter: brightness(120%);
      }

@@ -59,7 +59,8 @@ export type SerializedAppState = {
 export type SerializedPromptInput = [NodeID, number] | any
 
 export type SerializedPromptInputs = {
-    inputs: Record<NodeID, SerializedPromptInput>,
+    /* property name -> value or link */
+    inputs: Record<string, SerializedPromptInput>,
     class_type: string
 }
 
@@ -611,7 +612,7 @@ export default class ComfyApp {
 
                     // The reasoning behind this check:
                     // We only want to serialize inputs to nodes with backend equivalents.
-                    // And in ComfyBox, the nodes in litegraph *never* have widgets, instead they're all inputs.
+                    // And in ComfyBox, the backend nodes in litegraph *never* have widgets, instead they're all inputs.
                     // All values are passed by separate frontend-only nodes,
                     // either UI-bound or something like ConstantInteger.
                     // So we know that any value passed into a backend node *must* come from
@@ -728,8 +729,26 @@ export default class ComfyApp {
                 ({ num, batchCount } = this.queueItems.pop());
                 console.debug(`Queue get! ${num} ${batchCount} ${tag}`);
 
+                const thumbnails = []
+                for (const node of this.lGraph.iterateNodesInOrderRecursive()) {
+                    if (node.mode !== NodeMode.ALWAYS
+                        || (tag != null
+                            && Array.isArray(node.properties.tags)
+                            && node.properties.tags.indexOf(tag) === -1))
+                        continue;
+
+                    if ("getPromptThumbnails" in node) {
+                        const thumbsToAdd = (node as ComfyGraphNode).getPromptThumbnails();
+                        if (thumbsToAdd)
+                            thumbnails.push(...thumbsToAdd)
+                    }
+                }
+
                 for (let i = 0; i < batchCount; i++) {
-                    for (const node of this.lGraph._nodes_in_order) {
+                    for (const node of this.lGraph.iterateNodesInOrderRecursive()) {
+                        if (node.mode !== NodeMode.ALWAYS)
+                            continue;
+
                         if ("beforeQueued" in node) {
                             (node as ComfyGraphNode).beforeQueued(tag);
                         }
@@ -742,7 +761,8 @@ export default class ComfyApp {
                         extra_pnginfo: {
                             workflow: p.workflow
                         },
-                        subgraphs: [tag]
+                        subgraphs: [tag],
+                        thumbnails
                     }
 
                     let error = null;
@@ -871,7 +891,7 @@ export default class ComfyApp {
                     const isComfyInput = isComfyComboInput(input)
                     const isComfyCombo = isComfyComboNode(inputNode)
 
-                    console.debug("[refreshComboInNodes] CHECK", backendNode.type, input.name, "isComfyCombo", isComfyCombo, "isComfyInput", isComfyInput)
+                    // console.debug("[refreshComboInNodes] CHECK", backendNode.type, input.name, "isComfyCombo", isComfyCombo, "isComfyInput", isComfyInput)
 
                     return isComfyCombo && isComfyInput
                 });

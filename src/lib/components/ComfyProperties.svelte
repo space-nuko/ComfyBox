@@ -480,10 +480,5 @@
         padding: 0.5em; */
  }
 
- :global(input[type=text]:disabled) {
-     @include disable-input;
- }
- :global(textarea:disabled) {
-     @include disable-input;
- }
+ @include disable-inputs;
 </style>

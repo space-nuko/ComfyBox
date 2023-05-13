@@ -3,7 +3,7 @@ import type { SerializedPrompt } from "$lib/components/ComfyApp";
 import type ComfyWidget from "$lib/components/widgets/ComfyWidget";
 import { LGraph, LGraphNode, LLink, LiteGraph, NodeMode, type INodeInputSlot, type SerializedLGraphNode, type Vector2, type INodeOutputSlot, LConnectionKind, type SlotType, LGraphCanvas, getStaticPropertyOnInstance, type PropertyLayout, type SlotLayout } from "@litegraph-ts/core";
 import type { SvelteComponentDev } from "svelte/internal";
-import type { ComfyWidgetNode, GalleryOutput } from "./ComfyWidgetNodes";
+import type { ComfyWidgetNode, GalleryOutput, GalleryOutputEntry } from "./ComfyWidgetNodes";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import uiState from "$lib/stores/uiState";
 import { get } from "svelte/store";
@@ -49,6 +49,13 @@ export default class ComfyGraphNode extends LGraphNode {
      * Valid for output nodes like SaveImage and PreviewImage.
      */
     onExecuted?(output: GalleryOutput): void;
+
+    /*
+     * When a prompt is queued, this will be called on the node if it can
+     * provide any thumbnails for use with the prompt queue. Useful for HR Fix
+     * or img2img workloads.
+     */
+    getPromptThumbnails?(): GalleryOutputEntry[] | null
 
     /*
      * Allows you to manually specify an auto-config for certain input slot

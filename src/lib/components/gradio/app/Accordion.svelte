@@ -13,7 +13,7 @@
  }
 </script>
 
-<div on:click={handleClick} class="label-wrap" class:open>
+<div class="label-wrap" on:click={handleClick} class:open>
 	<span>{label}</span>
 	<span style:transform={open ? "rotate(0)" : "rotate(90deg)"} class="icon">
 		▼

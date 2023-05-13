@@ -1,7 +1,7 @@
 import type { Progress, SerializedPrompt, SerializedPromptInputs, SerializedPromptInputsAll, SerializedPromptOutput, SerializedPromptOutputs } from "./components/ComfyApp";
 import type TypedEmitter from "typed-emitter";
 import EventEmitter from "events";
-import type { GalleryOutput } from "./nodes/ComfyWidgetNodes";
+import type { GalleryOutput, GalleryOutputEntry } from "./nodes/ComfyWidgetNodes";
 import type { SerializedLGraph } from "@litegraph-ts/core";
 
 export type ComfyPromptRequest = {
@@ -62,7 +62,8 @@ export type ComfyPromptPNGInfo = {
 export type ComfyPromptExtraData = {
     extra_pnginfo?: ComfyPromptPNGInfo,
     client_id?: string, // UUID
-    subgraphs: string[]
+    subgraphs: string[],
+    thumbnails?: GalleryOutputEntry[]
 }
 
 type ComfyAPIEvents = {
