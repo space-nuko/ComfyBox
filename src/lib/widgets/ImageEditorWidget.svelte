@@ -10,13 +10,13 @@
 
  import "klecks/style/style.scss";
 	import ImageUpload from "$lib/components/ImageUpload.svelte";
-	import { uploadImageToComfyUI, type ComfyUploadImageAPIResponse } from "$lib/utils";
+	import { uploadImageToComfyUI, type ComfyUploadImageAPIResponse, convertComfyOutputToComfyURL } from "$lib/utils";
 	import notify from "$lib/notify";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfyImageEditorNode | null = null;
- let nodeValue: Writable<MultiImageData> | null = null;
+ let nodeValue: Writable<GalleryOutputEntry[]> | null = null;
  let attrsChanged: Writable<number> | null = null;
  let leftUrl: string = ""
  let rightUrl: string = ""
@@ -63,6 +63,8 @@
  let kl: Klecks | null = null;
 
  function disposeEditor() {
+     console.warn("[ImageEditorWidget] CLOSING", widget, $nodeValue)
+
      if (editorRoot) {
          while (editorRoot.firstChild) {
              editorRoot.removeChild(editorRoot.firstChild);
@@ -73,25 +75,52 @@
      showModal = false;
  }
 
+ function generateBlankCanvas(width: number, height: number, fill: string = "#fff"): HTMLCanvasElement {
+     const canvas = document.createElement('canvas');
+     canvas.width = width;
+     canvas.height = height;
+     const ctx = canvas.getContext('2d');
+     ctx.save();
+     ctx.fillStyle = fill,
+     ctx.fillRect(0, 0, canvas.width, canvas.height);
+     ctx.restore();
+     return canvas;
+ }
+
+ async function loadImage(imageURL: string): Promise<HTMLImageElement> {
+     return new Promise((resolve) => {
+         const e = new Image();
+         e.setAttribute('crossorigin', 'anonymous'); // Don't taint the canvas from loading files on-disk
+         e.addEventListener("load", () => { resolve(e); });
+         e.src = imageURL;
+         return e;
+     });
+ }
+
+ async function generateImageCanvas(imageURL: string): Promise<[HTMLCanvasElement, number, number]> {
+     const image = await loadImage(imageURL);
+     const canvas = document.createElement('canvas');
+     canvas.width = image.width;
+     canvas.height = image.height;
+     const ctx = canvas.getContext('2d');
+     ctx.save();
+     ctx.fillStyle = "rgba(255, 255, 255, 0.0)";
+     ctx.fillRect(0, 0, canvas.width, canvas.height);
+     ctx.drawImage(image, 0, 0);
+     ctx.restore();
+     return [canvas, image.width, image.height];
+ }
+
  const FILENAME: string = "ComfyUITemp.png";
- const SUBFOLDER: string = "ComfyBox_Editor";
+ // const SUBFOLDER: string = "ComfyBox_Editor";
 
  async function submitKlecksToComfyUI(onSuccess: () => void, onError: () => void) {
      const blob = kl.getPNG();
 
-     const formData = new FormData();
-     formData.append("image", blob, FILENAME);
-
-     const entry: GalleryOutputEntry = {
-         filename: FILENAME,
-         subfolder: SUBFOLDER,
-         type: "input"
-     }
-
-     await uploadImageToComfyUI(entry)
-         .then((resp: ComfyUploadImageAPIResponse) => {
-             entry.filename = resp.name;
-             $nodeValue = [entry]
+     await uploadImageToComfyUI(blob, FILENAME, "input")
+         .then((entry: GalleryOutputEntry) => {
+             $nodeValue = [entry] // TODO more than one image
+             notify("Saved image to ComfyUI!", { type: "success" })
              onSuccess();
          })
          .catch(err => {
@@ -101,19 +130,7 @@
          })
  }
 
- function generateBlankImage(fill: string = "#fff"): HTMLCanvasElement {
-     const canvas = document.createElement('canvas');
-     canvas.width = 512;
-     canvas.height = 512;
-     const ctx = canvas.getContext('2d');
-     ctx.save();
-     ctx.fillStyle = fill,
-     ctx.fillRect(0, 0, canvas.width, canvas.height);
-     ctx.restore();
-     return canvas;
- }
-
- function openImageEditor() {
+ async function openImageEditor() {
      if (!editorRoot)
          return;
 
@@ -124,17 +141,33 @@
      kl = new Klecks({
          embedUrl: url,
          onSubmit: submitKlecksToComfyUI,
-         targetEl: editorRoot.parentElement.parentElement
+         targetEl: editorRoot,
+         warnOnPageClose: false
      });
 
+     console.warn("[ImageEditorWidget] OPENING", widget, $nodeValue)
+
+     let canvas = null;
+     let width = 512;
+     let height = 512;
+
+     if ($nodeValue && $nodeValue.length > 0) {
+         const comfyImage = $nodeValue[0];
+         const comfyURL = convertComfyOutputToComfyURL(comfyImage);
+         [canvas, width, height] = await generateImageCanvas(comfyURL);
+     }
+     else {
+         canvas = generateBlankCanvas(width, height);
+     }
+
      kl.openProject({
-         width: 512,
-         height: 512,
+         width: width,
+         height: height,
          layers: [{
              name: 'Image',
              opacity: 1,
              mixModeStr: 'source-over',
-             image: generateBlankImage(),
+             image: canvas
          }]
      });
 
@@ -143,24 +176,52 @@
      }, 1000);
  }
 
- function onUploadChanged(e: CustomEvent<GradioFileData[]>) {
+ let status = "none"
+ let uploadError = null;
 
+ function onUploading() {
+     uploadError = null;
+     status = "uploading"
  }
+
+ function onUploaded(e: CustomEvent<GalleryOutputEntry[]>) {
+     uploadError = null;
+     status = "uploaded"
+     $nodeValue = e.detail;
+ }
+
+ function onClear() {
+     uploadError = null;
+     status = "none"
+ }
+
+ function onUploadError(e: CustomEvent<any>) {
+     status = "error"
+     uploadError = e.detail
+ }
+
+ function onChange(e: CustomEvent<GalleryOutputEntry[]>) {
+     // $nodeValue = e.detail;
+ }
+
+ $: canEdit = status === "none" || status === "uploaded";
+
 </script>
 
 <div class="wrapper comfy-image-editor">
     {#if isMobile}
         <span>TODO mask editor</span>
     {:else}
-        <Modal bind:showModal on:close={disposeEditor}>
-            <div id="klecks-loading-screen">
-                <span id="klecks-loading-screen-text"></span>
+        <Modal bind:showModal closeOnClick={false} on:close={disposeEditor}>
+            <div>
+                <div id="klecks-loading-screen">
+                    <span id="klecks-loading-screen-text"></span>
+                </div>
+                <div class="image-editor-root" bind:this={editorRoot} />
             </div>
-            <div class="image-editor-root" bind:this={editorRoot} />
         </Modal>
         <div class="comfy-image-editor-panel">
             <ImageUpload value={$nodeValue}
-                         {isMobile}
                          bind:imgWidth
                          bind:imgHeight
                          bind:imgElem
@@ -168,13 +229,22 @@
                          elem_classes={[]}
                          style={""}
                          label={"Image"}
-                         on:change={onUploadChanged}
+                         on:uploading={onUploading}
+                         on:uploaded={onUploaded}
+                         on:upload_error={onUploadError}
+                         on:clear={onClear}
+                         on:change={onChange}
             />
             <Block>
-                <BlockTitle>Image editor.</BlockTitle>
-                <Button variant="secondary" on:click={openImageEditor}>
-                    Open
+                <Button variant="primary" disabled={!canEdit} on:click={openImageEditor}>
+                    Edit Image
                 </Button>
+                <BlockTitle>Status: {status}</BlockTitle>
+                {#if uploadError}
+                    <div>
+                        Upload error: {uploadError}
+                    </div>
+                {/if}
             </Block>
         </div>
     {/if}
@@ -185,11 +255,21 @@
      width: 75vw;
      height: 75vh;
      overflow: hidden;
+
+     color: black;
+
+     :global(> .g-root) {
+         height: calc(100% - 59px);
+     }
  }
 
  .comfy-image-editor {
      :global(> dialog) {
          overflow: hidden;
      }
+ }
+
+ :global(.kl-popup) {
+     z-index: 999999999999;
  }
 </style>

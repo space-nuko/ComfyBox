@@ -1,14 +1,13 @@
 <script lang="ts">
- import { createEventDispatcher } from "svelte";
- import { Block, BlockLabel, Empty } from "@gradio/atoms";
- import { File as FileIcon } from "@gradio/icons";
- import { ModifyUpload, Upload, blobToBase64, normalise_file } from "@gradio/upload";
- import type { FileData as GradioFileData } from "@gradio/upload";
  import UploadText from "$lib/components/gradio/app/UploadText.svelte";
- import { tick } from "svelte";
+ import type { GalleryOutputEntry } from "$lib/nodes/ComfyWidgetNodes";
  import notify from "$lib/notify";
- import { convertComfyOutputToComfyURL, type ComfyUploadImageAPIResponse, converGradioFileDataToComfyURL } from "$lib/utils";
-	import type { GalleryOutputEntry, MultiImageData } from "$lib/nodes/ComfyWidgetNodes";
+ import { convertComfyOutputEntryToGradio, convertComfyOutputToComfyURL, type ComfyUploadImageAPIResponse } from "$lib/utils";
+ import { Block, BlockLabel } from "@gradio/atoms";
+ import { File as FileIcon } from "@gradio/icons";
+ import type { FileData as GradioFileData } from "@gradio/upload";
+ import { ModifyUpload, Upload } from "@gradio/upload";
+ import { createEventDispatcher, tick } from "svelte";
 
  export let value: GalleryOutputEntry[] | null = null;
  export let imgWidth: number = 0;
@@ -29,7 +28,10 @@
 
 	const dispatch = createEventDispatcher<{
 		change: GalleryOutputEntry[];
-		upload: undefined;
+        uploading: undefined;
+		uploaded: GalleryOutputEntry[];
+		upload_error: any;
+		load: undefined;
 		clear: undefined;
 	}>();
 
@@ -49,11 +51,15 @@
  }
 
  function onUpload() {
-     dispatch("upload")
+     dispatch("uploaded")
  }
 
  function onClear() {
      dispatch("clear")
+ }
+
+ function onLoad() {
+     dispatch("load")
  }
 
  interface GradioUploadResponse {
@@ -63,6 +69,8 @@
 
  async function upload_files(root: string, files: Array<File>): Promise<GradioUploadResponse> {
      console.debug("UPLOADILFES", root, files);
+
+     dispatch("uploading")
 
      const url = `http://${location.hostname}:8188` // TODO make configurable
 
@@ -147,8 +155,11 @@
                  }
 
                  value = response.files;
-                 onChange();
-                 onUpload();
+                 dispatch("change")
+                 dispatch("uploaded", value)
+             }).
+             catch(err => {
+                 dispatch("upload_error", err)
              });
          }
      }
@@ -157,19 +168,23 @@
  async function handle_upload({ detail }: CustomEvent<GradioFileData | Array<GradioFileData>>) {
      _value = Array.isArray(detail) ? detail : [detail];
      await tick();
-     onChange();
-     onUpload();
+     dispatch("change")
+     dispatch("load")
  }
 
  function handle_clear(_e: CustomEvent<null>) {
      _value = null;
      value = [];
-     onChange();
-     onClear();
+     dispatch("change")
+     dispatch("clear")
  }
 
  function convertGradioUpload(e: CustomEvent<GradioFileData[]>) {
      _value = e.detail
+ }
+
+ function convertNodeValue(nodeValue: GalleryOutputEntry[]): GradioFileData[] {
+     return nodeValue.map(convertComfyOutputEntryToGradio);
  }
 </script>
 
@@ -189,11 +204,11 @@
                 Icon={FileIcon}
                 float={label != ""}
             />
-            {#if _value && _value.length > 0 && !pending_upload}
-                {@const firstImage = _value[0]}
+            {#if value && value.length > 0 && !pending_upload}
+                {@const firstImage = value[0]}
                 <ModifyUpload on:clear={handle_clear} absolute />
-                <img src={converGradioFileDataToComfyURL(firstImage)}
-                     alt={firstImage.orig_name}
+                <img src={convertComfyOutputToComfyURL(firstImage)}
+                     alt={firstImage.filename}
                      bind:this={imgElem}
                      bind:naturalWidth={imgWidth}
                      bind:naturalHeight={imgHeight}

@@ -1,7 +1,7 @@
 import { BuiltInSlotType, LiteGraph, type ITextWidget, type SlotLayout, clamp, type PropertyLayout, type IComboWidget, type SerializedLGraphNode } from "@litegraph-ts/core";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
-import type { GalleryOutput } from "./ComfyWidgetNodes";
-import { uploadImageToComfyUI, type ComfyUploadImageAPIResponse } from "$lib/utils";
+import type { GalleryOutput, GalleryOutputEntry } from "./ComfyWidgetNodes";
+import { reuploadImageToComfyUI, type ComfyUploadImageAPIResponse } from "$lib/utils";
 
 export interface ComfyImageCacheNodeProperties extends ComfyGraphNodeProperties {
     images: GalleryOutput | null,
@@ -171,11 +171,11 @@ export default class ComfyImageCacheNode extends ComfyGraphNode {
             this.properties.filenames[newIndex] = { filename: null, status: "uploading" }
             this.onPropertyChanged("filenames", this.properties.filenames)
 
-            const promise = uploadImageToComfyUI(data)
-                .then((json: ComfyUploadImageAPIResponse) => {
-                    console.debug("Gottem", json)
+            const promise = reuploadImageToComfyUI(data, "input")
+                .then((entry: GalleryOutputEntry) => {
+                    console.debug("Gottem", entry)
                     if (lastGenNumber === this.properties.genNumber) {
-                        this.properties.filenames[newIndex] = { filename: json.name, status: "cached" }
+                        this.properties.filenames[newIndex] = { filename: entry.filename, status: "cached" }
                         this.onPropertyChanged("filenames", this.properties.filenames)
                     }
                     else {

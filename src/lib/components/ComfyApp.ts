@@ -409,6 +409,7 @@ export default class ComfyApp {
         }
 
         setColor("IMAGE", "rebeccapurple")
+        setColor("COMFY_IMAGE_FILE", "chartreuse")
         setColor(BuiltInSlotType.EVENT, "lightseagreen")
         setColor(BuiltInSlotType.ACTION, "lightseagreen")
     }

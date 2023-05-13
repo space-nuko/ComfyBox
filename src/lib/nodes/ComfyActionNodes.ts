@@ -8,7 +8,7 @@ import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode"
 import type { ComfyWidgetNode, GalleryOutput, GalleryOutputEntry } from "./ComfyWidgetNodes";
 import type { NotifyOptions } from "$lib/notify";
 import type { FileData as GradioFileData } from "@gradio/upload";
-import { convertComfyOutputToGradio, uploadImageToComfyUI, type ComfyUploadImageAPIResponse } from "$lib/utils";
+import { convertComfyOutputToGradio, reuploadImageToComfyUI, type ComfyUploadImageAPIResponse } from "$lib/utils";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
@@ -638,10 +638,10 @@ export class ComfyUploadImageAction extends ComfyGraphNode {
             type: this.properties.folderType || "output"
         }
 
-        this._promise = uploadImageToComfyUI(data)
-            .then((json: ComfyUploadImageAPIResponse) => {
-                console.debug("[UploadImageAction] Succeeded", json)
-                this.properties.lastUploadedImageFile = json.name;
+        this._promise = reuploadImageToComfyUI(data, "input")
+            .then((entry: GalleryOutputEntry) => {
+                console.debug("[UploadImageAction] Succeeded", entry)
+                this.properties.lastUploadedImageFile = entry.filename;
                 this.triggerSlot(1, this.properties.lastUploadedImageFile);
                 this._promise = null;
             })

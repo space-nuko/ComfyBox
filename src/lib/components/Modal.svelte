@@ -1,7 +1,10 @@
 <script lang="ts">
+	import { Button } from "@gradio/button";
 	import { createEventDispatcher } from "svelte";
 
 	export let showModal; // boolean
+	export let closeOnClick = true; // boolean
+	export let showCloseButton = true; // boolean
 
 	let dialog; // HTMLDialogElement
 
@@ -11,7 +14,17 @@
 
 	$: if (dialog && showModal) dialog.showModal();
 
- function close() {
+ function close(e: Event) {
+     if (!closeOnClick) {
+         e.preventDefault();
+         e.stopPropagation();
+         return false
+     }
+
+     doClose()
+ }
+
+ function doClose() {
      dialog.close();
      dispatch("close")
  }
@@ -21,13 +34,16 @@
 <dialog
 	bind:this={dialog}
 	on:close={close}
+    on:cancel={doClose}
 	on:click|self={close}
 >
 	<div on:click|stopPropagation>
 		<slot name="header" />
 		<slot />
 		<!-- svelte-ignore a11y-autofocus -->
-		<button autofocus on:click={close}>Close</button>
+        {#if showCloseButton}
+            <Button variant="secondary" on:click={doClose}>Close</Button>
+        {/if}
 	</div>
 </dialog>
 

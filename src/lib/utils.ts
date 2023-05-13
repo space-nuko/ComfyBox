@@ -126,17 +126,19 @@ export const debounce = (callback: Function, wait = 250) => {
 };
 
 export function convertComfyOutputToGradio(output: GalleryOutput): GradioFileData[] {
-    return output.images.map(r => {
-        const url = `http://${location.hostname}:8188` // TODO make configurable
-        const params = new URLSearchParams(r)
-        const fileData: GradioFileData = {
-            name: r.filename,
-            orig_name: r.filename,
-            is_file: false,
-            data: url + "/view?" + params
-        }
-        return fileData
-    });
+    return output.images.map(convertComfyOutputEntryToGradio);
+}
+
+export function convertComfyOutputEntryToGradio(r: GalleryOutputEntry): GradioFileData {
+    const url = `http://${location.hostname}:8188` // TODO make configurable
+    const params = new URLSearchParams(r)
+    const fileData: GradioFileData = {
+        name: r.filename,
+        orig_name: r.filename,
+        is_file: false,
+        data: url + "/view?" + params
+    }
+    return fileData
 }
 
 export function convertComfyOutputToComfyURL(output: FileNameOrGalleryData): string {
@@ -148,13 +150,13 @@ export function convertComfyOutputToComfyURL(output: FileNameOrGalleryData): str
     return url + "/view?" + params
 }
 
-export function converGradioFileDataToComfyURL(image: GradioFileData, type: "input" | "output" | "temp" = "input"): string {
+export function convertGradioFileDataToComfyURL(image: GradioFileData, type: ComfyUploadImageType = "input"): string {
     const baseUrl = `http://${location.hostname}:8188` // TODO make configurable
     const params = new URLSearchParams({ filename: image.name, subfolder: "", type })
     return `${baseUrl}/view?${params}`
 }
 
-export function convertGradioFileDataToComfyOutput(fileData: GradioFileData, type: "input" | "output" | "temp" = "input"): GalleryOutputEntry {
+export function convertGradioFileDataToComfyOutput(fileData: GradioFileData, type: ComfyUploadImageType = "input"): GalleryOutputEntry {
     if (!fileData.is_file)
         throw "Can't convert blob data to comfy output!"
 
@@ -191,26 +193,58 @@ export function jsonToJsObject(json: string): string {
     });
 }
 
+export type ComfyUploadImageType = "output" | "input" | "temp"
+
 export interface ComfyUploadImageAPIResponse {
-    name: string
+    name: string, // Yes this is different from the "executed" event args
+    subfolder: string,
+    type: ComfyUploadImageType
 }
 
-export async function uploadImageToComfyUI(data: GalleryOutputEntry): Promise<ComfyUploadImageAPIResponse> {
+/*
+ * Uploads an image into ComfyUI's `input` folder.
+ */
+export async function uploadImageToComfyUI(blob: Blob, filename: string, type: ComfyUploadImageType, subfolder: string = "", overwrite: boolean = false): Promise<GalleryOutputEntry> {
+    console.debug("[utils] Uploading image to ComfyUI", filename, blob.size)
+
+    const url = `http://${location.hostname}:8188` // TODO make configurable
+
+    const formData = new FormData();
+    formData.append("image", blob, filename);
+    formData.set("type", type)
+    formData.set("subfolder", subfolder)
+    formData.set("overwrite", String(overwrite))
+
+    const req = new Request(url + "/upload/image", {
+        body: formData,
+        method: 'POST'
+    });
+
+    return fetch(req)
+        .then((r) => r.json())
+        .then((resp) => {
+            return {
+                filename: resp.name,
+                subfolder: resp.subfolder,
+                type: resp.type
+            }
+        });
+}
+
+/*
+ * Copies an *EXISTING* image in a ComfyUI image folder into a different folder,
+ * for use with LoadImage etc.
+ */
+export async function reuploadImageToComfyUI(data: GalleryOutputEntry, type: ComfyUploadImageType): Promise<GalleryOutputEntry> {
+    if (data.type === type)
+        return data
+
     const url = `http://${location.hostname}:8188` // TODO make configurable
     const params = new URLSearchParams(data)
 
+    console.debug("[utils] Reuploading image into to ComfyUI input folder", data)
+
     return fetch(url + "/view?" + params)
         .then((r) => r.blob())
-        .then((blob) => {
-            console.debug("Fetchin", url, params)
-            const formData = new FormData();
-            formData.append("image", blob, data.filename);
-            return fetch(
-                new Request(url + "/upload/image", {
-                    body: formData,
-                    method: 'POST'
-                })
-            )
-        })
-        .then((r) => r.json())
+        .then((blob) => uploadImageToComfyUI(blob, data.filename, type))
 }

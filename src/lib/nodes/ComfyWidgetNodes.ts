@@ -4,7 +4,7 @@ import type { SvelteComponentDev } from "svelte/internal";
 import { Watch } from "@litegraph-ts/nodes-basic";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import { writable, type Unsubscriber, type Writable, get } from "svelte/store";
-import { clamp, convertComfyOutputToGradio, range } from "$lib/utils"
+import { clamp, convertComfyOutputToGradio, range, type ComfyUploadImageType } from "$lib/utils"
 import layoutState from "$lib/stores/layoutState";
 import type { FileData as GradioFileData } from "@gradio/upload";
 import queueState from "$lib/stores/queueState";
@@ -604,7 +604,7 @@ export type GalleryOutput = {
 export type GalleryOutputEntry = {
     filename: string,
     subfolder: string,
-    type: string
+    type: ComfyUploadImageType
 }
 
 export interface ComfyGalleryProperties extends ComfyWidgetProperties {
@@ -985,7 +985,7 @@ export type MultiImageData = FileNameOrGalleryData[];
 export interface ComfyImageEditorNodeProperties extends ComfyWidgetProperties {
 }
 
-export class ComfyImageEditorNode extends ComfyWidgetNode<MultiImageData> {
+export class ComfyImageEditorNode extends ComfyWidgetNode<GalleryOutputEntry[]> {
     override properties: ComfyImageEditorNodeProperties = {
         defaultValue: [],
         tags: [],
@@ -1000,7 +1000,7 @@ export class ComfyImageEditorNode extends ComfyWidgetNode<MultiImageData> {
     }
 
     override svelteComponentType = ImageEditorWidget;
-    override defaultValue: MultiImageData = [];
+    override defaultValue: GalleryOutputEntry[] = [];
     override outputIndex = null;
     override changedIndex = null;
     override storeActionName = "store";
@@ -1012,27 +1012,30 @@ export class ComfyImageEditorNode extends ComfyWidgetNode<MultiImageData> {
 
     _value = null;
 
-    override parseValue(value: any): MultiImageData {
-        if (value == null) {
+    override parseValue(value: any): GalleryOutputEntry[] {
+        if (value == null)
             return []
+
+        const isComfyImageSpec = (value: any): boolean => {
+            return value && typeof value === "object" && "filename" in value && "type" in value
         }
-        else if (typeof value === "string" && value !== "") { // Single filename
-            const prevValue = get(this.value)
-            prevValue.push(value)
-            if (prevValue.length > 2)
-                prevValue.splice(0, 1)
-            return prevValue as MultiImageData
+
+        if (typeof value === "string") {
+            // Single filename
+            return [{ filename: value, subfolder: "", type: "input" }]
         }
-        else if (typeof value === "object" && "images" in value && value.images.length > 0) {
-            const output = value as GalleryOutput
+        else if (isComfyImageSpec(value)) {
+            // Single ComfyUI file
             return [value]
         }
-        else if (Array.isArray(value) && value.every(s => typeof s === "string")) {
-            return value as MultiImageData
+        else if (Array.isArray(value)) {
+            if (value.every(v => typeof v === "string"))
+                return value.map(filename => { return { filename, subfolder: "", type: "input" } })
+            else if (value.every(isComfyImageSpec))
+                return value
         }
-        else {
-            return []
-        }
+
+        return []
     }
 
     override formatValue(value: GradioFileData[]): string {
