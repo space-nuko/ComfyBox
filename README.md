@@ -23,6 +23,7 @@ This frontend isn't compatible with regular ComfyUI's workflow format since extr
 - *Extension Support* - All custom ComfyUI nodes are supported out of the box.
 - *Prompt Queue* - Queue up multiple prompts without waiting for them to finish first. Inspect currently queued and executed prompts.
 - *Prompt History* - Browse through previously generated prompts and their output images/parameters.
+- *Mobile-Friendly Version* - Includes a version of the UI optimized for mobile use, while still supporting the same customized workflows of the desktop version.
 
 ## Development
 

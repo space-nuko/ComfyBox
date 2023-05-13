@@ -97,7 +97,7 @@ export class ImageViewer {
     }
 
     modalImageSwitch(offset: number) {
-        this.selectedIndex = negmod(this.selectedIndex + offset, this.currentImages.length - 1);
+        this.selectedIndex = negmod(this.selectedIndex + offset, this.currentImages.length);
         const selectedImageUrl = this.currentImages[this.selectedIndex];
 
         this.setModalImageSrc(selectedImageUrl)
