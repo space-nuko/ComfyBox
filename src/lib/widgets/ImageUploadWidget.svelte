@@ -3,6 +3,7 @@
  import type { WidgetLayout } from "$lib/stores/layoutState";
  import type { Writable } from "svelte/store";
  import type { ComfyGalleryNode, ComfyImageUploadNode, GalleryOutputEntry, MultiImageData } from "$lib/nodes/ComfyWidgetNodes";
+	import notify from "$lib/notify";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -32,9 +33,25 @@
      }
  };
 
+ function onUploading() {
+     console.warn("ONUPLOAD!!!")
+     $nodeValue = []
+ }
+
  function onChange(e: CustomEvent<GalleryOutputEntry[]>) {
      console.warn("ONCHANGE!!!", e.detail)
      $nodeValue = e.detail || []
+ }
+
+ function onUploaded(e: CustomEvent<GalleryOutputEntry[]>) {
+     console.warn("ONUPLOADED!!!", e.detail)
+     $nodeValue = e.detail || []
+ }
+
+ function onUploadError(e: CustomEvent<any>) {
+     console.warn("ONUPLOADERRO!!!", e.detail)
+     notify(`Error uploading image to ComfyUI: ${e.detail}`)
+     $nodeValue = []
  }
 
  function onClear(e: CustomEvent<GalleryOutputEntry[]>) {
@@ -44,16 +61,19 @@
 </script>
 
 <div class="wrapper gradio-file comfy-image-upload" style={widget.attrs.style}>
-    {#if widget && node && nodeValue}
-        <ImageUpload value={$nodeValue}
+    {#if widget && node}
+        <ImageUpload value={$nodeValue || []}
                      bind:imgWidth
                      bind:imgHeight
                      bind:fileCount={node.properties.fileCount}
                      elem_classes={widget.attrs.classes.split(",")}
                      style={widget.attrs.style}
                      label={widget.attrs.title}
-                     on:change={onChange}
-                     on:clear={onClear}/>
+                     on:uploading={onUploading}
+                     on:uploaded={onUploaded}
+                     on:upload_error={onUploadError}
+                     on:clear={onClear}
+                     on:change={onChange}/>
     {/if}
 </div>
 

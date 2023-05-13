@@ -913,14 +913,32 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<GalleryOutputEntry[]> 
     override svelteComponentType = ImageUploadWidget;
     override defaultValue = [];
     override outputIndex = null;
-    override changedIndex = 3;
+    override changedIndex = 4;
     override storeActionName = "store";
     override saveUserState = false;
 
-    imageSize: Vector2 = [1, 1];
+    imageSize: Vector2 = [0, 0];
 
     constructor(name?: string) {
         super(name, [])
+    }
+
+    override onExecute(param: any, options: object) {
+        super.onExecute(param, options);
+
+        const value = get(this.value)
+        if (value.length > 0) {
+            this.setOutputData(0, value[0].filename) // TODO when ComfyUI LoadImage supports loading an image batch
+            this.setOutputData(1, this.imageSize[0])
+            this.setOutputData(2, this.imageSize[1])
+            this.setOutputData(3, value.length)
+        }
+        else {
+            this.setOutputData(0, "")
+            this.setOutputData(1, 0)
+            this.setOutputData(2, 0)
+            this.setOutputData(3, 0)
+        }
     }
 
     override parseValue(value: any): GalleryOutputEntry[] {
@@ -947,24 +965,6 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<GalleryOutputEntry[]> 
         }
 
         return []
-    }
-
-    override onExecute(param: any, options: object) {
-        super.onExecute(param, options);
-
-        const value = get(this.value)
-        if (value.length > 0) {
-            this.setOutputData(0, value[0].filename) // TODO when ComfyUI LoadImage supports loading an image batch
-            this.setOutputData(1, this.imageSize[0])
-            this.setOutputData(2, this.imageSize[1])
-            this.setOutputData(3, value.length)
-        }
-        else {
-            this.setOutputData(0, "")
-            this.setOutputData(1, 1)
-            this.setOutputData(2, 1)
-            this.setOutputData(3, 0)
-        }
     }
 
     override formatValue(value: GalleryOutputEntry[]): string {
@@ -996,13 +996,18 @@ export class ComfyImageEditorNode extends ComfyWidgetNode<GalleryOutputEntry[]> 
             { name: "store", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
+            { name: "filename", type: "string" }, // TODO support batches
+            { name: "width", type: "number" },
+            { name: "height", type: "number" },
+            { name: "image_count", type: "number" },
+            { name: "changed", type: BuiltInSlotType.EVENT },
         ]
     }
 
     override svelteComponentType = ImageEditorWidget;
     override defaultValue: GalleryOutputEntry[] = [];
     override outputIndex = null;
-    override changedIndex = null;
+    override changedIndex = 4;
     override storeActionName = "store";
     override saveUserState = false;
 
@@ -1010,7 +1015,25 @@ export class ComfyImageEditorNode extends ComfyWidgetNode<GalleryOutputEntry[]> 
         super(name, [])
     }
 
-    _value = null;
+    imageSize: Vector2 = [0, 0];
+
+    override onExecute(param: any, options: object) {
+        super.onExecute(param, options);
+
+        const value = get(this.value)
+        if (value.length > 0) {
+            this.setOutputData(0, value[0].filename) // TODO when ComfyUI LoadImage supports loading an image batch
+            this.setOutputData(1, this.imageSize[0])
+            this.setOutputData(2, this.imageSize[1])
+            this.setOutputData(3, value.length)
+        }
+        else {
+            this.setOutputData(0, "")
+            this.setOutputData(1, 0)
+            this.setOutputData(2, 0)
+            this.setOutputData(3, 0)
+        }
+    }
 
     override parseValue(value: any): GalleryOutputEntry[] {
         if (value == null)

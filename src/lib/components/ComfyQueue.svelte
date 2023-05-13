@@ -339,6 +339,7 @@
      border-bottom: 1px solid var(--block-border-color);
      border-top: 1px solid var(--table-border-color);
      background: var(--panel-background-fill);
+     max-height: 14rem;
 
      &:hover:not(:has(img:hover)) {
          cursor: pointer;
@@ -387,6 +388,7 @@
      column-gap: 1px;
      row-gap: 1px;
      vertical-align: top;
+     flex: 1 1 40%;
 
      img {
          aspect-ratio: 1 / 1;

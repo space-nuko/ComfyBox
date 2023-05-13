@@ -25,13 +25,13 @@
  let _value: GradioFileData[] | null = null;
  const root = "comf"
  const root_url = "https//ComfyUI!"
+ let uploaded: boolean = false;
 
 	const dispatch = createEventDispatcher<{
 		change: GalleryOutputEntry[];
         uploading: undefined;
 		uploaded: GalleryOutputEntry[];
 		upload_error: any;
-		load: undefined;
 		clear: undefined;
 	}>();
 
@@ -56,10 +56,6 @@
 
  function onClear() {
      dispatch("clear")
- }
-
- function onLoad() {
-     dispatch("load")
  }
 
  interface GradioUploadResponse {
@@ -114,7 +110,8 @@
  }
 
  $: {
-     if (JSON.stringify(_value) !== JSON.stringify(old_value)) {
+     if (JSON.stringify(_value) !== JSON.stringify(old_value) || uploaded) {
+         uploaded = false;
          pending_upload = true;
 
          old_value = _value;
@@ -128,11 +125,14 @@
 
          if (allBlobs == null || allBlobs.length === 0) {
              _value = null;
+             value = null;
              onChange();
              pending_upload = false;
          }
          else if (!allBlobs.every(b => b != null)) {
              _value = null;
+             value = null;
+             onChange();
              pending_upload = false;
          }
          else {
@@ -155,7 +155,7 @@
                  }
 
                  value = response.files;
-                 dispatch("change")
+                 dispatch("change", value)
                  dispatch("uploaded", value)
              }).
              catch(err => {
@@ -166,25 +166,21 @@
  }
 
  async function handle_upload({ detail }: CustomEvent<GradioFileData | Array<GradioFileData>>) {
+     // Received Gradio-format file data from the Upload component.
+     // In the reactive block above it will be uploaded to ComfyUI.
      _value = Array.isArray(detail) ? detail : [detail];
-     await tick();
-     dispatch("change")
-     dispatch("load")
+     uploaded = true;
  }
 
  function handle_clear(_e: CustomEvent<null>) {
      _value = null;
      value = [];
-     dispatch("change")
+     dispatch("change", value)
      dispatch("clear")
  }
 
  function convertGradioUpload(e: CustomEvent<GradioFileData[]>) {
      _value = e.detail
- }
-
- function convertNodeValue(nodeValue: GalleryOutputEntry[]): GradioFileData[] {
-     return nodeValue.map(convertComfyOutputEntryToGradio);
  }
 </script>
 

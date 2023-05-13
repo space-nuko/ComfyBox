@@ -18,14 +18,21 @@
  let node: ComfyImageEditorNode | null = null;
  let nodeValue: Writable<GalleryOutputEntry[]> | null = null;
  let attrsChanged: Writable<number> | null = null;
- let leftUrl: string = ""
- let rightUrl: string = ""
 
- let imgElem: HTMLImageElement | null = null
  let imgWidth: number = 0;
  let imgHeight: number = 0;
 
  $: widget && setNodeValue(widget);
+
+ $: if (!(node && $nodeValue && $nodeValue.length > 0)) {
+     node.imageSize = [0, 0]
+ }
+ else if (imgWidth > 0 && imgHeight > 0) {
+     node.imageSize = [imgWidth, imgHeight]
+ }
+ else {
+     node.imageSize = [0, 0]
+ }
 
  function setNodeValue(widget: WidgetLayout) {
      if (widget) {
@@ -224,7 +231,6 @@
             <ImageUpload value={$nodeValue}
                          bind:imgWidth
                          bind:imgHeight
-                         bind:imgElem
                          fileCount={"single"}
                          elem_classes={[]}
                          style={""}
