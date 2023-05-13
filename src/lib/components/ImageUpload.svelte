@@ -7,10 +7,10 @@
  import UploadText from "$lib/components/gradio/app/UploadText.svelte";
  import { tick } from "svelte";
  import notify from "$lib/notify";
- import type { ComfyUploadImageAPIResponse } from "$lib/utils";
+ import { convertComfyOutputToComfyURL, type ComfyUploadImageAPIResponse, converGradioFileDataToComfyURL } from "$lib/utils";
+	import type { GalleryOutputEntry, MultiImageData } from "$lib/nodes/ComfyWidgetNodes";
 
- export let value: GradioFileData[] | null = null;
- export let isMobile: boolean = false;
+ export let value: GalleryOutputEntry[] | null = null;
  export let imgWidth: number = 0;
  export let imgHeight: number = 0;
  export let imgElem: HTMLImageElement | null = null
@@ -21,19 +21,23 @@
  // let propsChanged: Writable<number> | null = null;
  let dragging = false;
  let pending_upload = false;
- let old_value: Array<GradioFileData> | null = null;
+ let old_value: GradioFileData[] | null = null;
 
  let _value: GradioFileData[] | null = null;
  const root = "comf"
  const root_url = "https//ComfyUI!"
 
 	const dispatch = createEventDispatcher<{
-		change: GradioFileData[];
+		change: GalleryOutputEntry[];
 		upload: undefined;
 		clear: undefined;
 	}>();
 
- $: _value = normalise_file(value, root, root_url);
+ if (value) {
+     _value = null
+     if (imgElem)
+         imgElem.src = convertComfyOutputToComfyURL(value[0])
+ }
 
  $: if (!(_value && _value.length > 0 && imgElem)) {
      imgWidth = 1
@@ -41,7 +45,6 @@
  }
 
  function onChange() {
-     value = _value || []
      dispatch("change", value)
  }
 
@@ -55,7 +58,7 @@
 
  interface GradioUploadResponse {
      error?: string;
-     files?: Array<string>;
+     files?: Array<GalleryOutputEntry>;
  }
 
  async function upload_files(root: string, files: Array<File>): Promise<GradioUploadResponse> {
@@ -85,7 +88,12 @@
                            }
                            else {
                                // bare filename of image
-                               files.push((r as ComfyUploadImageAPIResponse).name)
+                               const resp = r as ComfyUploadImageAPIResponse;
+                               files.push({
+                                   filename: resp.name,
+                                   subfolder: "",
+                                   type: "input"
+                               })
                            }
                        }
 
@@ -133,21 +141,12 @@
                  }
 
                  pending_upload = false;
-                 _value.forEach(
-                     (file_data: GradioFileData, i: number) => {
-                         if (response.files) {
-                             file_data.orig_name = file_data.name;
-                             file_data.name = response.files[i];
-                             file_data.is_file = true;
-                         }
-                     }
-                 );
 
                  if (response.error) {
                      notify(response.error, { type: "error" })
                  }
 
-                 value = normalise_file(_value, root, root_url) as GradioFileData[];
+                 value = response.files;
                  onChange();
                  onUpload();
              });
@@ -164,14 +163,13 @@
 
  function handle_clear(_e: CustomEvent<null>) {
      _value = null;
+     value = [];
      onChange();
      onClear();
  }
 
- function getImageUrl(image: GradioFileData) {
-     const baseUrl = `http://${location.hostname}:8188` // TODO make configurable
-     const params = new URLSearchParams({ filename: image.name, subfolder: "", type: "input" })
-     return `${baseUrl}/view?${params}`
+ function convertGradioUpload(e: CustomEvent<GradioFileData[]>) {
+     _value = e.detail
  }
 </script>
 
@@ -194,7 +192,7 @@
             {#if _value && _value.length > 0 && !pending_upload}
                 {@const firstImage = _value[0]}
                 <ModifyUpload on:clear={handle_clear} absolute />
-                <img src={getImageUrl(firstImage)}
+                <img src={converGradioFileDataToComfyURL(firstImage)}
                      alt={firstImage.orig_name}
                      bind:this={imgElem}
                      bind:naturalWidth={imgWidth}
@@ -204,13 +202,13 @@
                 <Upload
                     file_count={fileCount}
                     filetype="image/*"
-                    on:change={({ detail }) => (value = detail)}
+                    on:change={convertGradioUpload}
                     on:load={handle_upload}
                     bind:dragging
                     on:clear
                     on:select
                     parse_to_data_url={false}
-                    >
+                >
                     <UploadText type="file" />
                 </Upload>
             {/if}

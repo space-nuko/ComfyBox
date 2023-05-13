@@ -1,37 +1,27 @@
 <script lang="ts">
- import { Block, BlockLabel, Empty } from "@gradio/atoms";
- import { File as FileIcon } from "@gradio/icons";
  import ImageUpload from "$lib/components/ImageUpload.svelte"
  import type { WidgetLayout } from "$lib/stores/layoutState";
  import type { Writable } from "svelte/store";
- import type { ComfyGalleryNode, ComfyImageUploadNode, GalleryOutputEntry } from "$lib/nodes/ComfyWidgetNodes";
- import type { FileData as GradioFileData } from "@gradio/upload";
- import UploadText from "$lib/components/gradio/app/UploadText.svelte";
-	import { tick } from "svelte";
-	import notify from "$lib/notify";
-	import type { Vector2 } from "@litegraph-ts/core";
+ import type { ComfyGalleryNode, ComfyImageUploadNode, GalleryOutputEntry, MultiImageData } from "$lib/nodes/ComfyWidgetNodes";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfyImageUploadNode | null = null;
- let nodeValue: Writable<Array<GradioFileData>> | null = null;
+ let nodeValue: Writable<GalleryOutputEntry[]> | null = null;
  let propsChanged: Writable<number> | null = null;
- let dragging = false;
- let pending_upload = false;
- let old_value: Array<GradioFileData> | null = null;
  let imgWidth: number = 1;
  let imgHeight: number = 1;
 
  $: widget && setNodeValue(widget);
 
  $: if (!(node && $nodeValue && $nodeValue.length > 0)) {
-     node.imageSize = [1, 1]
+     node.imageSize = [0, 0]
  }
- else if (imgWidth > 1 || imgHeight > 1) {
+ else if (imgWidth > 0 && imgHeight > 0) {
      node.imageSize = [imgWidth, imgHeight]
  }
  else {
-     node.imageSize = [1, 1]
+     node.imageSize = [0, 0]
  }
 
  function setNodeValue(widget: WidgetLayout) {
@@ -42,22 +32,28 @@
      }
  };
 
- function onChange(e: CustomEvent<GradioFileData[]>) {
+ function onChange(e: CustomEvent<GalleryOutputEntry[]>) {
+     console.warn("ONCHANGE!!!", e.detail)
      $nodeValue = e.detail || []
+ }
+
+ function onClear(e: CustomEvent<GalleryOutputEntry[]>) {
+     console.warn("ONCLEAR!!!", e.detail)
+     $nodeValue = []
  }
 </script>
 
 <div class="wrapper gradio-file comfy-image-upload" style={widget.attrs.style}>
     {#if widget && node && nodeValue}
         <ImageUpload value={$nodeValue}
-                     {isMobile}
                      bind:imgWidth
                      bind:imgHeight
                      bind:fileCount={node.properties.fileCount}
                      elem_classes={widget.attrs.classes.split(",")}
                      style={widget.attrs.style}
                      label={widget.attrs.title}
-                     on:change={onChange}/>
+                     on:change={onChange}
+                     on:clear={onClear}/>
     {/if}
 </div>
 

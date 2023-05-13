@@ -890,7 +890,7 @@ export interface ComfyImageUploadProperties extends ComfyWidgetProperties {
     fileCount: "single" | "multiple" // gradio File component format
 }
 
-export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>> {
+export class ComfyImageUploadNode extends ComfyWidgetNode<GalleryOutputEntry[]> {
     override properties: ComfyImageUploadProperties = {
         defaultValue: [],
         tags: [],
@@ -923,24 +923,38 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
         super(name, [])
     }
 
-    override parseValue(value: any): GradioFileData[] {
+    override parseValue(value: any): GalleryOutputEntry[] {
         if (value == null)
             return []
 
-        if (typeof value === "string" && value !== "") { // Single filename
-            return [{ name: value, data: value, orig_name: value, is_file: true }]
+        const isComfyImageSpec = (value: any): boolean => {
+            return value && typeof value === "object" && "filename" in value && "type" in value
         }
-        else {
-            return []
+
+        if (typeof value === "string") {
+            // Single filename
+            return [{ filename: value, subfolder: "", type: "input" }]
         }
+        else if (isComfyImageSpec(value)) {
+            // Single ComfyUI file
+            return [value]
+        }
+        else if (Array.isArray(value)) {
+            if (value.every(v => typeof v === "string"))
+                return value.map(filename => { return { filename, subfolder: "", type: "input" } })
+            else if (value.every(isComfyImageSpec))
+                return value
+        }
+
+        return []
     }
 
     override onExecute(param: any, options: object) {
         super.onExecute(param, options);
 
         const value = get(this.value)
-        if (value.length > 0 && value[0].name) {
-            this.setOutputData(0, value[0].name) // TODO when ComfyUI LoadImage supports loading an image batch
+        if (value.length > 0) {
+            this.setOutputData(0, value[0].filename) // TODO when ComfyUI LoadImage supports loading an image batch
             this.setOutputData(1, this.imageSize[0])
             this.setOutputData(2, this.imageSize[1])
             this.setOutputData(3, value.length)
@@ -953,7 +967,7 @@ export class ComfyImageUploadNode extends ComfyWidgetNode<Array<GradioFileData>>
         }
     }
 
-    override formatValue(value: GradioFileData[]): string {
+    override formatValue(value: GalleryOutputEntry[]): string {
         return `Images: ${value?.length || 0}`
     }
 }

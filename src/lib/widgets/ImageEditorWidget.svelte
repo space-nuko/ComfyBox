@@ -4,10 +4,14 @@
  import { get, type Writable, writable } from "svelte/store";
  import Modal from "$lib/components/Modal.svelte";
  import { Button } from "@gradio/button";
- import type { ComfyImageEditorNode, MultiImageData } from "$lib/nodes/ComfyWidgetNodes";
+ import type { ComfyImageEditorNode, GalleryOutputEntry, MultiImageData } from "$lib/nodes/ComfyWidgetNodes";
  import { Embed as Klecks, KL, KlApp, klHistory, type KlAppOptionsEmbed } from "klecks";
+ import type { FileData as GradioFileData } from "@gradio/upload";
 
  import "klecks/style/style.scss";
+	import ImageUpload from "$lib/components/ImageUpload.svelte";
+	import { uploadImageToComfyUI, type ComfyUploadImageAPIResponse } from "$lib/utils";
+	import notify from "$lib/notify";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -16,6 +20,10 @@
  let attrsChanged: Writable<number> | null = null;
  let leftUrl: string = ""
  let rightUrl: string = ""
+
+ let imgElem: HTMLImageElement | null = null
+ let imgWidth: number = 0;
+ let imgHeight: number = 0;
 
  $: widget && setNodeValue(widget);
 
@@ -65,8 +73,32 @@
      showModal = false;
  }
 
- function submitKlecksToComfyUI(onSuccess: () => void, onError: () => void) {
-     const data = kl.getPNG();
+ const FILENAME: string = "ComfyUITemp.png";
+ const SUBFOLDER: string = "ComfyBox_Editor";
+
+ async function submitKlecksToComfyUI(onSuccess: () => void, onError: () => void) {
+     const blob = kl.getPNG();
+
+     const formData = new FormData();
+     formData.append("image", blob, FILENAME);
+
+     const entry: GalleryOutputEntry = {
+         filename: FILENAME,
+         subfolder: SUBFOLDER,
+         type: "input"
+     }
+
+     await uploadImageToComfyUI(entry)
+         .then((resp: ComfyUploadImageAPIResponse) => {
+             entry.filename = resp.name;
+             $nodeValue = [entry]
+             onSuccess();
+         })
+         .catch(err => {
+             notify(`Failed to upload image from editor: ${err}`, { type: "error", timeout: 10000 })
+             $nodeValue = []
+             onError();
+         })
  }
 
  function generateBlankImage(fill: string = "#fff"): HTMLCanvasElement {
@@ -110,6 +142,10 @@
          kl.klApp?.out("yo");
      }, 1000);
  }
+
+ function onUploadChanged(e: CustomEvent<GradioFileData[]>) {
+
+ }
 </script>
 
 <div class="wrapper comfy-image-editor">
@@ -123,6 +159,17 @@
             <div class="image-editor-root" bind:this={editorRoot} />
         </Modal>
         <div class="comfy-image-editor-panel">
+            <ImageUpload value={$nodeValue}
+                         {isMobile}
+                         bind:imgWidth
+                         bind:imgHeight
+                         bind:imgElem
+                         fileCount={"single"}
+                         elem_classes={[]}
+                         style={""}
+                         label={"Image"}
+                         on:change={onUploadChanged}
+            />
             <Block>
                 <BlockTitle>Image editor.</BlockTitle>
                 <Button variant="secondary" on:click={openImageEditor}>

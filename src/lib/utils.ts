@@ -6,7 +6,7 @@ import { get } from "svelte/store"
 import layoutState from "$lib/stores/layoutState"
 import type { SvelteComponentDev } from "svelte/internal";
 import type { SerializedLGraph } from "@litegraph-ts/core";
-import type { GalleryOutput, GalleryOutputEntry } from "./nodes/ComfyWidgetNodes";
+import type { FileNameOrGalleryData, GalleryOutput, GalleryOutputEntry } from "./nodes/ComfyWidgetNodes";
 import type { FileData as GradioFileData } from "@gradio/upload";
 
 export function clamp(n: number, min: number, max: number): number {
@@ -139,10 +139,30 @@ export function convertComfyOutputToGradio(output: GalleryOutput): GradioFileDat
     });
 }
 
-export function convertComfyOutputToComfyURL(output: GalleryOutputEntry): string {
+export function convertComfyOutputToComfyURL(output: FileNameOrGalleryData): string {
+    if (typeof output === "string")
+        return output;
+
     const params = new URLSearchParams(output)
     const url = `http://${location.hostname}:8188` // TODO make configurable
     return url + "/view?" + params
+}
+
+export function converGradioFileDataToComfyURL(image: GradioFileData, type: "input" | "output" | "temp" = "input"): string {
+    const baseUrl = `http://${location.hostname}:8188` // TODO make configurable
+    const params = new URLSearchParams({ filename: image.name, subfolder: "", type })
+    return `${baseUrl}/view?${params}`
+}
+
+export function convertGradioFileDataToComfyOutput(fileData: GradioFileData, type: "input" | "output" | "temp" = "input"): GalleryOutputEntry {
+    if (!fileData.is_file)
+        throw "Can't convert blob data to comfy output!"
+
+    return {
+        filename: fileData.name,
+        subfolder: "",
+        type
+    }
 }
 
 export function convertFilenameToComfyURL(filename: string,
