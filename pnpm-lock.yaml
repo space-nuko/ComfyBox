@@ -115,6 +115,9 @@ importers:
       typed-emitter:
         specifier: github:andywer/typed-emitter
         version: github.com/andywer/typed-emitter/9a139b6fa0ec6b0db6141b5b756b784e4f7ef4e4
+      uuid:
+        specifier: ^9.0.0
+        version: 9.0.0
       vite-plugin-full-reload:
         specifier: ^1.0.5
         version: 1.0.5(vite@4.3.1)

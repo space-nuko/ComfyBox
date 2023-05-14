@@ -7,7 +7,7 @@ import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import type { ComfyInputConfig } from "$lib/IComfyInputSlot";
 
 /*
- * Base class for any node wit  configuration sent by the backend.
+ * Base class for any node with configuration sent by the backend.
  */
 export class ComfyBackendNode extends ComfyGraphNode {
     comfyClass: string;
