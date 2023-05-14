@@ -53,7 +53,7 @@ jobs:
 
       - name: Build
         run: |
-          pnpm build:css
+          pnpm prebuild
           pnpm build
 
       - uses: actions/upload-artifact@v3

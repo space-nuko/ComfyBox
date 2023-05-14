@@ -1,23 +1,52 @@
-<script>
+<script lang="ts">
+	import { Button } from "@gradio/button";
+	import { createEventDispatcher } from "svelte";
+
 	export let showModal; // boolean
+	export let closeOnClick = true; // boolean
+    export const closeDialog = _ => doClose();
 
 	let dialog; // HTMLDialogElement
 
+	const dispatch = createEventDispatcher<{
+		close: undefined;
+	}>();
+
 	$: if (dialog && showModal) dialog.showModal();
+
+ function close(e: Event) {
+     if (!closeOnClick) {
+         e.preventDefault();
+         e.stopPropagation();
+         return false
+     }
+
+     doClose()
+ }
+
+ function doClose() {
+     dialog.close();
+     dispatch("close")
+ }
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <dialog
-	bind:this={dialog}
-	on:close={() => (showModal = false)}
-	on:click|self={() => dialog.close()}
+    bind:this={dialog}
+    on:close={close}
+    on:cancel={doClose}
+    on:click|self={close}
 >
-	<div on:click|stopPropagation>
-		<slot name="header" />
-		<slot />
-		<!-- svelte-ignore a11y-autofocus -->
-		<button autofocus on:click={() => dialog.close()}>Close</button>
-	</div>
+    <div on:click|stopPropagation>
+        <slot name="header" />
+        <slot />
+        <div class="button-row">
+            <slot name="buttons">
+                <!-- svelte-ignore a11y-autofocus -->
+                <Button variant="secondary" on:click={doClose}>Close</Button>
+            </slot>
+        </div>
+    </div>
 </dialog>
 
 <style>
@@ -26,6 +55,7 @@
 		border-radius: 0.2em;
 		border: none;
 		padding: 0;
+        overflow: hidden;
 	}
 	dialog::backdrop {
 		background: rgba(0, 0, 0, 0.3);
@@ -58,4 +88,10 @@
 	button {
 		display: block;
 	}
+
+ .button-row {
+     display: flex;
+     flex-direction: row;
+     gap: var(--spacing-sm);
+ }
 </style>

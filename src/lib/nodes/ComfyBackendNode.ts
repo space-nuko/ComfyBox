@@ -1,8 +1,8 @@
 import LGraphCanvas from "@litegraph-ts/core/src/LGraphCanvas";
 import ComfyGraphNode from "./ComfyGraphNode";
 import ComfyWidgets from "$lib/widgets"
-import type { ComfyWidgetNode, GalleryOutput } from "./ComfyWidgetNodes";
-import { BuiltInSlotType, type SerializedLGraphNode } from "@litegraph-ts/core";
+import type { ComfyWidgetNode, ComfyExecutionResult } from "./ComfyWidgetNodes";
+import { BuiltInSlotShape, BuiltInSlotType, type SerializedLGraphNode } from "@litegraph-ts/core";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import type { ComfyInputConfig } from "$lib/IComfyInputSlot";
 
@@ -11,10 +11,12 @@ import type { ComfyInputConfig } from "$lib/IComfyInputSlot";
  */
 export class ComfyBackendNode extends ComfyGraphNode {
     comfyClass: string;
+    displayName: string | null;
 
     constructor(title: string, comfyClass: string, nodeData: any) {
         super(title)
         this.type = comfyClass; // XXX: workaround dependency in LGraphNode.addInput()
+        this.displayName = nodeData.display_name;
         this.comfyClass = comfyClass;
         this.isBackendNode = true;
 
@@ -32,6 +34,7 @@ export class ComfyBackendNode extends ComfyGraphNode {
         }
     }
 
+    // comfy class -> input name -> input config
     private static defaultInputConfigs: Record<string, Record<string, ComfyInputConfig>> = {}
 
     private setup(nodeData: any) {
@@ -43,7 +46,7 @@ export class ComfyBackendNode extends ComfyGraphNode {
         ComfyBackendNode.defaultInputConfigs[this.type] = {}
 
         for (const inputName in inputs) {
-            const config = { minWidth: 1, minHeight: 1 };
+            const config: Partial<IComfyInputSlot> = {};
 
             const inputData = inputs[inputName];
             const type = inputData[0];
@@ -67,13 +70,14 @@ export class ComfyBackendNode extends ComfyGraphNode {
             }
 
             if ("widgetNodeType" in config)
-                ComfyBackendNode.defaultInputConfigs[this.type][config.name] = config.config
+                ComfyBackendNode.defaultInputConfigs[this.type][inputName] = (config as IComfyInputSlot).config
         }
 
         for (const o in nodeData["output"]) {
             const output = nodeData["output"][o];
             const outputName = nodeData["output_name"][o] || output;
-            this.addOutput(outputName, output);
+            const outputShape = nodeData["output_is_list"][o] ? BuiltInSlotShape.GRID_SHAPE : BuiltInSlotShape.CIRCLE_SHAPE;
+            this.addOutput(outputName, output, { shape: outputShape });
         }
 
         this.serialize_widgets = false;
@@ -110,7 +114,7 @@ export class ComfyBackendNode extends ComfyGraphNode {
         }
     }
 
-    override onExecuted(outputData: GalleryOutput) {
+    override onExecuted(outputData: ComfyExecutionResult) {
         console.warn("onExecuted outputs", outputData)
         this.triggerSlot(0, outputData)
     }

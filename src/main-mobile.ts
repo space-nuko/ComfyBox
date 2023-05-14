@@ -9,6 +9,7 @@ import ComfyGraph from '$lib/ComfyGraph';
 
 Framework7.use(Framework7Svelte);
 
+LiteGraph.use_uuids = true;
 LiteGraph.dialog_close_on_mouse_leave = false;
 LiteGraph.search_hide_on_mouse_leave = false;
 LiteGraph.pointerevents_method = "pointer";

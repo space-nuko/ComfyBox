@@ -52,7 +52,7 @@ jobs:
 
       - name: Build
         run: |
-          pnpm build:css
+          pnpm prebuild
           pnpm build
 
       - name: Test

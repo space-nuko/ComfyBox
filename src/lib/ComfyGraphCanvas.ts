@@ -1,4 +1,4 @@
-import { BuiltInSlotShape, LGraph, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type MouseEventExt, type Vector2, type Vector4, TitleMode, type ContextMenuItem, type IContextMenuItem, Subgraph } from "@litegraph-ts/core";
+import { BuiltInSlotShape, LGraph, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type MouseEventExt, type Vector2, type Vector4, TitleMode, type ContextMenuItem, type IContextMenuItem, Subgraph, LLink } from "@litegraph-ts/core";
 import type ComfyApp from "./components/ComfyApp";
 import queueState from "./stores/queueState";
 import { get } from "svelte/store";
@@ -259,66 +259,59 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
 
         const newNode = LiteGraph.createNode(node.type);
 
-        for (let index = 0; index < newNode.inputs.length; index++) {
-            const newInput = newNode.inputs[index];
-            const oldInput = node.inputs[index]
-
-            if (oldInput && newInput.type === oldInput.type) {
-                continue;
-            }
-
-            let link: LLink | null = null;
-
-            if (oldInput) {
-                link = node.getInputLink(index);
-                node.disconnectInput(index)
-                oldInput.type = newInput.type
-                oldInput.name = newInput.name
-            }
-            else {
-                node.addInput(newInput.name, newInput.type, newInput)
-            }
-
+        const createInputReroute = (slotIndex: number, link: LLink | null): ComfyReroute => {
             const reroute = LiteGraph.createNode(ComfyReroute);
             reroute.properties.ignoreTypes = true;
             node.graph.add(reroute)
-            const inputPos = node.getConnectionPos(true, index);
+            const inputPos = node.getConnectionPos(true, slotIndex);
             reroute.pos = [inputPos[0] - 140, inputPos[1] + LiteGraph.NODE_SLOT_HEIGHT / 2];
-            reroute.connect(0, node, index);
-            if (link != null)
-                node.graph.getNodeById(link.target_id).connect(link.target_slot, reroute, 0)
+            node.graph.getNodeById(link.origin_id).connect(link.origin_slot, reroute, 0)
+            return reroute
         }
 
-        for (let index = 0; index < newNode.outputs.length; index++) {
-            const newOutput = newNode.outputs[index];
-            const oldOutput = node.outputs[index]
+        for (let index = node.inputs.length - 1; index >= 0; index--) {
+            let link: LLink | null = null;
 
-            if (oldOutput && newOutput.type === oldOutput.type) {
-                continue;
-            }
+            link = node.getInputLink(index);
+            node.disconnectInput(index)
 
-            let links = []
+            if (link)
+                createInputReroute(index, link);
 
-            if (oldOutput) {
-                links = node.getOutputLinks(index)
-                node.disconnectOutput(index)
-                oldOutput.type = newOutput.type
-                oldOutput.name = newOutput.name
-            }
-            else {
-                node.addOutput(newOutput.name, newOutput.type, newOutput)
-            }
+            node.removeInput(index);
+        }
 
+        for (let index = 0; index < newNode.inputs.length; index++) {
+            const newInput = newNode.inputs[index]
+            const input = node.addInput(newInput.name, newInput.type);
+        }
+
+        const createOutputReroute = (index: number, links: LLink[], connect: boolean = true): ComfyReroute => {
             const reroute = LiteGraph.createNode(ComfyReroute);
             reroute.properties.ignoreTypes = true;
             node.graph.add(reroute)
             const rerouteSize = reroute.computeSize();
             const outputPos = node.getConnectionPos(false, index);
             reroute.pos = [outputPos[0] + rerouteSize[0] + 20, outputPos[1] + LiteGraph.NODE_SLOT_HEIGHT / 2];
-            node.connect(index, reroute, 0);
             for (const link of links) {
-                reroute.connect(0, link.target_id, link.target_slot)
+                reroute.connect(0, node.graph.getNodeById(link.target_id), link.target_slot)
             }
+            return reroute
+        }
+
+        for (let index = node.outputs.length - 1; index >= 0; index--) {
+            let links = node.getOutputLinks(index)
+            node.disconnectOutput(index)
+
+            if (links.length > 0)
+                createOutputReroute(index, links);
+
+            node.removeOutput(index);
+        }
+
+        for (let index = 0; index < newNode.outputs.length; index++) {
+            const newOutput = newNode.outputs[index]
+            const output = node.addOutput(newOutput.name, newOutput.type);
         }
     }
 
