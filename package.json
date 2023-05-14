@@ -13,6 +13,7 @@
     "lint": "prettier --plugin-search-dir . --check . && eslint .",
     "format": "prettier --plugin-search-dir . --write .",
     "svelte-check": "svelte-check",
+    "prebuild": "pnpm run build:css && pnpm --filter=klecks lang:build",
     "build:css": "pollen -c gradio/js/theme/src/pollen.config.cjs && mv src/pollen.css node_modules/@gradio/theme/src"
   },
   "devDependencies": {
