@@ -1,16 +1,19 @@
 <script lang="ts">
  import { type WidgetLayout } from "$lib/stores/layoutState";
- import { Block, BlockTitle } from "@gradio/atoms";
- import { get, type Writable, writable } from "svelte/store";
+ import { Block } from "@gradio/atoms";
+ import { TextBox } from "@gradio/form";
+ import Row from "$lib/components/gradio/app/Row.svelte";
+ import { get, type Writable } from "svelte/store";
  import Modal from "$lib/components/Modal.svelte";
  import { Button } from "@gradio/button";
- import type { ComfyImageEditorNode, ComfyImageLocation, MultiImageData } from "$lib/nodes/ComfyWidgetNodes";
- import { Embed as Klecks, KL, KlApp, klHistory, type KlAppOptionsEmbed } from "klecks";
+ import type { ComfyImageEditorNode, ComfyImageLocation } from "$lib/nodes/ComfyWidgetNodes";
+ import { Embed as Klecks } from "klecks";
 
  import "klecks/style/style.scss";
  import ImageUpload from "$lib/components/ImageUpload.svelte";
- import { uploadImageToComfyUI, type ComfyUploadImageAPIResponse, convertComfyOutputToComfyURL, type ComfyBoxImageMetadata, comfyFileToComfyBoxMetadata, comfyBoxImageToComfyURL, comfyBoxImageToComfyFile } from "$lib/utils";
+ import { uploadImageToComfyUI, type ComfyBoxImageMetadata, comfyFileToComfyBoxMetadata, comfyBoxImageToComfyURL, comfyBoxImageToComfyFile, type ComfyUploadImageType } from "$lib/utils";
  import notify from "$lib/notify";
+ import NumberInput from "$lib/components/NumberInput.svelte";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -40,6 +43,7 @@
          node = widget.node as ComfyImageEditorNode
          nodeValue = node.value;
          attrsChanged = widget.attrsChanged;
+         status = $nodeValue && $nodeValue.length > 0 ? "uploaded" : "empty"
      }
  };
 
@@ -67,7 +71,7 @@
      const ctx = canvas.getContext('2d');
      ctx.save();
      ctx.fillStyle = fill,
-     ctx.fillRect(0, 0, canvas.width, canvas.height);
+           ctx.fillRect(0, 0, canvas.width, canvas.height);
      ctx.restore();
      return canvas;
  }
@@ -97,24 +101,44 @@
  }
 
  const FILENAME: string = "ComfyUITemp.png";
- // const SUBFOLDER: string = "ComfyBox_Editor";
+ const SUBFOLDER: string = "ComfyBox_Editor";
+ const DIRECTORY: ComfyUploadImageType = "input";
 
  async function submitKlecksToComfyUI(onSuccess: () => void, onError: () => void) {
      const blob = kl.getPNG();
 
-     await uploadImageToComfyUI(blob, FILENAME, "input")
+     status = "uploading"
+
+     await uploadImageToComfyUI(blob, FILENAME, DIRECTORY, SUBFOLDER)
          .then((entry: ComfyImageLocation) => {
              const meta: ComfyBoxImageMetadata = comfyFileToComfyBoxMetadata(entry);
              $nodeValue = [meta] // TODO more than one image
+             status = "uploaded"
              notify("Saved image to ComfyUI!", { type: "success" })
              onSuccess();
          })
          .catch(err => {
              notify(`Failed to upload image from editor: ${err}`, { type: "error", timeout: 10000 })
+             status = "error"
+             uploadError = err;
              $nodeValue = []
              onError();
          })
  }
+
+ let closeDialog = null;
+
+ async function saveAndClose() {
+     console.log(closeDialog, kl)
+     if (!closeDialog || !kl)
+         return;
+
+     submitKlecksToComfyUI(() => {}, () => {});
+     closeDialog()
+ }
+
+ let blankImageWidth = 512;
+ let blankImageHeight = 512;
 
  async function openImageEditor() {
      if (!editorRoot)
@@ -134,12 +158,12 @@
      console.warn("[ImageEditorWidget] OPENING", widget, $nodeValue)
 
      let canvas = null;
-     let width = 512;
-     let height = 512;
+     let width = blankImageWidth;
+     let height = blankImageHeight;
 
      if ($nodeValue && $nodeValue.length > 0) {
          const comfyImage = $nodeValue[0];
-         const comfyURL = convertComfyOutputToComfyURL(comfyImage);
+         const comfyURL = comfyBoxImageToComfyURL(comfyImage);
          [canvas, width, height] = await generateImageCanvas(comfyURL);
      }
      else {
@@ -162,7 +186,7 @@
      }, 1000);
  }
 
- let status = "none"
+ let status = "empty";
  let uploadError = null;
 
  function onUploading() {
@@ -181,14 +205,16 @@
  function onClear() {
      console.warn("CLEAR!!!")
      uploadError = null;
-     status = "none"
+     status = "empty"
+     $nodeValue = []
  }
 
  function onUploadError(e: CustomEvent<any>) {
      console.warn("ERROR!!!")
      status = "error"
      uploadError = e.detail
-     notify(`Failed to upload image to ComfyUI: ${err}`, { type: "error", timeout: 10000 })
+     $nodeValue = []
+     notify(`Failed to upload image to ComfyUI: ${uploadError}`, { type: "error", timeout: 10000 })
  }
 
  function onChange(e: CustomEvent<ComfyImageLocation[]>) {
@@ -200,7 +226,7 @@
  else
      _value = []
 
- $: canEdit = status === "none" || status === "uploaded";
+ $: canEdit = status === "empty" || status === "uploaded";
 </script>
 
 <div class="wrapper comfy-image-editor">
@@ -217,6 +243,7 @@
                      on:upload_error={onUploadError}
                      on:clear={onClear}
                      on:change={onChange}
+                     on:image_clicked={openImageEditor}
         />
     {:else}
         <div class="comfy-image-editor-panel">
@@ -232,24 +259,59 @@
                          on:upload_error={onUploadError}
                          on:clear={onClear}
                          on:change={onChange}
+                         on:image_clicked={openImageEditor}
             />
-            <Modal bind:showModal closeOnClick={false} on:close={disposeEditor}>
+            <Modal bind:showModal closeOnClick={false} on:close={disposeEditor} bind:closeDialog>
                 <div>
                     <div id="klecks-loading-screen">
                         <span id="klecks-loading-screen-text"></span>
                     </div>
                     <div class="image-editor-root" bind:this={editorRoot} />
                 </div>
+                <div slot="buttons">
+                    <Button variant="primary" on:click={saveAndClose}>
+                        Save and Close
+                    </Button>
+                    <Button variant="secondary" on:click={closeDialog}>
+                        Discard Edits
+                    </Button>
+                </div>
             </Modal>
             <Block>
-                <Button variant="primary" disabled={!canEdit} on:click={openImageEditor}>
-                    Edit Image
-                </Button>
-                <BlockTitle>Status: {status}</BlockTitle>
-                {#if uploadError}
-                    <div>
-                        Upload error: {uploadError}
-                    </div>
+                {#if !$nodeValue || $nodeValue.length === 0}
+                    <Row>
+                        <Row>
+                            <Button variant="secondary" disabled={!canEdit} on:click={openImageEditor}>
+                                Create Image
+                            </Button>
+                            <div>
+                                <TextBox show_label={false} disabled={true} value="Status: {status}"/>
+                            </div>
+                            {#if uploadError}
+                                <div>
+                                    Upload error: {uploadError}
+                                </div>
+                            {/if}
+                        </Row>
+                        <Row>
+                            <NumberInput label={"Width"} min={64} max={2048} step={64} bind:value={blankImageWidth} />
+                            <NumberInput label={"Height"} min={64} max={2048} step={64} bind:value={blankImageHeight} />
+                        </Row>
+                    </Row>
+                {:else}
+                    <Row>
+                        <Button variant="secondary" disabled={!canEdit} on:click={openImageEditor}>
+                            Edit Image
+                        </Button>
+                        <div>
+                            <TextBox show_label={false} disabled={true} value="Status: {status}"/>
+                        </div>
+                        {#if uploadError}
+                            <div>
+                                Upload error: {uploadError}
+                            </div>
+                        {/if}
+                    </Row>
                 {/if}
             </Block>
         </div>

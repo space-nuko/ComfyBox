@@ -33,6 +33,7 @@
 		uploaded: ComfyImageLocation[];
 		upload_error: any;
 		clear: undefined;
+		image_clicked: undefined;
 	}>();
 
  if (value) {
@@ -56,6 +57,10 @@
 
  function onClear() {
      dispatch("clear")
+ }
+
+ function onImgClicked() {
+     dispatch("image_clicked")
  }
 
  interface GradioUploadResponse {
@@ -205,6 +210,7 @@
                 <ModifyUpload on:clear={handle_clear} absolute />
                 <img src={convertComfyOutputToComfyURL(firstImage)}
                      alt={firstImage.filename}
+                     on:click={onImgClicked}
                      bind:this={imgElem}
                      bind:naturalWidth={imgWidth}
                      bind:naturalHeight={imgHeight}
