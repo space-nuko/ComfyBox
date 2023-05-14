@@ -170,6 +170,10 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
 
     parseValue(value: any): T { return value as T };
 
+    getValue(): T {
+        return get(this.value);
+    }
+
     setValue(value: any, noChangedEvent: boolean = false) {
         if (noChangedEvent)
             this._noChangedEvent = true;
@@ -869,57 +873,6 @@ LiteGraph.registerNodeType({
     type: "ui/radio"
 })
 
-export interface ComfyImageUploadProperties extends ComfyWidgetProperties {
-    fileCount: "single" | "multiple" // gradio File component format
-}
-
-export class ComfyImageUploadNode extends ComfyWidgetNode<ComfyBoxImageMetadata[]> {
-    override properties: ComfyImageUploadProperties = {
-        defaultValue: [],
-        tags: [],
-        fileCount: "single",
-    }
-
-    static slotLayout: SlotLayout = {
-        inputs: [
-            { name: "store", type: BuiltInSlotType.ACTION }
-        ],
-        outputs: [
-            { name: "images", type: "COMFYBOX_IMAGES" }, // TODO support batches
-            { name: "changed", type: BuiltInSlotType.EVENT },
-        ]
-    }
-
-    override svelteComponentType = ImageUploadWidget;
-    override defaultValue = [];
-    override outputIndex = 0;
-    override changedIndex = 1;
-    override storeActionName = "store";
-    override saveUserState = false;
-
-    constructor(name?: string) {
-        super(name, [])
-    }
-
-    override parseValue(value: any): ComfyBoxImageMetadata[] {
-        return parseWhateverIntoImageMetadata(value) || []
-    }
-
-    override formatValue(value: ComfyImageLocation[]): string {
-        return `Images: ${value?.length || 0}`
-    }
-}
-
-LiteGraph.registerNodeType({
-    class: ComfyImageUploadNode,
-    title: "UI.ImageUpload",
-    desc: "Widget that lets you upload images into ComfyUI's input folder",
-    type: "ui/image_upload"
-})
-
-export type FileNameOrGalleryData = string | ComfyImageLocation;
-export type MultiImageData = FileNameOrGalleryData[];
-
 export interface ComfyImageEditorNodeProperties extends ComfyWidgetProperties {
 }
 
@@ -941,7 +894,7 @@ export class ComfyImageEditorNode extends ComfyWidgetNode<ComfyBoxImageMetadata[
 
     override svelteComponentType = ImageEditorWidget;
     override defaultValue = [];
-    override outputIndex = null;
+    override outputIndex = 0;
     override inputIndex = null;
     override changedIndex = 1;
     override storeActionName = "store";
@@ -963,6 +916,6 @@ export class ComfyImageEditorNode extends ComfyWidgetNode<ComfyBoxImageMetadata[
 LiteGraph.registerNodeType({
     class: ComfyImageEditorNode,
     title: "UI.ImageEditor",
-    desc: "Widget that lets edit a multi-layered image",
+    desc: "Widget that lets you upload and edit a multi-layered image. Can also act like a standalone image uploader.",
     type: "ui/image_editor"
 })

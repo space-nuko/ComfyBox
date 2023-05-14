@@ -1,11 +1,11 @@
 import { LiteGraph, type SlotLayout } from "@litegraph-ts/core";
 import ComfyGraphNode from "./ComfyGraphNode";
-import { comfyFileToAnnotatedFilepath, isComfyBoxImageMetadata } from "$lib/utils";
+import { comfyFileToAnnotatedFilepath, isComfyBoxImageMetadata, parseWhateverIntoImageMetadata } from "$lib/utils";
 
-export class ComfyImageToFilepath extends ComfyGraphNode {
+export default class ComfyImageToFilepathNode extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "image", type: "COMFYBOX_IMAGE" },
+            { name: "image", type: "COMFYBOX_IMAGES,COMFYBOX_IMAGE" },
         ],
         outputs: [
             { name: "filepath", type: "string" },
@@ -14,19 +14,20 @@ export class ComfyImageToFilepath extends ComfyGraphNode {
 
     override onExecute() {
         const data = this.getInputData(0)
-        if (data == null || !isComfyBoxImageMetadata(data)) {
+        const meta = parseWhateverIntoImageMetadata(data);
+        if (meta == null || meta.length === 0) {
             this.setOutputData(0, null)
             return;
         }
 
-        const path = comfyFileToAnnotatedFilepath(data.comfyUIFile);
+        const path = comfyFileToAnnotatedFilepath(meta[0].comfyUIFile);
         this.setOutputData(0, path);
     }
 }
 
 LiteGraph.registerNodeType({
-    class: ComfyImageToFilepath,
+    class: ComfyImageToFilepathNode,
     title: "Comfy.ImageToFilepath",
     desc: "Converts ComfyBox image metadata to an annotated filepath like \"image.png[output]\" for use with ComfyUI.",
-    type: "images/file_to_filepath"
+    type: "image/file_to_filepath"
 })

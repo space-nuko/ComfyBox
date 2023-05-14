@@ -258,9 +258,13 @@ export default class ComfyAPI {
             },
             body: postBody
         })
-            .then(res => res.json())
+            .then(async (res) => {
+                if (res.status != 200) {
+                    throw await res.text()
+                }
+                return res.json()
+            })
             .then(raw => { return { promptID: raw.prompt_id } })
-            .catch(res => { throw res.text() })
             .catch(error => { return { error } })
     }
 

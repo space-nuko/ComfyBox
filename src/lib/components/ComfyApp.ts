@@ -408,9 +408,8 @@ export default class ComfyApp {
             setColor(type, "orange")
         }
 
-        setColor("IMAGE", "rebeccapurple")
-        setColor("COMFYBOX_IMAGES", "lime")
-        setColor("COMFYBOX_IMAGE", "green")
+        setColor("COMFYBOX_IMAGES", "rebeccapurple")
+        setColor("COMFYBOX_IMAGE", "fuchsia")
         setColor(BuiltInSlotType.EVENT, "lightseagreen")
         setColor(BuiltInSlotType.ACTION, "lightseagreen")
     }
@@ -787,15 +786,15 @@ export default class ComfyApp {
                         queueState.afterQueued(promptID, num, p.output, extraData)
 
                         error = response.error;
-                    } catch (error) {
-                        error = error.toString();
+                    } catch (err) {
+                        error = err
                     }
 
                     if (error != null) {
                         const mes = error.response || error.toString()
                         notify(`Error queuing prompt:\n${mes}`, { type: "error" })
                         console.error(promptToGraphVis(p))
-                        console.error("Error queuing prompt", mes, num, p)
+                        console.error("Error queuing prompt", error, num, p)
                         break;
                     }
 

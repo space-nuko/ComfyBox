@@ -6,12 +6,11 @@
  import { Button } from "@gradio/button";
  import type { ComfyImageEditorNode, ComfyImageLocation, MultiImageData } from "$lib/nodes/ComfyWidgetNodes";
  import { Embed as Klecks, KL, KlApp, klHistory, type KlAppOptionsEmbed } from "klecks";
- import type { FileData as GradioFileData } from "@gradio/upload";
 
  import "klecks/style/style.scss";
-	import ImageUpload from "$lib/components/ImageUpload.svelte";
-	import { uploadImageToComfyUI, type ComfyUploadImageAPIResponse, convertComfyOutputToComfyURL, type ComfyBoxImageMetadata, comfyFileToComfyBoxMetadata } from "$lib/utils";
-	import notify from "$lib/notify";
+ import ImageUpload from "$lib/components/ImageUpload.svelte";
+ import { uploadImageToComfyUI, type ComfyUploadImageAPIResponse, convertComfyOutputToComfyURL, type ComfyBoxImageMetadata, comfyFileToComfyBoxMetadata, comfyBoxImageToComfyURL, comfyBoxImageToComfyFile } from "$lib/utils";
+ import notify from "$lib/notify";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -43,29 +42,6 @@
          attrsChanged = widget.attrsChanged;
      }
  };
-
- const urlPattern = /^((http|https|ftp):\/\/)/;
-
- $: updateUrls($nodeValue);
-
- function updateUrls(value: MultiImageData) {
-     // leftUrl = ""
-     // rightUrl = ""
-     // console.warn("UPD", value)
-     //
-     // if (typeof value[0] === "string") {
-     //     if (urlPattern.test(value[0]))
-     //         leftUrl = value[0]
-     //     else
-     //         leftUrl = convertFilenameToComfyURL(value[0])
-     // }
-     // if (typeof value[1] === "string") {
-     //     if (urlPattern.test(value[1]))
-     //         rightUrl = value[1]
-     //     else
-     //         rightUrl = convertFilenameToComfyURL(value[1])
-     // }
- }
 
  let editorRoot: HTMLDivElement | null = null;
  let showModal = false;
@@ -190,60 +166,81 @@
  let uploadError = null;
 
  function onUploading() {
+     console.warn("UPLOADING!!!")
      uploadError = null;
      status = "uploading"
  }
 
  function onUploaded(e: CustomEvent<ComfyImageLocation[]>) {
+     console.warn("UPLOADED!!!")
      uploadError = null;
      status = "uploaded"
-     $nodeValue = e.detail;
+     $nodeValue = e.detail.map(comfyFileToComfyBoxMetadata);
  }
 
  function onClear() {
+     console.warn("CLEAR!!!")
      uploadError = null;
      status = "none"
  }
 
  function onUploadError(e: CustomEvent<any>) {
+     console.warn("ERROR!!!")
      status = "error"
      uploadError = e.detail
+     notify(`Failed to upload image to ComfyUI: ${err}`, { type: "error", timeout: 10000 })
  }
 
  function onChange(e: CustomEvent<ComfyImageLocation[]>) {
-     // $nodeValue = e.detail;
  }
 
- $: canEdit = status === "none" || status === "uploaded";
+ let _value: ComfyImageLocation[] = []
+ $: if ($nodeValue)
+     _value = $nodeValue.map(comfyBoxImageToComfyFile)
+ else
+     _value = []
 
+ $: canEdit = status === "none" || status === "uploaded";
 </script>
 
 <div class="wrapper comfy-image-editor">
-    {#if isMobile}
-        <span>TODO mask editor</span>
+    {#if widget.attrs.variant === "fileUpload" || isMobile}
+        <ImageUpload value={_value}
+                     bind:imgWidth
+                     bind:imgHeight
+                     fileCount={"single"}
+                     elem_classes={[]}
+                     style={""}
+                     label={widget.attrs.title}
+                     on:uploading={onUploading}
+                     on:uploaded={onUploaded}
+                     on:upload_error={onUploadError}
+                     on:clear={onClear}
+                     on:change={onChange}
+        />
     {:else}
-        <Modal bind:showModal closeOnClick={false} on:close={disposeEditor}>
-            <div>
-                <div id="klecks-loading-screen">
-                    <span id="klecks-loading-screen-text"></span>
-                </div>
-                <div class="image-editor-root" bind:this={editorRoot} />
-            </div>
-        </Modal>
         <div class="comfy-image-editor-panel">
-            <ImageUpload value={$nodeValue}
+            <ImageUpload value={_value}
                          bind:imgWidth
                          bind:imgHeight
                          fileCount={"single"}
                          elem_classes={[]}
                          style={""}
-                         label={"Image"}
+                         label={widget.attrs.title}
                          on:uploading={onUploading}
                          on:uploaded={onUploaded}
                          on:upload_error={onUploadError}
                          on:clear={onClear}
                          on:change={onChange}
             />
+            <Modal bind:showModal closeOnClick={false} on:close={disposeEditor}>
+                <div>
+                    <div id="klecks-loading-screen">
+                        <span id="klecks-loading-screen-text"></span>
+                    </div>
+                    <div class="image-editor-root" bind:this={editorRoot} />
+                </div>
+            </Modal>
             <Block>
                 <Button variant="primary" disabled={!canEdit} on:click={openImageEditor}>
                     Edit Image

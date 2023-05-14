@@ -5,6 +5,7 @@ import { type LGraphNode, type IWidget, type LGraph, NodeMode, type LGraphRemove
 import { SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 import type { ComfyWidgetNode } from '$lib/nodes';
 import type { NodeID } from '$lib/api';
+import { v4 as uuidv4 } from "uuid";
 
 type DragItemEntry = {
     /*
@@ -60,11 +61,6 @@ export type LayoutState = {
      * Only contains drag items of type "widget"
      */
     allItemsByNode: Record<NodeID, DragItemEntry>,
-
-    /*
-     * Next ID to use for instantiating a new drag item
-     */
-    currentId: UUID,
 
     /*
      * Selected drag items.
@@ -411,6 +407,18 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: ""
             },
 
+            // Editor
+            {
+                name: "variant",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                validNodeTypes: ["ui/image_editor"],
+                values: ["inlineEditor", "fileUpload"],
+                defaultValue: "inlineEditor",
+                refreshPanelOnChange: true
+            },
+
             // Gallery
             {
                 name: "variant",
@@ -668,7 +676,6 @@ const store: Writable<LayoutState> = writable({
     root: null,
     allItems: {},
     allItemsByNode: {},
-    currentId: 0,
     currentSelection: [],
     currentSelectionNodes: [],
     isMenuOpen: false,
@@ -703,7 +710,7 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
     const state = get(store);
     const dragItem: ContainerLayout = {
         type: "container",
-        id: `${state.currentId++}`,
+        id: uuidv4(),
         attrsChanged: writable(0),
         attrs: {
             ...defaultWidgetAttributes,
@@ -726,7 +733,7 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
     const widgetName = "Widget"
     const dragItem: WidgetLayout = {
         type: "widget",
-        id: `${state.currentId++}`,
+        id: uuidv4(),
         node: node,
         attrsChanged: writable(0),
         attrs: {
@@ -939,7 +946,6 @@ function initDefaultLayout() {
         root: null,
         allItems: {},
         allItemsByNode: {},
-        currentId: 0,
         currentSelection: [],
         currentSelectionNodes: [],
         isMenuOpen: false,
@@ -964,7 +970,6 @@ function initDefaultLayout() {
 export type SerializedLayoutState = {
     root: DragItemID | null,
     allItems: Record<DragItemID, SerializedDragEntry>,
-    currentId: UUID,
     attrs: LayoutAttributes
 }
 
@@ -1002,7 +1007,6 @@ function serialize(): SerializedLayoutState {
     return {
         root: state.root?.id,
         allItems,
-        currentId: state.currentId,
         attrs: state.attrs
     }
 }
@@ -1055,7 +1059,6 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
         root,
         allItems,
         allItemsByNode,
-        currentId: data.currentId,
         currentSelection: [],
         currentSelectionNodes: [],
         isMenuOpen: false,

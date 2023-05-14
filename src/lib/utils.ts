@@ -256,6 +256,10 @@ export function isComfyBoxImageMetadata(value: any): value is ComfyBoxImageMetad
     return value && typeof value === "object" && (value as any).isComfyBoxImageMetadata;
 }
 
+export function isComfyBoxImageMetadataArray(value: any): value is ComfyBoxImageMetadata[] {
+    return Array.isArray(value) && value.every(isComfyBoxImageMetadata);
+}
+
 export function isComfyExecutionResult(value: any): value is ComfyExecutionResult {
     return value && typeof value === "object" && Array.isArray(value.images)
 }
@@ -284,7 +288,7 @@ export function comfyFileToComfyBoxMetadata(comfyUIFile: ComfyImageLocation): Co
 
 /*
  * Converts a ComfyUI file into an annotated filepath. Backend nodes like
- * LoadImage support syntax like "subfolder/image.png[output]" to specify which
+ * LoadImage support syntax like "subfolder/image.png [output]" to specify which
  * image folder to load from.
  */
 export function comfyFileToAnnotatedFilepath(comfyUIFile: ComfyImageLocation): string {
@@ -292,7 +296,7 @@ export function comfyFileToAnnotatedFilepath(comfyUIFile: ComfyImageLocation): s
     if (comfyUIFile.subfolder != "")
         path = comfyUIFile.subfolder + "/";
 
-    path += `${comfyUIFile.filename}[${comfyUIFile.type}]`
+    path += `${comfyUIFile.filename} [${comfyUIFile.type}]`
     return path;
 }
 
@@ -306,7 +310,7 @@ export function parseWhateverIntoImageMetadata(param: any): ComfyBoxImageMetadat
     if (isComfyBoxImageMetadata(param)) {
         meta = [param];
     }
-    if (Array.isArray(param) && !param.every(isComfyBoxImageMetadata)) {
+    else if (Array.isArray(param) && param.every(isComfyBoxImageMetadata)) {
         meta = param
     }
     else if (isComfyExecutionResult(param)) {
@@ -314,6 +318,10 @@ export function parseWhateverIntoImageMetadata(param: any): ComfyBoxImageMetadat
     }
 
     return meta;
+}
+
+export function comfyBoxImageToComfyFile(image: ComfyBoxImageMetadata): ComfyImageLocation {
+    return image.comfyUIFile
 }
 
 export function comfyBoxImageToComfyURL(image: ComfyBoxImageMetadata): string {
