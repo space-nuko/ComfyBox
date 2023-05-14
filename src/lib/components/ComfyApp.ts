@@ -245,7 +245,7 @@ export default class ComfyApp {
 
             const node: LGraphNodeConstructor = {
                 class: ctor,
-                title: nodeData.name,
+                title: nodeData.display_name || nodeData.name,
                 type: nodeId,
                 desc: `ComfyNode: ${nodeId}`
             }
