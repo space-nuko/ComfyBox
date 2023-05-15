@@ -260,7 +260,7 @@ export default class ComfyAPI {
         })
             .then(async (res) => {
                 if (res.status != 200) {
-                    throw await res.text()
+                    throw await res.json()
                 }
                 return res.json()
             })
