@@ -6,6 +6,7 @@ import ComfyGraph from "$lib/ComfyGraph";
 import ComfyPromptSerializer from "$lib/components/ComfyPromptSerializer";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
+import { graphToGraphVis } from "$lib/utils";
 
 class MockBackendInput extends ComfyGraphNode {
     override isBackendNode = true;
@@ -97,9 +98,12 @@ export default class ComfyPromptSerializerTests extends UnitTest {
 
         const result = ser.serialize(graph)
 
+        console.warn(result.output)
         expect(Object.keys(result.output)).toHaveLength(3);
-        expect(Object.keys(result.output[input.id].inputs)).toHaveLength(1);
-        expect(Object.keys(result.output[link.id].inputs)).toHaveLength(1);
+        expect(result.output[input.id].inputs["in"]).toBeInstanceOf(Array)
+        expect(result.output[input.id].inputs["in"][0]).toEqual(link.id)
+        expect(result.output[link.id].inputs["in"]).toBeInstanceOf(Array)
+        expect(result.output[link.id].inputs["in"][0]).toEqual(output.id)
         expect(Object.keys(result.output[output.id].inputs)).toHaveLength(0);
     }
 
@@ -115,6 +119,7 @@ export default class ComfyPromptSerializerTests extends UnitTest {
         const graphInput = subgraph.addGraphInput("testIn", "number")
         const graphOutput = subgraph.addGraphOutput("testOut", "number")
 
+        graph.add(subgraph)
         graph.add(output)
         subgraph.subgraph.add(link)
         graph.add(input)
@@ -126,9 +131,13 @@ export default class ComfyPromptSerializerTests extends UnitTest {
 
         const result = ser.serialize(graph)
 
+        console.warn(graphToGraphVis(graph))
+        console.warn(result.output)
         expect(Object.keys(result.output)).toHaveLength(3);
-        expect(Object.keys(result.output[input.id].inputs)).toHaveLength(1);
-        expect(Object.keys(result.output[link.id].inputs)).toHaveLength(1);
-        expect(Object.keys(result.output[output.id].inputs)).toHaveLength(0);
+        expect(result.output[input.id].inputs["in"]).toBeInstanceOf(Array)
+        expect(result.output[input.id].inputs["in"][0]).toEqual(link.id)
+        expect(result.output[link.id].inputs["in"]).toBeInstanceOf(Array)
+        expect(result.output[link.id].inputs["in"][0]).toEqual(output.id)
+        expect(result.output[output.id].inputs).toEqual({})
     }
 }

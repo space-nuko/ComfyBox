@@ -5,7 +5,7 @@ import TextWidget from "$lib/widgets/TextWidget.svelte";
 import { get } from "svelte/store"
 import layoutState from "$lib/stores/layoutState"
 import type { SvelteComponentDev } from "svelte/internal";
-import type { SerializedLGraph } from "@litegraph-ts/core";
+import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, GraphInput } from "@litegraph-ts/core";
 import type { FileNameOrGalleryData, ComfyExecutionResult, ComfyImageLocation } from "./nodes/ComfyWidgetNodes";
 import type { FileData as GradioFileData } from "@gradio/upload";
 
@@ -19,6 +19,13 @@ export function negmod(n: number, m: number): number {
 
 export function range(size: number, startAt: number = 0): ReadonlyArray<number> {
     return [...Array(size).keys()].map(i => i + startAt);
+}
+
+export function* enumerate<T>(iterable: Iterable<T>): Iterable<[number, T]> {
+    let index = 0;
+    for (const value of iterable) {
+        yield [index++, value];
+    }
 }
 
 export function download(filename: string, text: string, type: string = "text/plain") {
@@ -67,6 +74,98 @@ export function startDrag(evt: MouseEvent) {
 
 export function stopDrag(evt: MouseEvent) {
 };
+
+export function graphToGraphVis(graph: LGraph): string {
+    let links: string[] = []
+    let seenLinks = new Set()
+    let subgraphs: Record<string, [Subgraph, string[]]> = {}
+    let subgraphNodes: Record<number | UUID, Subgraph> = {}
+    let idToInt: Record<number | UUID, number> = {}
+    let curId = 0;
+
+    const convId = (id: number | UUID): number => {
+        if (idToInt[id] == null) {
+            idToInt[id] = curId++;
+        }
+        return idToInt[id];
+    }
+
+    const addLink = (node: LGraphNode, link: LLink): string => {
+        const nodeA = node.graph.getNodeById(link.origin_id)
+        const nodeB = node.graph.getNodeById(link.target_id);
+        seenLinks.add(link.id)
+        return `    "${convId(nodeA.id)}_${nodeA.title}" -> "${convId(nodeB.id)}_${nodeB.title}";\n`;
+    }
+
+    for (const node of graph.iterateNodesInOrderRecursive()) {
+        for (let [index, input] of enumerate(node.iterateInputInfo())) {
+            const link = node.getInputLink(index);
+            if (link && !seenLinks.has(link.id)) {
+                const linkText = addLink(node, link)
+                if (node.graph != graph) {
+                    subgraphs[node.graph._subgraph_node.id] ||= [node.graph._subgraph_node, []]
+                    subgraphs[node.graph._subgraph_node.id][1].push(linkText)
+                    subgraphNodes[node.graph._subgraph_node.id] = node.graph._subgraph_node
+                }
+                else {
+                    links.push(linkText)
+                }
+            }
+        }
+        for (let [index, output] of enumerate(node.iterateOutputInfo())) {
+            for (const link of node.getOutputLinks(index)) {
+                if (!seenLinks.has(link.id)) {
+                    const linkText = addLink(node, link)
+                    if (node.graph != graph) {
+                        subgraphs[node.graph._subgraph_node.id] ||= [node.graph._subgraph_node, []]
+                        subgraphs[node.graph._subgraph_node.id][1].push(linkText)
+                        subgraphNodes[node.graph._subgraph_node.id] = node.graph._subgraph_node
+                    }
+                    else if (!node.is(Subgraph) && !node.graph.getNodeById(link.target_id)?.is(Subgraph)) {
+                        links.push(linkText)
+                    }
+                }
+            }
+        }
+    }
+
+    let out = "digraph {\n"
+    out += "    node [shape=box];\n"
+
+    for (const [subgraph, links] of Object.values(subgraphs)) {
+        // Subgraph name has to be prefixed with "cluster" to show up as a cluster...
+        out += `    subgraph cluster_subgraph_${convId(subgraph.id)} {\n`
+        out += `        label="${convId(subgraph.id)}: ${subgraph.title}";\n`;
+        out += "        color=red;\n";
+        // out += "        style=grey;\n";
+        out += "        node [style=filled,fillcolor=white];\n";
+        out += "    " + links.join("    ")
+        out += "    }\n"
+    }
+
+    out += links.join("")
+
+    for (const subgraphNode of Object.values(subgraphNodes)) {
+        for (const [index, input] of enumerate(subgraphNode.iterateInputInfo())) {
+            const link = subgraphNode.getInputLink(index);
+            if (link) {
+                const inputNode = subgraphNode.getInputNode(link.origin_slot);
+                const innerInput = subgraphNode.getInnerGraphInputByIndex(index);
+                out += `    "${convId(link.origin_id)}_${inputNode.title}" -> "${convId(innerInput.id)}_${innerInput.title}";\n`
+            }
+        }
+        for (const [index, output] of enumerate(subgraphNode.iterateOutputInfo())) {
+            for (const link of subgraphNode.getOutputLinks(index)) {
+                const outputNode = subgraphNode.graph.getNodeById(link.target_id)
+                const innerOutput = subgraphNode.getInnerGraphOutputByIndex(index);
+                out += `    "${convId(innerOutput.id)}_${innerOutput.title}" -> "${convId(link.origin_id)}_${outputNode.title}";\n`
+            }
+        }
+    }
+
+    out += "}"
+    return out
+}
 
 export function workflowToGraphVis(workflow: SerializedLGraph): string {
     let out = "digraph {\n"

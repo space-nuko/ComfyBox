@@ -54,6 +54,23 @@ function followGraphInput(graphInput: GraphInput, link: LLink): LLink | null {
     return nextLink;
 }
 
+function getUpstreamLink(parent: LGraphNode, currentLink: LLink): LLink | null {
+    if (parent.is(Subgraph)) {
+        console.warn("FollowSubgraph")
+        return followSubgraph(parent, currentLink);
+    }
+    else if (parent.is(GraphInput)) {
+        console.warn("FollowGraphInput")
+
+        return followGraphInput(parent, currentLink);
+    }
+    else if ("getUpstreamLink" in parent) {
+        return (parent as ComfyGraphNode).getUpstreamLink();
+    }
+    console.warn("[graphToPrompt] Node does not support getUpstreamLink", parent.type)
+    return null;
+}
+
 export default class ComfyPromptSerializer {
     serializeInputValues(node: ComfyBackendNode): Record<string, SerializedPromptInput> {
         // Store input values passed by frontend-only nodes
@@ -118,7 +135,7 @@ export default class ComfyPromptSerializer {
             let parent: ComfyGraphNode = node.getInputNode(i) as ComfyGraphNode;
             if (parent) {
                 const seen = {}
-                let link = node.getInputLink(i);
+                let currentLink = node.getInputLink(i);
 
                 const isFrontendParent = (parent: ComfyGraphNode) => {
                     if (!parent || parent.isBackendNode)
@@ -135,20 +152,7 @@ export default class ComfyPromptSerializer {
                 // nodes have conditional logic that determines which link
                 // to follow backwards.
                 while (isFrontendParent(parent)) {
-                    let nextLink = null;
-                    if (parent.is(Subgraph)) {
-                        nextLink = followSubgraph(parent, link);
-                    }
-                    else if (parent.is(GraphInput)) {
-                        nextLink = followGraphInput(parent, link);
-                    }
-                    else if ("getUpstreamLink" in parent) {
-                        nextLink = parent.getUpstreamLink();
-                    }
-                    else {
-                        console.warn("[graphToPrompt] Node does not support getUpstreamLink", parent.type)
-                        break;
-                    }
+                    const nextLink = getUpstreamLink(parent, currentLink);
 
                     if (nextLink == null) {
                         console.warn("[graphToPrompt] No upstream link found in frontend node", parent)
@@ -164,7 +168,7 @@ export default class ComfyPromptSerializer {
                         }
                         else {
                             console.debug("[graphToPrompt] Traverse upstream link", parent.id, inputNode?.id, inputNode?.isBackendNode)
-                            link = nextLink;
+                            currentLink = nextLink;
                             parent = inputNode;
                         }
                     } else {
@@ -172,7 +176,7 @@ export default class ComfyPromptSerializer {
                     }
                 }
 
-                if (link && parent && parent.isBackendNode) {
+                if (currentLink && parent && parent.isBackendNode) {
                     if (tag && !hasTag(parent, tag))
                         continue;
 
@@ -181,7 +185,7 @@ export default class ComfyPromptSerializer {
                     // TODO can null be a legitimate value in some cases?
                     // Nodes like CLIPLoader will never have a value in the frontend, hence "null".
                     if (!(input.name in inputs))
-                        inputs[input.name] = [String(link.origin_id), link.origin_slot];
+                        inputs[input.name] = [String(currentLink.origin_id), currentLink.origin_slot];
                 }
             }
         }

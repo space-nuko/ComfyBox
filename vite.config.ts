@@ -74,7 +74,7 @@ export default defineConfig({
     test: {
         environment: 'jsdom',
         deps: {
-            inline: [/^svelte/, /^@floating-ui/, /dist/, "skeleton-elements", "mdn-polyfills"]
+            inline: [/^svelte/, /^@floating-ui/, /dist/, "skeleton-elements", "mdn-polyfills", "loupe"]
         },
         include: [
             'litegraph/packages/tests/src/main.ts',
