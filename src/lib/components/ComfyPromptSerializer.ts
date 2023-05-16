@@ -1,7 +1,7 @@
 import type ComfyGraph from "$lib/ComfyGraph";
 import type { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
-import { GraphInput, LGraphNode, LLink, NodeMode, Subgraph } from "@litegraph-ts/core";
+import { GraphInput, GraphOutput, LGraph, LGraphNode, LLink, NodeMode, Subgraph } from "@litegraph-ts/core";
 import type { SerializedPrompt, SerializedPromptInput, SerializedPromptInputs, SerializedPromptInputsAll } from "./ComfyApp";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 
@@ -26,7 +26,7 @@ function isActiveBackendNode(node: ComfyGraphNode, tag: string | null): node is 
     return true;
 }
 
-function followSubgraph(subgraph: Subgraph, link: LLink): LLink | null {
+function followSubgraph(subgraph: Subgraph, link: LLink): [LGraph | null, LLink | null] {
     if (link.origin_id != subgraph.id)
         throw new Error("A!")
 
@@ -35,10 +35,10 @@ function followSubgraph(subgraph: Subgraph, link: LLink): LLink | null {
         throw new Error("No inner graph input!")
 
     const nextLink = innerGraphOutput.getInputLink(0)
-    return nextLink;
+    return [innerGraphOutput.graph, nextLink];
 }
 
-function followGraphInput(graphInput: GraphInput, link: LLink): LLink | null {
+function followGraphInput(graphInput: GraphInput, link: LLink): [LGraph | null, LLink | null] {
     if (link.origin_id != graphInput.id)
         throw new Error("A!")
 
@@ -51,24 +51,23 @@ function followGraphInput(graphInput: GraphInput, link: LLink): LLink | null {
         throw new Error("No outer input slot!")
 
     const nextLink = outerSubgraph.getInputLink(outerInputIndex)
-    return nextLink;
+    return [outerSubgraph.graph, nextLink];
 }
 
-function getUpstreamLink(parent: LGraphNode, currentLink: LLink): LLink | null {
+function getUpstreamLink(parent: LGraphNode, currentLink: LLink): [LGraph | null, LLink | null] {
     if (parent.is(Subgraph)) {
         console.warn("FollowSubgraph")
         return followSubgraph(parent, currentLink);
     }
     else if (parent.is(GraphInput)) {
         console.warn("FollowGraphInput")
-
         return followGraphInput(parent, currentLink);
     }
     else if ("getUpstreamLink" in parent) {
-        return (parent as ComfyGraphNode).getUpstreamLink();
+        return [parent.graph, (parent as ComfyGraphNode).getUpstreamLink()];
     }
     console.warn("[graphToPrompt] Node does not support getUpstreamLink", parent.type)
-    return null;
+    return [null, null];
 }
 
 export default class ComfyPromptSerializer {
@@ -132,13 +131,13 @@ export default class ComfyPromptSerializer {
 
         // Store links between backend-only and hybrid nodes
         for (let i = 0; i < node.inputs.length; i++) {
-            let parent: ComfyGraphNode = node.getInputNode(i) as ComfyGraphNode;
+            let parent = node.getInputNode(i);
             if (parent) {
                 const seen = {}
                 let currentLink = node.getInputLink(i);
 
-                const isFrontendParent = (parent: ComfyGraphNode) => {
-                    if (!parent || parent.isBackendNode)
+                const isFrontendParent = (parent: LGraphNode) => {
+                    if (!parent || (parent as any).isBackendNode)
                         return false;
                     if (tag && !hasTag(parent, tag))
                         return false;
@@ -152,7 +151,7 @@ export default class ComfyPromptSerializer {
                 // nodes have conditional logic that determines which link
                 // to follow backwards.
                 while (isFrontendParent(parent)) {
-                    const nextLink = getUpstreamLink(parent, currentLink);
+                    const [nextGraph, nextLink] = getUpstreamLink(parent, currentLink);
 
                     if (nextLink == null) {
                         console.warn("[graphToPrompt] No upstream link found in frontend node", parent)
@@ -161,22 +160,22 @@ export default class ComfyPromptSerializer {
 
                     if (nextLink && !seen[nextLink.id]) {
                         seen[nextLink.id] = true
-                        const inputNode = parent.graph.getNodeById(nextLink.origin_id) as ComfyGraphNode;
-                        if (inputNode && tag && !hasTag(inputNode, tag)) {
+                        const nextParent = nextGraph.getNodeById(nextLink.origin_id);
+                        if (nextParent && tag && !hasTag(nextParent, tag)) {
                             console.debug("[graphToPrompt] Skipping tagged intermediate frontend node", tag, node.properties.tags)
                             parent = null;
                         }
                         else {
-                            console.debug("[graphToPrompt] Traverse upstream link", parent.id, inputNode?.id, inputNode?.isBackendNode)
+                            console.debug("[graphToPrompt] Traverse upstream link", parent.id, nextParent?.id, nextParent?.isBackendNode)
                             currentLink = nextLink;
-                            parent = inputNode;
+                            parent = nextParent;
                         }
                     } else {
                         parent = null;
                     }
                 }
 
-                if (currentLink && parent && parent.isBackendNode) {
+                if (currentLink && parent && (parent as any).isBackendNode) {
                     if (tag && !hasTag(parent, tag))
                         continue;
 
@@ -186,6 +185,9 @@ export default class ComfyPromptSerializer {
                     // Nodes like CLIPLoader will never have a value in the frontend, hence "null".
                     if (!(input.name in inputs))
                         inputs[input.name] = [String(currentLink.origin_id), currentLink.origin_slot];
+                }
+                else {
+                    console.warn("[graphToPrompt] Didn't find upstream link!", currentLink, parent?.id)
                 }
             }
         }
