@@ -541,7 +541,7 @@ export default class ComfyApp {
      * @returns The workflow and node links
      */
     graphToPrompt(tag: string | null = null): SerializedPrompt {
-        return this.promptSerializer.serializePrompt(this.lGraph, tag)
+        return this.promptSerializer.serialize(this.lGraph, tag)
     }
 
     async queuePrompt(num: number, batchCount: number = 1, tag: string | null = null) {

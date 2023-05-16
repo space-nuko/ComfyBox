@@ -1,7 +1,7 @@
 import type ComfyGraph from "$lib/ComfyGraph";
 import type { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
-import { LGraphNode, NodeMode } from "@litegraph-ts/core";
+import { GraphInput, LGraphNode, LLink, NodeMode, Subgraph } from "@litegraph-ts/core";
 import type { SerializedPrompt, SerializedPromptInput, SerializedPromptInputs, SerializedPromptInputsAll } from "./ComfyApp";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 
@@ -24,6 +24,34 @@ function isActiveBackendNode(node: ComfyGraphNode, tag: string | null): node is 
     }
 
     return true;
+}
+
+function followSubgraph(subgraph: Subgraph, link: LLink): LLink | null {
+    if (link.origin_id != subgraph.id)
+        throw new Error("A!")
+
+    const innerGraphOutput = subgraph.getInnerGraphOutputByIndex(link.origin_slot)
+    if (innerGraphOutput == null)
+        throw new Error("No inner graph input!")
+
+    const nextLink = innerGraphOutput.getInputLink(0)
+    return nextLink;
+}
+
+function followGraphInput(graphInput: GraphInput, link: LLink): LLink | null {
+    if (link.origin_id != graphInput.id)
+        throw new Error("A!")
+
+    const outerSubgraph = graphInput.getParentSubgraph();
+    if (outerSubgraph == null)
+        throw new Error("No outer subgraph!")
+
+    const outerInputIndex = outerSubgraph.inputs.findIndex(i => i.name === graphInput.nameInGraph)
+    if (outerInputIndex == null)
+        throw new Error("No outer input slot!")
+
+    const nextLink = outerSubgraph.getInputLink(outerInputIndex)
+    return nextLink;
 }
 
 export default class ComfyPromptSerializer {
@@ -107,12 +135,21 @@ export default class ComfyPromptSerializer {
                 // nodes have conditional logic that determines which link
                 // to follow backwards.
                 while (isFrontendParent(parent)) {
-                    if (!("getUpstreamLink" in parent)) {
+                    let nextLink = null;
+                    if (parent.is(Subgraph)) {
+                        nextLink = followSubgraph(parent, link);
+                    }
+                    else if (parent.is(GraphInput)) {
+                        nextLink = followGraphInput(parent, link);
+                    }
+                    else if ("getUpstreamLink" in parent) {
+                        nextLink = parent.getUpstreamLink();
+                    }
+                    else {
                         console.warn("[graphToPrompt] Node does not support getUpstreamLink", parent.type)
                         break;
                     }
 
-                    const nextLink = parent.getUpstreamLink()
                     if (nextLink == null) {
                         console.warn("[graphToPrompt] No upstream link found in frontend node", parent)
                         break;
@@ -152,7 +189,7 @@ export default class ComfyPromptSerializer {
         return inputs
     }
 
-    serializePrompt(graph: ComfyGraph, tag: string | null = null): SerializedPrompt {
+    serialize(graph: ComfyGraph, tag: string | null = null): SerializedPrompt {
         // Run frontend-only logic
         graph.runStep(1)
 
@@ -161,7 +198,7 @@ export default class ComfyPromptSerializer {
         const output: SerializedPromptInputsAll = {};
 
         // Process nodes in order of execution
-        for (const node of graph.computeExecutionOrder<ComfyGraphNode>(false, null)) {
+        for (const node of graph.computeExecutionOrderRecursive<ComfyGraphNode>(false, null)) {
             const n = workflow.nodes.find((n) => n.id === node.id);
 
             if (!isActiveBackendNode(node, tag)) {

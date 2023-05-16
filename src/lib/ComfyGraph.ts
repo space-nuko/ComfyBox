@@ -116,19 +116,19 @@ export default class ComfyGraph extends LGraph {
             }
         }
 
-        console.debug("Added", node);
+        // console.debug("Added", node);
         this.eventBus.emit("nodeAdded", node);
     }
 
     override onNodeRemoved(node: LGraphNode, options: LGraphRemoveNodeOptions) {
         layoutState.nodeRemoved(node, options);
 
-        console.debug("Removed", node);
+        // console.debug("Removed", node);
         this.eventBus.emit("nodeRemoved", node);
     }
 
     override onNodeConnectionChange(kind: LConnectionKind, node: LGraphNode, slot: SlotIndex, targetNode: LGraphNode, targetSlot: SlotIndex) {
-        console.debug("ConnectionChange", node);
+        // console.debug("ConnectionChange", node);
         this.eventBus.emit("nodeConnectionChanged", kind, node, slot, targetNode, targetSlot);
     }
 }

@@ -17,10 +17,14 @@
     "build:css": "pollen -c gradio/js/theme/src/pollen.config.cjs && mv src/pollen.css node_modules/@gradio/theme/src"
   },
   "devDependencies": {
+    "@floating-ui/core": "^1.2.6",
+    "@floating-ui/dom": "^1.2.8",
     "@zerodevx/svelte-toast": "^0.9.3",
     "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-svelte3": "^4.0.0",
+    "happy-dom": "^9.18.3",
+    "jsdom": "^22.0.0",
     "prettier": "^2.8.7",
     "prettier-plugin-svelte": "^2.10.0",
     "sass": "^1.61.0",
