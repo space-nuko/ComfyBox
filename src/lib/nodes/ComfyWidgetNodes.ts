@@ -89,16 +89,11 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     override isBackendNode = false;
     override serialize_widgets = true;
 
-
-    // TODO these are bad, create override methods instead
-    // input slots
-    inputIndex: number | null = null;
     storeActionName: string | null = "store";
 
     // output slots
-    outputIndex: number | null = 0;
-    changedIndex: number | null = 1;
-
+    outputSlotName: string | null = "value";
+    changedEventName: string | null = "changed";
 
     displayWidget: ITextWidget;
 
@@ -145,11 +140,13 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         // console.debug("[Widget] valueUpdated", this, value)
         this.displayWidget.value = this.formatValue(value)
 
-        if (this.outputIndex !== null && this.outputs.length >= this.outputIndex) {
-            this.setOutputData(this.outputIndex, get(this.value))
+        if (this.outputSlotName !== null) {
+            const outputIndex = this.findOutputSlotIndexByName(this.outputSlotName)
+            if (outputIndex !== -1)
+                this.setOutputData(outputIndex, get(this.value))
         }
 
-        if (this.changedIndex !== null && this.outputs.length >= this.changedIndex && !this._noChangedEvent) {
+        if (this.changedEventName !== null && !this._noChangedEvent) {
             if (!this.delayChangedEvent)
                 this.triggerChangeEvent(get(this.value))
             else {
@@ -163,9 +160,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
 
     private triggerChangeEvent(value: any) {
         // console.debug("[Widget] trigger changed", this, value)
-        const changedOutput = this.outputs[this.changedIndex]
-        if (changedOutput.type === BuiltInSlotType.EVENT)
-            this.triggerSlot(this.changedIndex, value)
+        this.trigger(this.changedEventName, value)
     }
 
     parseValue(value: any): T { return value as T };
@@ -198,18 +193,10 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
      * Logic to run if this widget can be treated as output (slider, combo, text)
      */
     override onExecute(param: any, options: object) {
-        if (this.inputIndex != null) {
-            if (this.inputs.length >= this.inputIndex) {
-                const data = this.getInputData(this.inputIndex)
-                if (data != null) { // TODO can "null" be a legitimate value here?
-                    this.setValue(data)
-                }
-            }
-        }
-        if (this.outputIndex != null) {
-            if (this.outputs.length >= this.outputIndex) {
-                this.setOutputData(this.outputIndex, get(this.value))
-            }
+        if (this.outputSlotName != null) {
+            const outputIndex = this.findOutputSlotIndexByName(this.outputSlotName)
+            if (outputIndex !== -1)
+                this.setOutputData(outputIndex, get(this.value))
         }
         for (const propName in this.shownOutputProperties) {
             const data = this.shownOutputProperties[propName]
@@ -373,7 +360,6 @@ export class ComfySliderNode extends ComfyWidgetNode<number> {
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "value", type: "number" },
             { name: "store", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
@@ -431,7 +417,6 @@ export class ComfyComboNode extends ComfyWidgetNode<string> {
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "value", type: "string" },
             { name: "store", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
@@ -574,7 +559,6 @@ export class ComfyTextNode extends ComfyWidgetNode<string> {
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "value", type: "string" },
             { name: "store", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
@@ -650,10 +634,9 @@ export class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetadata[]> {
 
     override svelteComponentType = GalleryWidget
     override defaultValue = []
-    override inputIndex = null;
     override saveUserState = false;
-    override outputIndex = null;
-    override changedIndex = null;
+    override outputSlotName = null;
+    override changedEventName = null;
 
     selectedFilename: string | null = null;
 
@@ -727,13 +710,13 @@ export class ComfyButtonNode extends ComfyWidgetNode<boolean> {
     static slotLayout: SlotLayout = {
         outputs: [
             { name: "clicked", type: BuiltInSlotType.EVENT },
-            { name: "isClicked", type: "boolean" },
         ]
     }
 
     override svelteComponentType = ButtonWidget;
     override defaultValue = false;
-    override outputIndex = 1;
+    override outputSlotName = null;
+    override changedEventName = null;
 
     constructor(name?: string) {
         super(name, false)
@@ -768,7 +751,6 @@ export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "value", type: "boolean" },
             { name: "store", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
@@ -779,7 +761,6 @@ export class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
 
     override svelteComponentType = CheckboxWidget;
     override defaultValue = false;
-    override changedIndex = 1;
 
     constructor(name?: string) {
         super(name, false)
@@ -810,7 +791,6 @@ export class ComfyRadioNode extends ComfyWidgetNode<string> {
 
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "value", type: "string,number" },
             { name: "store", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
@@ -822,7 +802,6 @@ export class ComfyRadioNode extends ComfyWidgetNode<string> {
 
     override svelteComponentType = RadioWidget;
     override defaultValue = "";
-    override changedIndex = 2;
 
     indexWidget: INumberWidget;
 
@@ -894,9 +873,6 @@ export class ComfyImageEditorNode extends ComfyWidgetNode<ComfyBoxImageMetadata[
 
     override svelteComponentType = ImageEditorWidget;
     override defaultValue = [];
-    override outputIndex = 0;
-    override inputIndex = null;
-    override changedIndex = 1;
     override storeActionName = "store";
     override saveUserState = false;
 
