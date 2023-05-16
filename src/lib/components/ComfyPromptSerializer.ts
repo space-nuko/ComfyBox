@@ -166,7 +166,7 @@ export default class ComfyPromptSerializer {
                             parent = null;
                         }
                         else {
-                            console.debug("[graphToPrompt] Traverse upstream link", parent.id, nextParent?.id, nextParent?.isBackendNode)
+                            console.debug("[graphToPrompt] Traverse upstream link", parent.id, nextParent?.id, (nextParent as any)?.isBackendNode)
                             currentLink = nextLink;
                             parent = nextParent;
                         }

@@ -26,17 +26,14 @@ export default class ComfyGraph extends LGraph {
 
     override onConfigure() {
         console.debug("Configured");
-        this.eventBus.emit("configured", this);
     }
 
     override onBeforeChange(graph: LGraph, info: any) {
         console.debug("BeforeChange", info);
-        this.eventBus.emit("beforeChange", graph, info);
     }
 
     override onAfterChange(graph: LGraph, info: any) {
         console.debug("AfterChange", info);
-        this.eventBus.emit("afterChange", graph, info);
     }
 
     override onAfterExecute() {
@@ -44,6 +41,9 @@ export default class ComfyGraph extends LGraph {
     }
 
     override onNodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
+        if (options.subgraphs && options.subgraphs.length > 0)
+            return
+
         layoutState.nodeAdded(node, options)
 
         // All nodes whether they come from base litegraph or ComfyBox should

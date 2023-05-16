@@ -18,7 +18,7 @@ import CheckboxWidget from "$lib/widgets/CheckboxWidget.svelte";
 import RadioWidget from "$lib/widgets/RadioWidget.svelte";
 import ImageUploadWidget from "$lib/widgets/ImageUploadWidget.svelte";
 import ImageEditorWidget from "$lib/widgets/ImageEditorWidget.svelte";
-import type { NodeID } from "$lib/api";
+import type { ComfyNodeID } from "$lib/api";
 
 export type AutoConfigOptions = {
     includeProperties?: Set<string> | null,
@@ -272,7 +272,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         }
 
         if (options.setWidgetTitle) {
-            const widget = layoutState.findLayoutForNode(this.id as NodeID)
+            const widget = layoutState.findLayoutForNode(this.id as ComfyNodeID)
             if (widget && input.name !== "") {
                 widget.attrs.title = input.name;
             }
@@ -291,7 +291,7 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     notifyPropsChanged() {
-        const layoutEntry = layoutState.findLayoutEntryForNode(this.id as NodeID)
+        const layoutEntry = layoutState.findLayoutEntryForNode(this.id as ComfyNodeID)
         if (layoutEntry && layoutEntry.parent) {
             layoutEntry.parent.attrsChanged.set(get(layoutEntry.parent.attrsChanged) + 1)
         }

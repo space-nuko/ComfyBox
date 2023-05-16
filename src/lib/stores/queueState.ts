@@ -1,4 +1,4 @@
-import type { ComfyAPIHistoryEntry, ComfyAPIHistoryItem, ComfyAPIHistoryResponse, ComfyAPIQueueResponse, ComfyAPIStatusResponse, ComfyBoxPromptExtraData, NodeID, PromptID } from "$lib/api";
+import type { ComfyAPIHistoryEntry, ComfyAPIHistoryItem, ComfyAPIHistoryResponse, ComfyAPIQueueResponse, ComfyAPIStatusResponse, ComfyBoxPromptExtraData, ComfyNodeID, PromptID } from "$lib/api";
 import type { Progress, SerializedPromptInputsAll, SerializedPromptOutputs } from "$lib/components/ComfyApp";
 import type { ComfyExecutionResult } from "$lib/nodes/ComfyWidgetNodes";
 import notify from "$lib/notify";
@@ -14,12 +14,12 @@ type QueueStateOps = {
     queueUpdated: (resp: ComfyAPIQueueResponse) => void,
     historyUpdated: (resp: ComfyAPIHistoryResponse) => void,
     statusUpdated: (status: ComfyAPIStatusResponse | null) => void,
-    executingUpdated: (promptID: PromptID | null, runningNodeID: NodeID | null) => void,
-    executionCached: (promptID: PromptID, nodes: NodeID[]) => void,
+    executingUpdated: (promptID: PromptID | null, runningNodeID: ComfyNodeID | null) => void,
+    executionCached: (promptID: PromptID, nodes: ComfyNodeID[]) => void,
     executionError: (promptID: PromptID, message: string) => void,
     progressUpdated: (progress: Progress) => void
     afterQueued: (promptID: PromptID, number: number, prompt: SerializedPromptInputsAll, extraData: any) => void
-    onExecuted: (promptID: PromptID, nodeID: NodeID, output: ComfyExecutionResult) => void
+    onExecuted: (promptID: PromptID, nodeID: ComfyNodeID, output: ComfyExecutionResult) => void
 }
 
 export type QueueEntry = {
@@ -30,7 +30,7 @@ export type QueueEntry = {
     promptID: PromptID,
     prompt: SerializedPromptInputsAll,
     extraData: ComfyBoxPromptExtraData,
-    goodOutputs: NodeID[],
+    goodOutputs: ComfyNodeID[],
 
     /* Data not sent by ComfyUI's API, lost on page refresh */
 
@@ -38,8 +38,8 @@ export type QueueEntry = {
     outputs: SerializedPromptOutputs,
 
     /* Nodes in of the workflow that have finished running so far. */
-    nodesRan: Set<NodeID>,
-    cachedNodes: Set<NodeID>
+    nodesRan: Set<ComfyNodeID>,
+    cachedNodes: Set<ComfyNodeID>
 }
 
 export type CompletedQueueEntry = {
@@ -54,7 +54,7 @@ export type QueueState = {
     queuePending: Writable<QueueEntry[]>,
     queueCompleted: Writable<CompletedQueueEntry[]>,
     queueRemaining: number | "X" | null;
-    runningNodeID: NodeID | null;
+    runningNodeID: ComfyNodeID | null;
     progress: Progress | null,
     isInterrupting: boolean
 }
@@ -161,7 +161,7 @@ function moveToCompleted(index: number, queue: Writable<QueueEntry[]>, status: Q
     store.set(state)
 }
 
-function executingUpdated(promptID: PromptID, runningNodeID: NodeID | null) {
+function executingUpdated(promptID: PromptID, runningNodeID: ComfyNodeID | null) {
     console.debug("[queueState] executingUpdated", promptID, runningNodeID)
     store.update((s) => {
         s.progress = null;
@@ -199,7 +199,7 @@ function executingUpdated(promptID: PromptID, runningNodeID: NodeID | null) {
     })
 }
 
-function executionCached(promptID: PromptID, nodes: NodeID[]) {
+function executionCached(promptID: PromptID, nodes: ComfyNodeID[]) {
     console.debug("[queueState] executionCached", promptID, nodes)
     store.update(s => {
         const [index, entry, queue] = findEntryInPending(promptID);
@@ -257,7 +257,7 @@ function afterQueued(promptID: PromptID, number: number, prompt: SerializedPromp
     })
 }
 
-function onExecuted(promptID: PromptID, nodeID: NodeID, output: ComfyExecutionResult) {
+function onExecuted(promptID: PromptID, nodeID: ComfyNodeID, output: ComfyExecutionResult) {
     console.debug("[queueState] onExecuted", promptID, nodeID, output)
     store.update(s => {
         const [index, entry, queue] = findEntryInPending(promptID)

@@ -530,6 +530,7 @@ export class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
         }
 
         for (const [nodeId, newMode] of Object.entries(nodeChanges)) {
+            // NOTE: Only applies to this subgraph, not parent/child graphs.
             this.graph.getNodeById(nodeId).changeMode(newMode);
         }
 

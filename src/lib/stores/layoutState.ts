@@ -4,7 +4,7 @@ import type ComfyApp from "$lib/components/ComfyApp"
 import { type LGraphNode, type IWidget, type LGraph, NodeMode, type LGraphRemoveNodeOptions, type LGraphAddNodeOptions, type UUID } from "@litegraph-ts/core"
 import { SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 import type { ComfyWidgetNode } from '$lib/nodes';
-import type { NodeID } from '$lib/api';
+import type { ComfyNodeID } from '$lib/api';
 import { v4 as uuidv4 } from "uuid";
 
 type DragItemEntry = {
@@ -60,7 +60,7 @@ export type LayoutState = {
      * Items indexed by the litegraph node they're bound to
      * Only contains drag items of type "widget"
      */
-    allItemsByNode: Record<NodeID, DragItemEntry>,
+    allItemsByNode: Record<ComfyNodeID, DragItemEntry>,
 
     /*
      * Selected drag items.
@@ -663,8 +663,8 @@ type LayoutStateOps = {
     groupItems: (dragItems: IDragItem[], attrs?: Partial<Attributes>) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
     getCurrentSelection: () => IDragItem[],
-    findLayoutEntryForNode: (nodeId: NodeID) => DragItemEntry | null,
-    findLayoutForNode: (nodeId: NodeID) => IDragItem | null,
+    findLayoutEntryForNode: (nodeId: ComfyNodeID) => DragItemEntry | null,
+    findLayoutForNode: (nodeId: ComfyNodeID) => IDragItem | null,
     serialize: () => SerializedLayoutState,
     deserialize: (data: SerializedLayoutState, graph: LGraph) => void,
     initDefaultLayout: () => void,
@@ -924,7 +924,7 @@ function ungroup(container: ContainerLayout) {
     store.set(state)
 }
 
-function findLayoutEntryForNode(nodeId: NodeID): DragItemEntry | null {
+function findLayoutEntryForNode(nodeId: ComfyNodeID): DragItemEntry | null {
     const state = get(store)
     const found = Object.entries(state.allItems).find(pair =>
         pair[1].dragItem.type === "widget"
@@ -934,7 +934,7 @@ function findLayoutEntryForNode(nodeId: NodeID): DragItemEntry | null {
     return null;
 }
 
-function findLayoutForNode(nodeId: NodeID): WidgetLayout | null {
+function findLayoutForNode(nodeId: ComfyNodeID): WidgetLayout | null {
     const found = findLayoutEntryForNode(nodeId);
     if (!found)
         return null;
@@ -1034,7 +1034,9 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
 
         if (dragItem.type === "widget") {
             const widget = dragItem as WidgetLayout;
-            widget.node = graph.getNodeById(entry.dragItem.nodeId) as ComfyWidgetNode
+            widget.node = graph.getNodeByIdRecursive(entry.dragItem.nodeId) as ComfyWidgetNode
+            if (widget.node == null)
+                throw (`Node in litegraph not found! ${entry.dragItem.nodeId}`)
             allItemsByNode[entry.dragItem.nodeId] = dragEntry
         }
     }

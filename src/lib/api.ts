@@ -1,4 +1,4 @@
-import type { Progress, SerializedPrompt, SerializedPromptInputs, SerializedPromptInputsAll, SerializedPromptOutput, SerializedPromptOutputs } from "./components/ComfyApp";
+import type { Progress, SerializedPrompt, SerializedPromptInputs, SerializedPromptInputsAll, SerializedPromptOutputs } from "./components/ComfyApp";
 import type TypedEmitter from "typed-emitter";
 import EventEmitter from "events";
 import type { ComfyExecutionResult, ComfyImageLocation } from "./nodes/ComfyWidgetNodes";
@@ -30,7 +30,7 @@ export type ComfyAPIQueueResponse = {
     error?: string
 }
 
-export type NodeID = UUID;
+export type ComfyNodeID = UUID; // To distinguish from Litegraph NodeID
 export type PromptID = UUID; // UUID
 
 export type ComfyAPIHistoryItem = [
@@ -38,7 +38,7 @@ export type ComfyAPIHistoryItem = [
     PromptID,
     SerializedPromptInputsAll,
     ComfyBoxPromptExtraData,
-    NodeID[]  // good outputs
+    ComfyNodeID[]  // good outputs
 ]
 
 export type ComfyAPIPromptResponse = {
@@ -76,9 +76,9 @@ type ComfyAPIEvents = {
     progress: (progress: Progress) => void,
     reconnecting: () => void,
     reconnected: () => void,
-    executing: (promptID: PromptID | null, runningNodeID: NodeID | null) => void,
-    executed: (promptID: PromptID, nodeID: NodeID, output: SerializedPromptOutput) => void,
-    execution_cached: (promptID: PromptID, nodes: NodeID[]) => void,
+    executing: (promptID: PromptID | null, runningNodeID: ComfyNodeID | null) => void,
+    executed: (promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutputs) => void,
+    execution_cached: (promptID: PromptID, nodes: ComfyNodeID[]) => void,
     execution_error: (promptID: PromptID, message: string) => void,
 }
 

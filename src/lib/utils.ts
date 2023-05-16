@@ -6,8 +6,9 @@ import { get } from "svelte/store"
 import layoutState from "$lib/stores/layoutState"
 import type { SvelteComponentDev } from "svelte/internal";
 import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, GraphInput } from "@litegraph-ts/core";
-import type { FileNameOrGalleryData, ComfyExecutionResult, ComfyImageLocation } from "./nodes/ComfyWidgetNodes";
+import type { ComfyExecutionResult, ComfyImageLocation } from "./nodes/ComfyWidgetNodes";
 import type { FileData as GradioFileData } from "@gradio/upload";
+import type { ComfyNodeID } from "./api";
 
 export function clamp(n: number, min: number, max: number): number {
     return Math.min(Math.max(n, min), max)
@@ -121,7 +122,7 @@ export function graphToGraphVis(graph: LGraph): string {
                         subgraphs[node.graph._subgraph_node.id][1].push(linkText)
                         subgraphNodes[node.graph._subgraph_node.id] = node.graph._subgraph_node
                     }
-                    else if (!node.is(Subgraph) && !node.graph.getNodeById(link.target_id)?.is(Subgraph)) {
+                    else {
                         links.push(linkText)
                     }
                 }
@@ -130,38 +131,22 @@ export function graphToGraphVis(graph: LGraph): string {
     }
 
     let out = "digraph {\n"
-    out += "    node [shape=box];\n"
+    out += '    fontname="Helvetica,Arial,sans-serif"\n'
+    out += '    node [fontname="Helvetica,Arial,sans-serif"]\n'
+    out += '    edge [fontname="Helvetica,Arial,sans-serif"]\n'
+    out += '    node [shape=box style=filled fillcolor="#DDDDDD"]\n'
 
     for (const [subgraph, links] of Object.values(subgraphs)) {
         // Subgraph name has to be prefixed with "cluster" to show up as a cluster...
         out += `    subgraph cluster_subgraph_${convId(subgraph.id)} {\n`
-        out += `        label="${convId(subgraph.id)}: ${subgraph.title}";\n`;
+        out += `        label="${convId(subgraph.id)}_${subgraph.title}";\n`;
         out += "        color=red;\n";
         // out += "        style=grey;\n";
-        out += "        node [style=filled,fillcolor=white];\n";
         out += "    " + links.join("    ")
         out += "    }\n"
     }
 
     out += links.join("")
-
-    for (const subgraphNode of Object.values(subgraphNodes)) {
-        for (const [index, input] of enumerate(subgraphNode.iterateInputInfo())) {
-            const link = subgraphNode.getInputLink(index);
-            if (link) {
-                const inputNode = subgraphNode.getInputNode(link.origin_slot);
-                const innerInput = subgraphNode.getInnerGraphInputByIndex(index);
-                out += `    "${convId(link.origin_id)}_${inputNode.title}" -> "${convId(innerInput.id)}_${innerInput.title}";\n`
-            }
-        }
-        for (const [index, output] of enumerate(subgraphNode.iterateOutputInfo())) {
-            for (const link of subgraphNode.getOutputLinks(index)) {
-                const outputNode = subgraphNode.graph.getNodeById(link.target_id)
-                const innerOutput = subgraphNode.getInnerGraphOutputByIndex(index);
-                out += `    "${convId(innerOutput.id)}_${innerOutput.title}" -> "${convId(link.origin_id)}_${outputNode.title}";\n`
-            }
-        }
-    }
 
     out += "}"
     return out
@@ -186,17 +171,21 @@ export function promptToGraphVis(prompt: SerializedPrompt): string {
     for (const pair of Object.entries(prompt.output)) {
         const [id, o] = pair;
         const outNode = prompt.workflow.nodes.find(n => n.id == id)
-        for (const pair2 of Object.entries(o.inputs)) {
-            const [inpName, i] = pair2;
+        if (outNode) {
+            for (const pair2 of Object.entries(o.inputs)) {
+                const [inpName, i] = pair2;
 
-            if (Array.isArray(i) && i.length === 2 && typeof i[0] === "string" && typeof i[1] === "number") {
-                // Link
-                const inpNode = prompt.workflow.nodes.find(n => n.id == i[0])
-                out += `"${inpNode.title}" -> "${outNode.title}"\n`
-            }
-            else {
-                // Value
-                out += `"${id}-${inpName}-${i}" -> "${outNode.title}"\n`
+                if (Array.isArray(i) && i.length === 2 && typeof i[0] === "string" && typeof i[1] === "number") {
+                    // Link
+                    const inpNode = prompt.workflow.nodes.find(n => n.id == i[0])
+                    if (inpNode) {
+                        out += `"${inpNode.title}" -> "${outNode.title}"\n`
+                    }
+                }
+                else {
+                    // Value
+                    out += `"${id}-${inpName}-${i}" -> "${outNode.title}"\n`
+                }
             }
         }
     }
@@ -205,12 +194,13 @@ export function promptToGraphVis(prompt: SerializedPrompt): string {
     return out
 }
 
-export function getNodeInfo(nodeId: NodeID): string {
+export function getNodeInfo(nodeId: ComfyNodeID): string {
     let app = (window as any).app;
     if (!app || !app.lGraph)
         return String(nodeId);
 
-    const title = app.lGraph.getNodeById(nodeId)?.title || String(nodeId);
+    // TODO subgraph support
+    const title = app.lGraph.getNodeByIdRecursive(nodeId)?.title || String(nodeId);
     return title + " (" + nodeId + ")"
 }
 

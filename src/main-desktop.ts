@@ -1,7 +1,7 @@
-import { LiteGraph } from '@litegraph-ts/core';
+import { configureLitegraph } from '$lib/init';
 import App from './App.svelte';
 
-LiteGraph.use_uuids = true;
+configureLitegraph()
 
 const app = new App({
     target: document.getElementById('app'),
