@@ -1,4 +1,4 @@
-import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot, type NodeID } from "@litegraph-ts/core";
+import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot, type NodeID, type NodeTypeSpec, type NodeTypeOpts } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
 import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyPromptRequest, type ComfyNodeID, type PromptID } from "$lib/api"
 import { getPngMetadata, importA1111 } from "$lib/pnginfo";
@@ -34,12 +34,9 @@ import configState from "$lib/stores/configState";
 import { blankGraph } from "$lib/defaultGraph";
 import type { ComfyExecutionResult } from "$lib/nodes/ComfyWidgetNodes";
 import ComfyPromptSerializer from "./ComfyPromptSerializer";
+import { iterateNodeDefInputs, type ComfyNodeDef, isBackendNodeDefInputType, iterateNodeDefOutputs } from "$lib/ComfyNodeDef";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
-
-LiteGraph.catch_exceptions = false;
-LiteGraph.CANVAS_GRID_SIZE = 32;
-LiteGraph.default_subgraph_lgraph_factory = () => new ComfyGraph();
 
 if (typeof window !== "undefined") {
     // Load default visibility
@@ -130,8 +127,6 @@ export default class ComfyApp {
         this.lCanvas.allow_dragnodes = uiUnlocked;
         this.lCanvas.allow_interaction = uiUnlocked;
 
-        (window as any).LiteGraph = LiteGraph;
-
         // await this.#invokeExtensionsAsync("init");
         await this.registerNodes();
 
@@ -205,15 +200,11 @@ export default class ComfyApp {
     static widget_type_overrides: Record<string, typeof SvelteComponentDev> = {}
 
     private async registerNodes() {
-        const app = this;
-
         // Load node definitions from the backend
         const defs = await this.api.getNodeDefs();
 
         // Register a node for each definition
-        for (const nodeId in defs) {
-            const nodeData = defs[nodeId];
-
+        for (const [nodeId, nodeDef] of Object.entries(defs)) {
             const typeOverride = ComfyApp.node_type_overrides[nodeId]
             if (typeOverride)
                 console.debug("Attaching custom type to received node:", nodeId, typeOverride)
@@ -221,19 +212,42 @@ export default class ComfyApp {
 
             const ctor = class extends baseClass {
                 constructor(title?: string) {
-                    super(title, nodeId, nodeData);
+                    super(title, nodeId, nodeDef);
                 }
             }
 
             const node: LGraphNodeConstructor = {
                 class: ctor,
-                title: nodeData.display_name || nodeData.name,
+                title: nodeDef.display_name || nodeDef.name,
                 type: nodeId,
                 desc: `ComfyNode: ${nodeId}`
             }
 
             LiteGraph.registerNodeType(node);
-            node.category = nodeData.category;
+            node.category = nodeDef.category;
+
+            ComfyApp.registerDefaultSlotHandlers(nodeId, nodeDef)
+        }
+    }
+
+    static registerDefaultSlotHandlers(nodeId: string, nodeDef: ComfyNodeDef) {
+        const nodeTypeSpec: NodeTypeOpts = {
+            node: nodeId,
+            title: nodeDef.display_name || nodeDef.name,
+            properties: null,
+            inputs: null,
+            outputs: null
+        }
+
+        for (const [inputName, [inputType, _inputOpts]] of iterateNodeDefInputs(nodeDef)) {
+            if (isBackendNodeDefInputType(inputName, inputType)) {
+                LiteGraph.slot_types_default_out[inputType] ||= []
+                LiteGraph.slot_types_default_out[inputType].push(nodeTypeSpec)
+            }
+        }
+        for (const output of iterateNodeDefOutputs(nodeDef)) {
+            LiteGraph.slot_types_default_in[output.type] ||= []
+            LiteGraph.slot_types_default_in[output.type].push(nodeTypeSpec)
         }
     }
 

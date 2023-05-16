@@ -4,6 +4,7 @@ import EventEmitter from "events";
 import type { ComfyExecutionResult, ComfyImageLocation } from "./nodes/ComfyWidgetNodes";
 import type { SerializedLGraph, UUID } from "@litegraph-ts/core";
 import type { SerializedLayoutState } from "./stores/layoutState";
+import type { ComfyNodeDef } from "./ComfyNodeDef";
 
 export type ComfyPromptRequest = {
     client_id?: string,
@@ -226,7 +227,7 @@ export default class ComfyAPI {
      * Loads node object definitions for the graph
      * @returns The node definitions
      */
-    async getNodeDefs(): Promise<any> {
+    async getNodeDefs(): Promise<Record<ComfyNodeID, ComfyNodeDef>> {
         return fetch(this.getBackendUrl() + "/object_info", { cache: "no-store" })
             .then(resp => resp.json())
     }
