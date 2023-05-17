@@ -7,7 +7,6 @@ import layoutState, { type WidgetLayout } from "$lib/stores/layoutState"
 import selectionState from "$lib/stores/selectionState"
 import type { SvelteComponentDev } from "svelte/internal";
 import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, GraphInput } from "@litegraph-ts/core";
-import type { ComfyExecutionResult, ComfyImageLocation } from "./nodes/ComfyWidgetNodes";
 import type { FileData as GradioFileData } from "@gradio/upload";
 import type { ComfyNodeID } from "./api";
 
@@ -330,6 +329,24 @@ export async function uploadImageToComfyUI(blob: Blob, filename: string, type: C
                 type: resp.type
             }
         });
+}
+
+/** Raw output as received from ComfyUI's backend */
+export interface ComfyExecutionResult {
+    // Technically this response can contain arbitrary data, but "images" is the
+    // most frequently used as it's output by LoadImage and PreviewImage, the
+    // only two output nodes in base ComfyUI.
+    images: ComfyImageLocation[] | null,
+}
+
+/** Raw output entry as received from ComfyUI's backend */
+export type ComfyImageLocation = {
+    /* Filename with extension in the subfolder. */
+    filename: string,
+    /* Subfolder in the containing folder. */
+    subfolder: string,
+    /* Base ComfyUI folder where the image is located. */
+    type: ComfyUploadImageType
 }
 
 /*

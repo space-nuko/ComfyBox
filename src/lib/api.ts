@@ -1,7 +1,7 @@
 import type { Progress, SerializedPrompt, SerializedPromptInputs, SerializedPromptInputsAll, SerializedPromptOutputs } from "./components/ComfyApp";
 import type TypedEmitter from "typed-emitter";
 import EventEmitter from "events";
-import type { ComfyExecutionResult, ComfyImageLocation } from "./nodes/ComfyWidgetNodes";
+import type { ComfyImageLocation } from "$lib/utils";
 import type { SerializedLGraph, UUID } from "@litegraph-ts/core";
 import type { SerializedLayoutState } from "./stores/layoutState";
 import type { ComfyNodeDef } from "./ComfyNodeDef";

@@ -23,13 +23,21 @@
  export let dragDisabled: boolean = false;
  export let isMobile: boolean = false;
 
- let attrsChanged: Writable<boolean> | null = null;
+ let attrsChanged: Writable<number> | null = null;
  let children: IDragItem[] | null = null;
  const flipDurationMs = 100;
 
  $: if (container) {
-     children = $layoutState.allItems[container.id].children;
-     attrsChanged = container.attrsChanged
+     const entry = $layoutState.allItems[container.id]
+     if (entry) {
+         children = $layoutState.allItems[container.id].children;
+         attrsChanged = container.attrsChanged
+     }
+     else {
+         container = null;
+         children = null;
+         attrsChanged = null;
+     }
  }
  else {
      children = null;

@@ -1,9 +1,7 @@
-import type { IWidget, LGraphNode } from "@litegraph-js/core";
-import ComfyValueControlWidget from "./widgets/ComfyValueControlWidget";
-import type { ComfyInputConfig } from "./IComfyInputSlot";
+import { LGraphNode, LiteGraph } from "@litegraph-ts/core";
 import type IComfyInputSlot from "./IComfyInputSlot";
-import { BuiltInSlotShape, LiteGraph } from "@litegraph-ts/core";
-import { ComfyComboNode, ComfySliderNode, ComfyTextNode } from "./nodes";
+import type { ComfyInputConfig } from "./IComfyInputSlot";
+import { ComfyComboNode, ComfyNumberNode, ComfyTextNode } from "./nodes/widgets";
 
 type WidgetFactory = (node: LGraphNode, inputName: string, inputData: any) => IComfyInputSlot;
 
@@ -37,12 +35,12 @@ function addComfyInput(node: LGraphNode, inputName: string, extraInfo: Partial<I
 
 const FLOAT: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any): IComfyInputSlot => {
     const config = getNumberDefaults(inputData, 0.5);
-    return addComfyInput(node, inputName, { type: "number", config, defaultWidgetNode: ComfySliderNode })
+    return addComfyInput(node, inputName, { type: "number", config, defaultWidgetNode: ComfyNumberNode })
 }
 
 const INT: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any): IComfyInputSlot => {
     const config = getNumberDefaults(inputData, 1);
-    return addComfyInput(node, inputName, { type: "number", config, defaultWidgetNode: ComfySliderNode })
+    return addComfyInput(node, inputName, { type: "number", config, defaultWidgetNode: ComfyNumberNode })
 };
 
 const STRING: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any): IComfyInputSlot => {

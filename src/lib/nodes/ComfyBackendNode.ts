@@ -1,11 +1,12 @@
 import LGraphCanvas from "@litegraph-ts/core/src/LGraphCanvas";
 import ComfyGraphNode from "./ComfyGraphNode";
 import ComfyWidgets from "$lib/widgets"
-import type { ComfyWidgetNode, ComfyExecutionResult } from "./ComfyWidgetNodes";
+import type { ComfyWidgetNode } from "$lib/nodes/widgets";
 import { BuiltInSlotShape, BuiltInSlotType, type SerializedLGraphNode } from "@litegraph-ts/core";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import type { ComfyInputConfig } from "$lib/IComfyInputSlot";
 import { iterateNodeDefOutputs, type ComfyNodeDef, iterateNodeDefInputs } from "$lib/ComfyNodeDef";
+import type { ComfyExecutionResult } from "$lib/utils";
 
 /*
  * Base class for any node with configuration sent by the backend.

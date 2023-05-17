@@ -2,7 +2,7 @@ import { BuiltInSlotType, LiteGraph, type SlotLayout } from "@litegraph-ts/core"
 import ComfyGraphNode, { type ComfyGraphNodeProperties, type DefaultWidgetLayout } from "./ComfyGraphNode";
 import { clamp } from "$lib/utils";
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
-import { ComfyComboNode } from "./ComfyWidgetNodes";
+import { ComfyComboNode } from "./widgets";
 
 export interface ComfyValueControlProperties extends ComfyGraphNodeProperties {
     value: any,

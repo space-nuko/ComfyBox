@@ -1,9 +1,9 @@
 import type { ComfyInputConfig } from "$lib/IComfyInputSlot";
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
-import type ComfyWidget from "$lib/components/widgets/ComfyWidget";
 import { LGraph, LGraphNode, LLink, LiteGraph, NodeMode, type INodeInputSlot, type SerializedLGraphNode, type Vector2, type INodeOutputSlot, LConnectionKind, type SlotType, LGraphCanvas, getStaticPropertyOnInstance, type PropertyLayout, type SlotLayout } from "@litegraph-ts/core";
 import type { SvelteComponentDev } from "svelte/internal";
-import type { ComfyWidgetNode, ComfyExecutionResult, ComfyImageLocation } from "./ComfyWidgetNodes";
+import type { ComfyWidgetNode } from "$lib/nodes/widgets";
+import type { ComfyExecutionResult, ComfyImageLocation } from "$lib/utils"
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import uiState from "$lib/stores/uiState";
 import { get } from "svelte/store";

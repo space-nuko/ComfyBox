@@ -5,10 +5,10 @@ import queueState from "$lib/stores/queueState";
 import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWidget, type SerializedLGraphNode, type SlotLayout, type PropertyLayout } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
-import type { ComfyWidgetNode, ComfyExecutionResult, ComfyImageLocation } from "./ComfyWidgetNodes";
+import type { ComfyWidgetNode } from "$lib/nodes/widgets";
 import type { NotifyOptions } from "$lib/notify";
 import type { FileData as GradioFileData } from "@gradio/upload";
-import { convertComfyOutputToGradio, type ComfyUploadImageAPIResponse } from "$lib/utils";
+import { type ComfyExecutionResult, type ComfyImageLocation, convertComfyOutputToGradio, type ComfyUploadImageAPIResponse } from "$lib/utils";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
     static slotLayout: SlotLayout = {

@@ -7,8 +7,7 @@
  import { startDrag, stopDrag } from "$lib/utils"
  import Container from "./Container.svelte"
  import { type Writable } from "svelte/store"
- import type { ComfyWidgetNode } from "$lib/nodes";
-	import { NodeMode } from "@litegraph-ts/core";
+ import type { ComfyWidgetNode } from "$lib/nodes/widgets";
  import { isHidden } from "$lib/widgets/utils";
 
  export let dragItem: IDragItem | null = null;

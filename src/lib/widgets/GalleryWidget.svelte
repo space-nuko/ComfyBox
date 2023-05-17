@@ -7,11 +7,11 @@
  import type { Styles } from "@gradio/utils";
  import type { WidgetLayout } from "$lib/stores/layoutState";
  import type { Writable } from "svelte/store";
- import type { ComfyGalleryNode } from "$lib/nodes/ComfyWidgetNodes";
  import type { FileData as GradioFileData } from "@gradio/upload";
  import type { SelectData as GradioSelectData } from "@gradio/utils";
  import { clamp, comfyBoxImageToComfyURL, type ComfyBoxImageMetadata } from "$lib/utils";
  import { f7 } from "framework7-svelte";
+ import type { ComfyGalleryNode } from "$lib/nodes/widgets";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;

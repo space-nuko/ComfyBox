@@ -12,11 +12,12 @@ import "@litegraph-ts/nodes-logic"
 import "@litegraph-ts/nodes-math"
 import "@litegraph-ts/nodes-strings"
 import "$lib/nodes/index"
+import "$lib/nodes/widgets/index"
 import * as nodes from "$lib/nodes/index"
+import * as widgets from "$lib/nodes/widgets/index"
 
 import ComfyGraphCanvas, { type SerializedGraphCanvasState } from "$lib/ComfyGraphCanvas";
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
-import * as widgets from "$lib/widgets/index"
 import queueState from "$lib/stores/queueState";
 import { type SvelteComponentDev } from "svelte/internal";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
@@ -32,9 +33,10 @@ import { download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range, wor
 import notify from "$lib/notify";
 import configState from "$lib/stores/configState";
 import { blankGraph } from "$lib/defaultGraph";
-import type { ComfyExecutionResult } from "$lib/nodes/ComfyWidgetNodes";
+import type { ComfyExecutionResult } from "$lib/utils";
 import ComfyPromptSerializer from "./ComfyPromptSerializer";
 import { iterateNodeDefInputs, type ComfyNodeDef, isBackendNodeDefInputType, iterateNodeDefOutputs } from "$lib/ComfyNodeDef";
+import { ComfyComboNode } from "$lib/nodes/widgets";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -77,7 +79,7 @@ export type Progress = {
 }
 
 type BackendComboNode = {
-    comboNode: nodes.ComfyComboNode
+    comboNode: ComfyComboNode,
     inputSlot: IComfyInputSlot,
     backendNode: ComfyBackendNode
 }
@@ -747,7 +749,7 @@ export default class ComfyApp {
                 });
 
             for (const inputIndex of found) {
-                const comboNode = backendNode.getInputNode(inputIndex) as nodes.ComfyComboNode
+                const comboNode = backendNode.getInputNode(inputIndex) as ComfyComboNode
                 const inputSlot = backendNode.inputs[inputIndex] as IComfyInputSlot;
                 const def = defs[backendNode.type];
 
@@ -762,14 +764,14 @@ export default class ComfyApp {
         console.debug("[refreshComboInNodes] found:", backendUpdatedCombos.length, backendUpdatedCombos)
 
         // Mark combo nodes without backend configs as being loaded already.
-        for (const node of this.lGraph.iterateNodesOfClassRecursive(nodes.ComfyComboNode)) {
+        for (const node of this.lGraph.iterateNodesOfClassRecursive(ComfyComboNode)) {
             if (backendUpdatedCombos[node.id] != null) {
                 continue;
             }
 
             // This node isn't connected to a backend node, so it's configured
             // by the frontend instead.
-            const comboNode = node as nodes.ComfyComboNode;
+            const comboNode = node as ComfyComboNode;
             let values = comboNode.properties.values;
 
             // Frontend nodes can declare defaultWidgets which creates a

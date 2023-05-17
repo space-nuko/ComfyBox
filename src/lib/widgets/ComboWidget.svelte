@@ -4,7 +4,7 @@
  import Select from 'svelte-select';
  // import VirtualList from '$lib/components/VirtualList.svelte';
  import VirtualList from 'svelte-tiny-virtual-list';
- import type { ComfyComboNode } from "$lib/nodes/index";
+ import type { ComfyComboNode } from "$lib/nodes/widgets";
  import { type WidgetLayout } from "$lib/stores/layoutState";
  import { get, writable, type Writable } from "svelte/store";
  import { isDisabled } from "./utils"

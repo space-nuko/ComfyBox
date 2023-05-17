@@ -8,7 +8,7 @@ import { get } from "svelte/store";
 import type ComfyGraphNode from "./nodes/ComfyGraphNode";
 import type IComfyInputSlot from "./IComfyInputSlot";
 import type { ComfyBackendNode } from "./nodes/ComfyBackendNode";
-import type { ComfyComboNode, ComfyWidgetNode } from "./nodes";
+import type { ComfyComboNode, ComfyWidgetNode } from "./nodes/widgets";
 
 type ComfyGraphEvents = {
     configured: (graph: LGraph) => void

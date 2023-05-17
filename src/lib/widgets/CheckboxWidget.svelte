@@ -1,11 +1,11 @@
 <script lang="ts">
- import type { ComfyCheckboxNode } from "$lib/nodes/ComfyWidgetNodes";
  import { type WidgetLayout } from "$lib/stores/layoutState";
  import { Block } from "@gradio/atoms";
  import { Checkbox } from "@gradio/form";
  import { get, type Writable, writable } from "svelte/store";
  import { isDisabled } from "./utils"
-	import type { SelectData } from "@gradio/utils";
+ import type { SelectData } from "@gradio/utils";
+ import type { ComfyCheckboxNode } from "$lib/nodes/widgets";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
