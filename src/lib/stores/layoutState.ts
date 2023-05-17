@@ -837,7 +837,6 @@ function removeEntry(state: LayoutState, id: DragItemID) {
 
 function nodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
     const state = get(store)
-    console.error("NODEADDED", node.type, (node as any).svelteComponentType)
     if (state.isConfiguring)
         return;
 

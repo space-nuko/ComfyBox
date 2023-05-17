@@ -40,8 +40,14 @@ export default class ComfyGraph extends LGraph {
         this.eventBus.emit("afterExecute");
     }
 
+    /*
+     * NOTE: This function will also be called by child subgraphs on their
+     * parent graphs. So we have to be sure the node that receives the callback
+     * is a root graph (this._is_subgraph is false). If a subgraph calls this
+     * then options.subgraphsh will have the list of subgraphs down the chain.
+     */
     override onNodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
-        // Don't add detached subgraphs
+        // Don't add nodes in subgraphs
         if (node.getRootGraph() == null || this._is_subgraph)
             return;
 
