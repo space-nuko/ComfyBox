@@ -1,6 +1,6 @@
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import { BuiltInSlotType, LiteGraph, type INodeInputSlot, type LGraphNode, type SerializedLGraphNode, type SlotLayout } from "@litegraph-ts/core";
-import { writable, type Writable } from "svelte/store";
+import { get, writable, type Writable } from "svelte/store";
 
 import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import type { ComfyWidgetProperties } from "./ComfyWidgetNode";
@@ -39,11 +39,13 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
     // True if at least one combo box refresh has taken place
     // Wait until the initial graph load for combo to be valid.
     firstLoad: Writable<boolean>;
+    lightUp: Writable<boolean>;
     valuesForCombo: Writable<any[] | null>; // Changed when the combo box has values.
 
     constructor(name?: string) {
         super(name, "A")
         this.firstLoad = writable(false)
+        this.lightUp = writable(true)
         this.valuesForCombo = writable(null)
     }
 
@@ -53,11 +55,14 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
         }
     }
 
-    formatValues(values: string[]) {
+    formatValues(values: string[], lightUp: boolean = false) {
         if (values == null)
             return;
 
+        const changed = this.properties.values != values;
         this.properties.values = values;
+        if (lightUp && get(this.firstLoad) && changed)
+            this.lightUp.set(true)
 
         let formatter: any;
         if (this.properties.convertValueToLabelCode)

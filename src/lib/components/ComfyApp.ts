@@ -807,7 +807,7 @@ export default class ComfyApp {
             console.debug("[ComfyApp] Reconfiguring combo widget", backendNode.type, "=>", comboNode.type, rawValues.length)
             comboNode.doAutoConfig(comfyInput, { includeProperties: new Set(["values"]), setWidgetTitle: false })
 
-            comboNode.formatValues(rawValues as string[])
+            comboNode.formatValues(rawValues as string[], true)
             if (!rawValues?.includes(get(comboNode.value))) {
                 comboNode.setValue(rawValues[0])
             }

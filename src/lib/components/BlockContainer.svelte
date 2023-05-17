@@ -128,7 +128,7 @@
      &.empty {
          border-width: 3px;
          border-color: var(--color-grey-400);
-         border-radius: var(--block-radius);
+         border-radius: 0;
          background: var(--color-grey-300);
          min-height: 100px;
          border-style: dashed;

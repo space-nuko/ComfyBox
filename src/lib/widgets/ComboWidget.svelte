@@ -13,6 +13,7 @@
  let node: ComfyComboNode | null = null;
  let nodeValue: Writable<string> | null = null;
  let propsChanged: Writable<number> | null = null;
+ let lightUp: Writable<boolean> = writable(false);
  let valuesForCombo: Writable<any[]> | null = null;
  let lastConfigured: any = null;
  let option: any = null;
@@ -40,6 +41,7 @@
          node = widget.node as ComfyComboNode
          nodeValue = node.value;
          propsChanged = node.propsChanged;
+         lightUp = node.lightUp;
          valuesForCombo = node.valuesForCombo;
          lastConfigured = $valuesForCombo
      }
@@ -52,16 +54,8 @@
      activeIndex = values.findIndex(v => v.value === value);
  }
 
- $: $valuesForCombo != lastConfigured && flashOnRefreshed();
- let lightUp = false;
-
- function flashOnRefreshed() {
-     lastConfigured = $valuesForCombo
-     if (lastConfigured != null) {
-         lightUp = true;
-         setTimeout(() => (lightUp = false), 1000);
-     }
- }
+ $: if ($lightUp)
+     setTimeout(() => ($lightUp = false), 1000);
 
  function getLinkValue() {
      if (!node)
@@ -137,7 +131,7 @@
 
 </script>
 
-<div class="wrapper comfy-combo" class:mobile={isMobile} class:updated={lightUp}>
+<div class="wrapper comfy-combo" class:mobile={isMobile} class:updated={$lightUp}>
     {#key $valuesForCombo}
         {#if node !== null && nodeValue !== null}
             {#if $valuesForCombo == null}
@@ -172,10 +166,11 @@
                         <div class="comfy-select-list" slot="list" let:filteredItems>
                             {#if filteredItems.length > 0}
                                 {@const itemSize = isMobile ? 50 : 25}
+                                {@const itemsToShow = isMobile ? 10 : 30}
                                 <VirtualList
                                     items={filteredItems}
                                     width="100%"
-                                    height={Math.min(filteredItems.length, 10) * itemSize}
+                                    height={Math.min(filteredItems.length, itemsToShow) * itemSize}
                                     itemCount={filteredItems.length}
                                     {itemSize}
                                     overscanCount={5}
@@ -252,7 +247,7 @@
      --chevron-color: var(--body-text-color);
      --border: 1px solid var(--input-border-color);
      --border-hover: 1px solid var(--input-border-color-hover);
-     --border-focused: 1px solid var(--input-border-color-focus);
+     --border-focused: 1px solid var(--neutral-400);
      --border-radius-focused: 0px;
      --border-radius: 0px;
      --list-background: var(--comfy-dropdown-list-background);

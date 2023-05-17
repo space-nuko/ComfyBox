@@ -14,6 +14,8 @@ body {
 :root {
     --color-blue-500: #3985f5;
 
+    --input-border-color-focus: var(--neutral-400);
+
     --comfy-accent-soft: var(--neutral-300);
     --comfy-widget-selected-background-fill: var(--color-yellow-100);
     --comfy-widget-hovered-background-fill: var(--secondary-200);
@@ -40,6 +42,8 @@ body {
 
 .dark {
     color-scheme: dark;
+
+    --input-border-color-focus: var(--neutral-500);
 
     --comfy-accent-soft: var(--neutral-600);
     --comfy-widget-selected-background-fill: var(--primary-500);
@@ -137,17 +141,6 @@ select {
     //     }
     // }
 }
-
-// button {
-//     filter: none;
-//     &.primary:active {
-//         filter: brightness(80%)
-//     }
-//     &.secondary:active {
-//         filter: brightness(80%)
-//     }
-// }
-
 
 button {
     &.primary:active {
