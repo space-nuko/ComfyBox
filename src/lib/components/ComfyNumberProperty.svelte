@@ -45,6 +45,11 @@
          }
      }
  }
+ input {
+     color: var(--body-text-color);
+     background: var(--input-background-fill);
+     border: var(--input-border-width) solid var(--input-border-color)
+ }
  input[disabled] {
      cursor: not-allowed;
  }

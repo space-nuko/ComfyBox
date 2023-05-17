@@ -14,6 +14,7 @@ type QueueStateOps = {
     queueUpdated: (resp: ComfyAPIQueueResponse) => void,
     historyUpdated: (resp: ComfyAPIHistoryResponse) => void,
     statusUpdated: (status: ComfyAPIStatusResponse | null) => void,
+    executionStart: (promptID: PromptID) => void,
     executingUpdated: (promptID: PromptID | null, runningNodeID: ComfyNodeID | null) => void,
     executionCached: (promptID: PromptID, nodes: ComfyNodeID[]) => void,
     executionError: (promptID: PromptID, message: string) => void,
@@ -235,23 +236,51 @@ function executionError(promptID: PromptID, message: string) {
     })
 }
 
+function createNewQueueEntry(promptID: PromptID, number: number = -1, prompt: SerializedPromptInputsAll = {}, extraData: any = {}): QueueEntry {
+    return {
+        number,
+        queuedAt: new Date(), // Now
+        finishedAt: null,
+        promptID,
+        prompt,
+        extraData,
+        goodOutputs: [],
+        outputs: {},
+        nodesRan: new Set(),
+        cachedNodes: new Set()
+    }
+}
+
+function executionStart(promptID: PromptID) {
+    console.debug("[queueState] executionStart", promptID)
+    store.update(s => {
+        const [index, entry, queue] = findEntryInPending(promptID);
+        if (entry == null) {
+            const entry = createNewQueueEntry(promptID);
+            s.queuePending.update(qp => { qp.push(entry); return qp })
+            console.debug("[queueState] ADD PROMPT", promptID)
+        }
+        s.isInterrupting = false;
+        return s
+    })
+}
+
 function afterQueued(promptID: PromptID, number: number, prompt: SerializedPromptInputsAll, extraData: any) {
     console.debug("[queueState] afterQueued", promptID, Object.keys(prompt))
     store.update(s => {
-        const entry: QueueEntry = {
-            number,
-            queuedAt: new Date(), // Now
-            finishedAt: null,
-            promptID,
-            prompt,
-            extraData,
-            goodOutputs: [],
-            outputs: {},
-            nodesRan: new Set(),
-            cachedNodes: new Set()
+        const [index, entry, queue] = findEntryInPending(promptID);
+        if (entry == null) {
+            const entry = createNewQueueEntry(promptID, number, prompt, extraData);
+            s.queuePending.update(qp => { qp.push(entry); return qp })
+            console.debug("[queueState] ADD PROMPT", promptID)
         }
-        s.queuePending.update(qp => { qp.push(entry); return qp })
-        console.debug("[queueState] ADD PROMPT", promptID)
+        else {
+            entry.number = number;
+            entry.prompt = prompt
+            entry.extraData = extraData
+            queue.set(get(queue))
+            console.warn("[queueState] UPDATE PROMPT", promptID)
+        }
         s.isInterrupting = false;
         return s
     })
@@ -279,6 +308,7 @@ const queueStateStore: WritableQueueStateStore =
     historyUpdated,
     statusUpdated,
     progressUpdated,
+    executionStart,
     executingUpdated,
     executionCached,
     executionError,

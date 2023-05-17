@@ -19,14 +19,15 @@
  $: refreshPropsPanel = $layoutState.refreshPropsPanel;
 
  $: if ($selectionState.currentSelection.length > 0) {
+     node = null;
      const targetId = $selectionState.currentSelection.slice(-1)[0]
-     target = $layoutState.allItems[targetId].dragItem
-     attrsChanged = target.attrsChanged;
-     if (target.type === "widget") {
-         node = (target as WidgetLayout).node
-     }
-     else {
-         node = null;
+     const entry = $layoutState.allItems[targetId]
+     if (entry != null) {
+         target = entry.dragItem
+         attrsChanged = target.attrsChanged;
+         if (target.type === "widget") {
+             node = (target as WidgetLayout).node
+         }
      }
  }
  else if ($selectionState.currentSelectionNodes.length > 0) {

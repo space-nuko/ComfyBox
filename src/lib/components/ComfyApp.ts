@@ -351,6 +351,10 @@ export default class ComfyApp {
             queueState.onExecuted(promptID, nodeID, output)
         });
 
+        this.api.addEventListener("execution_start", (promptID: PromptID) => {
+            queueState.executionStart(promptID)
+        });
+
         this.api.addEventListener("execution_cached", (promptID: PromptID, nodes: ComfyNodeID[]) => {
             queueState.executionCached(promptID, nodes)
         });
@@ -614,8 +618,8 @@ export default class ComfyApp {
                         thumbnails
                     }
 
-                    let error = null;
-                    let promptID = null;
+                    let error: string | null = null;
+                    let promptID: PromptID | null = null;
 
                     const request: ComfyPromptRequest = {
                         number: num,
@@ -625,20 +629,18 @@ export default class ComfyApp {
 
                     try {
                         const response = await this.api.queuePrompt(request);
-
-                        // BUG: This can cause race conditions updating frontend state
-                        // since we don't have a prompt ID until the backend
-                        // returns!
-                        promptID = response.promptID;
-                        queueState.afterQueued(promptID, num, p.output, extraData)
-
-                        error = response.error;
+                        if (response.error != null) {
+                            error = response.error;
+                        }
+                        else {
+                            queueState.afterQueued(response.promptID, num, p.output, extraData)
+                        }
                     } catch (err) {
-                        error = { error: err }
+                        error = err?.toString();
                     }
 
                     if (error != null) {
-                        const mes = error.error
+                        const mes: string = error;
                         notify(`Error queuing prompt:\n${mes}`, { type: "error" })
                         console.error(graphToGraphVis(this.lGraph))
                         console.error(promptToGraphVis(p))
@@ -795,7 +797,7 @@ export default class ComfyApp {
             console.debug("[ComfyApp] Reconfiguring combo widget", backendNode.type, "=>", comboNode.type, rawValues.length)
             comboNode.doAutoConfig(inputSlot, { includeProperties: new Set(["values"]), setWidgetTitle: false })
 
-            comboNode.formatValues(rawValues)
+            comboNode.formatValues(rawValues as string[])
             if (!rawValues?.includes(get(comboNode.value))) {
                 comboNode.setValue(rawValues[0])
             }

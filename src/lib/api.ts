@@ -79,6 +79,7 @@ type ComfyAPIEvents = {
     reconnected: () => void,
     executing: (promptID: PromptID | null, runningNodeID: ComfyNodeID | null) => void,
     executed: (promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutputs) => void,
+    execution_start: (promptID: PromptID) => void,
     execution_cached: (promptID: PromptID, nodes: ComfyNodeID[]) => void,
     execution_error: (promptID: PromptID, message: string) => void,
 }
@@ -182,6 +183,9 @@ export default class ComfyAPI {
                         break;
                     case "executed":
                         this.eventBus.emit("executed", msg.data.prompt_id, msg.data.node, msg.data.output);
+                        break;
+                    case "execution_start":
+                        this.eventBus.emit("execution_start", msg.data.prompt_id);
                         break;
                     case "execution_cached":
                         this.eventBus.emit("execution_cached", msg.data.prompt_id, msg.data.nodes);

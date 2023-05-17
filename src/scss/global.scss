@@ -98,9 +98,14 @@ hr {
     color: var(--panel-border-color);
 }
 
+input, textarea {
+    border-radius: 0 !important;
+}
+
 select {
     color: var(--body-text-color);
-    background: var(--block-background-fill);
+    background: var(--input-background-fill);
+    border: var(--input-border-width) solid var(--input-border-color)
 }
 
 .container {
