@@ -1,4 +1,4 @@
-import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot, type NodeID, type NodeTypeSpec, type NodeTypeOpts } from "@litegraph-ts/core";
+import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot, type NodeID, type NodeTypeSpec, type NodeTypeOpts, type SlotIndex } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
 import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyPromptRequest, type ComfyNodeID, type PromptID } from "$lib/api"
 import { getPngMetadata, importA1111 } from "$lib/pnginfo";
@@ -34,7 +34,7 @@ import notify from "$lib/notify";
 import configState from "$lib/stores/configState";
 import { blankGraph } from "$lib/defaultGraph";
 import type { ComfyExecutionResult } from "$lib/utils";
-import ComfyPromptSerializer from "./ComfyPromptSerializer";
+import ComfyPromptSerializer, { UpstreamNodeLocator, isActiveBackendNode } from "./ComfyPromptSerializer";
 import { iterateNodeDefInputs, type ComfyNodeDef, isBackendNodeDefInputType, iterateNodeDefOutputs } from "$lib/ComfyNodeDef";
 import { ComfyComboNode } from "$lib/nodes/widgets";
 
@@ -80,7 +80,7 @@ export type Progress = {
 
 type BackendComboNode = {
     comboNode: ComfyComboNode,
-    inputSlot: IComfyInputSlot,
+    comfyInput: IComfyInputSlot,
     backendNode: ComfyBackendNode
 }
 
@@ -709,13 +709,13 @@ export default class ComfyApp {
     async refreshComboInNodes(flashUI: boolean = false) {
         const defs = await this.api.getNodeDefs();
 
-        const isComfyComboNode = (node: LGraphNode): boolean => {
+        const isComfyComboNode = (node: LGraphNode): node is ComfyComboNode => {
             return node
                 && node.type === "ui/combo"
                 && "doAutoConfig" in node;
         }
 
-        const isComfyComboInput = (input: INodeInputSlot) => {
+        const isComfyComboInput = (input: INodeInputSlot): input is IComfyInputSlot => {
             return "config" in input
                 && "widgetNodeType" in input
                 && input.widgetNodeType === "ui/combo";
@@ -729,34 +729,42 @@ export default class ComfyApp {
         // Figure out which combo nodes to update. They need to be connected to
         // an input slot on a backend node with a backend config in the input
         // slot connected to.
+        const nodeLocator = new UpstreamNodeLocator(isComfyComboNode)
+
+        const findComfyInputAndAttachedCombo = (node: LGraphNode, i: SlotIndex): [IComfyInputSlot, ComfyComboNode] | null => {
+            const input = node.inputs[i]
+
+            // Does this input autocreate a combo box on creation?
+            const isComfyInput = isComfyComboInput(input)
+            if (!isComfyInput)
+                return null;
+
+            // Find an attached combo node even if it's inside/outside of a
+            // subgraph, linked after several nodes, etc.
+            const [comboNode, _link] = nodeLocator.locateUpstream(node, i, null);
+
+            if (comboNode == null)
+                return null;
+
+            const result: [IComfyInputSlot, ComfyComboNode] = [input, comboNode as ComfyComboNode]
+            return result
+        }
+
         for (const node of this.lGraph.iterateNodesInOrderRecursive()) {
-            if (!(node as any).isBackendNode)
+            if (!isActiveBackendNode(node))
                 continue;
 
-            const backendNode = (node as ComfyBackendNode)
-            const found = range(backendNode.inputs.length)
-                .filter(i => {
-                    const input = backendNode.inputs[i]
-                    const inputNode = backendNode.getInputNode(i)
+            const found = range(node.inputs.length)
+                .map((i) => findComfyInputAndAttachedCombo(node, i))
+                .filter(Boolean);
 
-                    // Does this input autocreate a combo box on creation?
-                    const isComfyInput = isComfyComboInput(input)
-                    const isComfyCombo = isComfyComboNode(inputNode)
+            for (const [comfyInput, comboNode] of found) {
+                const def = defs[node.type];
 
-                    // console.debug("[refreshComboInNodes] CHECK", backendNode.type, input.name, "isComfyCombo", isComfyCombo, "isComfyInput", isComfyInput)
-
-                    return isComfyCombo && isComfyInput
-                });
-
-            for (const inputIndex of found) {
-                const comboNode = backendNode.getInputNode(inputIndex) as ComfyComboNode
-                const inputSlot = backendNode.inputs[inputIndex] as IComfyInputSlot;
-                const def = defs[backendNode.type];
-
-                const hasBackendConfig = def["input"]["required"][inputSlot.name] !== undefined
+                const hasBackendConfig = def["input"]["required"][comfyInput.name] !== undefined
 
                 if (hasBackendConfig) {
-                    backendUpdatedCombos[comboNode.id] = { comboNode, inputSlot, backendNode }
+                    backendUpdatedCombos[comboNode.id] = { comboNode, comfyInput, backendNode: node }
                 }
             }
         }
@@ -792,12 +800,12 @@ export default class ComfyApp {
         await tick();
 
         // Load definitions from the backend.
-        for (const { comboNode, inputSlot, backendNode } of Object.values(backendUpdatedCombos)) {
+        for (const { comboNode, comfyInput, backendNode } of Object.values(backendUpdatedCombos)) {
             const def = defs[backendNode.type];
-            const rawValues = def["input"]["required"][inputSlot.name][0];
+            const rawValues = def["input"]["required"][comfyInput.name][0];
 
             console.debug("[ComfyApp] Reconfiguring combo widget", backendNode.type, "=>", comboNode.type, rawValues.length)
-            comboNode.doAutoConfig(inputSlot, { includeProperties: new Set(["values"]), setWidgetTitle: false })
+            comboNode.doAutoConfig(comfyInput, { includeProperties: new Set(["values"]), setWidgetTitle: false })
 
             comboNode.formatValues(rawValues as string[])
             if (!rawValues?.includes(get(comboNode.value))) {

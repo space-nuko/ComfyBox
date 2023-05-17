@@ -1,7 +1,7 @@
 import type ComfyGraph from "$lib/ComfyGraph";
 import type { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
-import { GraphInput, GraphOutput, LGraph, LGraphNode, LLink, NodeMode, Subgraph } from "@litegraph-ts/core";
+import { GraphInput, GraphOutput, LGraph, LGraphNode, LLink, NodeMode, Subgraph, type SlotIndex } from "@litegraph-ts/core";
 import type { SerializedPrompt, SerializedPromptInput, SerializedPromptInputs, SerializedPromptInputsAll } from "./ComfyApp";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 
@@ -9,8 +9,8 @@ function hasTag(node: LGraphNode, tag: string): boolean {
     return "tags" in node.properties && node.properties.tags.indexOf(tag) !== -1
 }
 
-function isActiveBackendNode(node: ComfyGraphNode, tag: string | null): node is ComfyBackendNode {
-    if (!node.isBackendNode)
+export function isActiveNode(node: LGraphNode, tag: string | null = null): boolean {
+    if (!node)
         return false;
 
     if (tag && !hasTag(node, tag)) {
@@ -18,7 +18,7 @@ function isActiveBackendNode(node: ComfyGraphNode, tag: string | null): node is 
         return false;
     }
 
-    if (node.mode === NodeMode.NEVER) {
+    if (node.mode !== NodeMode.ALWAYS) {
         // Don't serialize muted nodes
         return false;
     }
@@ -26,48 +26,122 @@ function isActiveBackendNode(node: ComfyGraphNode, tag: string | null): node is 
     return true;
 }
 
-function followSubgraph(subgraph: Subgraph, link: LLink): [LGraph | null, LLink | null] {
-    if (link.origin_id != subgraph.id)
-        throw new Error("A!")
+export function isActiveBackendNode(node: LGraphNode, tag: string | null = null): node is ComfyBackendNode {
+    if (!(node as any).isBackendNode)
+        return false;
 
-    const innerGraphOutput = subgraph.getInnerGraphOutputByIndex(link.origin_slot)
-    if (innerGraphOutput == null)
-        throw new Error("No inner graph input!")
-
-    const nextLink = innerGraphOutput.getInputLink(0)
-    return [innerGraphOutput.graph, nextLink];
+    return isActiveNode(node, tag);
 }
 
-function followGraphInput(graphInput: GraphInput, link: LLink): [LGraph | null, LLink | null] {
-    if (link.origin_id != graphInput.id)
-        throw new Error("A!")
-
-    const outerSubgraph = graphInput.getParentSubgraph();
-    if (outerSubgraph == null)
-        throw new Error("No outer subgraph!")
-
-    const outerInputIndex = outerSubgraph.inputs.findIndex(i => i.name === graphInput.nameInGraph)
-    if (outerInputIndex == null)
-        throw new Error("No outer input slot!")
-
-    const nextLink = outerSubgraph.getInputLink(outerInputIndex)
-    return [outerSubgraph.graph, nextLink];
-}
-
-function getUpstreamLink(parent: LGraphNode, currentLink: LLink): [LGraph | null, LLink | null] {
-    if (parent.is(Subgraph)) {
-        console.warn("FollowSubgraph")
-        return followSubgraph(parent, currentLink);
+export class UpstreamNodeLocator {
+    constructor(private isTheTargetNode: (node: LGraphNode) => boolean) {
     }
-    else if (parent.is(GraphInput)) {
-        console.warn("FollowGraphInput")
-        return followGraphInput(parent, currentLink);
+
+    private followSubgraph(subgraph: Subgraph, link: LLink): [LGraph | null, LLink | null] {
+        if (link.origin_id != subgraph.id)
+            throw new Error("Invalid link and graph output!")
+
+        const innerGraphOutput = subgraph.getInnerGraphOutputByIndex(link.origin_slot)
+        if (innerGraphOutput == null)
+            throw new Error("No inner graph input!")
+
+        const nextLink = innerGraphOutput.getInputLink(0)
+        return [innerGraphOutput.graph, nextLink];
     }
-    else if ("getUpstreamLink" in parent) {
-        return [parent.graph, (parent as ComfyGraphNode).getUpstreamLink()];
+
+    private followGraphInput(graphInput: GraphInput, link: LLink): [LGraph | null, LLink | null] {
+        if (link.origin_id != graphInput.id)
+            throw new Error("Invalid link and graph input!")
+
+        const outerSubgraph = graphInput.getParentSubgraph();
+        if (outerSubgraph == null)
+            throw new Error("No outer subgraph!")
+
+        const outerInputIndex = outerSubgraph.inputs.findIndex(i => i.name === graphInput.nameInGraph)
+        if (outerInputIndex == null)
+            throw new Error("No outer input slot!")
+
+        const nextLink = outerSubgraph.getInputLink(outerInputIndex)
+        return [outerSubgraph.graph, nextLink];
     }
-    console.warn("[graphToPrompt] Node does not support getUpstreamLink", parent.type)
-    return [null, null];
+
+    private getUpstreamLink(parent: LGraphNode, currentLink: LLink): [LGraph | null, LLink | null] {
+        if (parent.is(Subgraph)) {
+            console.debug("FollowSubgraph")
+            return this.followSubgraph(parent, currentLink);
+        }
+        else if (parent.is(GraphInput)) {
+            console.debug("FollowGraphInput")
+            return this.followGraphInput(parent, currentLink);
+        }
+        else if ("getUpstreamLink" in parent) {
+            return [parent.graph, (parent as ComfyGraphNode).getUpstreamLink()];
+        }
+        else if (parent.inputs.length === 1) {
+            // Only one input, so assume we can follow it backwards.
+            const link = parent.getInputLink(0);
+            if (link) {
+                return [parent.graph, link]
+            }
+        }
+        console.warn("[graphToPrompt] Frontend node does not support getUpstreamLink", parent.type)
+        return [null, null];
+    }
+
+    /*
+     * Traverses the graph upstream from outputs towards inputs across
+     * a sequence of nodes dependent on a condition.
+     *
+     * Returns the node and the output link attached to it that leads to the
+     * starting node if any.
+     */
+    locateUpstream(fromNode: LGraphNode, inputIndex: SlotIndex, tag: string | null): [LGraphNode | null, LLink | null] {
+        let parent = fromNode.getInputNode(inputIndex);
+        if (!parent)
+            return [null, null];
+
+        const seen = {}
+        let currentLink = fromNode.getInputLink(inputIndex);
+
+        const shouldFollowParent = (parent: LGraphNode) => {
+            return isActiveNode(parent, tag) && !this.isTheTargetNode(parent);
+        }
+
+        // If there are non-target nodes between us and another
+        // backend node, we have to traverse them first. This
+        // behavior is dependent on the type of node. Reroute nodes
+        // will simply follow their single input, while branching
+        // nodes have conditional logic that determines which link
+        // to follow backwards.
+        while (shouldFollowParent(parent)) {
+            const [nextGraph, nextLink] = this.getUpstreamLink(parent, currentLink);
+
+            if (nextLink == null) {
+                console.warn("[graphToPrompt] No upstream link found in frontend node", parent)
+                break;
+            }
+
+            if (nextLink && !seen[nextLink.id]) {
+                seen[nextLink.id] = true
+                const nextParent = nextGraph.getNodeById(nextLink.origin_id);
+                if (!isActiveNode(parent, tag)) {
+                    parent = null;
+                }
+                else {
+                    console.debug("[graphToPrompt] Traverse upstream link", parent.id, nextParent?.id, (nextParent as any)?.isBackendNode)
+                    currentLink = nextLink;
+                    parent = nextParent;
+                }
+            } else {
+                parent = null;
+            }
+        }
+
+        if (!isActiveNode(parent, tag) || !this.isTheTargetNode(parent) || currentLink == null)
+            return [null, null];
+
+        return [parent, currentLink]
+    }
 }
 
 export default class ComfyPromptSerializer {
@@ -129,66 +203,21 @@ export default class ComfyPromptSerializer {
     serializeBackendLinks(node: ComfyBackendNode, tag: string | null): Record<string, SerializedPromptInput> {
         const inputs = {}
 
+        // Find a backend node upstream following before any number of frontend nodes
+        const test = (node: LGraphNode) => (node as any).isBackendNode
+        const nodeLocator = new UpstreamNodeLocator(test)
+
         // Store links between backend-only and hybrid nodes
         for (let i = 0; i < node.inputs.length; i++) {
-            let parent = node.getInputNode(i);
-            if (parent) {
-                const seen = {}
-                let currentLink = node.getInputLink(i);
-
-                const isFrontendParent = (parent: LGraphNode) => {
-                    if (!parent || (parent as any).isBackendNode)
-                        return false;
-                    if (tag && !hasTag(parent, tag))
-                        return false;
-                    return true;
-                }
-
-                // If there are frontend-only nodes between us and another
-                // backend node, we have to traverse them first. This
-                // behavior is dependent on the type of node. Reroute nodes
-                // will simply follow their single input, while branching
-                // nodes have conditional logic that determines which link
-                // to follow backwards.
-                while (isFrontendParent(parent)) {
-                    const [nextGraph, nextLink] = getUpstreamLink(parent, currentLink);
-
-                    if (nextLink == null) {
-                        console.warn("[graphToPrompt] No upstream link found in frontend node", parent)
-                        break;
-                    }
-
-                    if (nextLink && !seen[nextLink.id]) {
-                        seen[nextLink.id] = true
-                        const nextParent = nextGraph.getNodeById(nextLink.origin_id);
-                        if (nextParent && tag && !hasTag(nextParent, tag)) {
-                            console.debug("[graphToPrompt] Skipping tagged intermediate frontend node", tag, node.properties.tags)
-                            parent = null;
-                        }
-                        else {
-                            console.debug("[graphToPrompt] Traverse upstream link", parent.id, nextParent?.id, (nextParent as any)?.isBackendNode)
-                            currentLink = nextLink;
-                            parent = nextParent;
-                        }
-                    } else {
-                        parent = null;
-                    }
-                }
-
-                if (currentLink && parent && (parent as any).isBackendNode) {
-                    if (tag && !hasTag(parent, tag))
-                        continue;
-
-                    console.debug("[graphToPrompt] final link", parent.id, node.id)
-                    const input = node.inputs[i]
-                    // TODO can null be a legitimate value in some cases?
-                    // Nodes like CLIPLoader will never have a value in the frontend, hence "null".
-                    if (!(input.name in inputs))
-                        inputs[input.name] = [String(currentLink.origin_id), currentLink.origin_slot];
-                }
-                else {
-                    console.warn("[graphToPrompt] Didn't find upstream link!", currentLink, parent?.id)
-                }
+            const [backendNode, linkLeadingTo] = nodeLocator.locateUpstream(node, i, tag)
+            if (backendNode) {
+                console.debug("[graphToPrompt] final link", backendNode.id, "-->", node.id)
+                const input = node.inputs[i]
+                if (!(input.name in inputs))
+                    inputs[input.name] = [String(linkLeadingTo.origin_id), linkLeadingTo.origin_slot];
+            }
+            else {
+                console.warn("[graphToPrompt] Didn't find upstream link!", node.id, node.type, node.title)
             }
         }
 

@@ -53,8 +53,6 @@
      children = layoutState.updateChildren(container, evt.detail.items)
      // Ensure dragging is stopped on drag finish
  };
-
- const tt = "asd\nasdlkj"
 </script>
 
 {#if container && children}
