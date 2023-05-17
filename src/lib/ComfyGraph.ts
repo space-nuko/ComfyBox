@@ -47,15 +47,27 @@ export default class ComfyGraph extends LGraph {
      * then options.subgraphsh will have the list of subgraphs down the chain.
      */
     override onNodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
-        // Don't add nodes in subgraphs
+        // Don't add nodes in subgraphs until this callback reaches the root
+        // graph
         if (node.getRootGraph() == null || this._is_subgraph)
             return;
 
+        this.doAddNode(node, options);
+
+        // console.debug("Added", node);
+        this.eventBus.emit("nodeAdded", node);
+    }
+
+    /*
+     * Add widget UI/groups for newly added nodes.
+     */
+    private doAddNode(node: LGraphNode, options: LGraphAddNodeOptions) {
         layoutState.nodeAdded(node, options)
 
         // All nodes whether they come from base litegraph or ComfyBox should
         // have tags added to them. Can't override serialization for existing
-        // node types to add `tags` as anew field so putting it in properties is better.
+        // node types to add `tags` as a new field so putting it in properties
+        // is better.
         if (node.properties.tags == null)
             node.properties.tags = []
 
@@ -127,16 +139,14 @@ export default class ComfyGraph extends LGraph {
             }
         }
 
-        // Handle subgraphs being attached
+        // Handle nodes in subgraphs being attached to this graph indirectly
+        // ************** RECURSION ALERT ! **************
         if (node.is(Subgraph)) {
-            console.error("ISSUBGRAPH")
             for (const child of node.subgraph.iterateNodesInOrder()) {
-                this.onNodeAdded(child, options)
+                this.doAddNode(child, options)
             }
         }
-
-        // console.debug("Added", node);
-        this.eventBus.emit("nodeAdded", node);
+        // ************** RECURSION ALERT ! **************
     }
 
     override onNodeRemoved(node: LGraphNode, options: LGraphRemoveNodeOptions) {

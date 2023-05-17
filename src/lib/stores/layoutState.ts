@@ -1,12 +1,15 @@
 import { get, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import type ComfyApp from "$lib/components/ComfyApp"
-import { type LGraphNode, type IWidget, type LGraph, NodeMode, type LGraphRemoveNodeOptions, type LGraphAddNodeOptions, type UUID, type NodeID, LiteGraph } from "@litegraph-ts/core"
+import { type LGraphNode, type IWidget, type LGraph, NodeMode, type LGraphRemoveNodeOptions, type LGraphAddNodeOptions, type UUID, type NodeID, LiteGraph, type GraphIDMapping } from "@litegraph-ts/core"
 import { SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
-import type { ComfyWidgetNode } from '$lib/nodes';
 import type { ComfyNodeID } from '$lib/api';
 import { v4 as uuidv4 } from "uuid";
-import IComfyInputSlot from '$lib/IComfyInputSlot';
+import type { ComfyWidgetNode } from '$lib/nodes/widgets';
+
+function isComfyWidgetNode(node: LGraphNode): node is ComfyWidgetNode {
+    return "svelteComponentType" in node
+}
 
 type DragItemEntry = {
     /*
@@ -836,24 +839,62 @@ function removeEntry(state: LayoutState, id: DragItemID) {
 }
 
 function nodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
+    // Only concern ourselves with widget nodes
+    if (!isComfyWidgetNode(node))
+        return;
+
     const state = get(store)
     if (state.isConfiguring)
         return;
 
+    let attrs: Partial<Attributes> = {}
+
     if (options.addedBy === "moveIntoSubgraph" || options.addedBy === "moveOutOfSubgraph") {
         // All we need to do is update the nodeID linked to this node.
-        const item = state.allItemsByNode[options.prevNodeId]
-        delete state.allItemsByNode[options.prevNodeId]
+        const item = state.allItemsByNode[options.prevNodeID]
+        delete state.allItemsByNode[options.prevNodeID]
         state.allItemsByNode[node.id] = item
         return;
+    }
+    else if ((options.addedBy === "cloneSelection" || options.addedBy === "paste") && options.prevNodeID != null) {
+        console.warn("WASCLONED", options.addedBy, options.prevNodeID, Object.keys(state.allItemsByNode), options.prevNode, options.subgraphs)
+        // Grab layout state information and clone it too.
+
+        let prevWidget = state.allItemsByNode[node.id]
+        if (prevWidget == null) {
+            // If a subgraph was cloned, try looking for the original widget node corresponding to the new widget node being added.
+            // `node` is the new ComfyWidgetNode instance to copy attrs to.
+            // `options.cloneData` should contain the results of Subgraph.clone(), called "subgraphNewIDMapping".
+            // `options.cloneData` is attached to the onNodeAdded options if a node is added to a graph after being
+            // selection-cloned or pasted, as they both call clone() internally.
+            const cloneData = options.cloneData.forNode[options.prevNodeID]
+            if (cloneData && cloneData.subgraphNewIDMapping != null) {
+                // At this point we know options.prevNodeID points to a subgraph.
+                const mapping = cloneData.subgraphNewIDMapping as GraphIDMapping
+
+                // This mapping is two-way, so oldID -> newID *and* newID -> oldID are supported.
+                // Take the cloned node's ID and look up what the original node's ID was.
+                const nodeIDInLayoutState = mapping.nodeIDs[node.id];
+
+                if (nodeIDInLayoutState) {
+                    // Gottem.
+                    prevWidget = state.allItemsByNode[nodeIDInLayoutState]
+                    console.warn("FOUND CLONED SUBGRAPH NODE", node.id, "=>", nodeIDInLayoutState, prevWidget)
+                }
+            }
+        }
+
+        if (prevWidget) {
+            console.warn("FOUND", prevWidget.dragItem.attrs)
+            // XXX: Will this work for most properties?
+            attrs = structuredClone(prevWidget.dragItem.attrs)
+        }
     }
 
     const parent = findDefaultContainerForInsertion();
 
     console.debug("[layoutState] nodeAdded", node.id)
-    if ("svelteComponentType" in node) {
-        addWidget(parent, node as ComfyWidgetNode);
-    }
+    addWidget(parent, node, attrs);
 }
 
 function nodeRemoved(node: LGraphNode, options: LGraphRemoveNodeOptions) {
