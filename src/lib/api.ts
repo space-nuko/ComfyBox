@@ -253,7 +253,7 @@ export default class ComfyAPI {
             postBody = JSON.stringify(body)
         }
         catch (error) {
-            return Promise.reject({ error })
+            return Promise.reject({ error: error.toString() })
         }
 
         return fetch(this.getBackendUrl() + "/prompt", {
@@ -270,7 +270,7 @@ export default class ComfyAPI {
                 return res.json()
             })
             .then(raw => { return { promptID: raw.prompt_id } })
-            .catch(error => { return { error } })
+            .catch(error => { return error })
     }
 
     /**

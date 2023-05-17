@@ -771,7 +771,7 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
 
     console.debug("[layoutState] addContainer", state)
     store.set(state)
-    runOnChangedForWidgetDefaults(dragItem)
+    // runOnChangedForWidgetDefaults(dragItem)
     return dragItem;
 }
 
@@ -786,7 +786,6 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
         attrs: {
             ...defaultWidgetAttributes,
             title: widgetName,
-            nodeDisabledState: "disabled",
             ...attrs
         }
     }
@@ -803,7 +802,7 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
 
     console.debug("[layoutState] addWidget", state)
     moveItem(dragItem, parent, index)
-    runOnChangedForWidgetDefaults(dragItem)
+    // runOnChangedForWidgetDefaults(dragItem)
     return dragItem;
 }
 

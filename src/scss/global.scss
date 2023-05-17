@@ -1,4 +1,5 @@
 @import "gradio";
+@import "litegraph";
 
 body {
     overflow: hidden;
@@ -110,10 +111,12 @@ input, textarea {
     border-radius: 0 !important;
 }
 
-select {
-    color: var(--body-text-color);
-    background: var(--input-background-fill);
-    border: var(--input-border-width) solid var(--input-border-color)
+:not(.litegraph) {
+    select {
+        color: var(--body-text-color);
+        background: var(--input-background-fill);
+        border: var(--input-border-width) solid var(--input-border-color)
+    }
 }
 
 .container {

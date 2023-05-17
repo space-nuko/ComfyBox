@@ -121,9 +121,6 @@ export default class ComfyApp {
         this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl);
         this.canvasCtx = this.canvasEl.getContext("2d");
 
-        LiteGraph.release_link_on_empty_shows_menu = true;
-        LiteGraph.alt_drag_do_clone_nodes = true;
-
         const uiUnlocked = get(uiState).uiUnlocked;
         this.lCanvas.allow_dragnodes = uiUnlocked;
         this.lCanvas.allow_interaction = uiUnlocked;
@@ -242,13 +239,50 @@ export default class ComfyApp {
 
         for (const [inputName, [inputType, _inputOpts]] of iterateNodeDefInputs(nodeDef)) {
             if (isBackendNodeDefInputType(inputName, inputType)) {
-                LiteGraph.slot_types_default_out[inputType] ||= []
+                LiteGraph.slot_types_default_out[inputType] ||= ["utils/reroute"]
                 LiteGraph.slot_types_default_out[inputType].push(nodeTypeSpec)
+
+                // Input types have to be stored as lower case
+                // Store each node that can handle this input type
+                const lowerType = inputType.toLocaleLowerCase();
+                if (!(lowerType in LiteGraph.registered_slot_in_types)) {
+                    LiteGraph.registered_slot_in_types[lowerType] = { nodes: [] };
+                }
+                LiteGraph.registered_slot_in_types[lowerType].nodes.push(nodeId);
+
+                if (!LiteGraph.slot_types_in.includes(lowerType)) {
+                    LiteGraph.slot_types_in.push(lowerType);
+                }
+            }
+            else {
+                // inputType is an array of combo box entries (["euler", "karras", ...])
+                // or a widget input type ("INT").
             }
         }
+
         for (const output of iterateNodeDefOutputs(nodeDef)) {
-            LiteGraph.slot_types_default_in[output.type] ||= []
+            LiteGraph.slot_types_default_in[output.type] ||= ["utils/reroute"]
             LiteGraph.slot_types_default_in[output.type].push(nodeTypeSpec)
+
+            // Store each node that can handle this output type
+            if (!(output.type in LiteGraph.registered_slot_out_types)) {
+                LiteGraph.registered_slot_out_types[output.type] = { nodes: [] };
+            }
+            LiteGraph.registered_slot_out_types[output.type].nodes.push(nodeId);
+
+            if (!LiteGraph.slot_types_out.includes(output.type)) {
+                LiteGraph.slot_types_out.push(output.type);
+            }
+        }
+
+        const maxNodeSuggestions = 5 // TODO config
+
+        // TODO config beforeChanged
+        for (const key of Object.keys(LiteGraph.slot_types_default_in)) {
+            LiteGraph.slot_types_default_in[key] = LiteGraph.slot_types_default_in[key].slice(0, maxNodeSuggestions)
+        }
+        for (const key of Object.keys(LiteGraph.slot_types_default_out)) {
+            LiteGraph.slot_types_default_out[key] = LiteGraph.slot_types_default_out[key].slice(0, maxNodeSuggestions)
         }
     }
 

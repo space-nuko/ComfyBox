@@ -17,7 +17,7 @@ export type ComfyNodeDefInputs = {
     optional?: Record<string, ComfyNodeDefInput>
 }
 export type ComfyNodeDefInput = [ComfyNodeDefInputType, ComfyNodeDefInputOptions | null]
-export type ComfyNodeDefInputType = string[] | keyof typeof ComfyWidgets | string
+export type ComfyNodeDefInputType = any[] | keyof typeof ComfyWidgets | string
 export type ComfyNodeDefInputOptions = {
     forceInput?: boolean
 }
