@@ -1,4 +1,4 @@
-import { LConnectionKind, LGraph, LGraphNode, type INodeSlot, type SlotIndex, LiteGraph, getStaticProperty, type LGraphAddNodeOptions, LGraphCanvas, type LGraphRemoveNodeOptions } from "@litegraph-ts/core";
+import { LConnectionKind, LGraph, LGraphNode, type INodeSlot, type SlotIndex, LiteGraph, getStaticProperty, type LGraphAddNodeOptions, LGraphCanvas, type LGraphRemoveNodeOptions, Subgraph, type LGraphAddNodeMode } from "@litegraph-ts/core";
 import GraphSync from "./GraphSync";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
@@ -41,8 +41,9 @@ export default class ComfyGraph extends LGraph {
     }
 
     override onNodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
-        if (options.subgraphs && options.subgraphs.length > 0)
-            return
+        // Don't add detached subgraphs
+        if (node.getRootGraph() == null || this._is_subgraph)
+            return;
 
         layoutState.nodeAdded(node, options)
 
@@ -112,7 +113,19 @@ export default class ComfyGraph extends LGraph {
                 const dragItemIDs = widgetNodesAdded.map(wn => get(layoutState).allItemsByNode[wn.id]?.dragItem?.id).filter(Boolean)
                 console.debug("[ComfyGraph] Group new widgets", dragItemIDs)
 
-                layoutState.groupItems(dragItemIDs, { title: node.title })
+                // Use the default node title instead of custom node title, in
+                // case node was cloned
+                const reg = LiteGraph.registered_node_types[node.type]
+
+                layoutState.groupItems(dragItemIDs, { title: reg.title })
+            }
+        }
+
+        // Handle subgraphs being attached
+        if (node.is(Subgraph)) {
+            console.error("ISSUBGRAPH")
+            for (const child of node.subgraph.iterateNodesInOrder()) {
+                this.onNodeAdded(child, options)
             }
         }
 
@@ -122,6 +135,13 @@ export default class ComfyGraph extends LGraph {
 
     override onNodeRemoved(node: LGraphNode, options: LGraphRemoveNodeOptions) {
         layoutState.nodeRemoved(node, options);
+
+        // Handle subgraphs being removed
+        if (node.is(Subgraph)) {
+            for (const child of node.subgraph.iterateNodesInOrder()) {
+                this.onNodeRemoved(child, options)
+            }
+        }
 
         // console.debug("Removed", node);
         this.eventBus.emit("nodeRemoved", node);

@@ -1,3 +1,6 @@
+console.debug = (...msg) => {
+}
+
 import { vi, describe, it } from "vitest"
 import UnitTest from "./UnitTest"
 import * as testSuite from "./testSuite"

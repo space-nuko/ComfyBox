@@ -8,6 +8,9 @@ export function isNodeDisabled(node: LGraphNode): boolean {
         if (node.mode !== NodeMode.ALWAYS) {
             return true;
         }
+        if (node.graph == null) {
+            return true
+        }
         node = node.graph._subgraph_node;
     }
     return false;

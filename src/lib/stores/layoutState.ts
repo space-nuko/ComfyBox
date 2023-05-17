@@ -291,7 +291,7 @@ const setNodeTitle = (arg: IDragItem, value: any) => {
     if (reg == null)
         return
 
-    if (value)
+    if (value && value !== reg.title)
         widget.node.title = `${reg.title} (${value})`
     else
         widget.node.title = reg.title
@@ -699,6 +699,20 @@ const store: Writable<LayoutState> = writable({
     }
 })
 
+function clear() {
+    store.set({
+        root: null,
+        allItems: {},
+        allItemsByNode: {},
+        isMenuOpen: false,
+        isConfiguring: true,
+        refreshPropsPanel: writable(0),
+        attrs: {
+            ...defaultWorkflowAttributes
+        }
+    })
+}
+
 function findDefaultContainerForInsertion(): ContainerLayout | null {
     const state = get(store);
 
@@ -741,6 +755,7 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
             ...attrs
         }
     }
+
     const entry: DragItemEntry = { dragItem, children: [], parent: null };
 
     if (state.allItemsByNode[dragItem.id] != null)
@@ -750,6 +765,7 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
     if (parent) {
         moveItem(dragItem, parent, index)
     }
+
     console.debug("[layoutState] addContainer", state)
     store.set(state)
     runOnChangedForWidgetDefaults(dragItem)
@@ -758,7 +774,7 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
 
 function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes> = {}, index?: number): WidgetLayout {
     const state = get(store);
-    const widgetName = "Widget"
+    const widgetName = node.title || "Widget"
     const dragItem: WidgetLayout = {
         type: "widget",
         id: uuidv4(),
@@ -771,7 +787,7 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
             ...attrs
         }
     }
-    const parentEntry = state.allItems[parent.id]
+
     const entry: DragItemEntry = { dragItem, children: [], parent: null };
 
     if (state.allItems[dragItem.id] != null)
@@ -821,6 +837,7 @@ function removeEntry(state: LayoutState, id: DragItemID) {
 
 function nodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
     const state = get(store)
+    console.error("NODEADDED", node.type, (node as any).svelteComponentType)
     if (state.isConfiguring)
         return;
 
@@ -834,7 +851,7 @@ function nodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
 
     const parent = findDefaultContainerForInsertion();
 
-    console.debug("[layoutState] nodeAdded", node)
+    console.debug("[layoutState] nodeAdded", node.id)
     if ("svelteComponentType" in node) {
         addWidget(parent, node as ComfyWidgetNode);
     }
