@@ -1,6 +1,7 @@
 <script lang="ts">
  import { Block, BlockTitle } from "@gradio/atoms";
  import uiState from "$lib/stores/uiState";
+ import selectionState from "$lib/stores/selectionState";
  import WidgetContainer from "./WidgetContainer.svelte"
  import BlockContainer from "./BlockContainer.svelte"
  import AccordionContainer from "./AccordionContainer.svelte"
@@ -34,7 +35,7 @@
 
 {#if container}
     {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets" && zIndex > 1}
-    {@const dragDisabled = zIndex === 0 || $layoutState.currentSelection.length > 2 || !$uiState.uiUnlocked}
+    {@const dragDisabled = zIndex === 0 || $selectionState.currentSelection.length > 2 || !$uiState.uiUnlocked}
     {#key $attrsChanged}
         {#if edit || !isHidden(container)}
             {#if container.attrs.variant === "tabs"}

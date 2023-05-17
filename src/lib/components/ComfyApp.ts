@@ -92,7 +92,6 @@ export default class ComfyApp {
     dropZone: HTMLElement | null = null;
     nodeOutputs: Record<string, any> = {};
 
-    dragOverNode: LGraphNode | null = null;
     shiftDown: boolean = false;
     selectedGroupMoving: boolean = false;
 

@@ -1,11 +1,12 @@
 import { get, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import type ComfyApp from "$lib/components/ComfyApp"
-import { type LGraphNode, type IWidget, type LGraph, NodeMode, type LGraphRemoveNodeOptions, type LGraphAddNodeOptions, type UUID } from "@litegraph-ts/core"
+import { type LGraphNode, type IWidget, type LGraph, NodeMode, type LGraphRemoveNodeOptions, type LGraphAddNodeOptions, type UUID, type NodeID } from "@litegraph-ts/core"
 import { SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 import type { ComfyWidgetNode } from '$lib/nodes';
 import type { ComfyNodeID } from '$lib/api';
 import { v4 as uuidv4 } from "uuid";
+import IComfyInputSlot from '$lib/IComfyInputSlot';
 
 type DragItemEntry = {
     /*
@@ -61,16 +62,6 @@ export type LayoutState = {
      * Only contains drag items of type "widget"
      */
     allItemsByNode: Record<ComfyNodeID, DragItemEntry>,
-
-    /*
-     * Selected drag items.
-     */
-    currentSelection: DragItemID[],
-
-    /*
-     * Selected LGraphNodes inside the litegraph canvas.
-     */
-    currentSelectionNodes: LGraphNode[],
 
     /*
      * If true, a saved workflow is being deserialized, so ignore any
@@ -660,9 +651,8 @@ type LayoutStateOps = {
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode, options: LGraphAddNodeOptions) => void,
     nodeRemoved: (node: LGraphNode, options: LGraphRemoveNodeOptions) => void,
-    groupItems: (dragItems: IDragItem[], attrs?: Partial<Attributes>) => ContainerLayout,
+    groupItems: (dragItemIDs: DragItemID[], attrs?: Partial<Attributes>) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
-    getCurrentSelection: () => IDragItem[],
     findLayoutEntryForNode: (nodeId: ComfyNodeID) => DragItemEntry | null,
     findLayoutForNode: (nodeId: ComfyNodeID) => IDragItem | null,
     serialize: () => SerializedLayoutState,
@@ -676,8 +666,6 @@ const store: Writable<LayoutState> = writable({
     root: null,
     allItems: {},
     allItemsByNode: {},
-    currentSelection: [],
-    currentSelectionNodes: [],
     isMenuOpen: false,
     isConfiguring: true,
     refreshPropsPanel: writable(0),
@@ -858,33 +846,29 @@ function moveItem(target: IDragItem, to: ContainerLayout, index?: number) {
     store.set(state)
 }
 
-function getCurrentSelection(): IDragItem[] {
-    const state = get(store)
-    return state.currentSelection.map(id => state.allItems[id].dragItem)
-}
-
-function groupItems(dragItems: IDragItem[], attrs: Partial<Attributes> = {}): ContainerLayout {
-    if (dragItems.length === 0)
+function groupItems(dragItemIDs: DragItemID[], attrs: Partial<Attributes> = {}): ContainerLayout {
+    if (dragItemIDs.length === 0)
         return;
 
     const state = get(store)
-    const parent = state.allItems[dragItems[0].id].parent || findDefaultContainerForInsertion();
+    const parent = state.allItems[dragItemIDs[0]].parent || findDefaultContainerForInsertion();
 
     if (parent === null || parent.type !== "container")
         return;
 
     let index = undefined;
     if (parent) {
-        const indexFound = state.allItems[parent.id].children.findIndex(c => c.id === dragItems[0].id)
+        const indexFound = state.allItems[parent.id].children.findIndex(c => c.id === dragItemIDs[0])
         if (indexFound !== -1)
             index = indexFound
     }
 
-    const title = dragItems.length <= 1 ? "" : "Group";
+    const title = dragItemIDs.length <= 1 ? "" : "Group";
 
     const container = addContainer(parent as ContainerLayout, { title, ...attrs }, index)
 
-    for (const item of dragItems) {
+    for (const itemID of dragItemIDs) {
+        const item = state.allItems[itemID].dragItem;
         moveItem(item, container)
     }
 
@@ -946,8 +930,6 @@ function initDefaultLayout() {
         root: null,
         allItems: {},
         allItemsByNode: {},
-        currentSelection: [],
-        currentSelectionNodes: [],
         isMenuOpen: false,
         isConfiguring: false,
         refreshPropsPanel: writable(0),
@@ -1061,8 +1043,6 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
         root,
         allItems,
         allItemsByNode,
-        currentSelection: [],
-        currentSelectionNodes: [],
         isMenuOpen: false,
         isConfiguring: false,
         refreshPropsPanel: writable(0),
@@ -1093,7 +1073,6 @@ const layoutStateStore: WritableLayoutStateStore =
     updateChildren,
     nodeAdded,
     nodeRemoved,
-    getCurrentSelection,
     groupItems,
     findLayoutEntryForNode,
     findLayoutForNode,

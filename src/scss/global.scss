@@ -15,6 +15,10 @@ body {
     --color-blue-500: #3985f5;
 
     --comfy-accent-soft: var(--neutral-300);
+    --comfy-widget-selected-background-fill: var(--color-yellow-100);
+    --comfy-widget-hovered-background-fill: var(--secondary-200);
+    --comfy-container-selected-background-fill: var(--color-yellow-300);
+    --comfy-container-hovered-background-fill: var(--secondary-300);
     --comfy-disabled-label-color: var(--neutral-400);
     --comfy-disabled-textbox-background-fill: var(--neutral-200);
     --comfy-disabled-textbox-border-color: var(--neutral-300);
@@ -38,6 +42,10 @@ body {
     color-scheme: dark;
 
     --comfy-accent-soft: var(--neutral-600);
+    --comfy-widget-selected-background-fill: var(--primary-500);
+    --comfy-widget-hovered-background-fill: var(--neutral-600);
+    --comfy-container-selected-background-fill: var(--primary-700);
+    --comfy-container-hovered-background-fill: var(--neutral-500);
     --comfy-disabled-label-color: var(--neutral-500);
     --comfy-disabled-textbox-background-fill: var(--neutral-800);
     --comfy-disabled-textbox-border-color: var(--neutral-700);

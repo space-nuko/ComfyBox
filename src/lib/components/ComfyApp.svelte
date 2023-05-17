@@ -9,6 +9,7 @@
  import { Checkbox, TextBox } from "@gradio/form"
  import uiState from "$lib/stores/uiState";
  import layoutState from "$lib/stores/layoutState";
+ import selectionState from "$lib/stores/selectionState";
  import { ImageViewer } from "$lib/ImageViewer";
  import type { ComfyAPIStatus } from "$lib/api";
  import { SvelteToast, toast } from '@zerodevx/svelte-toast'
@@ -54,12 +55,12 @@
 
      if (!$uiState.uiUnlocked) {
          app.lCanvas.deselectAllNodes();
-         $layoutState.currentSelectionNodes = []
+         $selectionState.currentSelectionNodes = []
      }
  }
 
  $: if ($uiState.uiEditMode)
-     $layoutState.currentSelection = []
+     $selectionState.currentSelection = []
 
  let graphSize = 0;
  let graphTransitioning = false;

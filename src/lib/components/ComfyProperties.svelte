@@ -4,6 +4,7 @@
  import { LGraphNode } from "@litegraph-ts/core"
  import layoutState, { type IDragItem, type WidgetLayout, ALL_ATTRIBUTES, type AttributesSpec } from "$lib/stores/layoutState"
  import uiState from "$lib/stores/uiState"
+ import selectionState from "$lib/stores/selectionState"
  import { get, type Writable, writable } from "svelte/store"
  import type { ComfyWidgetNode } from "$lib/nodes";
  import ComfyNumberProperty from "./ComfyNumberProperty.svelte";
@@ -17,8 +18,8 @@
 
  $: refreshPropsPanel = $layoutState.refreshPropsPanel;
 
- $: if ($layoutState.currentSelection.length > 0) {
-     const targetId = $layoutState.currentSelection.slice(-1)[0]
+ $: if ($selectionState.currentSelection.length > 0) {
+     const targetId = $selectionState.currentSelection.slice(-1)[0]
      target = $layoutState.allItems[targetId].dragItem
      attrsChanged = target.attrsChanged;
      if (target.type === "widget") {
@@ -28,9 +29,9 @@
          node = null;
      }
  }
- else if ($layoutState.currentSelectionNodes.length > 0) {
+ else if ($selectionState.currentSelectionNodes.length > 0) {
      target = null;
-     node = $layoutState.currentSelectionNodes[0]
+     node = $selectionState.currentSelectionNodes[0]
      attrsChanged = null;
  }
  else {

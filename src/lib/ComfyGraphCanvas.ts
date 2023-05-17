@@ -1,11 +1,13 @@
-import { BuiltInSlotShape, LGraph, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type MouseEventExt, type Vector2, type Vector4, TitleMode, type ContextMenuItem, type IContextMenuItem, Subgraph, LLink } from "@litegraph-ts/core";
+import { BuiltInSlotShape, LGraph, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type MouseEventExt, type Vector2, type Vector4, TitleMode, type ContextMenuItem, type IContextMenuItem, Subgraph, LLink, type NodeID } from "@litegraph-ts/core";
 import type ComfyApp from "./components/ComfyApp";
 import queueState from "./stores/queueState";
-import { get } from "svelte/store";
+import { get, type Unsubscriber } from "svelte/store";
 import uiState from "./stores/uiState";
 import layoutState from "./stores/layoutState";
 import { Watch } from "@litegraph-ts/nodes-basic";
 import { ComfyReroute } from "./nodes";
+import type { Progress } from "./components/ComfyApp";
+import selectionState from "./stores/selectionState";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
@@ -14,6 +16,7 @@ export type SerializedGraphCanvasState = {
 
 export default class ComfyGraphCanvas extends LGraphCanvas {
     app: ComfyApp | null;
+    private _unsubscribe: Unsubscriber;
 
     constructor(
         app: ComfyApp,
@@ -27,7 +30,21 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     ) {
         super(canvas, app.lGraph, options);
         this.app = app;
+        this._unsubscribe = selectionState.subscribe(ss => {
+            for (const node of Object.values(this.selected_nodes)) {
+                node.is_selected = false;
+            }
+            this.selected_nodes = {}
+            for (const node of ss.currentSelectionNodes) {
+                this.selected_nodes[node.id] = node;
+                node.is_selected = true
+            }
+            this._selectedNodes = new Set()
+            this.setDirty(true, true);
+        })
     }
+
+    _selectedNodes: Set<NodeID> = new Set();
 
     serialize(): SerializedGraphCanvasState {
         return {
@@ -58,51 +75,61 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         super.drawNodeShape(node, ctx, size, fgColor, bgColor, selected, mouseOver);
 
         let state = get(queueState);
+        let ss = get(selectionState);
 
         let color = null;
-        if (node.id === +state.runningNodeID) {
+        let thickness = 1;
+        // if (this._selectedNodes.has(node.id)) {
+        //     color = "yellow";
+        //     thickness = 5;
+        // }
+        if (ss.currentHoveredNodes.has(node.id)) {
+            color = "lightblue";
+        }
+        else if (node.id === +state.runningNodeID) {
             color = "#0f0";
-            // this.app can be null inside the constructor if rendering is taking place already
-        } else if (this.app && this.app.dragOverNode && node.id === this.app.dragOverNode.id) {
-            color = "dodgerblue";
         }
 
         if (color) {
-            const shape = node.shape || BuiltInSlotShape.ROUND_SHAPE;
-            ctx.lineWidth = 1;
-            ctx.globalAlpha = 0.8;
-            ctx.beginPath();
-            if (shape == BuiltInSlotShape.BOX_SHAPE)
-                ctx.rect(-6, -6 + LiteGraph.NODE_TITLE_HEIGHT, 12 + size[0] + 1, 12 + size[1] + LiteGraph.NODE_TITLE_HEIGHT);
-            else if (shape == BuiltInSlotShape.ROUND_SHAPE || (shape == BuiltInSlotShape.CARD_SHAPE && node.flags.collapsed))
-                ctx.roundRect(
-                    -6,
-                    -6 - LiteGraph.NODE_TITLE_HEIGHT,
-                    12 + size[0] + 1,
-                    12 + size[1] + LiteGraph.NODE_TITLE_HEIGHT,
-                    this.round_radius * 2
-                );
-            else if (shape == BuiltInSlotShape.CARD_SHAPE)
-                ctx.roundRect(
-                    -6,
-                    -6 + LiteGraph.NODE_TITLE_HEIGHT,
-                    12 + size[0] + 1,
-                    12 + size[1] + LiteGraph.NODE_TITLE_HEIGHT,
-                    this.round_radius * 2,
-                    2
-                );
-            else if (shape == BuiltInSlotShape.CIRCLE_SHAPE)
-                ctx.arc(size[0] * 0.5, size[1] * 0.5, size[0] * 0.5 + 6, 0, Math.PI * 2);
-            ctx.strokeStyle = color;
-            ctx.stroke();
-            ctx.strokeStyle = fgColor;
-            ctx.globalAlpha = 1;
+            this.drawNodeOutline(node, ctx, state.progress, size, fgColor, bgColor, color, thickness)
+        }
+    }
 
-            if (state.progress) {
-                ctx.fillStyle = "green";
-                ctx.fillRect(0, 0, size[0] * (state.progress.value / state.progress.max), 6);
-                ctx.fillStyle = bgColor;
-            }
+    private drawNodeOutline(node: LGraphNode, ctx: CanvasRenderingContext2D, progress?: Progress, size: Vector2, fgColor: string, bgColor: string, outlineColor: string, outlineThickness: number) {
+        const shape = node.shape || BuiltInSlotShape.ROUND_SHAPE;
+        ctx.lineWidth = outlineThickness;
+        ctx.globalAlpha = 0.8;
+        ctx.beginPath();
+        if (shape == BuiltInSlotShape.BOX_SHAPE)
+            ctx.rect(-6, -6 + LiteGraph.NODE_TITLE_HEIGHT, 12 + size[0] + 1, 12 + size[1] + LiteGraph.NODE_TITLE_HEIGHT);
+        else if (shape == BuiltInSlotShape.ROUND_SHAPE || (shape == BuiltInSlotShape.CARD_SHAPE && node.flags.collapsed))
+            ctx.roundRect(
+                -6,
+                -6 - LiteGraph.NODE_TITLE_HEIGHT,
+                12 + size[0] + 1,
+                12 + size[1] + LiteGraph.NODE_TITLE_HEIGHT,
+                this.round_radius * 2
+            );
+        else if (shape == BuiltInSlotShape.CARD_SHAPE)
+            ctx.roundRect(
+                -6,
+                -6 + LiteGraph.NODE_TITLE_HEIGHT,
+                12 + size[0] + 1,
+                12 + size[1] + LiteGraph.NODE_TITLE_HEIGHT,
+                this.round_radius * 2,
+                2
+            );
+        else if (shape == BuiltInSlotShape.CIRCLE_SHAPE)
+            ctx.arc(size[0] * 0.5, size[1] * 0.5, size[0] * 0.5 + 6, 0, Math.PI * 2);
+        ctx.strokeStyle = outlineColor;
+        ctx.stroke();
+        ctx.strokeStyle = fgColor;
+        ctx.globalAlpha = 1;
+
+        if (progress) {
+            ctx.fillStyle = "green";
+            ctx.fillRect(0, 0, size[0] * (progress.value / progress.max), 6);
+            ctx.fillStyle = bgColor;
         }
     }
 
@@ -235,10 +262,43 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     }
 
     override onSelectionChange(nodes: Record<number, LGraphNode>) {
-        const ls = get(layoutState)
-        ls.currentSelectionNodes = Object.values(nodes)
-        ls.currentSelection = []
-        layoutState.set(ls)
+        selectionState.update(ss => {
+            ss.currentSelectionNodes = Object.values(nodes)
+            ss.currentSelection = []
+            const ls = get(layoutState)
+            for (const node of ss.currentSelectionNodes) {
+                const widget = ls.allItemsByNode[node.id]
+                if (widget)
+                    ss.currentSelection.push(widget.dragItem.id)
+            }
+            return ss
+        })
+    }
+
+    override onHoverChange(node: LGraphNode | null) {
+        selectionState.update(ss => {
+            ss.currentHoveredNodes.clear()
+            if (node) {
+                ss.currentHoveredNodes.add(node.id)
+            }
+            ss.currentHovered.clear()
+            const ls = get(layoutState)
+            for (const nodeID of ss.currentHoveredNodes) {
+                const widget = ls.allItemsByNode[nodeID]
+                if (widget)
+                    ss.currentHovered.add(widget.dragItem.id)
+            }
+            return ss
+        })
+    }
+
+    override clear() {
+        super.clear();
+        selectionState.update(ss => {
+            ss.currentSelectionNodes = [];
+            ss.currentHoveredNodes.clear()
+            return ss;
+        })
     }
 
     override onNodeMoved(node: LGraphNode) {

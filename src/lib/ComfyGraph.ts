@@ -88,7 +88,7 @@ export default class ComfyGraph extends LGraph {
             if (!("svelteComponentType" in node) && options.addedBy == null) {
                 console.debug("[ComfyGraph] AutoAdd UI")
                 const comfyNode = node as ComfyGraphNode;
-                const widgetNodesAdded = []
+                const widgetNodesAdded: ComfyWidgetNode[] = []
                 for (let index = 0; index < comfyNode.inputs.length; index++) {
                     const input = comfyNode.inputs[index];
                     if ("config" in input) {
@@ -109,10 +109,10 @@ export default class ComfyGraph extends LGraph {
                         }
                     }
                 }
-                const dragItems = widgetNodesAdded.map(wn => get(layoutState).allItemsByNode[wn.id]?.dragItem).filter(di => di)
-                console.debug("[ComfyGraph] Group new widgets", dragItems)
+                const dragItemIDs = widgetNodesAdded.map(wn => get(layoutState).allItemsByNode[wn.id]?.dragItem?.id).filter(Boolean)
+                console.debug("[ComfyGraph] Group new widgets", dragItemIDs)
 
-                layoutState.groupItems(dragItems, { title: node.title })
+                layoutState.groupItems(dragItemIDs, { title: node.title })
             }
         }
 

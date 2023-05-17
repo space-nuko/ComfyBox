@@ -115,15 +115,15 @@ export abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     addPropertyAsOutput(propertyName: string, type: string) {
-        if (this.shownOutputProperties[propertyName])
+        if (this.shownOutputProperties["@" + propertyName])
             return;
 
         if (!(propertyName in this.properties)) {
             throw `No property named ${propertyName} found!`
         }
 
-        this.shownOutputProperties[propertyName] = { type, index: this.outputs.length }
-        this.addOutput(propertyName, type)
+        this.shownOutputProperties["@" + propertyName] = { type, index: this.outputs.length }
+        this.addOutput("@" + propertyName, type)
     }
 
     formatValue(value: any): string {

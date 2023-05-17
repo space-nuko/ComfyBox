@@ -2,6 +2,7 @@
  import { Block, BlockTitle } from "@gradio/atoms";
  import { Tabs, TabItem } from "@gradio/tabs";
  import uiState from "$lib/stores/uiState";
+ import selectionState from "$lib/stores/selectionState";
  import WidgetContainer from "./WidgetContainer.svelte"
 
  import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
@@ -68,9 +69,10 @@
 </script>
 
 {#if container && children}
+    {@const selected = $uiState.uiUnlocked && $selectionState.currentSelection.includes(container.id)}
     <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')} z-index{zIndex}"
          class:hide-block={container.attrs.containerVariant === "hidden"}
-         class:selected={$uiState.uiUnlocked && $layoutState.currentSelection.includes(container.id)}
+         class:selected
          class:root-container={zIndex === 0}
          class:is-executing={container.isNodeExecuting}
          class:edit={edit}>
@@ -132,6 +134,10 @@
 <style lang="scss">
  .container {
      display: flex;
+
+     &.selected {
+         background: var(--comfy-container-selected-background-fill) !important;
+     }
 
      > :global(*) {
          border-radius: 0;

@@ -3,7 +3,8 @@ import ComboWidget from "$lib/widgets/ComboWidget.svelte";
 import RangeWidget from "$lib/widgets/RangeWidget.svelte";
 import TextWidget from "$lib/widgets/TextWidget.svelte";
 import { get } from "svelte/store"
-import layoutState from "$lib/stores/layoutState"
+import layoutState, { type WidgetLayout } from "$lib/stores/layoutState"
+import selectionState from "$lib/stores/selectionState"
 import type { SvelteComponentDev } from "svelte/internal";
 import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, GraphInput } from "@litegraph-ts/core";
 import type { ComfyExecutionResult, ComfyImageLocation } from "./nodes/ComfyWidgetNodes";
@@ -45,11 +46,12 @@ export function download(filename: string, text: string, type: string = "text/pl
 
 export function startDrag(evt: MouseEvent) {
     const dragItemId: string = evt.target.dataset["dragItemId"];
+    const ss = get(selectionState)
     const ls = get(layoutState)
 
     if (evt.button !== 0) {
-        if (ls.currentSelection.length <= 1 && !ls.isMenuOpen)
-            ls.currentSelection = [dragItemId]
+        if (ss.currentSelection.length <= 1 && !ls.isMenuOpen)
+            ss.currentSelection = [dragItemId]
         return;
     }
 
@@ -58,19 +60,29 @@ export function startDrag(evt: MouseEvent) {
     console.debug("startDrag", item)
 
     if (evt.ctrlKey) {
-        const index = ls.currentSelection.indexOf(item.id)
+        const index = ss.currentSelection.indexOf(item.id)
         if (index === -1)
-            ls.currentSelection.push(item.id);
+            ss.currentSelection.push(item.id);
         else
-            ls.currentSelection.splice(index, 1);
-        ls.currentSelection = ls.currentSelection;
+            ss.currentSelection.splice(index, 1);
+        ss.currentSelection = ss.currentSelection;
     }
     else {
-        ls.currentSelection = [item.id]
+        ss.currentSelection = [item.id]
     }
-    ls.currentSelectionNodes = [];
+    ss.currentSelectionNodes = [];
+    for (const id of ss.currentSelection) {
+        const item = ls.allItems[id].dragItem
+        if (item.type === "widget") {
+            const node = (item as WidgetLayout).node;
+            if (node) {
+                ss.currentSelectionNodes.push(node)
+            }
+        }
+    }
 
     layoutState.set(ls)
+    selectionState.set(ss)
 };
 
 export function stopDrag(evt: MouseEvent) {
