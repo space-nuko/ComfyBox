@@ -6,9 +6,9 @@
  import uiState from "$lib/stores/uiState"
  import selectionState from "$lib/stores/selectionState"
  import { get, type Writable, writable } from "svelte/store"
- import type { ComfyWidgetNode } from "$lib/nodes";
  import ComfyNumberProperty from "./ComfyNumberProperty.svelte";
  import ComfyComboProperty from "./ComfyComboProperty.svelte";
+	import type { ComfyWidgetNode } from "$lib/nodes/widgets";
 
  let target: IDragItem | null = null;
  let node: LGraphNode | null = null;
@@ -146,8 +146,12 @@
      if (spec.deserialize)
          value = spec.deserialize(value)
 
+     const prevValue = target.attrs[name]
      target.attrs[name] = value
      target.attrsChanged.set(get(target.attrsChanged) + 1)
+
+     if (spec.onChanged)
+         spec.onChanged(target, value, prevValue)
 
      if (node && "propsChanged" in node) {
          const comfyNode = node as ComfyWidgetNode
@@ -180,7 +184,11 @@
      if (spec.deserialize)
          value = spec.deserialize(value)
 
+     const prevValue = node.properties[name]
      node.properties[name] = value;
+
+     if (spec.onChanged)
+         spec.onChanged(node, value, prevValue)
 
      if ("propsChanged" in node) {
          const comfyNode = node as ComfyWidgetNode
@@ -211,7 +219,11 @@
      if (spec.deserialize)
          value = spec.deserialize(value)
 
+     const prevValue = node[name]
      node[name] = value;
+
+     if (spec.onChanged)
+         spec.onChanged(node, value, prevValue)
 
      if ("propsChanged" in node) {
          const comfyNode = node as ComfyWidgetNode
@@ -240,8 +252,12 @@
      const name = spec.name
      console.warn("[ComfyProperties] updateWorkflowAttribute", name, value)
 
+     const prevValue = value
      $layoutState.attrs[name] = value
      $layoutState = $layoutState
+
+     if (spec.onChanged)
+         spec.onChanged($layoutState, value, prevValue)
 
      if (spec.refreshPanelOnChange)
          doRefreshPanel()

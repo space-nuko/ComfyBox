@@ -1,7 +1,7 @@
 import { get, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import type ComfyApp from "$lib/components/ComfyApp"
-import { type LGraphNode, type IWidget, type LGraph, NodeMode, type LGraphRemoveNodeOptions, type LGraphAddNodeOptions, type UUID, type NodeID } from "@litegraph-ts/core"
+import { type LGraphNode, type IWidget, type LGraph, NodeMode, type LGraphRemoveNodeOptions, type LGraphAddNodeOptions, type UUID, type NodeID, LiteGraph } from "@litegraph-ts/core"
 import { SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 import type { ComfyWidgetNode } from '$lib/nodes';
 import type { ComfyNodeID } from '$lib/api';
@@ -250,7 +250,12 @@ export type AttributesSpec = {
      * This should be used if there's a canShow dependent on this property so
      * the pane can be updated with the new list of valid properties.
      */
-    refreshPanelOnChange?: boolean
+    refreshPanelOnChange?: boolean,
+
+    /*
+     * Callback run when this value is changed.
+     */
+    onChanged?: (arg: IDragItem | LGraphNode | LayoutState, value: any, prevValue: any) => void,
 }
 
 /*
@@ -274,6 +279,24 @@ const deserializeStringArray = (arg: string) => {
     return arg.split(",").map(s => s.trim())
 }
 
+const setNodeTitle = (arg: IDragItem, value: any) => {
+    if (arg.type !== "widget")
+        return
+
+    const widget = arg as WidgetLayout;
+    if (widget.node == null)
+        return;
+
+    const reg = LiteGraph.registered_node_types[widget.node.type];
+    if (reg == null)
+        return
+
+    if (value)
+        widget.node.title = `${reg.title} (${value})`
+    else
+        widget.node.title = reg.title
+}
+
 /*
  * Attributes that will show up in the properties panel.
  * Their order in the list is the order they'll appear in the panel.
@@ -288,6 +311,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "widget",
                 defaultValue: "",
                 editable: true,
+                onChanged: setNodeTitle
             },
             {
                 name: "hidden",
@@ -570,6 +594,7 @@ for (const cat of Object.values(ALL_ATTRIBUTES)) {
 
 export { ALL_ATTRIBUTES };
 
+// TODO Should be nested by category for name uniqueness?
 const defaultWidgetAttributes: Attributes = {} as any
 const defaultWorkflowAttributes: LayoutAttributes = {} as any
 for (const cat of Object.values(ALL_ATTRIBUTES)) {
@@ -694,6 +719,16 @@ function findDefaultContainerForInsertion(): ContainerLayout | null {
     return null
 }
 
+function runOnChangedForWidgetDefaults(dragItem: IDragItem) {
+    for (const cat of Object.values(ALL_ATTRIBUTES)) {
+        for (const spec of Object.values(cat.specs)) {
+            if (defaultWidgetAttributes[spec.name] !== undefined && spec.onChanged != null) {
+                spec.onChanged(dragItem, dragItem.attrs[spec.name], dragItem.attrs[spec.name])
+            }
+        }
+    }
+}
+
 function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes> = {}, index?: number): ContainerLayout {
     const state = get(store);
     const dragItem: ContainerLayout = {
@@ -707,14 +742,17 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
         }
     }
     const entry: DragItemEntry = { dragItem, children: [], parent: null };
-    if (state.allItemsByNode[dragItem.id] !== null)
+
+    if (state.allItemsByNode[dragItem.id] != null)
         throw new Error(`Container with ID ${dragItem.id} already registered!!!`)
     state.allItems[dragItem.id] = entry;
+
     if (parent) {
         moveItem(dragItem, parent, index)
     }
     console.debug("[layoutState] addContainer", state)
     store.set(state)
+    runOnChangedForWidgetDefaults(dragItem)
     return dragItem;
 }
 
@@ -735,14 +773,18 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
     }
     const parentEntry = state.allItems[parent.id]
     const entry: DragItemEntry = { dragItem, children: [], parent: null };
-    if (state.allItemsByNode[dragItem.id] !== null)
+
+    if (state.allItems[dragItem.id] != null)
         throw new Error(`Widget with ID ${dragItem.id} already registered!!!`)
     state.allItems[dragItem.id] = entry;
-    if (state.allItemsByNode[node.id] !== null)
+
+    if (state.allItemsByNode[node.id] != null)
         throw new Error(`Widget's node with ID ${node.id} already registered!!!`)
     state.allItemsByNode[node.id] = entry;
+
     console.debug("[layoutState] addWidget", state)
     moveItem(dragItem, parent, index)
+    runOnChangedForWidgetDefaults(dragItem)
     return dragItem;
 }
 
