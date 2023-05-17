@@ -23,7 +23,7 @@ export type AutoConfigOptions = {
  *
  * - Go to layoutState, look for `ALL_ATTRIBUTES,` insert or find a "variant"
  *   attribute and set `validNodeTypes` to the type of the litegraph node
- * - Add a new entry in the `values` array, like "knob" or "dial" for ComfySliderWidget
+ * - Add a new entry in the `values` array, like "knob" or "dial" for ComfyNumberWidget
  * - Add an {#if widget.attrs.variant === <...>} statement in the existing Svelte component
  *
  * Also, BEWARE of calling setOutputData() and triggerSlot() on the same frame!

@@ -41,8 +41,11 @@
  $: {
      canUngroup = false;
      if ($selectionState.currentSelection.length === 1) {
-         const item = $layoutState.allItems[$selectionState.currentSelection[0]].dragItem;
-         canUngroup = item.type === "container"
+         const entry = $layoutState.allItems[$selectionState.currentSelection[0]]
+         if (entry != null) {
+             const item = entry.dragItem;
+             canUngroup = item.type === "container"
+         }
      }
  }
  $: if (canUngroup) {
@@ -59,7 +62,11 @@
      if (itemID == null)
          return;
 
-     const item = $layoutState.allItems[$selectionState.currentSelection[0]].dragItem;
+     const entry = $layoutState.allItems[$selectionState.currentSelection[0]]
+     if (entry == null)
+         return
+
+     const item = entry.dragItem;
      if(item.type !== "container")
          return
 

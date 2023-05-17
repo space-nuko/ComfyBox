@@ -132,7 +132,7 @@
          value = spec.defaultValue
      else if (spec.serialize)
          value = spec.serialize(value)
-     console.debug("[ComfyProperties] getAttribute", spec.name, value, target, spec)
+     // console.debug("[ComfyProperties] getAttribute", spec.name, value, target, spec)
      return value
  }
 
@@ -166,7 +166,7 @@
          value = spec.defaultValue
      else if (spec.serialize)
          value = spec.serialize(value)
-     console.debug("[ComfyProperties] getProperty", spec, value, node)
+     // console.debug("[ComfyProperties] getProperty", spec, value, node)
      return value
  }
 
@@ -197,7 +197,7 @@
          value = spec.defaultValue
      else if (spec.serialize)
          value = spec.serialize(value)
-     console.debug("[ComfyProperties] getVar", spec, value, node)
+     // console.debug("[ComfyProperties] getVar", spec, value, node)
      return value
  }
 
@@ -229,7 +229,7 @@
          value = spec.defaultValue
      else if (spec.serialize)
          value = spec.serialize(value)
-     console.debug("[ComfyProperties] getWorkflowAttribute", spec.name, value, spec, $layoutState.attrs[spec.name])
+     // console.debug("[ComfyProperties] getWorkflowAttribute", spec.name, value, spec, $layoutState.attrs[spec.name])
      return value
  }
 
@@ -238,7 +238,7 @@
          return;
 
      const name = spec.name
-     console.warn("updateWorkflowAttribute", name, value)
+     console.warn("[ComfyProperties] updateWorkflowAttribute", name, value)
 
      $layoutState.attrs[name] = value
      $layoutState = $layoutState

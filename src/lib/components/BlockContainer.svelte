@@ -63,7 +63,7 @@
          class:root-container={zIndex === 0}
          class:is-executing={container.isNodeExecuting}
          class:mobile={isMobile}
-         class:edit={edit}>
+         class:edit>
         <Block>
             {#if container.attrs.title && container.attrs.title !== ""}
                 <label for={String(container.id)} class={($uiState.uiUnlocked && $uiState.uiEditMode === "widgets") ? "edit-title-label" : ""}>
@@ -72,7 +72,7 @@
             {/if}
             <div class="v-pane"
                  class:empty={children.length === 0}
-                 class:edit={edit}
+                 class:edit
                  use:dndzone="{{
                      items: children,
                      flipDurationMs,
@@ -85,8 +85,9 @@
                  on:finalize="{handleFinalize}"
             >
                 {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
-                    {@const hidden = isHidden(item)}
+                    {@const hidden = isHidden(item) && !edit}
                     <div class="animation-wrapper"
+                         class:edit
                          class:hidden={hidden}
                          animate:flip={{duration:flipDurationMs}}
                          style={item?.attrs?.style || ""}
@@ -119,17 +120,18 @@
 
      .edit {
          min-width: 200px;
+         margin: 0.2rem 0;
      }
 
-     &:not(.edit) > .animation-wrapper.hidden {
+     .animation-wrapper.hidden:not(.edit) {
          display: none;
      }
 
      &.empty {
          border-width: 3px;
-         border-color: var(--color-grey-400);
+         border-color: var(--comfy-container-empty-border-color);
          border-radius: 0;
-         background: var(--color-grey-300);
+         background: var(--comfy-container-empty-background-fill);
          min-height: 100px;
          border-style: dashed;
      }
@@ -246,7 +248,7 @@
  }
 
  .handle-hidden {
-     background-color: #40404080;
+     background-color: #303030A0;
  }
 
  .handle-widget:hover {

@@ -1,14 +1,10 @@
-import ComfyApp, { type SerializedPrompt } from "./components/ComfyApp";
-import ComboWidget from "$lib/widgets/ComboWidget.svelte";
-import RangeWidget from "$lib/widgets/RangeWidget.svelte";
-import TextWidget from "$lib/widgets/TextWidget.svelte";
-import { get } from "svelte/store"
-import layoutState, { type WidgetLayout } from "$lib/stores/layoutState"
-import selectionState from "$lib/stores/selectionState"
-import type { SvelteComponentDev } from "svelte/internal";
-import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, GraphInput } from "@litegraph-ts/core";
+import layoutState, { type WidgetLayout } from "$lib/stores/layoutState";
+import selectionState from "$lib/stores/selectionState";
 import type { FileData as GradioFileData } from "@gradio/upload";
+import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID } from "@litegraph-ts/core";
+import { get } from "svelte/store";
 import type { ComfyNodeID } from "./api";
+import { type SerializedPrompt } from "./components/ComfyApp";
 
 export function clamp(n: number, min: number, max: number): number {
     return Math.min(Math.max(n, min), max)

@@ -177,8 +177,8 @@ export class ComfySwapAction extends ComfyGraphNode {
     override onAction(action: any, param: any) {
         const a = this.getInputData(0)
         const b = this.getInputData(1)
-        this.triggerSlot(0, a)
-        this.triggerSlot(1, b)
+        this.triggerSlot(0, b)
+        this.triggerSlot(1, a)
     };
 }
 

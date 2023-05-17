@@ -65,7 +65,7 @@
         <Container {container} {classes} {zIndex} {showHandles} {isMobile} />
     {/key}
 {:else if widget && widget.node}
-    {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets" && zIndex > 1}
+    {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets"}
     {@const hidden = isHidden(widget)}
     {@const hovered = $uiState.uiUnlocked && $selectionState.currentHovered.has(widget.id)}
     {@const selected = $uiState.uiUnlocked && $selectionState.currentSelection.includes(widget.id)}
@@ -136,7 +136,5 @@
 
  .edit {
      border: 2px dashed var(--color-blue-400);
-     margin: 0.2em;
-     padding: 0.2em;
  }
 </style>

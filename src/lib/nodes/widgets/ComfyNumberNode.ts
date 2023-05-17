@@ -2,7 +2,7 @@ import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import { clamp } from "$lib/utils";
 import { BuiltInSlotType, LiteGraph, type SlotLayout } from "@litegraph-ts/core";
 
-import RangeWidget from "$lib/widgets/RangeWidget.svelte";
+import NumberWidget from "$lib/widgets/NumberWidget.svelte";
 import type { ComfyWidgetProperties } from "./ComfyWidgetNode";
 import ComfyWidgetNode from "./ComfyWidgetNode";
 
@@ -23,7 +23,7 @@ export default class ComfyNumberNode extends ComfyWidgetNode<number> {
         precision: 1
     }
 
-    override svelteComponentType = RangeWidget
+    override svelteComponentType = NumberWidget
     override defaultValue = 0;
 
     static slotLayout: SlotLayout = {

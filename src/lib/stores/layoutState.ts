@@ -185,7 +185,7 @@ export type AttributesSpec = {
     location: "widget" | "nodeProps" | "nodeVars" | "workflow"
 
     /*
-     * Can this attribute be edited in the properties pane.
+     * Can this attribute be edited in the properties pane?
      */
     editable: boolean,
 
@@ -332,7 +332,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "widget",
                 editable: true,
                 values: ["visible", "disabled", "hidden"],
-                defaultValue: "disabled",
+                defaultValue: "hidden",
                 canShow: (di: IDragItem) => di.type === "widget"
             },
 
@@ -353,7 +353,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "widget",
                 editable: true,
                 values: ["block", "hidden"],
-                defaultValue: "block",
+                defaultValue: "hidden",
                 canShow: (di: IDragItem) => di.type === "container"
             },
 
@@ -484,7 +484,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: 0,
                 min: -2 ^ 16,
                 max: 2 ^ 16,
-                validNodeTypes: ["ui/slider"],
+                validNodeTypes: ["ui/number"],
             },
             {
                 name: "max",
@@ -494,7 +494,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: 10,
                 min: -2 ^ 16,
                 max: 2 ^ 16,
-                validNodeTypes: ["ui/slider"],
+                validNodeTypes: ["ui/number"],
             },
             {
                 name: "step",
@@ -504,7 +504,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: 1,
                 min: -2 ^ 16,
                 max: 2 ^ 16,
-                validNodeTypes: ["ui/slider"],
+                validNodeTypes: ["ui/number"],
             },
 
             // Button
@@ -707,6 +707,8 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
         }
     }
     const entry: DragItemEntry = { dragItem, children: [], parent: null };
+    if (state.allItemsByNode[dragItem.id] !== null)
+        throw new Error(`Container with ID ${dragItem.id} already registered!!!`)
     state.allItems[dragItem.id] = entry;
     if (parent) {
         moveItem(dragItem, parent, index)
@@ -733,7 +735,11 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
     }
     const parentEntry = state.allItems[parent.id]
     const entry: DragItemEntry = { dragItem, children: [], parent: null };
+    if (state.allItemsByNode[dragItem.id] !== null)
+        throw new Error(`Widget with ID ${dragItem.id} already registered!!!`)
     state.allItems[dragItem.id] = entry;
+    if (state.allItemsByNode[node.id] !== null)
+        throw new Error(`Widget's node with ID ${node.id} already registered!!!`)
     state.allItemsByNode[node.id] = entry;
     console.debug("[layoutState] addWidget", state)
     moveItem(dragItem, parent, index)
@@ -863,9 +869,7 @@ function groupItems(dragItemIDs: DragItemID[], attrs: Partial<Attributes> = {}):
             index = indexFound
     }
 
-    const title = dragItemIDs.length <= 1 ? "" : "Group";
-
-    const container = addContainer(parent as ContainerLayout, { title, ...attrs }, index)
+    const container = addContainer(parent as ContainerLayout, { title: "", containerVariant: "block", ...attrs }, index)
 
     for (const itemID of dragItemIDs) {
         const item = state.allItems[itemID].dragItem;

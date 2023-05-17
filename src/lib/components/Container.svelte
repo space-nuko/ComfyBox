@@ -15,8 +15,8 @@
  import { flip } from 'svelte/animate';
  import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
  import { startDrag, stopDrag } from "$lib/utils"
-	import type { Writable } from "svelte/store";
-	import { isHidden } from "$lib/widgets/utils";
+ import type { Writable } from "svelte/store";
+ import { isHidden } from "$lib/widgets/utils";
 
  export let container: ContainerLayout | null = null;
  export let zIndex: number = 0;
@@ -34,7 +34,7 @@
 </script>
 
 {#if container}
-    {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets" && zIndex > 1}
+    {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets"}
     {@const dragDisabled = zIndex === 0 || $selectionState.currentSelection.length > 2 || !$uiState.uiUnlocked}
     {#key $attrsChanged}
         {#if edit || !isHidden(container)}
