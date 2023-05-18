@@ -137,45 +137,22 @@ export class ImageViewer {
         }
     }
 
-    setupGalleryImageForLightbox(e: HTMLImageElement) {
-        if (e.dataset.modded === "true")
+    showLightbox(source: HTMLImageElement) {
+        const initiallyZoomed = true
+        this.modalZoomSet(this.modalImage, initiallyZoomed)
+
+        const galleryElem = source.closest<HTMLDivElement>("div.block")
+        console.debug("[ImageViewer] showModal", event, source, galleryElem);
+        if (!galleryElem || ImageViewer.all_gallery_buttons(galleryElem).length === 0) {
+            console.error("No buttons found on gallery element!", galleryElem)
             return;
+        }
 
-        e.dataset.modded = "true";
-        e.style.cursor = 'pointer'
-        e.style.userSelect = 'none'
+        let urls = ImageViewer.get_gallery_urls(galleryElem)
+        const [_currentButton, index] = ImageViewer.selected_gallery_button(galleryElem)
+        console.warn("Gallery!", index, urls, galleryElem)
 
-        var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
-
-        // For Firefox, listening on click first switched to next image then shows the lightbox.
-        // If you know how to fix this without switching to mousedown event, please.
-        // For other browsers the event is click to make it possiblr to drag picture.
-        var event = isFirefox ? 'mousedown' : 'click'
-
-        e.addEventListener(event, (evt) => {
-            // if (!opts.js_modal_lightbox || evt.button != 0) return;
-
-            const initiallyZoomed = true
-            this.modalZoomSet(this.modalImage, initiallyZoomed)
-            evt.preventDefault()
-
-            const source = evt.target as HTMLImageElement;
-
-            const galleryElem = source.closest<HTMLDivElement>("div.block")
-            console.debug("[ImageViewer] showModal", event, source, galleryElem);
-            if (!galleryElem || ImageViewer.all_gallery_buttons(galleryElem).length === 0) {
-                console.error("No buttons found on gallery element!", galleryElem)
-                return;
-            }
-
-            let urls = ImageViewer.get_gallery_urls(galleryElem)
-            const [_currentButton, index] = ImageViewer.selected_gallery_button(galleryElem)
-            console.warn("Gallery!", index, urls, galleryElem)
-
-            this.showModal(urls, index, galleryElem)
-            evt.stopPropagation();
-        }, true);
-
+        this.showModal(urls, index, galleryElem)
     }
 
     modalZoomSet(modalImage: HTMLImageElement, enable: boolean) {

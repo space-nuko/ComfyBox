@@ -82,6 +82,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
 
         let state = get(queueState);
         let ss = get(selectionState);
+        const isRunningNode = node.id === state.runningNodeID
 
         let color = null;
         let thickness = 1;
@@ -92,16 +93,22 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         if (ss.currentHoveredNodes.has(node.id)) {
             color = "lightblue";
         }
-        else if (node.id === +state.runningNodeID) {
+        else if (isRunningNode) {
             color = "#0f0";
         }
 
         if (color) {
-            this.drawNodeOutline(node, ctx, state.progress, size, fgColor, bgColor, color, thickness)
+            this.drawNodeOutline(node, ctx, size, fgColor, bgColor, color, thickness)
+        }
+
+        if (isRunningNode && state.progress) {
+            ctx.fillStyle = "green";
+            ctx.fillRect(0, 0, size[0] * (state.progress.value / state.progress.max), 6);
+            ctx.fillStyle = bgColor;
         }
     }
 
-    private drawNodeOutline(node: LGraphNode, ctx: CanvasRenderingContext2D, progress?: Progress, size: Vector2, fgColor: string, bgColor: string, outlineColor: string, outlineThickness: number) {
+    private drawNodeOutline(node: LGraphNode, ctx: CanvasRenderingContext2D, size: Vector2, fgColor: string, bgColor: string, outlineColor: string, outlineThickness: number) {
         const shape = node.shape || BuiltInSlotShape.ROUND_SHAPE;
         ctx.lineWidth = outlineThickness;
         ctx.globalAlpha = 0.8;
@@ -131,12 +138,6 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         ctx.stroke();
         ctx.strokeStyle = fgColor;
         ctx.globalAlpha = 1;
-
-        if (progress) {
-            ctx.fillStyle = "green";
-            ctx.fillRect(0, 0, size[0] * (progress.value / progress.max), 6);
-            ctx.fillStyle = bgColor;
-        }
     }
 
     private alignToGrid(node: LGraphNode, ctx: CanvasRenderingContext2D) {

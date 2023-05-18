@@ -26,6 +26,7 @@
 
 	const dispatch = createEventDispatcher<{
 		select: SelectData;
+        clicked: HTMLImageElement
 	}>();
 
 	// tracks whether the value of the gallery was reset
@@ -142,6 +143,14 @@
 
 	let height = 0;
 	let window_height = 0;
+
+    let imgElem = null;
+
+    function onClick() {
+        // selected_image = next
+        if (imgElem)
+            dispatch("clicked", imgElem)
+    }
 </script>
 
 <svelte:window bind:innerHeight={window_height} />
@@ -166,7 +175,8 @@
 			<ModifyUpload on:clear={() => (selected_image = null)} />
 
 			<img
-				on:click={() => (selected_image = next)}
+				on:click={onClick}
+                bind:this={imgElem}
 				src={_value[selected_image][0].data}
 				alt={_value[selected_image][1] || ""}
 				title={_value[selected_image][1] || null}

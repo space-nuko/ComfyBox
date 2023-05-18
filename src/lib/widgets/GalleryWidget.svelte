@@ -49,7 +49,7 @@
 
  let mobileLightbox = null;
 
- function showMobileLightbox(event: Event) {
+ function showMobileLightbox(source: HTMLImageElement) {
      if (!f7)
          return
 
@@ -58,16 +58,14 @@
          mobileLightbox = null;
      }
 
-     const source = (event.target || event.srcElement) as HTMLImageElement;
      const galleryElem = source.closest<HTMLDivElement>("div.block")
-     console.debug("[ImageViewer] showModal", event, source, galleryElem);
+     console.debug("[ImageViewer] showModal", source, galleryElem);
      if (!galleryElem || ImageViewer.all_gallery_buttons(galleryElem).length === 0) {
          console.error("No buttons found on gallery element!", galleryElem)
          return;
      }
 
      const allGalleryButtons = ImageViewer.all_gallery_buttons(galleryElem);
-     const selectedSource = source.src
 
      const images = allGalleryButtons.map(button => {
          return {
@@ -84,47 +82,18 @@
          type: 'popup',
      });
      mobileLightbox.open(selected_image)
-
-     event.stopPropagation()
  }
 
- function setupImageForMobileLightbox(e: HTMLImageElement) {
-     if (e.dataset.modded === "true")
-         return;
-
-     e.dataset.modded = "true";
-     e.style.cursor = "pointer";
-     e.style.userSelect = "none";
-
-     var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
-
-     // For Firefox, listening on click first switched to next image then shows the lightbox.
-     // If you know how to fix this without switching to mousedown event, please.
-     // For other browsers the event is click to make it possiblr to drag picture.
-     var event = isFirefox ? 'mousedown' : 'click'
-
-     e.addEventListener(event, (evt) => {
-         evt.preventDefault()
-         showMobileLightbox(evt)
-     }, true);
+ function onClicked(e: CustomEvent<HTMLImageElement>) {
+     if (isMobile) {
+         showMobileLightbox(e.detail)
+     }
+     else {
+         ImageViewer.instance.showLightbox(e.detail)
+     }
  }
 
  function onSelect(e: CustomEvent<GradioSelectData>) {
-     // Setup lightbox
-     // Wait for gradio gallery to show the large preview image, if no timeout then
-     // the event might fire too early
-
-     const callback = isMobile ? setupImageForMobileLightbox
-                    : ImageViewer.instance.setupGalleryImageForLightbox.bind(ImageViewer.instance)
-
-     setTimeout(() => {
-         const images = element.querySelectorAll<HTMLImageElement>('div.block div > img')
-         if (images != null) {
-             images.forEach(callback);
-         }
-         ImageViewer.instance.refreshImages();
-     }, 200)
-
      // Update index
      node.setProperty("index", e.detail.index as number)
  }
@@ -176,6 +145,7 @@
                         root={""}
                         root_url={""}
                         on:select={onSelect}
+                        on:clicked={onClicked}
                         bind:imageWidth={$imageWidth}
                         bind:imageHeight={$imageHeight}
                         bind:selected_image

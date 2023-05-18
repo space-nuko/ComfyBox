@@ -25,6 +25,7 @@
  }
 
  function doClose() {
+     showModal = false;
      dialog.close();
      dispatch("close")
  }
@@ -41,7 +42,7 @@
         <slot name="header" />
         <slot />
         <div class="button-row">
-            <slot name="buttons">
+            <slot name="buttons" {closeDialog}>
                 <!-- svelte-ignore a11y-autofocus -->
                 <Button variant="secondary" on:click={doClose}>Close</Button>
             </slot>
