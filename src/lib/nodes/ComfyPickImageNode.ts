@@ -78,6 +78,9 @@ export default class ComfyPickImageNode extends ComfyGraphNode {
             this.setOutputData(2, this._image.width);
             this.setOutputData(3, this._image.height);
 
+            // XXX: image size doesn't load until the <img> element is ready on
+            // the page so this can come after several frames' worth of
+            // execution
             this.widthWidget.value = this._image.width
             this.heightWidget.value = this._image.height
         }

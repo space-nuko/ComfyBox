@@ -47,10 +47,16 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     _selectedNodes: Set<NodeID> = new Set();
 
     serialize(): SerializedGraphCanvasState {
-        return {
-            offset: this.ds.offset,
-            scale: this.ds.scale
+        let offset = this.ds.offset;
+        let scale = this.ds.scale;
+
+        // Use top-level graph for saved offset if we're viewing a subgraph
+        if (this._graph_stack?.length > 0) {
+            offset = this._graph_stack[0].offset;
+            scale = this._graph_stack[0].scale;
         }
+
+        return { offset, scale }
     }
 
     deserialize(data: SerializedGraphCanvasState) {
