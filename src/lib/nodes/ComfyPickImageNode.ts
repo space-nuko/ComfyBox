@@ -63,7 +63,7 @@ export default class ComfyPickImageNode extends ComfyGraphNode {
 
     override onExecute() {
         const data = this.getInputData(0)
-        const index = this.getInputData(1)
+        const index = this.getInputData(1) || 0
         this.setValue(data, index);
 
         if (this._image == null) {

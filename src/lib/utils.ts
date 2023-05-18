@@ -419,6 +419,12 @@ export function executionResultToImageMetadata(result: ComfyExecutionResult): Co
     return result.images.map(comfyFileToComfyBoxMetadata)
 }
 
+export function isComfyImageLocation(param: any): param is ComfyImageLocation {
+    return param != null && typeof param === "object"
+        && typeof param.filename === "string"
+        && typeof param.type === "string"
+}
+
 export function parseWhateverIntoImageMetadata(param: any): ComfyBoxImageMetadata[] | null {
     let meta: ComfyBoxImageMetadata[] | null = null
 
@@ -429,10 +435,24 @@ export function parseWhateverIntoImageMetadata(param: any): ComfyBoxImageMetadat
         meta = param
     }
     else if (isComfyExecutionResult(param)) {
-        meta = executionResultToImageMetadata(param)
+        meta = executionResultToImageMetadata(param);
+    }
+    else if (isComfyImageLocation(param)) {
+        meta = [comfyFileToComfyBoxMetadata(param)]
+    }
+    else if (Array.isArray(param) && param.every(isComfyImageLocation)) {
+        meta = param.map(comfyFileToComfyBoxMetadata)
     }
 
     return meta;
+}
+
+export function parseWhateverIntoComfyImageLocations(param: any): ComfyImageLocation[] | null {
+    const meta = parseWhateverIntoImageMetadata(param);
+    if (!Array.isArray(meta))
+        return null
+
+    return meta.map(m => m.comfyUIFile);
 }
 
 export function comfyBoxImageToComfyFile(image: ComfyBoxImageMetadata): ComfyImageLocation {

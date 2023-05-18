@@ -8,7 +8,7 @@ import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode"
 import type { ComfyWidgetNode } from "$lib/nodes/widgets";
 import type { NotifyOptions } from "$lib/notify";
 import type { FileData as GradioFileData } from "@gradio/upload";
-import { type ComfyExecutionResult, type ComfyImageLocation, convertComfyOutputToGradio, type ComfyUploadImageAPIResponse } from "$lib/utils";
+import { type ComfyExecutionResult, type ComfyImageLocation, convertComfyOutputToGradio, type ComfyUploadImageAPIResponse, parseWhateverIntoComfyImageLocations } from "$lib/utils";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
@@ -598,27 +598,7 @@ export class ComfySetPromptThumbnailsAction extends ComfyGraphNode {
 
     override getPromptThumbnails(): ComfyImageLocation[] | null {
         const data = this.getInputData(0)
-
-        const folderType = this.properties.folderType || "input";
-
-        const convertString = (s: string): ComfyImageLocation => {
-            return { filename: data, subfolder: "", type: folderType }
-        }
-
-        if (typeof data === "string") {
-            return [convertString(data)]
-        }
-        else if (data != null && typeof data === "object") {
-            if ("filename" in data && "type" in data)
-                return [data as ComfyImageLocation];
-        }
-        else if (Array.isArray(data) && data.length > 0) {
-            if (typeof data[0] === "string")
-                return data.map(convertString)
-            else if (typeof data[0] === "object" && "filename" in data[0] && "type" in data[0])
-                return data as ComfyImageLocation[]
-        }
-        return null;
+        return parseWhateverIntoComfyImageLocations(data);
     }
 }
 
