@@ -6,7 +6,7 @@
  import { StaticImage } from "$lib/components/gradio/image";
  import type { Styles } from "@gradio/utils";
  import type { WidgetLayout } from "$lib/stores/layoutState";
- import type { Writable } from "svelte/store";
+ import { writable, type Writable } from "svelte/store";
  import type { FileData as GradioFileData } from "@gradio/upload";
  import type { SelectData as GradioSelectData } from "@gradio/utils";
  import { clamp, comfyBoxImageToComfyURL, type ComfyBoxImageMetadata } from "$lib/utils";
@@ -19,8 +19,8 @@
  let nodeValue: Writable<ComfyBoxImageMetadata[]> | null = null;
  let propsChanged: Writable<number> | null = null;
  let option: number | null = null;
- let imageWidth: number = 1;
- let imageHeight: number = 1;
+ let imageWidth: Writable<number> = writable(0);
+ let imageHeight: Writable<number> = writable(0);
  let selected_image: number | null = null;
 
  $: widget && setNodeValue(widget);
@@ -30,6 +30,8 @@
          node = widget.node as ComfyGalleryNode
          nodeValue = node.value;
          propsChanged = node.propsChanged;
+         imageWidth = node.imageWidth
+         imageHeight = node.imageHeight
 
          if ($nodeValue != null) {
              if (node.properties.index < 0 || node.properties.index >= $nodeValue.length) {
@@ -44,15 +46,6 @@
      object_fit: "cover",
  }
  let element: HTMLDivElement;
-
- $: if (node) {
-     if (imageWidth > 1 || imageHeight > 1) {
-         node.imageSize = [imageWidth, imageHeight]
-     }
-     else {
-         node.imageSize = [1, 1]
-     }
- }
 
  let mobileLightbox = null;
 
@@ -138,8 +131,10 @@
 
  $: if ($propsChanged > -1 && widget && $nodeValue) {
      if (widget.attrs.variant === "image") {
-         selected_image = $nodeValue.length - 1
          node.setProperty("index", selected_image)
+     }
+     else {
+         node.setProperty("index", $nodeValue.length > 0 ? 0 : null)
      }
  }
  else {
@@ -160,8 +155,8 @@
                         value={url}
                         show_label={widget.attrs.title != ""}
                         label={widget.attrs.title}
-                        bind:imageWidth
-                        bind:imageHeight
+                        bind:imageWidth={$imageWidth}
+                        bind:imageHeight={$imageHeight}
                     />
                 {:else}
                     <Empty size="large" unpadded_box={true}><Image /></Empty>
@@ -181,8 +176,8 @@
                         root={""}
                         root_url={""}
                         on:select={onSelect}
-                        bind:imageWidth
-                        bind:imageHeight
+                        bind:imageWidth={$imageWidth}
+                        bind:imageHeight={$imageHeight}
                         bind:selected_image
                     />
                 </div>

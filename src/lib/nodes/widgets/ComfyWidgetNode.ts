@@ -152,6 +152,9 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     private triggerChangeEvent(value: any) {
+        if (this.changedEventName == null)
+            return;
+
         // console.debug("[Widget] trigger changed", this, value)
         this.trigger(this.changedEventName, value)
     }

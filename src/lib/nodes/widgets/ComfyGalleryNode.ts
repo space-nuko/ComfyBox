@@ -1,13 +1,13 @@
 import { parseWhateverIntoImageMetadata, type ComfyBoxImageMetadata, type ComfyUploadImageType } from "$lib/utils";
 import { BuiltInSlotType, LiteGraph, type IComboWidget, type ITextWidget, type PropertyLayout, type SlotLayout } from "@litegraph-ts/core";
-import { get } from "svelte/store";
+import { get, writable, type Writable } from "svelte/store";
 
 import GalleryWidget from "$lib/widgets/GalleryWidget.svelte";
 import type { ComfyWidgetProperties } from "./ComfyWidgetNode";
 import ComfyWidgetNode from "./ComfyWidgetNode";
 
 export interface ComfyGalleryProperties extends ComfyWidgetProperties {
-    index: number,
+    index: number | null,
     updateMode: "replace" | "append",
 }
 
@@ -45,6 +45,9 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
     selectedIndexWidget: ITextWidget;
     modeWidget: IComboWidget;
 
+    imageWidth: Writable<number> = writable(0);
+    imageHeight: Writable<number> = writable(0);
+
     constructor(name?: string) {
         super(name, [])
         this.selectedIndexWidget = this.addWidget("text", "Selected", String(this.properties.index), "index")
@@ -59,8 +62,15 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
     }
 
     override onExecute() {
-        this.setOutputData(0, get(this.value))
+        const value = get(this.value)
+        this.setOutputData(0, value)
         this.setOutputData(1, this.properties.index)
+
+        if (this.properties.index != null && value && value[this.properties.index] != null) {
+            const image = value[this.properties.index];
+            image.width = get(this.imageWidth)
+            image.height = get(this.imageHeight)
+        }
     }
 
     override onAction(action: any, param: any, options: { action_call?: string }) {

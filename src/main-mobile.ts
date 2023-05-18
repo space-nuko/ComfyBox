@@ -13,9 +13,10 @@ Framework7.use(Framework7Svelte);
 configureLitegraph(true);
 
 const comfyApp = new ComfyApp();
+(window as any).app = comfyApp;
 
 const app = new AppMobile({
-    target: document.getElementById('app'),
+    target: document.getElementById("app-root"),
     props: { app: comfyApp }
 })
 

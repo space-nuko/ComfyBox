@@ -26,8 +26,6 @@
 
  $: widget && setNodeValue(widget);
 
- $: console.warn("IMGSIZE2!!!", $imgWidth, $imgHeight)
-
  function setNodeValue(widget: WidgetLayout) {
      if (widget) {
          node = widget.node as ComfyImageEditorNode

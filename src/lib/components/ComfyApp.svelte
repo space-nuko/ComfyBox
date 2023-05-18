@@ -172,8 +172,6 @@
 
  onMount(async () => {
      await app.setup();
-     (window as any).app = app;
-     (window as any).appPane = uiPane;
 
      // await import('../../scss/ux.scss');
 
@@ -185,10 +183,10 @@
  }
 
  $: if (uiTheme === "gradio-dark") {
-     document.getElementById("app").classList.add("dark")
+     document.getElementById("app-root").classList.add("dark")
  }
  else {
-     document.getElementById("app").classList.remove("dark")
+     document.getElementById("app-root").classList.remove("dark")
  }
 </script>
 

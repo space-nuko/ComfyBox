@@ -115,7 +115,7 @@ export default class ComfyApp {
 
         this.setupColorScheme()
 
-        this.rootEl = document.getElementById("app") as HTMLDivElement;
+        this.rootEl = document.getElementById("app-root") as HTMLDivElement;
         this.canvasEl = document.getElementById("graph-canvas") as HTMLCanvasElement;
         this.lGraph = new ComfyGraph();
         this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl);

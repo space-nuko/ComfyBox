@@ -11,8 +11,8 @@
 	export let label: string | undefined = undefined;
 	export let show_label: boolean;
 	export let selectable: boolean = false;
- export let imageWidth: number = 1;
- export let imageHeight: number = 1;
+ export let imageWidth: number = 0;
+ export let imageHeight: number = 0;
  let imageElem: HTMLImageElement | null = null;
 
 	const dispatch = createEventDispatcher<{
@@ -23,8 +23,8 @@
 	$: value && dispatch("change", value);
 
  $: if (value == null || !imageElem) {
-     imageWidth = 1;
-     imageHeight = 1;
+     imageWidth = 0;
+     imageHeight = 0;
  }
 
 	const handle_click = (evt: MouseEvent) => {
