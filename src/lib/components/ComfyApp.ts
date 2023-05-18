@@ -45,25 +45,49 @@ if (typeof window !== "undefined") {
     nodes.ComfyReroute.setDefaultTextVisibility(!!localStorage["Comfy.ComfyReroute.DefaultVisibility"]);
 }
 
-type QueueItem = { num: number, batchCount: number }
+/*
+ * Queued prompt that hasn't been sent to the backend yet.
+ * TODO: Assumes the currently active graph will be serialized, needs to change
+ * for multiple loaded workflow support
+ */
+type QueueItem = {
+    num: number,
+    batchCount: number
+}
 
+/*
+ * Represents a single workflow that can be loaded into the program from JSON.
+ */
 export type SerializedAppState = {
+    /** Program identifier, should always be "ComfyBox" */
     createdBy: "ComfyBox",
+    /** Serial version, should be incremented on breaking changes */
     version: number,
+    /** Commit hash if found */
+    commitHash?: string,
+    /** Graph state */
     workflow: SerializedLGraph,
+    /** UI state */
     layout: SerializedLayoutState,
+    /** Position/offset of the canvas at the time of saving */
     canvas: SerializedGraphCanvasState
 }
 
-/** [link origin, link index] | value */
+/** [link_origin, link_slot_index] | input_value */
 export type SerializedPromptInput = [ComfyNodeID, number] | any
 
+/*
+ * A single node in the prompt and its input values.
+ */
 export type SerializedPromptInputs = {
     /* property name -> value or link */
     inputs: Record<string, SerializedPromptInput>,
     class_type: string
 }
 
+/*
+ * All nodes in the graph and their input values.
+ */
 export type SerializedPromptInputsAll = Record<ComfyNodeID, SerializedPromptInputs>
 
 export type SerializedPrompt = {
@@ -71,6 +95,9 @@ export type SerializedPrompt = {
     output: SerializedPromptInputsAll
 }
 
+/*
+ * Outputs for each node.
+ */
 export type SerializedPromptOutputs = Record<ComfyNodeID, ComfyExecutionResult>
 
 export type Progress = {
@@ -78,6 +105,10 @@ export type Progress = {
     max: number
 }
 
+/*
+ * A combo node and the backend node that will send an updated config over, for
+ * refreshing lists of model files
+ */
 type BackendComboNode = {
     comboNode: ComfyComboNode,
     comfyInput: IComfyInputSlot,
@@ -95,6 +126,7 @@ export default class ComfyApp {
     nodeOutputs: Record<string, any> = {};
 
     shiftDown: boolean = false;
+    ctrlDown: boolean = false;
     selectedGroupMoving: boolean = false;
 
     private queueItems: QueueItem[] = [];
@@ -406,6 +438,7 @@ export default class ComfyApp {
     private addKeyboardHandler() {
         window.addEventListener("keydown", (e) => {
             this.shiftDown = e.shiftKey;
+            this.ctrlDown = e.ctrlKey;
 
             // Queue prompt using ctrl or command + enter
             if ((e.ctrlKey || e.metaKey) && (e.key === "Enter" || e.keyCode === 13 || e.keyCode === 10)) {
@@ -414,6 +447,7 @@ export default class ComfyApp {
         });
         window.addEventListener("keyup", (e) => {
             this.shiftDown = e.shiftKey;
+            this.ctrlDown = e.ctrlKey;
         });
     }
 
@@ -561,7 +595,9 @@ export default class ComfyApp {
         }
 
         if (get(layoutState).attrs.queuePromptButtonRunWorkflow) {
-            this.queuePrompt(0, 1);
+            // Hold control to queue at the front
+            const num = this.ctrlDown ? -1 : 0;
+            this.queuePrompt(num, 1);
         }
     }
 

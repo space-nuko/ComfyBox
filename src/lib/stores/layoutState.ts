@@ -39,8 +39,10 @@ export type LayoutAttributes = {
     queuePromptButtonName: string,
 
     /*
-     * If true, clicking the "Queue Prompt" button will run the default subgraph.
-     * Set this to false if you need special behavior before running any subgraphs.
+     * If true, clicking the "Queue Prompt" button will run the default
+     * subgraph. Set this to false if you need special behavior before running
+     * any subgraphs, and instead use the `onDefaultQueueAction` event of the
+     * Comfy.QueueEvents node.
      */
     queuePromptButtonRunWorkflow: boolean,
 }
@@ -84,6 +86,9 @@ export type LayoutState = {
      */
     attrs: LayoutAttributes
 
+    /*
+     * Increment to force Svelte to re-render the props panel
+     */
     refreshPropsPanel: Writable<number>
 }
 
@@ -102,7 +107,7 @@ export type Attributes = {
     title: string,
 
     /*
-     * List of classes to apply to the component.
+     * List of CSS classes to apply to the component.
      */
     classes: string,
 
@@ -204,22 +209,22 @@ export type AttributesSpec = {
     values?: string[],
 
     /*
-     * If `type` is "number", step for the slider
+     * If `type` is "number", step for the slider that edits this attribute
      */
     step?: number,
 
     /*
-     * If `type` is "number", min for the slider
+     * If `type` is "number", min for the slider that edits this attribute
      */
     min?: number,
 
     /*
-     * If `type` is "number", max for the slider
+     * If `type` is "number", max for the slider that edits this attribute
      */
     max?: number,
 
     /*
-     * If `type` is "string", display as a textarea.
+     * If `type` is "string", display as a textarea instead of an input.
      */
     multiline?: boolean,
 
@@ -863,8 +868,9 @@ function nodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
         let prevWidget = state.allItemsByNode[node.id]
         if (prevWidget == null) {
             // If a subgraph was cloned, try looking for the original widget node corresponding to the new widget node being added.
-            // `node` is the new ComfyWidgetNode instance to copy attrs to.
-            // `options.cloneData` should contain the results of Subgraph.clone(), called "subgraphNewIDMapping".
+            // `node` is the new ComfyWidgetNode instance to copy layout attrs to.
+            // `options.cloneData` should contain the results of Subgraph.clone(), which is named "subgraphNewIDMapping" in an
+            // entry of the `forNode` Record.
             // `options.cloneData` is attached to the onNodeAdded options if a node is added to a graph after being
             // selection-cloned or pasted, as they both call clone() internally.
             const cloneData = options.cloneData.forNode[options.prevNodeID]
@@ -879,7 +885,7 @@ function nodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
                 if (nodeIDInLayoutState) {
                     // Gottem.
                     prevWidget = state.allItemsByNode[nodeIDInLayoutState]
-                    console.warn("FOUND CLONED SUBGRAPH NODE", node.id, "=>", nodeIDInLayoutState, prevWidget)
+                    // console.warn("FOUND CLONED SUBGRAPH NODE", node.id, "=>", nodeIDInLayoutState, prevWidget)
                 }
             }
         }

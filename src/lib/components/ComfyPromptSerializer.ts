@@ -113,7 +113,7 @@ export class UpstreamNodeLocator {
         }
 
         // If there are non-target nodes between us and another
-        // backend node, we have to traverse them first. This
+        // target node, we have to traverse them first. This
         // behavior is dependent on the type of node. Reroute nodes
         // will simply follow their single input, while branching
         // nodes have conditional logic that determines which link

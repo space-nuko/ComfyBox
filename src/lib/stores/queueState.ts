@@ -4,10 +4,6 @@ import type { ComfyExecutionResult } from "$lib/nodes/ComfyWidgetNodes";
 import notify from "$lib/notify";
 import { get, writable, type Writable } from "svelte/store";
 
-export type QueueItem = {
-    name: string
-}
-
 export type QueueEntryStatus = "success" | "error" | "interrupted" | "all_cached" | "unknown";
 
 type QueueStateOps = {
@@ -23,8 +19,13 @@ type QueueStateOps = {
     onExecuted: (promptID: PromptID, nodeID: ComfyNodeID, output: ComfyExecutionResult) => void
 }
 
+/*
+ * Single job that the backend keeps track of.
+ */
 export type QueueEntry = {
-    /* Data preserved on page refresh */
+    /*** Data preserved on page refresh ***/
+
+    /** Priority of the prompt. -1 means to queue at the front. */
     number: number,
     queuedAt?: Date,
     finishedAt?: Date,
@@ -33,23 +34,34 @@ export type QueueEntry = {
     extraData: ComfyBoxPromptExtraData,
     goodOutputs: ComfyNodeID[],
 
-    /* Data not sent by ComfyUI's API, lost on page refresh */
+    /*** Data not sent by ComfyUI's API, lost on page refresh ***/
 
     /* Prompt outputs, collected while the prompt is still executing */
     outputs: SerializedPromptOutputs,
-
-    /* Nodes in of the workflow that have finished running so far. */
+    /* Nodes of the workflow that have finished running so far. */
     nodesRan: Set<ComfyNodeID>,
+    /* Nodes of the workflow the backend reported as cached. */
     cachedNodes: Set<ComfyNodeID>
 }
 
+/*
+ * Represents a queue entry that has finished executing (suceeded or failed) and
+ * has been moved to the history.
+ */
 export type CompletedQueueEntry = {
+    /** Corresponding entry in the queue, for the prompt/extra data */
     entry: QueueEntry,
+    /** The result of this prompt, success/failed/cached */
     status: QueueEntryStatus,
+    /** Message to display in the frontend */
     message?: string,
+    /** Detailed error/stacktrace, perhaps inspectible with a popup */
     error?: string,
 }
 
+/*
+ * Keeps track of queued and completed (history) prompts.
+ */
 export type QueueState = {
     queueRunning: Writable<QueueEntry[]>,
     queuePending: Writable<QueueEntry[]>,
@@ -57,6 +69,11 @@ export type QueueState = {
     queueRemaining: number | "X" | null;
     runningNodeID: ComfyNodeID | null;
     progress: Progress | null,
+    /**
+     * If true, user pressed the "Interrupt" button in the frontend. Disable the
+     * button and wait until the next prompt starts running to re-enable it
+     * again
+     */
     isInterrupting: boolean
 }
 type WritableQueueStateStore = Writable<QueueState> & QueueStateOps;
@@ -159,6 +176,7 @@ function moveToCompleted(index: number, queue: Writable<QueueEntry[]>, status: Q
         return qc
     })
 
+    state.isInterrupting = false;
     store.set(state)
 }
 
