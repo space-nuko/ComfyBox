@@ -9,7 +9,6 @@ export function configureLitegraph(isMobile: boolean = false) {
     // Must be enabled, otherwise subgraphs won't work (because of non-unique node/link IDs)
     LiteGraph.use_uuids = true;
 
-
     LiteGraph.search_filter_enabled = true;
     LiteGraph.release_link_on_empty_shows_menu = true;
     LiteGraph.alt_drag_do_clone_nodes = true;

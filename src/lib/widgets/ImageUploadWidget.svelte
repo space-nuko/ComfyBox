@@ -172,7 +172,7 @@
      });
 
      setTimeout(function () {
-         kl.klApp?.out("yo");
+         kl?.klApp?.out("yo");
      }, 1000);
  }
 
