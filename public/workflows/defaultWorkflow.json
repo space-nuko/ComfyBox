@@ -15769,8 +15769,7 @@
               "properties": {
                 "tags": [
                   "img2img",
-                  "gen",
-                  "hr"
+                  "gen"
                 ],
                 "defaultFolderType": "input"
               },
