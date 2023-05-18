@@ -6,6 +6,7 @@ export default class ComfyPickImageNode extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
         inputs: [
             { name: "images", type: "COMFYBOX_IMAGES,COMFYBOX_IMAGE" },
+            { name: "index", type: "number" },
         ],
         outputs: [
             { name: "image", type: "COMFYBOX_IMAGE" },
@@ -35,13 +36,14 @@ export default class ComfyPickImageNode extends ComfyGraphNode {
     _path: string | null = null;
     _index: number = 0;
 
-    private setValue(value: ComfyBoxImageMetadata[] | ComfyBoxImageMetadata | null) {
+    private setValue(value: ComfyBoxImageMetadata[] | ComfyBoxImageMetadata | null, index: number) {
         if (value != null && !Array.isArray(value)) {
             value = [value]
-            this._index = 0;
+            index = 0;
         }
-        const changed = this._value != value;
+        const changed = this._value != value || this._index != index;
         this._value = value as ComfyBoxImageMetadata[];
+        this._index = index;
         if (changed) {
             if (value && value[this._index] != null) {
                 this._image = value[this._index]
@@ -61,7 +63,8 @@ export default class ComfyPickImageNode extends ComfyGraphNode {
 
     override onExecute() {
         const data = this.getInputData(0)
-        this.setValue(data);
+        const index = this.getInputData(1)
+        this.setValue(data, index);
 
         if (this._image == null) {
             this.setOutputData(0, null)
