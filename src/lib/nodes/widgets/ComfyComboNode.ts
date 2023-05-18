@@ -55,7 +55,7 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
         }
     }
 
-    formatValues(values: string[], lightUp: boolean = false) {
+    formatValues(values: string[], defaultValue?: string, lightUp: boolean = false) {
         if (values == null)
             return;
 
@@ -65,7 +65,7 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
         const oldValue = get(this.value)
         if (this.properties.values.indexOf(oldValue) === -1) {
             changed = true;
-            this.value.set(this.properties.values[0])
+            this.value.set(defaultValue || this.properties.values[0])
         }
 
         if (lightUp && get(this.firstLoad) && changed)
@@ -129,7 +129,7 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
         thisProps.values = Array.from(otherProps.values);
         const value = get(this.value)
         if (thisProps.values.indexOf(value) === -1)
-            this.setValue(thisProps.values[0])
+            this.setValue(otherProps.defaultValue || thisProps.values[0])
 
         console.warn("PASSED")
 

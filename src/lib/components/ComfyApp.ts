@@ -821,13 +821,15 @@ export default class ComfyApp {
                 .flatMap(i => node.getInputSlotsConnectedTo(i))
                 .find(inp => "config" in inp && Array.isArray((inp.config as any).values))
 
+            let defaultValue = null;
             if (foundInput != null) {
                 const comfyInput = foundInput as IComfyInputSlot;
                 console.warn("[refreshComboInNodes] found frontend config:", node.title, node.type, comfyInput.config.values)
                 values = comfyInput.config.values;
+                defaultValue = comfyInput.config.defaultValue;
             }
 
-            comboNode.formatValues(values);
+            comboNode.formatValues(values, defaultValue);
         }
 
         await tick();
@@ -842,7 +844,7 @@ export default class ComfyApp {
 
             comboNode.formatValues(rawValues as string[], true)
             if (!rawValues?.includes(get(comboNode.value))) {
-                comboNode.setValue(rawValues[0])
+                comboNode.setValue(rawValues[0], comfyInput.config.defaultValue)
             }
         }
     }

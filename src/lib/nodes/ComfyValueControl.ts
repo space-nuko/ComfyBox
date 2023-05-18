@@ -19,7 +19,7 @@ export default class ComfyValueControl extends ComfyGraphNode {
     override properties: ComfyValueControlProperties = {
         tags: [],
         value: null,
-        action: "fixed",
+        action: "randomize",
         min: -INT_MAX,
         max: INT_MAX,
         step: 1,
