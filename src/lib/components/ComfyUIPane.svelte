@@ -8,6 +8,7 @@
  import WidgetContainer from "./WidgetContainer.svelte";
  import layoutState, { type ContainerLayout, type DragItem, type IDragItem } from "$lib/stores/layoutState";
  import uiState from "$lib/stores/uiState";
+ import selectionState from "$lib/stores/selectionState";
 
  import Menu from './menu/Menu.svelte';
  import MenuOption from './menu/MenuOption.svelte';
@@ -29,19 +30,72 @@
      // TODO
  }
 
+ function moveTo(delta: number | ((cur: number, total: number) => number)) {
+     const dragItemID = $selectionState.currentSelection[0];
+     const entry = $layoutState.allItems[dragItemID];
+     if (!entry) {
+         return
+     }
+
+     const dragItem = entry.dragItem;
+     const containing = entry.parent
+     if (containing == null || containing.type !== "container") {
+         return
+     }
+
+     const containingEntry = $layoutState.allItems[containing.id];
+     const oldIndex = containingEntry.children.findIndex(c => c.id === dragItem.id)
+     if (oldIndex === -1) {
+         return;
+     }
+
+     let newIndex: number;
+     if (typeof delta === "number")
+         newIndex = oldIndex + delta;
+     else
+         newIndex = delta(oldIndex, containingEntry.children.length);
+
+     layoutState.moveItem(dragItem, containing as ContainerLayout, newIndex)
+     $layoutState = $layoutState
+ }
+
+ function moveUp() {
+     moveTo(-1)
+ }
+
+ function moveDown() {
+     moveTo(1)
+ }
+
+ function sendToTop() {
+     moveTo(() => 0)
+ }
+
+ function sendToBottom() {
+     moveTo((cur: number, total: number) => total - 1)
+ }
+
  function groupWidgets(horizontal: boolean) {
-     const items = layoutState.getCurrentSelection()
-     $layoutState.currentSelection = []
+     const items = $selectionState.currentSelection
+     $selectionState.currentSelection = []
      layoutState.groupItems(items, { direction: horizontal ? "horizontal" : "vertical" })
  }
 
  let canUngroup = false;
  let isDeleteGroup = false;
- $: canUngroup = $layoutState.currentSelection.length === 1
-            && layoutState.getCurrentSelection()[0].type === "container"
+ $: {
+     canUngroup = false;
+     if ($selectionState.currentSelection.length === 1) {
+         const entry = $layoutState.allItems[$selectionState.currentSelection[0]]
+         if (entry != null) {
+             const item = entry.dragItem;
+             canUngroup = item.type === "container"
+         }
+     }
+ }
  $: if (canUngroup) {
-     const dragItem = layoutState.getCurrentSelection()[0];
-     const entry = $layoutState.allItems[dragItem.id];
+     const dragItemID = $selectionState.currentSelection[0];
+     const entry = $layoutState.allItems[dragItemID];
      isDeleteGroup = entry.children.length === 0
  }
  else {
@@ -49,11 +103,19 @@
  }
 
  function ungroup() {
-     const item = layoutState.getCurrentSelection()[0]
-     if (!item || item.type !== "container")
+     const itemID = $selectionState.currentSelection[0]
+     if (itemID == null)
          return;
 
-     $layoutState.currentSelection = []
+     const entry = $layoutState.allItems[$selectionState.currentSelection[0]]
+     if (entry == null)
+         return
+
+     const item = entry.dragItem;
+     if(item.type !== "container")
+         return
+
+     $selectionState.currentSelection = []
      layoutState.ungroup(item as ContainerLayout)
  }
 
@@ -94,11 +156,28 @@
 {#if showMenu}
     <Menu {...menuPos} on:click={closeMenu} on:clickoutside={closeMenu}>
         <MenuOption
-            isDisabled={$layoutState.currentSelection.length === 0}
+            isDisabled={$selectionState.currentSelection.length !== 1}
+            on:click={() => moveUp()}
+            text="Move Up" />
+        <MenuOption
+            isDisabled={$selectionState.currentSelection.length !== 1}
+            on:click={() => moveDown()}
+            text="Move Down" />
+        <MenuOption
+            isDisabled={$selectionState.currentSelection.length !== 1}
+            on:click={() => sendToTop()}
+            text="Send to Top" />
+        <MenuOption
+            isDisabled={$selectionState.currentSelection.length !== 1}
+            on:click={() => sendToBottom()}
+            text="Send to Bottom" />
+        <MenuDivider/>
+        <MenuOption
+            isDisabled={$selectionState.currentSelection.length === 0}
             on:click={() => groupWidgets(false)}
             text="Group" />
         <MenuOption
-            isDisabled={$layoutState.currentSelection.length === 0}
+            isDisabled={$selectionState.currentSelection.length === 0}
             on:click={() => groupWidgets(true)}
             text="Group Horizontally" />
         <MenuOption

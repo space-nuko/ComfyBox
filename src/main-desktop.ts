@@ -1,10 +1,15 @@
-import { LiteGraph } from '@litegraph-ts/core';
+import ComfyApp from '$lib/components/ComfyApp';
+import { configureLitegraph } from '$lib/init';
 import App from './App.svelte';
 
-LiteGraph.use_uuids = true;
+configureLitegraph()
+
+const comfyApp = new ComfyApp();
+(window as any).app = comfyApp;
 
 const app = new App({
-    target: document.getElementById('app'),
+    target: document.getElementById("app-root"),
+    props: { app: comfyApp }
 })
 
 export default app;

@@ -1,4 +1,5 @@
 @import "gradio";
+@import "litegraph";
 
 body {
     overflow: hidden;
@@ -7,14 +8,22 @@ body {
     overscroll-behavior-y: contain;
 }
 
-#app {
+#app-root {
     background: var(--body-background-fill);
 }
 
 :root {
     --color-blue-500: #3985f5;
 
+    --input-border-color-focus: var(--neutral-400);
+
     --comfy-accent-soft: var(--neutral-300);
+    --comfy-widget-selected-background-fill: var(--color-yellow-100);
+    --comfy-widget-hovered-background-fill: var(--secondary-200);
+    --comfy-container-selected-background-fill: var(--color-yellow-300);
+    --comfy-container-hovered-background-fill: var(--secondary-300);
+    --comfy-container-empty-background-fill: var(--color-grey-300);
+    --comfy-container-empty-border-color: var(--color-grey-400);
     --comfy-disabled-label-color: var(--neutral-400);
     --comfy-disabled-textbox-background-fill: var(--neutral-200);
     --comfy-disabled-textbox-border-color: var(--neutral-300);
@@ -37,7 +46,15 @@ body {
 .dark {
     color-scheme: dark;
 
+    --input-border-color-focus: var(--neutral-500);
+
     --comfy-accent-soft: var(--neutral-600);
+    --comfy-widget-selected-background-fill: var(--primary-500);
+    --comfy-widget-hovered-background-fill: var(--neutral-600);
+    --comfy-container-selected-background-fill: var(--primary-700);
+    --comfy-container-hovered-background-fill: var(--neutral-500);
+    --comfy-container-empty-background-fill: var(--color-grey-800);
+    --comfy-container-empty-border-color: var(--color-grey-600);
     --comfy-disabled-label-color: var(--neutral-500);
     --comfy-disabled-textbox-background-fill: var(--neutral-800);
     --comfy-disabled-textbox-border-color: var(--neutral-700);
@@ -90,9 +107,16 @@ hr {
     color: var(--panel-border-color);
 }
 
-select {
-    color: var(--body-text-color);
-    background: var(--block-background-fill);
+input, textarea {
+    border-radius: 0 !important;
+}
+
+:not(.litegraph) {
+    select {
+        color: var(--body-text-color);
+        background: var(--input-background-fill);
+        border: var(--input-border-width) solid var(--input-border-color)
+    }
 }
 
 .container {
@@ -124,17 +148,6 @@ select {
     //     }
     // }
 }
-
-// button {
-//     filter: none;
-//     &.primary:active {
-//         filter: brightness(80%)
-//     }
-//     &.secondary:active {
-//         filter: brightness(80%)
-//     }
-// }
-
 
 button {
     &.primary:active {

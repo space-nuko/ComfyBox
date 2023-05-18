@@ -1,11 +1,15 @@
 import { get, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import type ComfyApp from "$lib/components/ComfyApp"
-import { type LGraphNode, type IWidget, type LGraph, NodeMode, type LGraphRemoveNodeOptions, type LGraphAddNodeOptions, type UUID } from "@litegraph-ts/core"
+import { type LGraphNode, type IWidget, type LGraph, NodeMode, type LGraphRemoveNodeOptions, type LGraphAddNodeOptions, type UUID, type NodeID, LiteGraph, type GraphIDMapping } from "@litegraph-ts/core"
 import { SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
-import type { ComfyWidgetNode } from '$lib/nodes';
-import type { NodeID } from '$lib/api';
+import type { ComfyNodeID } from '$lib/api';
 import { v4 as uuidv4 } from "uuid";
+import type { ComfyWidgetNode } from '$lib/nodes/widgets';
+
+function isComfyWidgetNode(node: LGraphNode): node is ComfyWidgetNode {
+    return "svelteComponentType" in node
+}
 
 type DragItemEntry = {
     /*
@@ -60,17 +64,7 @@ export type LayoutState = {
      * Items indexed by the litegraph node they're bound to
      * Only contains drag items of type "widget"
      */
-    allItemsByNode: Record<NodeID, DragItemEntry>,
-
-    /*
-     * Selected drag items.
-     */
-    currentSelection: DragItemID[],
-
-    /*
-     * Selected LGraphNodes inside the litegraph canvas.
-     */
-    currentSelectionNodes: LGraphNode[],
+    allItemsByNode: Record<ComfyNodeID, DragItemEntry>,
 
     /*
      * If true, a saved workflow is being deserialized, so ignore any
@@ -194,7 +188,7 @@ export type AttributesSpec = {
     location: "widget" | "nodeProps" | "nodeVars" | "workflow"
 
     /*
-     * Can this attribute be edited in the properties pane.
+     * Can this attribute be edited in the properties pane?
      */
     editable: boolean,
 
@@ -259,7 +253,12 @@ export type AttributesSpec = {
      * This should be used if there's a canShow dependent on this property so
      * the pane can be updated with the new list of valid properties.
      */
-    refreshPanelOnChange?: boolean
+    refreshPanelOnChange?: boolean,
+
+    /*
+     * Callback run when this value is changed.
+     */
+    onChanged?: (arg: IDragItem | LGraphNode | LayoutState, value: any, prevValue: any) => void,
 }
 
 /*
@@ -283,6 +282,24 @@ const deserializeStringArray = (arg: string) => {
     return arg.split(",").map(s => s.trim())
 }
 
+const setNodeTitle = (arg: IDragItem, value: any) => {
+    if (arg.type !== "widget")
+        return
+
+    const widget = arg as WidgetLayout;
+    if (widget.node == null)
+        return;
+
+    const reg = LiteGraph.registered_node_types[widget.node.type];
+    if (reg == null)
+        return
+
+    if (value && value !== reg.title)
+        widget.node.title = `${reg.title} (${value})`
+    else
+        widget.node.title = reg.title
+}
+
 /*
  * Attributes that will show up in the properties panel.
  * Their order in the list is the order they'll appear in the panel.
@@ -297,6 +314,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "widget",
                 defaultValue: "",
                 editable: true,
+                // onChanged: setNodeTitle
             },
             {
                 name: "hidden",
@@ -341,7 +359,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "widget",
                 editable: true,
                 values: ["visible", "disabled", "hidden"],
-                defaultValue: "disabled",
+                defaultValue: "hidden",
                 canShow: (di: IDragItem) => di.type === "widget"
             },
 
@@ -362,7 +380,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "widget",
                 editable: true,
                 values: ["block", "hidden"],
-                defaultValue: "block",
+                defaultValue: "hidden",
                 canShow: (di: IDragItem) => di.type === "container"
             },
 
@@ -493,7 +511,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: 0,
                 min: -2 ^ 16,
                 max: 2 ^ 16,
-                validNodeTypes: ["ui/slider"],
+                validNodeTypes: ["ui/number"],
             },
             {
                 name: "max",
@@ -503,7 +521,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: 10,
                 min: -2 ^ 16,
                 max: 2 ^ 16,
-                validNodeTypes: ["ui/slider"],
+                validNodeTypes: ["ui/number"],
             },
             {
                 name: "step",
@@ -513,7 +531,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: 1,
                 min: -2 ^ 16,
                 max: 2 ^ 16,
-                validNodeTypes: ["ui/slider"],
+                validNodeTypes: ["ui/number"],
             },
 
             // Button
@@ -579,6 +597,7 @@ for (const cat of Object.values(ALL_ATTRIBUTES)) {
 
 export { ALL_ATTRIBUTES };
 
+// TODO Should be nested by category for name uniqueness?
 const defaultWidgetAttributes: Attributes = {} as any
 const defaultWorkflowAttributes: LayoutAttributes = {} as any
 for (const cat of Object.values(ALL_ATTRIBUTES)) {
@@ -660,11 +679,11 @@ type LayoutStateOps = {
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode, options: LGraphAddNodeOptions) => void,
     nodeRemoved: (node: LGraphNode, options: LGraphRemoveNodeOptions) => void,
-    groupItems: (dragItems: IDragItem[], attrs?: Partial<Attributes>) => ContainerLayout,
+    moveItem: (target: IDragItem, to: ContainerLayout, index?: number) => void,
+    groupItems: (dragItemIDs: DragItemID[], attrs?: Partial<Attributes>) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
-    getCurrentSelection: () => IDragItem[],
-    findLayoutEntryForNode: (nodeId: NodeID) => DragItemEntry | null,
-    findLayoutForNode: (nodeId: NodeID) => IDragItem | null,
+    findLayoutEntryForNode: (nodeId: ComfyNodeID) => DragItemEntry | null,
+    findLayoutForNode: (nodeId: ComfyNodeID) => IDragItem | null,
     serialize: () => SerializedLayoutState,
     deserialize: (data: SerializedLayoutState, graph: LGraph) => void,
     initDefaultLayout: () => void,
@@ -676,8 +695,6 @@ const store: Writable<LayoutState> = writable({
     root: null,
     allItems: {},
     allItemsByNode: {},
-    currentSelection: [],
-    currentSelectionNodes: [],
     isMenuOpen: false,
     isConfiguring: true,
     refreshPropsPanel: writable(0),
@@ -685,6 +702,20 @@ const store: Writable<LayoutState> = writable({
         ...defaultWorkflowAttributes
     }
 })
+
+function clear() {
+    store.set({
+        root: null,
+        allItems: {},
+        allItemsByNode: {},
+        isMenuOpen: false,
+        isConfiguring: true,
+        refreshPropsPanel: writable(0),
+        attrs: {
+            ...defaultWorkflowAttributes
+        }
+    })
+}
 
 function findDefaultContainerForInsertion(): ContainerLayout | null {
     const state = get(store);
@@ -706,6 +737,16 @@ function findDefaultContainerForInsertion(): ContainerLayout | null {
     return null
 }
 
+function runOnChangedForWidgetDefaults(dragItem: IDragItem) {
+    for (const cat of Object.values(ALL_ATTRIBUTES)) {
+        for (const spec of Object.values(cat.specs)) {
+            if (defaultWidgetAttributes[spec.name] !== undefined && spec.onChanged != null) {
+                spec.onChanged(dragItem, dragItem.attrs[spec.name], dragItem.attrs[spec.name])
+            }
+        }
+    }
+}
+
 function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes> = {}, index?: number): ContainerLayout {
     const state = get(store);
     const dragItem: ContainerLayout = {
@@ -718,19 +759,26 @@ function addContainer(parent: ContainerLayout | null, attrs: Partial<Attributes>
             ...attrs
         }
     }
+
     const entry: DragItemEntry = { dragItem, children: [], parent: null };
+
+    if (state.allItemsByNode[dragItem.id] != null)
+        throw new Error(`Container with ID ${dragItem.id} already registered!!!`)
     state.allItems[dragItem.id] = entry;
+
     if (parent) {
         moveItem(dragItem, parent, index)
     }
+
     console.debug("[layoutState] addContainer", state)
     store.set(state)
+    // runOnChangedForWidgetDefaults(dragItem)
     return dragItem;
 }
 
 function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes> = {}, index?: number): WidgetLayout {
     const state = get(store);
-    const widgetName = "Widget"
+    const widgetName = node.title || "Widget"
     const dragItem: WidgetLayout = {
         type: "widget",
         id: uuidv4(),
@@ -739,16 +787,23 @@ function addWidget(parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partia
         attrs: {
             ...defaultWidgetAttributes,
             title: widgetName,
-            nodeDisabledState: "disabled",
             ...attrs
         }
     }
-    const parentEntry = state.allItems[parent.id]
+
     const entry: DragItemEntry = { dragItem, children: [], parent: null };
+
+    if (state.allItems[dragItem.id] != null)
+        throw new Error(`Widget with ID ${dragItem.id} already registered!!!`)
     state.allItems[dragItem.id] = entry;
+
+    if (state.allItemsByNode[node.id] != null)
+        throw new Error(`Widget's node with ID ${node.id} already registered!!!`)
     state.allItemsByNode[node.id] = entry;
+
     console.debug("[layoutState] addWidget", state)
     moveItem(dragItem, parent, index)
+    // runOnChangedForWidgetDefaults(dragItem)
     return dragItem;
 }
 
@@ -784,24 +839,62 @@ function removeEntry(state: LayoutState, id: DragItemID) {
 }
 
 function nodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
+    // Only concern ourselves with widget nodes
+    if (!isComfyWidgetNode(node))
+        return;
+
     const state = get(store)
     if (state.isConfiguring)
         return;
 
+    let attrs: Partial<Attributes> = {}
+
     if (options.addedBy === "moveIntoSubgraph" || options.addedBy === "moveOutOfSubgraph") {
         // All we need to do is update the nodeID linked to this node.
-        const item = state.allItemsByNode[options.prevNodeId]
-        delete state.allItemsByNode[options.prevNodeId]
+        const item = state.allItemsByNode[options.prevNodeID]
+        delete state.allItemsByNode[options.prevNodeID]
         state.allItemsByNode[node.id] = item
         return;
+    }
+    else if ((options.addedBy === "cloneSelection" || options.addedBy === "paste") && options.prevNodeID != null) {
+        console.warn("WASCLONED", options.addedBy, options.prevNodeID, Object.keys(state.allItemsByNode), options.prevNode, options.subgraphs)
+        // Grab layout state information and clone it too.
+
+        let prevWidget = state.allItemsByNode[node.id]
+        if (prevWidget == null) {
+            // If a subgraph was cloned, try looking for the original widget node corresponding to the new widget node being added.
+            // `node` is the new ComfyWidgetNode instance to copy attrs to.
+            // `options.cloneData` should contain the results of Subgraph.clone(), called "subgraphNewIDMapping".
+            // `options.cloneData` is attached to the onNodeAdded options if a node is added to a graph after being
+            // selection-cloned or pasted, as they both call clone() internally.
+            const cloneData = options.cloneData.forNode[options.prevNodeID]
+            if (cloneData && cloneData.subgraphNewIDMapping != null) {
+                // At this point we know options.prevNodeID points to a subgraph.
+                const mapping = cloneData.subgraphNewIDMapping as GraphIDMapping
+
+                // This mapping is two-way, so oldID -> newID *and* newID -> oldID are supported.
+                // Take the cloned node's ID and look up what the original node's ID was.
+                const nodeIDInLayoutState = mapping.nodeIDs[node.id];
+
+                if (nodeIDInLayoutState) {
+                    // Gottem.
+                    prevWidget = state.allItemsByNode[nodeIDInLayoutState]
+                    console.warn("FOUND CLONED SUBGRAPH NODE", node.id, "=>", nodeIDInLayoutState, prevWidget)
+                }
+            }
+        }
+
+        if (prevWidget) {
+            console.warn("FOUND", prevWidget.dragItem.attrs)
+            // XXX: Will this work for most properties?
+            attrs = structuredClone(prevWidget.dragItem.attrs)
+        }
     }
 
     const parent = findDefaultContainerForInsertion();
 
-    console.debug("[layoutState] nodeAdded", node)
-    if ("svelteComponentType" in node) {
-        addWidget(parent, node as ComfyWidgetNode);
-    }
+    console.debug("[layoutState] nodeAdded", node.id)
+    addWidget(parent, node, attrs);
 }
 
 function nodeRemoved(node: LGraphNode, options: LGraphRemoveNodeOptions) {
@@ -830,7 +923,7 @@ function nodeRemoved(node: LGraphNode, options: LGraphRemoveNodeOptions) {
 function moveItem(target: IDragItem, to: ContainerLayout, index?: number) {
     const state = get(store)
     const entry = state.allItems[target.id]
-    if (entry.parent && entry.parent.id === to.id)
+    if (!entry || (entry.parent && entry.parent.id === to.id && entry.children.indexOf(target) === index))
         return;
 
     if (entry.parent) {
@@ -858,33 +951,27 @@ function moveItem(target: IDragItem, to: ContainerLayout, index?: number) {
     store.set(state)
 }
 
-function getCurrentSelection(): IDragItem[] {
-    const state = get(store)
-    return state.currentSelection.map(id => state.allItems[id].dragItem)
-}
-
-function groupItems(dragItems: IDragItem[], attrs: Partial<Attributes> = {}): ContainerLayout {
-    if (dragItems.length === 0)
+function groupItems(dragItemIDs: DragItemID[], attrs: Partial<Attributes> = {}): ContainerLayout {
+    if (dragItemIDs.length === 0)
         return;
 
     const state = get(store)
-    const parent = state.allItems[dragItems[0].id].parent || findDefaultContainerForInsertion();
+    const parent = state.allItems[dragItemIDs[0]].parent || findDefaultContainerForInsertion();
 
     if (parent === null || parent.type !== "container")
         return;
 
     let index = undefined;
     if (parent) {
-        const indexFound = state.allItems[parent.id].children.findIndex(c => c.id === dragItems[0].id)
+        const indexFound = state.allItems[parent.id].children.findIndex(c => c.id === dragItemIDs[0])
         if (indexFound !== -1)
             index = indexFound
     }
 
-    const title = dragItems.length <= 1 ? "" : "Group";
+    const container = addContainer(parent as ContainerLayout, { title: "", containerVariant: "block", ...attrs }, index)
 
-    const container = addContainer(parent as ContainerLayout, { title, ...attrs }, index)
-
-    for (const item of dragItems) {
+    for (const itemID of dragItemIDs) {
+        const item = state.allItems[itemID].dragItem;
         moveItem(item, container)
     }
 
@@ -924,7 +1011,7 @@ function ungroup(container: ContainerLayout) {
     store.set(state)
 }
 
-function findLayoutEntryForNode(nodeId: NodeID): DragItemEntry | null {
+function findLayoutEntryForNode(nodeId: ComfyNodeID): DragItemEntry | null {
     const state = get(store)
     const found = Object.entries(state.allItems).find(pair =>
         pair[1].dragItem.type === "widget"
@@ -934,7 +1021,7 @@ function findLayoutEntryForNode(nodeId: NodeID): DragItemEntry | null {
     return null;
 }
 
-function findLayoutForNode(nodeId: NodeID): WidgetLayout | null {
+function findLayoutForNode(nodeId: ComfyNodeID): WidgetLayout | null {
     const found = findLayoutEntryForNode(nodeId);
     if (!found)
         return null;
@@ -946,8 +1033,6 @@ function initDefaultLayout() {
         root: null,
         allItems: {},
         allItemsByNode: {},
-        currentSelection: [],
-        currentSelectionNodes: [],
         isMenuOpen: false,
         isConfiguring: false,
         refreshPropsPanel: writable(0),
@@ -1034,7 +1119,9 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
 
         if (dragItem.type === "widget") {
             const widget = dragItem as WidgetLayout;
-            widget.node = graph.getNodeById(entry.dragItem.nodeId) as ComfyWidgetNode
+            widget.node = graph.getNodeByIdRecursive(entry.dragItem.nodeId) as ComfyWidgetNode
+            if (widget.node == null)
+                throw (`Node in litegraph not found! ${entry.dragItem.nodeId}`)
             allItemsByNode[entry.dragItem.nodeId] = dragEntry
         }
     }
@@ -1059,8 +1146,6 @@ function deserialize(data: SerializedLayoutState, graph: LGraph) {
         root,
         allItems,
         allItemsByNode,
-        currentSelection: [],
-        currentSelectionNodes: [],
         isMenuOpen: false,
         isConfiguring: false,
         refreshPropsPanel: writable(0),
@@ -1091,7 +1176,7 @@ const layoutStateStore: WritableLayoutStateStore =
     updateChildren,
     nodeAdded,
     nodeRemoved,
-    getCurrentSelection,
+    moveItem,
     groupItems,
     findLayoutEntryForNode,
     findLayoutForNode,

@@ -1,6 +1,6 @@
-import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot } from "@litegraph-ts/core";
+import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot, type NodeID, type NodeTypeSpec, type NodeTypeOpts, type SlotIndex } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
-import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyPromptRequest, type NodeID, type PromptID } from "$lib/api"
+import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyPromptRequest, type ComfyNodeID, type PromptID } from "$lib/api"
 import { getPngMetadata, importA1111 } from "$lib/pnginfo";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
@@ -12,11 +12,12 @@ import "@litegraph-ts/nodes-logic"
 import "@litegraph-ts/nodes-math"
 import "@litegraph-ts/nodes-strings"
 import "$lib/nodes/index"
+import "$lib/nodes/widgets/index"
 import * as nodes from "$lib/nodes/index"
+import * as widgets from "$lib/nodes/widgets/index"
 
 import ComfyGraphCanvas, { type SerializedGraphCanvasState } from "$lib/ComfyGraphCanvas";
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
-import * as widgets from "$lib/widgets/index"
 import queueState from "$lib/stores/queueState";
 import { type SvelteComponentDev } from "svelte/internal";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
@@ -28,17 +29,16 @@ import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import { get } from "svelte/store";
 import { tick } from "svelte";
 import uiState from "$lib/stores/uiState";
-import { download, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
+import { download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
 import notify from "$lib/notify";
 import configState from "$lib/stores/configState";
 import { blankGraph } from "$lib/defaultGraph";
-import type { ComfyExecutionResult } from "$lib/nodes/ComfyWidgetNodes";
+import type { ComfyExecutionResult } from "$lib/utils";
+import ComfyPromptSerializer, { UpstreamNodeLocator, isActiveBackendNode } from "./ComfyPromptSerializer";
+import { iterateNodeDefInputs, type ComfyNodeDef, isBackendNodeDefInputType, iterateNodeDefOutputs } from "$lib/ComfyNodeDef";
+import { ComfyComboNode } from "$lib/nodes/widgets";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
-
-LiteGraph.catch_exceptions = false;
-LiteGraph.CANVAS_GRID_SIZE = 32;
-LiteGraph.default_subgraph_lgraph_factory = () => new ComfyGraph();
 
 if (typeof window !== "undefined") {
     // Load default visibility
@@ -56,7 +56,7 @@ export type SerializedAppState = {
 }
 
 /** [link origin, link index] | value */
-export type SerializedPromptInput = [NodeID, number] | any
+export type SerializedPromptInput = [ComfyNodeID, number] | any
 
 export type SerializedPromptInputs = {
     /* property name -> value or link */
@@ -64,14 +64,14 @@ export type SerializedPromptInputs = {
     class_type: string
 }
 
-export type SerializedPromptInputsAll = Record<NodeID, SerializedPromptInputs>
+export type SerializedPromptInputsAll = Record<ComfyNodeID, SerializedPromptInputs>
 
 export type SerializedPrompt = {
     workflow: SerializedLGraph,
     output: SerializedPromptInputsAll
 }
 
-export type SerializedPromptOutputs = Record<NodeID, ComfyExecutionResult>
+export type SerializedPromptOutputs = Record<ComfyNodeID, ComfyExecutionResult>
 
 export type Progress = {
     value: number,
@@ -79,30 +79,9 @@ export type Progress = {
 }
 
 type BackendComboNode = {
-    comboNode: nodes.ComfyComboNode
-    inputSlot: IComfyInputSlot,
+    comboNode: ComfyComboNode,
+    comfyInput: IComfyInputSlot,
     backendNode: ComfyBackendNode
-}
-
-function isActiveBackendNode(node: ComfyGraphNode, tag: string | null): boolean {
-    if (!node.isBackendNode)
-        return false;
-
-    if (tag && !hasTag(node, tag)) {
-        console.debug("Skipping tagged node", tag, node.properties.tags, node)
-        return false;
-    }
-
-    if (node.mode === NodeMode.NEVER) {
-        // Don't serialize muted nodes
-        return false;
-    }
-
-    return true;
-}
-
-function hasTag(node: LGraphNode, tag: string): boolean {
-    return "tags" in node.properties && node.properties.tags.indexOf(tag) !== -1
 }
 
 export default class ComfyApp {
@@ -115,16 +94,17 @@ export default class ComfyApp {
     dropZone: HTMLElement | null = null;
     nodeOutputs: Record<string, any> = {};
 
-    dragOverNode: LGraphNode | null = null;
     shiftDown: boolean = false;
     selectedGroupMoving: boolean = false;
 
     private queueItems: QueueItem[] = [];
     private processingQueue: boolean = false;
     private alreadySetup = false;
+    private promptSerializer: ComfyPromptSerializer;
 
     constructor() {
         this.api = new ComfyAPI();
+        this.promptSerializer = new ComfyPromptSerializer();
     }
 
     async setup(): Promise<void> {
@@ -135,20 +115,15 @@ export default class ComfyApp {
 
         this.setupColorScheme()
 
-        this.rootEl = document.getElementById("app") as HTMLDivElement;
+        this.rootEl = document.getElementById("app-root") as HTMLDivElement;
         this.canvasEl = document.getElementById("graph-canvas") as HTMLCanvasElement;
         this.lGraph = new ComfyGraph();
         this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl);
         this.canvasCtx = this.canvasEl.getContext("2d");
 
-        LiteGraph.release_link_on_empty_shows_menu = true;
-        LiteGraph.alt_drag_do_clone_nodes = true;
-
         const uiUnlocked = get(uiState).uiUnlocked;
         this.lCanvas.allow_dragnodes = uiUnlocked;
         this.lCanvas.allow_interaction = uiUnlocked;
-
-        (window as any).LiteGraph = LiteGraph;
 
         // await this.#invokeExtensionsAsync("init");
         await this.registerNodes();
@@ -223,15 +198,11 @@ export default class ComfyApp {
     static widget_type_overrides: Record<string, typeof SvelteComponentDev> = {}
 
     private async registerNodes() {
-        const app = this;
-
         // Load node definitions from the backend
         const defs = await this.api.getNodeDefs();
 
         // Register a node for each definition
-        for (const nodeId in defs) {
-            const nodeData = defs[nodeId];
-
+        for (const [nodeId, nodeDef] of Object.entries(defs)) {
             const typeOverride = ComfyApp.node_type_overrides[nodeId]
             if (typeOverride)
                 console.debug("Attaching custom type to received node:", nodeId, typeOverride)
@@ -239,19 +210,79 @@ export default class ComfyApp {
 
             const ctor = class extends baseClass {
                 constructor(title?: string) {
-                    super(title, nodeId, nodeData);
+                    super(title, nodeId, nodeDef);
                 }
             }
 
             const node: LGraphNodeConstructor = {
                 class: ctor,
-                title: nodeData.display_name || nodeData.name,
+                title: nodeDef.display_name || nodeDef.name,
                 type: nodeId,
                 desc: `ComfyNode: ${nodeId}`
             }
 
             LiteGraph.registerNodeType(node);
-            node.category = nodeData.category;
+            node.category = nodeDef.category;
+
+            ComfyApp.registerDefaultSlotHandlers(nodeId, nodeDef)
+        }
+    }
+
+    static registerDefaultSlotHandlers(nodeId: string, nodeDef: ComfyNodeDef) {
+        const nodeTypeSpec: NodeTypeOpts = {
+            node: nodeId,
+            title: nodeDef.display_name || nodeDef.name,
+            properties: null,
+            inputs: null,
+            outputs: null
+        }
+
+        for (const [inputName, [inputType, _inputOpts]] of iterateNodeDefInputs(nodeDef)) {
+            if (isBackendNodeDefInputType(inputName, inputType)) {
+                LiteGraph.slot_types_default_out[inputType] ||= ["utils/reroute"]
+                LiteGraph.slot_types_default_out[inputType].push(nodeTypeSpec)
+
+                // Input types have to be stored as lower case
+                // Store each node that can handle this input type
+                const lowerType = inputType.toLocaleLowerCase();
+                if (!(lowerType in LiteGraph.registered_slot_in_types)) {
+                    LiteGraph.registered_slot_in_types[lowerType] = { nodes: [] };
+                }
+                LiteGraph.registered_slot_in_types[lowerType].nodes.push(nodeId);
+
+                if (!LiteGraph.slot_types_in.includes(lowerType)) {
+                    LiteGraph.slot_types_in.push(lowerType);
+                }
+            }
+            else {
+                // inputType is an array of combo box entries (["euler", "karras", ...])
+                // or a widget input type ("INT").
+            }
+        }
+
+        for (const output of iterateNodeDefOutputs(nodeDef)) {
+            LiteGraph.slot_types_default_in[output.type] ||= ["utils/reroute"]
+            LiteGraph.slot_types_default_in[output.type].push(nodeTypeSpec)
+
+            // Store each node that can handle this output type
+            if (!(output.type in LiteGraph.registered_slot_out_types)) {
+                LiteGraph.registered_slot_out_types[output.type] = { nodes: [] };
+            }
+            LiteGraph.registered_slot_out_types[output.type].nodes.push(nodeId);
+
+            if (!LiteGraph.slot_types_out.includes(output.type)) {
+                LiteGraph.slot_types_out.push(output.type);
+            }
+        }
+
+        const maxNodeSuggestions = 5 // TODO config
+
+        // TODO config beforeChanged
+        for (const key of Object.keys(LiteGraph.slot_types_default_in)) {
+            LiteGraph.slot_types_default_in[key] = LiteGraph.slot_types_default_in[key].slice(0, maxNodeSuggestions)
+        }
+        for (const key of Object.keys(LiteGraph.slot_types_default_out)) {
+            LiteGraph.slot_types_default_out[key] = LiteGraph.slot_types_default_out[key].slice(0, maxNodeSuggestions)
         }
     }
 
@@ -342,21 +373,25 @@ export default class ComfyApp {
             this.lGraph.setDirtyCanvas(true, false);
         });
 
-        this.api.addEventListener("executing", (promptID: PromptID | null, nodeID: NodeID | null) => {
+        this.api.addEventListener("executing", (promptID: PromptID | null, nodeID: ComfyNodeID | null) => {
             queueState.executingUpdated(promptID, nodeID);
             this.lGraph.setDirtyCanvas(true, false);
         });
 
-        this.api.addEventListener("executed", (promptID: PromptID, nodeID: NodeID, output: ComfyExecutionResult) => {
+        this.api.addEventListener("executed", (promptID: PromptID, nodeID: ComfyNodeID, output: ComfyExecutionResult) => {
             this.nodeOutputs[nodeID] = output;
-            const node = this.lGraph.getNodeById(nodeID) as ComfyGraphNode;
+            const node = this.lGraph.getNodeByIdRecursive(nodeID) as ComfyGraphNode;
             if (node?.onExecuted) {
                 node.onExecuted(output);
             }
             queueState.onExecuted(promptID, nodeID, output)
         });
 
-        this.api.addEventListener("execution_cached", (promptID: PromptID, nodes: NodeID[]) => {
+        this.api.addEventListener("execution_start", (promptID: PromptID) => {
+            queueState.executionStart(promptID)
+        });
+
+        this.api.addEventListener("execution_cached", (promptID: PromptID, nodes: ComfyNodeID[]) => {
             queueState.executionCached(promptID, nodes)
         });
 
@@ -403,7 +438,7 @@ export default class ComfyApp {
         }
 
         // Distinguish frontend/backend connections
-        const BACKEND_TYPES = ["CLIP", "CLIP_VISION", "CLIP_VISION_OUTPUT", "CONDITIONING", "CONTROL_NET", "LATENT", "MASK", "MODEL", "STYLE_MODEL", "VAE", "UPSCALE_MODEL"]
+        const BACKEND_TYPES = ["CLIP", "CLIP_VISION", "CLIP_VISION_OUTPUT", "CONDITIONING", "CONTROL_NET", "IMAGE", "LATENT", "MASK", "MODEL", "STYLE_MODEL", "VAE", "UPSCALE_MODEL"]
         for (const type of BACKEND_TYPES) {
             setColor(type, "orange")
         }
@@ -508,6 +543,7 @@ export default class ComfyApp {
         }
 
         layoutState.onStartConfigure();
+        this.lCanvas.closeAllSubgraphs();
         this.lGraph.configure(blankGraph)
         layoutState.initDefaultLayout();
         uiState.update(s => {
@@ -518,7 +554,7 @@ export default class ComfyApp {
     }
 
     runDefaultQueueAction() {
-        for (const node of this.lGraph.iterateNodesInOrder()) {
+        for (const node of this.lGraph.iterateNodesInOrderRecursive()) {
             if ("onDefaultQueueAction" in node) {
                 (node as ComfyGraphNode).onDefaultQueueAction()
             }
@@ -559,157 +595,7 @@ export default class ComfyApp {
      * @returns The workflow and node links
      */
     graphToPrompt(tag: string | null = null): SerializedPrompt {
-        // Run frontend-only logic
-        this.lGraph.runStep(1)
-
-        const workflow = this.lGraph.serialize();
-
-        const output = {};
-        // Process nodes in order of execution
-        for (const node_ of this.lGraph.computeExecutionOrder<ComfyGraphNode>(false, null)) {
-            const n = workflow.nodes.find((n) => n.id === node_.id);
-
-            if (!isActiveBackendNode(node_, tag)) {
-                continue;
-            }
-
-            const node = node_ as ComfyBackendNode;
-
-            const inputs = {};
-
-            // Store input values passed by frontend-only nodes
-            if (node.inputs) {
-                for (let i = 0; i < node.inputs.length; i++) {
-                    const inp = node.inputs[i];
-                    const inputLink = node.getInputLink(i)
-                    const inputNode = node.getInputNode(i)
-
-                    // We don't check tags for non-backend nodes.
-                    // Just check for node inactivity (so you can toggle groups of
-                    // tagged frontend nodes on/off)
-                    if (inputNode && inputNode.mode === NodeMode.NEVER) {
-                        console.debug("Skipping inactive node", inputNode)
-                        continue;
-                    }
-
-                    if (!inputLink || !inputNode) {
-                        if ("config" in inp) {
-                            const defaultValue = (inp as IComfyInputSlot).config?.defaultValue
-                            if (defaultValue !== null && defaultValue !== undefined)
-                                inputs[inp.name] = defaultValue
-                        }
-                        continue;
-                    }
-
-                    let serialize = true;
-                    if ("config" in inp)
-                        serialize = (inp as IComfyInputSlot).serialize
-
-                    let isBackendNode = node.isBackendNode;
-                    let isInputBackendNode = false;
-                    if ("isBackendNode" in inputNode)
-                        isInputBackendNode = (inputNode as ComfyGraphNode).isBackendNode;
-
-                    // The reasoning behind this check:
-                    // We only want to serialize inputs to nodes with backend equivalents.
-                    // And in ComfyBox, the backend nodes in litegraph *never* have widgets, instead they're all inputs.
-                    // All values are passed by separate frontend-only nodes,
-                    // either UI-bound or something like ConstantInteger.
-                    // So we know that any value passed into a backend node *must* come from
-                    // a frontend node.
-                    // The rest (links between backend nodes) will be serialized after this bit runs.
-                    if (serialize && isBackendNode && !isInputBackendNode) {
-                        inputs[inp.name] = inputLink.data
-                    }
-                }
-            }
-
-            // Store links between backend-only and hybrid nodes
-            for (let i = 0; i < node.inputs.length; i++) {
-                let parent: ComfyGraphNode = node.getInputNode(i) as ComfyGraphNode;
-                if (parent) {
-                    const seen = {}
-                    let link = node.getInputLink(i);
-
-                    const isFrontendParent = (parent: ComfyGraphNode) => {
-                        if (!parent || parent.isBackendNode)
-                            return false;
-                        if (tag && !hasTag(parent, tag))
-                            return false;
-                        return true;
-                    }
-
-                    // If there are frontend-only nodes between us and another
-                    // backend node, we have to traverse them first. This
-                    // behavior is dependent on the type of node. Reroute nodes
-                    // will simply follow their single input, while branching
-                    // nodes have conditional logic that determines which link
-                    // to follow backwards.
-                    while (isFrontendParent(parent)) {
-                        if (!("getUpstreamLink" in parent)) {
-                            console.warn("[graphToPrompt] Node does not support getUpstreamLink", parent.type)
-                            break;
-                        }
-
-                        const nextLink = parent.getUpstreamLink()
-                        if (nextLink == null) {
-                            console.warn("[graphToPrompt] No upstream link found in frontend node", parent)
-                            break;
-                        }
-
-                        if (nextLink && !seen[nextLink.id]) {
-                            seen[nextLink.id] = true
-                            const inputNode = parent.graph.getNodeById(nextLink.origin_id) as ComfyGraphNode;
-                            if (inputNode && tag && !hasTag(inputNode, tag)) {
-                                console.debug("[graphToPrompt] Skipping tagged intermediate frontend node", tag, node.properties.tags)
-                                parent = null;
-                            }
-                            else {
-                                console.debug("[graphToPrompt] Traverse upstream link", parent.id, inputNode?.id, inputNode?.isBackendNode)
-                                link = nextLink;
-                                parent = inputNode;
-                            }
-                        } else {
-                            parent = null;
-                        }
-                    }
-
-                    if (link && parent && parent.isBackendNode) {
-                        if (tag && !hasTag(parent, tag))
-                            continue;
-
-                        console.debug("[graphToPrompt] final link", parent.id, node.id)
-                        const input = node.inputs[i]
-                        // TODO can null be a legitimate value in some cases?
-                        // Nodes like CLIPLoader will never have a value in the frontend, hence "null".
-                        if (!(input.name in inputs))
-                            inputs[input.name] = [String(link.origin_id), link.origin_slot];
-                    }
-                }
-            }
-
-            output[String(node.id)] = {
-                inputs,
-                class_type: node.comfyClass,
-            };
-        }
-
-        // Remove inputs connected to removed nodes
-        for (const nodeId in output) {
-            for (const inputName in output[nodeId].inputs) {
-                if (Array.isArray(output[nodeId].inputs[inputName])
-                    && output[nodeId].inputs[inputName].length === 2
-                    && !output[output[nodeId].inputs[inputName][0]]) {
-                    console.debug("Prune removed node link", nodeId, inputName, output[nodeId].inputs[inputName])
-                    delete output[nodeId].inputs[inputName];
-                }
-            }
-        }
-
-        // console.debug({ workflow, output })
-        // console.debug(promptToGraphVis({ workflow, output }))
-
-        return { workflow, output };
+        return this.promptSerializer.serialize(this.lGraph, tag)
     }
 
     async queuePrompt(num: number, batchCount: number = 1, tag: string | null = null) {
@@ -756,6 +642,7 @@ export default class ComfyApp {
 
                     const p = this.graphToPrompt(tag);
                     const l = layoutState.serialize();
+                    console.debug(graphToGraphVis(this.lGraph))
                     console.debug(promptToGraphVis(p))
 
                     const extraData: ComfyBoxPromptExtraData = {
@@ -767,8 +654,8 @@ export default class ComfyApp {
                         thumbnails
                     }
 
-                    let error = null;
-                    let promptID = null;
+                    let error: string | null = null;
+                    let promptID: PromptID | null = null;
 
                     const request: ComfyPromptRequest = {
                         number: num,
@@ -778,28 +665,26 @@ export default class ComfyApp {
 
                     try {
                         const response = await this.api.queuePrompt(request);
-
-                        // BUG: This can cause race conditions updating frontend state
-                        // since we don't have a prompt ID until the backend
-                        // returns!
-                        promptID = response.promptID;
-                        queueState.afterQueued(promptID, num, p.output, extraData)
-
-                        error = response.error;
+                        if (response.error != null) {
+                            error = response.error;
+                        }
+                        else {
+                            queueState.afterQueued(response.promptID, num, p.output, extraData)
+                        }
                     } catch (err) {
-                        error = err
+                        error = err?.toString();
                     }
 
                     if (error != null) {
-                        const mes = error.response || error.toString()
+                        const mes: string = error;
                         notify(`Error queuing prompt:\n${mes}`, { type: "error" })
+                        console.error(graphToGraphVis(this.lGraph))
                         console.error(promptToGraphVis(p))
                         console.error("Error queuing prompt", error, num, p)
                         break;
                     }
 
-                    for (const n of p.workflow.nodes) {
-                        const node = this.lGraph.getNodeById(n.id);
+                    for (const node of this.lGraph.iterateNodesInOrderRecursive()) {
                         if ("afterQueued" in node) {
                             (node as ComfyGraphNode).afterQueued(p, tag);
                         }
@@ -857,98 +742,109 @@ export default class ComfyApp {
     async refreshComboInNodes(flashUI: boolean = false) {
         const defs = await this.api.getNodeDefs();
 
-        const toUpdate: BackendComboNode[] = []
-
-        const isComfyComboNode = (node: LGraphNode): boolean => {
+        const isComfyComboNode = (node: LGraphNode): node is ComfyComboNode => {
             return node
                 && node.type === "ui/combo"
                 && "doAutoConfig" in node;
         }
 
-        const isComfyComboInput = (input: INodeInputSlot) => {
+        const isComfyComboInput = (input: INodeInputSlot): input is IComfyInputSlot => {
             return "config" in input
                 && "widgetNodeType" in input
                 && input.widgetNodeType === "ui/combo";
         }
 
         // Node IDs of combo widgets attached to a backend node
-        let backendCombos: Set<number> = new Set()
+        const backendUpdatedCombos: Record<NodeID, BackendComboNode> = {}
 
         console.debug("[refreshComboInNodes] start")
 
         // Figure out which combo nodes to update. They need to be connected to
         // an input slot on a backend node with a backend config in the input
         // slot connected to.
-        for (const node of this.lGraph.iterateNodesInOrder()) {
-            if (!(node as any).isBackendNode)
+        const nodeLocator = new UpstreamNodeLocator(isComfyComboNode)
+
+        const findComfyInputAndAttachedCombo = (node: LGraphNode, i: SlotIndex): [IComfyInputSlot, ComfyComboNode] | null => {
+            const input = node.inputs[i]
+
+            // Does this input autocreate a combo box on creation?
+            const isComfyInput = isComfyComboInput(input)
+            if (!isComfyInput)
+                return null;
+
+            // Find an attached combo node even if it's inside/outside of a
+            // subgraph, linked after several nodes, etc.
+            const [comboNode, _link] = nodeLocator.locateUpstream(node, i, null);
+
+            if (comboNode == null)
+                return null;
+
+            const result: [IComfyInputSlot, ComfyComboNode] = [input, comboNode as ComfyComboNode]
+            return result
+        }
+
+        for (const node of this.lGraph.iterateNodesInOrderRecursive()) {
+            if (!isActiveBackendNode(node))
                 continue;
 
-            const backendNode = (node as ComfyBackendNode)
-            const found = range(backendNode.inputs.length)
-                .filter(i => {
-                    const input = backendNode.inputs[i]
-                    const inputNode = backendNode.getInputNode(i)
+            const found = range(node.inputs.length)
+                .map((i) => findComfyInputAndAttachedCombo(node, i))
+                .filter(Boolean);
 
-                    // Does this input autocreate a combo box on creation?
-                    const isComfyInput = isComfyComboInput(input)
-                    const isComfyCombo = isComfyComboNode(inputNode)
+            for (const [comfyInput, comboNode] of found) {
+                const def = defs[node.type];
 
-                    // console.debug("[refreshComboInNodes] CHECK", backendNode.type, input.name, "isComfyCombo", isComfyCombo, "isComfyInput", isComfyInput)
-
-                    return isComfyCombo && isComfyInput
-                });
-
-            for (const inputIndex of found) {
-                const comboNode = backendNode.getInputNode(inputIndex) as nodes.ComfyComboNode
-                const inputSlot = backendNode.inputs[inputIndex] as IComfyInputSlot;
-                const def = defs[backendNode.type];
-
-                const hasBackendConfig = def["input"]["required"][inputSlot.name] !== undefined
+                const hasBackendConfig = def["input"]["required"][comfyInput.name] !== undefined
 
                 if (hasBackendConfig) {
-                    backendCombos.add(comboNode.id)
-                    toUpdate.push({ comboNode, inputSlot, backendNode })
+                    backendUpdatedCombos[comboNode.id] = { comboNode, comfyInput, backendNode: node }
                 }
             }
         }
 
-        console.debug("[refreshComboInNodes] found:", toUpdate.length, toUpdate)
+        console.debug("[refreshComboInNodes] found:", backendUpdatedCombos.length, backendUpdatedCombos)
 
         // Mark combo nodes without backend configs as being loaded already.
-        for (const node of this.lGraph.iterateNodesInOrder()) {
-            if (isComfyComboNode(node) && !backendCombos.has(node.id)) {
-                const comboNode = node as nodes.ComfyComboNode;
-                let values = comboNode.properties.values;
-
-                // Frontend nodes can declare defaultWidgets which creates a
-                // config inside their own inputs slots too.
-                const foundInput = range(node.outputs.length)
-                    .flatMap(i => node.getInputSlotsConnectedTo(i))
-                    .find(inp => "config" in inp && Array.isArray((inp.config as any).values))
-
-                if (foundInput != null) {
-                    const comfyInput = foundInput as IComfyInputSlot;
-                    console.warn("[refreshComboInNodes] found frontend config:", node.title, node.type, comfyInput.config.values)
-                    values = comfyInput.config.values;
-                }
-
-                comboNode.formatValues(values);
+        for (const node of this.lGraph.iterateNodesOfClassRecursive(ComfyComboNode)) {
+            if (backendUpdatedCombos[node.id] != null) {
+                continue;
             }
+
+            // This node isn't connected to a backend node, so it's configured
+            // by the frontend instead.
+            const comboNode = node as ComfyComboNode;
+            let values = comboNode.properties.values;
+
+            // Frontend nodes can declare defaultWidgets which creates a
+            // config inside their own inputs slots too.
+            const foundInput = range(node.outputs.length)
+                .flatMap(i => node.getInputSlotsConnectedTo(i))
+                .find(inp => "config" in inp && Array.isArray((inp.config as any).values))
+
+            let defaultValue = null;
+            if (foundInput != null) {
+                const comfyInput = foundInput as IComfyInputSlot;
+                console.warn("[refreshComboInNodes] found frontend config:", node.title, node.type, comfyInput.config.values)
+                values = comfyInput.config.values;
+                defaultValue = comfyInput.config.defaultValue;
+            }
+
+            comboNode.formatValues(values, defaultValue);
         }
 
         await tick();
 
         // Load definitions from the backend.
-        for (const { comboNode, inputSlot, backendNode } of toUpdate) {
+        for (const { comboNode, comfyInput, backendNode } of Object.values(backendUpdatedCombos)) {
             const def = defs[backendNode.type];
-            const rawValues = def["input"]["required"][inputSlot.name][0];
+            const rawValues = def["input"]["required"][comfyInput.name][0];
 
             console.debug("[ComfyApp] Reconfiguring combo widget", backendNode.type, "=>", comboNode.type, rawValues.length)
-            comboNode.doAutoConfig(inputSlot, { includeProperties: new Set(["values"]), setWidgetTitle: false })
+            comboNode.doAutoConfig(comfyInput, { includeProperties: new Set(["values"]), setWidgetTitle: false })
 
-            comboNode.formatValues(rawValues)
+            comboNode.formatValues(rawValues as string[], true)
             if (!rawValues?.includes(get(comboNode.value))) {
-                comboNode.setValue(rawValues[0])
+                comboNode.setValue(rawValues[0], comfyInput.config.defaultValue)
             }
         }
     }

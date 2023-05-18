@@ -1,6 +1,7 @@
 <script lang="ts">
  import { Block, BlockTitle } from "@gradio/atoms";
  import uiState from "$lib/stores/uiState";
+ import selectionState from "$lib/stores/selectionState";
  import WidgetContainer from "./WidgetContainer.svelte"
 
  import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
@@ -22,13 +23,21 @@
  export let dragDisabled: boolean = false;
  export let isMobile: boolean = false;
 
- let attrsChanged: Writable<boolean> | null = null;
+ let attrsChanged: Writable<number> | null = null;
  let children: IDragItem[] | null = null;
  const flipDurationMs = 100;
 
  $: if (container) {
-     children = $layoutState.allItems[container.id].children;
-     attrsChanged = container.attrsChanged
+     const entry = $layoutState.allItems[container.id]
+     if (entry) {
+         children = $layoutState.allItems[container.id].children;
+         attrsChanged = container.attrsChanged
+     }
+     else {
+         container = null;
+         children = null;
+         attrsChanged = null;
+     }
  }
  else {
      children = null;
@@ -44,18 +53,17 @@
      children = layoutState.updateChildren(container, evt.detail.items)
      // Ensure dragging is stopped on drag finish
  };
-
- const tt = "asd\nasdlkj"
 </script>
 
-{#if container && children}
+{#if container && Array.isArray(children)}
+    {@const selected = $uiState.uiUnlocked && $selectionState.currentSelection.includes(container.id)}
     <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')} z-index{zIndex}"
          class:hide-block={container.attrs.containerVariant === "hidden"}
-         class:selected={$uiState.uiUnlocked && $layoutState.currentSelection.includes(container.id)}
+         class:selected
          class:root-container={zIndex === 0}
          class:is-executing={container.isNodeExecuting}
          class:mobile={isMobile}
-         class:edit={edit}>
+         class:edit>
         <Block>
             {#if container.attrs.title && container.attrs.title !== ""}
                 <label for={String(container.id)} class={($uiState.uiUnlocked && $uiState.uiEditMode === "widgets") ? "edit-title-label" : ""}>
@@ -64,7 +72,7 @@
             {/if}
             <div class="v-pane"
                  class:empty={children.length === 0}
-                 class:edit={edit}
+                 class:edit
                  use:dndzone="{{
                      items: children,
                      flipDurationMs,
@@ -77,8 +85,9 @@
                  on:finalize="{handleFinalize}"
             >
                 {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
-                    {@const hidden = isHidden(item)}
+                    {@const hidden = isHidden(item) && !edit}
                     <div class="animation-wrapper"
+                         class:edit
                          class:hidden={hidden}
                          animate:flip={{duration:flipDurationMs}}
                          style={item?.attrs?.style || ""}
@@ -111,17 +120,18 @@
 
      .edit {
          min-width: 200px;
+         margin: 0.2rem 0;
      }
 
-     &:not(.edit) > .animation-wrapper.hidden {
+     .animation-wrapper.hidden:not(.edit) {
          display: none;
      }
 
      &.empty {
          border-width: 3px;
-         border-color: var(--color-grey-400);
-         border-radius: var(--block-radius);
-         background: var(--color-grey-300);
+         border-color: var(--comfy-container-empty-border-color);
+         border-radius: 0;
+         background: var(--comfy-container-empty-background-fill);
          min-height: 100px;
          border-style: dashed;
      }
@@ -153,6 +163,10 @@
 
  .container {
      display: flex;
+
+     &.selected {
+         background: var(--comfy-container-selected-background-fill) !important;
+     }
 
      > :global(*) {
          border-radius: 0;
@@ -234,7 +248,7 @@
  }
 
  .handle-hidden {
-     background-color: #40404080;
+     background-color: #303030A0;
  }
 
  .handle-widget:hover {

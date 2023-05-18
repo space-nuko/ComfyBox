@@ -65,9 +65,11 @@
          dateStr = formatDate(date);
      }
 
+     const subgraphs: string[] | null = entry.extraData?.extra_pnginfo?.comfyBoxSubgraphs;
+
      let message = "Prompt";
-     if (entry.extraData.subgraphs)
-         message = `Prompt: ${entry.extraData.subgraphs.join(', ')}`
+     if (subgraphs?.length > 0)
+         message = `Prompt: ${subgraphs.join(', ')}`
 
      let submessage = `Nodes: ${Object.keys(entry.prompt).length}`
      if (Object.keys(entry.outputs).length > 0) {
@@ -156,12 +158,14 @@
  }
 
  let showModal = false;
+ let expandAll = false;
  let selectedPrompt = null;
  let selectedImages = [];
  function showPrompt(entry: QueueUIEntry, e: MouseEvent) {
      selectedPrompt = entry.entry.prompt;
      selectedImages = entry.images;
      showModal = true;
+     expandAll = false
  }
 
  $: if(!showModal)
@@ -180,8 +184,16 @@
         <h1 style="padding-bottom: 1rem;">Prompt Details</h1>
     </div>
     {#if selectedPrompt}
-        <PromptDisplay prompt={selectedPrompt} images={selectedImages} />
+        <PromptDisplay prompt={selectedPrompt} images={selectedImages} {expandAll} />
     {/if}
+    <div slot="buttons" let:closeDialog>
+        <Button variant="secondary" on:click={closeDialog}>
+            Close
+        </Button>
+        <Button variant="secondary" on:click={() => (expandAll = !expandAll)}>
+            Expand All
+        </Button>
+    </div>
 </Modal>
 
 <div class="queue">

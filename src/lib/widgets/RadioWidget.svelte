@@ -1,5 +1,4 @@
 <script lang="ts">
- import type { ComfyRadioNode } from "$lib/nodes/ComfyWidgetNodes";
  import { type WidgetLayout } from "$lib/stores/layoutState";
  import { Block } from "@gradio/atoms";
  import { Radio } from "@gradio/form";
@@ -7,6 +6,7 @@
  import { isDisabled } from "./utils"
  import type { SelectData } from "@gradio/utils";
 	import { clamp } from "$lib/utils";
+ import type { ComfyRadioNode } from "$lib/nodes/widgets";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;

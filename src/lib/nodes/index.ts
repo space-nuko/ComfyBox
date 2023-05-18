@@ -1,5 +1,4 @@
 export { default as ComfyReroute } from "./ComfyReroute"
-export { ComfyWidgetNode, ComfySliderNode, ComfyComboNode, ComfyTextNode } from "./ComfyWidgetNodes"
 export {
     ComfyQueueEvents,
     ComfyCopyAction,
@@ -17,4 +16,3 @@ export { default as ComfySelector } from "./ComfySelector"
 export { default as ComfyTriggerNewEventNode } from "./ComfyTriggerNewEventNode"
 export { default as ComfyConfigureQueuePromptButton } from "./ComfyConfigureQueuePromptButton"
 export { default as ComfyPickImageNode } from "./ComfyPickImageNode"
-export { default as ComfyImageToFilepathNode } from "./ComfyImageToFilepathNode"

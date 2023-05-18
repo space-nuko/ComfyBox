@@ -6,20 +6,17 @@ import ComfyApp from '$lib/components/ComfyApp';
 import uiState from '$lib/stores/uiState';
 import { LiteGraph } from '@litegraph-ts/core';
 import ComfyGraph from '$lib/ComfyGraph';
+import { configureLitegraph } from '$lib/init';
 
 Framework7.use(Framework7Svelte);
 
-LiteGraph.use_uuids = true;
-LiteGraph.dialog_close_on_mouse_leave = false;
-LiteGraph.search_hide_on_mouse_leave = false;
-LiteGraph.pointerevents_method = "pointer";
+configureLitegraph(true);
 
 const comfyApp = new ComfyApp();
-
-uiState.update(s => { s.app = comfyApp; return s; })
+(window as any).app = comfyApp;
 
 const app = new AppMobile({
-    target: document.getElementById('app'),
+    target: document.getElementById("app-root"),
     props: { app: comfyApp }
 })
 

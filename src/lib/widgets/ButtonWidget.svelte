@@ -1,10 +1,9 @@
 <script lang="ts">
- import type { ComfyButtonNode } from "$lib/nodes/ComfyWidgetNodes";
- import type { ComfySliderNode } from "$lib/nodes/index";
  import { type WidgetLayout } from "$lib/stores/layoutState";
  import { Button } from "@gradio/button";
  import { get, type Writable, writable } from "svelte/store";
  import { isDisabled } from "./utils"
+ import type { ComfyButtonNode } from "$lib/nodes/widgets";
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfyButtonNode | null = null;

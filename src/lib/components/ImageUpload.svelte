@@ -42,11 +42,6 @@
          imgElem.src = convertComfyOutputToComfyURL(value[0])
  }
 
- $: if (!(_value && _value.length > 0 && imgElem)) {
-     imgWidth = 1
-     imgHeight = 1
- }
-
  function onChange() {
      dispatch("change", value)
  }
@@ -119,6 +114,8 @@
          uploaded = false;
          pending_upload = true;
 
+         imgWidth = 0;
+         imgHeight = 0;
          old_value = _value;
 
          if (_value == null)
@@ -177,9 +174,13 @@
      uploaded = true;
  }
 
+ $: console.warn(imgWidth, imgHeight, "IMGSIZE!!")
+
  function handle_clear(_e: CustomEvent<null>) {
      _value = null;
      value = [];
+     imgWidth = 0;
+     imgHeight = 0;
      dispatch("change", value)
      dispatch("clear")
  }

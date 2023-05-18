@@ -6,16 +6,20 @@
  import { JSON as JSONIcon, Copy, Check } from "@gradio/icons";
  import Accordion from "$lib/components/gradio/app/Accordion.svelte";
  import Gallery from "$lib/components/gradio/gallery/Gallery.svelte";
-	import type { Styles } from "@gradio/utils";
+ import { ImageViewer } from "$lib/ImageViewer";
+ import type { Styles } from "@gradio/utils";
 
  const splitLength = 50;
 
  export let prompt: SerializedPromptInputsAll;
  export let images: string[] = [];
+ export let isMobile: boolean = false;
+ export let expandAll: boolean = false;
 
  let galleryStyle: Styles = {
      grid_cols: [2],
      object_fit: "cover",
+     height: "var(--size-96)"
  }
 
  function isInputLink(input: SerializedPromptInput): boolean {
@@ -59,6 +63,11 @@
          copyFeedback(nodeID, inputName);
      }
  }
+
+ function onGalleryImageClicked(e: CustomEvent<HTMLImageElement>) {
+     // TODO dialog renders over it
+     // ImageViewer.instance.showLightbox(e.detail)
+ }
 </script>
 
 <div class="prompt-display">
@@ -70,7 +79,7 @@
                 {#if filtered.length > 0}
                     <div class="accordion">
                         <Block padding={true}>
-                            <Accordion label="Node {i+1}: {classType}" open={false}>
+                            <Accordion label="Node {i+1}: {classType}" open={expandAll}>
                                 {#each filtered as [inputName, input]}
                                     <Block>
                                         <button class="copy-button" on:click={() => handleCopy(nodeID, inputName, input)}>
@@ -121,6 +130,7 @@
                     style={galleryStyle}
                     root={""}
                     root_url={""}
+                    on:clicked={onGalleryImageClicked}
                 />
             </Block>
         </div>

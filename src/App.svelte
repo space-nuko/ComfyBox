@@ -6,7 +6,7 @@
 
  import { onMount } from 'svelte';
 
- const app = new ComfyAppState();
+ export let app: ComfyAppState;
 </script>
 
 <ComfyApp {app}/>

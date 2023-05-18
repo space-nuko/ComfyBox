@@ -1,14 +1,14 @@
 <script lang="ts">
- import type { ComfySliderNode } from "$lib/nodes/index";
+ import type { ComfyNumberNode } from "$lib/nodes/widgets";
  import { type WidgetLayout } from "$lib/stores/layoutState";
  import { Range } from "$lib/components/gradio/form";
  import { get, type Writable } from "svelte/store";
-	import { debounce } from "$lib/utils";
-	import interfaceState from "$lib/stores/interfaceState";
+ import { debounce } from "$lib/utils";
+ import interfaceState from "$lib/stores/interfaceState";
  import { isDisabled } from "./utils"
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
- let node: ComfySliderNode | null = null;
+ let node: ComfyNumberNode | null = null;
  let nodeValue: Writable<number> | null = null;
  let propsChanged: Writable<number> | null = null;
  let option: number | null = null;
@@ -18,7 +18,7 @@
 
  function setNodeValue(widget: WidgetLayout) {
      if (widget) {
-         node = widget.node as ComfySliderNode
+         node = widget.node as ComfyNumberNode
          nodeValue = node.value;
          propsChanged = node.propsChanged;
          setOption($nodeValue); // don't react on option

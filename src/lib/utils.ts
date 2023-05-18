@@ -1,13 +1,10 @@
-import ComfyApp, { type SerializedPrompt } from "./components/ComfyApp";
-import ComboWidget from "$lib/widgets/ComboWidget.svelte";
-import RangeWidget from "$lib/widgets/RangeWidget.svelte";
-import TextWidget from "$lib/widgets/TextWidget.svelte";
-import { get } from "svelte/store"
-import layoutState from "$lib/stores/layoutState"
-import type { SvelteComponentDev } from "svelte/internal";
-import type { SerializedLGraph } from "@litegraph-ts/core";
-import type { FileNameOrGalleryData, ComfyExecutionResult, ComfyImageLocation } from "./nodes/ComfyWidgetNodes";
+import layoutState, { type WidgetLayout } from "$lib/stores/layoutState";
+import selectionState from "$lib/stores/selectionState";
 import type { FileData as GradioFileData } from "@gradio/upload";
+import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID } from "@litegraph-ts/core";
+import { get } from "svelte/store";
+import type { ComfyNodeID } from "./api";
+import { type SerializedPrompt } from "./components/ComfyApp";
 
 export function clamp(n: number, min: number, max: number): number {
     return Math.min(Math.max(n, min), max)
@@ -19,6 +16,13 @@ export function negmod(n: number, m: number): number {
 
 export function range(size: number, startAt: number = 0): ReadonlyArray<number> {
     return [...Array(size).keys()].map(i => i + startAt);
+}
+
+export function* enumerate<T>(iterable: Iterable<T>): Iterable<[number, T]> {
+    let index = 0;
+    for (const value of iterable) {
+        yield [index++, value];
+    }
 }
 
 export function download(filename: string, text: string, type: string = "text/plain") {
@@ -37,11 +41,12 @@ export function download(filename: string, text: string, type: string = "text/pl
 
 export function startDrag(evt: MouseEvent) {
     const dragItemId: string = evt.target.dataset["dragItemId"];
+    const ss = get(selectionState)
     const ls = get(layoutState)
 
     if (evt.button !== 0) {
-        if (ls.currentSelection.length <= 1 && !ls.isMenuOpen)
-            ls.currentSelection = [dragItemId]
+        if (ss.currentSelection.length <= 1 && !ls.isMenuOpen)
+            ss.currentSelection = [dragItemId]
         return;
     }
 
@@ -50,23 +55,109 @@ export function startDrag(evt: MouseEvent) {
     console.debug("startDrag", item)
 
     if (evt.ctrlKey) {
-        const index = ls.currentSelection.indexOf(item.id)
+        const index = ss.currentSelection.indexOf(item.id)
         if (index === -1)
-            ls.currentSelection.push(item.id);
+            ss.currentSelection.push(item.id);
         else
-            ls.currentSelection.splice(index, 1);
-        ls.currentSelection = ls.currentSelection;
+            ss.currentSelection.splice(index, 1);
+        ss.currentSelection = ss.currentSelection;
     }
     else {
-        ls.currentSelection = [item.id]
+        ss.currentSelection = [item.id]
     }
-    ls.currentSelectionNodes = [];
+    ss.currentSelectionNodes = [];
+    for (const id of ss.currentSelection) {
+        const item = ls.allItems[id].dragItem
+        if (item.type === "widget") {
+            const node = (item as WidgetLayout).node;
+            if (node) {
+                ss.currentSelectionNodes.push(node)
+            }
+        }
+    }
 
     layoutState.set(ls)
+    selectionState.set(ss)
 };
 
 export function stopDrag(evt: MouseEvent) {
 };
+
+export function graphToGraphVis(graph: LGraph): string {
+    let links: string[] = []
+    let seenLinks = new Set()
+    let subgraphs: Record<string, [Subgraph, string[]]> = {}
+    let subgraphNodes: Record<number | UUID, Subgraph> = {}
+    let idToInt: Record<number | UUID, number> = {}
+    let curId = 0;
+
+    const convId = (id: number | UUID): number => {
+        if (idToInt[id] == null) {
+            idToInt[id] = curId++;
+        }
+        return idToInt[id];
+    }
+
+    const addLink = (node: LGraphNode, link: LLink): string => {
+        const nodeA = node.graph.getNodeById(link.origin_id)
+        const nodeB = node.graph.getNodeById(link.target_id);
+        seenLinks.add(link.id)
+        return `    "${convId(nodeA.id)}_${nodeA.title}" -> "${convId(nodeB.id)}_${nodeB.title}";\n`;
+    }
+
+    for (const node of graph.iterateNodesInOrderRecursive()) {
+        for (let [index, input] of enumerate(node.iterateInputInfo())) {
+            const link = node.getInputLink(index);
+            if (link && !seenLinks.has(link.id)) {
+                const linkText = addLink(node, link)
+                if (node.graph != graph) {
+                    subgraphs[node.graph._subgraph_node.id] ||= [node.graph._subgraph_node, []]
+                    subgraphs[node.graph._subgraph_node.id][1].push(linkText)
+                    subgraphNodes[node.graph._subgraph_node.id] = node.graph._subgraph_node
+                }
+                else {
+                    links.push(linkText)
+                }
+            }
+        }
+        for (let [index, output] of enumerate(node.iterateOutputInfo())) {
+            for (const link of node.getOutputLinks(index)) {
+                if (!seenLinks.has(link.id)) {
+                    const linkText = addLink(node, link)
+                    if (node.graph != graph) {
+                        subgraphs[node.graph._subgraph_node.id] ||= [node.graph._subgraph_node, []]
+                        subgraphs[node.graph._subgraph_node.id][1].push(linkText)
+                        subgraphNodes[node.graph._subgraph_node.id] = node.graph._subgraph_node
+                    }
+                    else {
+                        links.push(linkText)
+                    }
+                }
+            }
+        }
+    }
+
+    let out = "digraph {\n"
+    out += '    fontname="Helvetica,Arial,sans-serif"\n'
+    out += '    node [fontname="Helvetica,Arial,sans-serif"]\n'
+    out += '    edge [fontname="Helvetica,Arial,sans-serif"]\n'
+    out += '    node [shape=box style=filled fillcolor="#DDDDDD"]\n'
+
+    for (const [subgraph, links] of Object.values(subgraphs)) {
+        // Subgraph name has to be prefixed with "cluster" to show up as a cluster...
+        out += `    subgraph cluster_subgraph_${convId(subgraph.id)} {\n`
+        out += `        label="${convId(subgraph.id)}_${subgraph.title}";\n`;
+        out += "        color=red;\n";
+        // out += "        style=grey;\n";
+        out += "    " + links.join("    ")
+        out += "    }\n"
+    }
+
+    out += links.join("")
+
+    out += "}"
+    return out
+}
 
 export function workflowToGraphVis(workflow: SerializedLGraph): string {
     let out = "digraph {\n"
@@ -87,17 +178,21 @@ export function promptToGraphVis(prompt: SerializedPrompt): string {
     for (const pair of Object.entries(prompt.output)) {
         const [id, o] = pair;
         const outNode = prompt.workflow.nodes.find(n => n.id == id)
-        for (const pair2 of Object.entries(o.inputs)) {
-            const [inpName, i] = pair2;
+        if (outNode) {
+            for (const pair2 of Object.entries(o.inputs)) {
+                const [inpName, i] = pair2;
 
-            if (Array.isArray(i) && i.length === 2 && typeof i[0] === "string" && typeof i[1] === "number") {
-                // Link
-                const inpNode = prompt.workflow.nodes.find(n => n.id == i[0])
-                out += `"${inpNode.title}" -> "${outNode.title}"\n`
-            }
-            else {
-                // Value
-                out += `"${id}-${inpName}-${i}" -> "${outNode.title}"\n`
+                if (Array.isArray(i) && i.length === 2 && typeof i[0] === "string" && typeof i[1] === "number") {
+                    // Link
+                    const inpNode = prompt.workflow.nodes.find(n => n.id == i[0])
+                    if (inpNode) {
+                        out += `"${inpNode.title}" -> "${outNode.title}"\n`
+                    }
+                }
+                else {
+                    // Value
+                    out += `"${id}-${inpName}-${i}" -> "${outNode.title}"\n`
+                }
             }
         }
     }
@@ -106,13 +201,15 @@ export function promptToGraphVis(prompt: SerializedPrompt): string {
     return out
 }
 
-export function getNodeInfo(nodeId: NodeID): string {
+export function getNodeInfo(nodeId: ComfyNodeID): string {
     let app = (window as any).app;
     if (!app || !app.lGraph)
         return String(nodeId);
 
-    const title = app.lGraph.getNodeById(nodeId)?.title || String(nodeId);
-    return title + " (" + nodeId + ")"
+    const displayNodeID = nodeId ? (nodeId.split("-")[0]) : String(nodeId);
+
+    const title = app.lGraph.getNodeByIdRecursive(nodeId)?.title || String(nodeId);
+    return title + " (" + displayNodeID + ")"
 }
 
 export const debounce = (callback: Function, wait = 250) => {
@@ -231,6 +328,24 @@ export async function uploadImageToComfyUI(blob: Blob, filename: string, type: C
         });
 }
 
+/** Raw output as received from ComfyUI's backend */
+export interface ComfyExecutionResult {
+    // Technically this response can contain arbitrary data, but "images" is the
+    // most frequently used as it's output by LoadImage and PreviewImage, the
+    // only two output nodes in base ComfyUI.
+    images: ComfyImageLocation[] | null,
+}
+
+/** Raw output entry as received from ComfyUI's backend */
+export type ComfyImageLocation = {
+    /* Filename with extension in the subfolder. */
+    filename: string,
+    /* Subfolder in the containing folder. */
+    subfolder: string,
+    /* Base ComfyUI folder where the image is located. */
+    type: ComfyUploadImageType
+}
+
 /*
  * Convenient type for passing around image filepaths and their metadata with
  * wires. Needs to be converted to a filename for use with LoadImage.
@@ -304,6 +419,12 @@ export function executionResultToImageMetadata(result: ComfyExecutionResult): Co
     return result.images.map(comfyFileToComfyBoxMetadata)
 }
 
+export function isComfyImageLocation(param: any): param is ComfyImageLocation {
+    return param != null && typeof param === "object"
+        && typeof param.filename === "string"
+        && typeof param.type === "string"
+}
+
 export function parseWhateverIntoImageMetadata(param: any): ComfyBoxImageMetadata[] | null {
     let meta: ComfyBoxImageMetadata[] | null = null
 
@@ -314,10 +435,24 @@ export function parseWhateverIntoImageMetadata(param: any): ComfyBoxImageMetadat
         meta = param
     }
     else if (isComfyExecutionResult(param)) {
-        meta = executionResultToImageMetadata(param)
+        meta = executionResultToImageMetadata(param);
+    }
+    else if (isComfyImageLocation(param)) {
+        meta = [comfyFileToComfyBoxMetadata(param)]
+    }
+    else if (Array.isArray(param) && param.every(isComfyImageLocation)) {
+        meta = param.map(comfyFileToComfyBoxMetadata)
     }
 
     return meta;
+}
+
+export function parseWhateverIntoComfyImageLocations(param: any): ComfyImageLocation[] | null {
+    const meta = parseWhateverIntoImageMetadata(param);
+    if (!Array.isArray(meta))
+        return null
+
+    return meta.map(m => m.comfyUIFile);
 }
 
 export function comfyBoxImageToComfyFile(image: ComfyBoxImageMetadata): ComfyImageLocation {

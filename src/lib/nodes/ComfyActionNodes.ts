@@ -5,10 +5,10 @@ import queueState from "$lib/stores/queueState";
 import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWidget, type SerializedLGraphNode, type SlotLayout, type PropertyLayout } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
-import type { ComfyWidgetNode, ComfyExecutionResult, ComfyImageLocation } from "./ComfyWidgetNodes";
+import type { ComfyWidgetNode } from "$lib/nodes/widgets";
 import type { NotifyOptions } from "$lib/notify";
 import type { FileData as GradioFileData } from "@gradio/upload";
-import { convertComfyOutputToGradio, type ComfyUploadImageAPIResponse } from "$lib/utils";
+import { type ComfyExecutionResult, type ComfyImageLocation, convertComfyOutputToGradio, type ComfyUploadImageAPIResponse, parseWhateverIntoComfyImageLocations } from "$lib/utils";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
@@ -59,7 +59,7 @@ LiteGraph.registerNodeType({
     class: ComfyQueueEvents,
     title: "Comfy.QueueEvents",
     desc: "Triggers a 'bang' event when a prompt is queued.",
-    type: "actions/queue_events"
+    type: "events/queue_events"
 })
 
 export interface ComfyStoreImagesActionProperties extends ComfyGraphNodeProperties {
@@ -177,8 +177,8 @@ export class ComfySwapAction extends ComfyGraphNode {
     override onAction(action: any, param: any) {
         const a = this.getInputData(0)
         const b = this.getInputData(1)
-        this.triggerSlot(0, a)
-        this.triggerSlot(1, b)
+        this.triggerSlot(0, b)
+        this.triggerSlot(1, a)
     };
 }
 
@@ -469,7 +469,7 @@ export class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
     }
 
     private getModeChanges(action: TagAction, enable: boolean, nodeChanges: Record<string, NodeMode>, widgetChanges: Record<DragItemID, boolean>) {
-        for (const node of this.graph._nodes) {
+        for (const node of this.graph.iterateNodesInOrderRecursive()) {
             if ("tags" in node.properties) {
                 const comfyNode = node as ComfyGraphNode;
                 const hasTag = comfyNode.properties.tags.indexOf(action.tag) != -1;
@@ -482,9 +482,6 @@ export class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
                         newMode = NodeMode.NEVER;
                     }
                     nodeChanges[node.id] = newMode
-                    node.changeMode(newMode);
-                    if ("notifyPropsChanged" in node)
-                        (node as ComfyWidgetNode).notifyPropsChanged();
                 }
             }
         }
@@ -530,7 +527,7 @@ export class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
         }
 
         for (const [nodeId, newMode] of Object.entries(nodeChanges)) {
-            this.graph.getNodeById(nodeId).changeMode(newMode);
+            this.graph.getNodeByIdRecursive(nodeId).changeMode(newMode);
         }
 
         const layout = get(layoutState);
@@ -601,27 +598,7 @@ export class ComfySetPromptThumbnailsAction extends ComfyGraphNode {
 
     override getPromptThumbnails(): ComfyImageLocation[] | null {
         const data = this.getInputData(0)
-
-        const folderType = this.properties.folderType || "input";
-
-        const convertString = (s: string): ComfyImageLocation => {
-            return { filename: data, subfolder: "", type: folderType }
-        }
-
-        if (typeof data === "string") {
-            return [convertString(data)]
-        }
-        else if (data != null && typeof data === "object") {
-            if ("filename" in data && "type" in data)
-                return [data as ComfyImageLocation];
-        }
-        else if (Array.isArray(data) && data.length > 0) {
-            if (typeof data[0] === "string")
-                return data.map(convertString)
-            else if (typeof data[0] === "object" && "filename" in data[0] && "type" in data[0])
-                return data as ComfyImageLocation[]
-        }
-        return null;
+        return parseWhateverIntoComfyImageLocations(data);
     }
 }
 

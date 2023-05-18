@@ -3,11 +3,11 @@
  import uiState from "$lib/stores/uiState";
 
  import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
+ import selectionState from "$lib/stores/selectionState";
  import { startDrag, stopDrag } from "$lib/utils"
  import Container from "./Container.svelte"
  import { type Writable } from "svelte/store"
- import type { ComfyWidgetNode } from "$lib/nodes";
-	import { NodeMode } from "@litegraph-ts/core";
+ import type { ComfyWidgetNode } from "$lib/nodes/widgets";
  import { isHidden } from "$lib/widgets/utils";
 
  export let dragItem: IDragItem | null = null;
@@ -65,23 +65,26 @@
         <Container {container} {classes} {zIndex} {showHandles} {isMobile} />
     {/key}
 {:else if widget && widget.node}
-    {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets" && zIndex > 1}
+    {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets"}
     {@const hidden = isHidden(widget)}
+    {@const hovered = $uiState.uiUnlocked && $selectionState.currentHovered.has(widget.id)}
+    {@const selected = $uiState.uiUnlocked && $selectionState.currentSelection.includes(widget.id)}
     {#key $attrsChanged}
         {#key $propsChanged}
             <div class="widget {widget.attrs.classes} {getWidgetClass()}"
                  class:edit={edit}
-                class:selected={$uiState.uiUnlocked && $layoutState.currentSelection.includes(widget.id)}
-                class:is-executing={$queueState.runningNodeID && $queueState.runningNodeId == widget.node.id}
-                class:hidden={hidden}
-                >
+                 class:hovered
+                 class:selected
+                 class:is-executing={$queueState.runningNodeID && $queueState.runningNodeID == widget.node.id}
+                 class:hidden={hidden}
+            >
                 <svelte:component this={widget.node.svelteComponentType} {widget} {isMobile} />
             </div>
             {#if hidden && edit}
                 <div class="handle handle-hidden" class:hidden={!edit} />
             {/if}
-            {#if showHandles}
-                <div class="handle handle-widget" data-drag-item-id={widget.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+            {#if showHandles || hovered}
+                <div class="handle handle-widget" class:hovered data-drag-item-id={widget.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
             {/if}
         {/key}
     {/key}
@@ -92,11 +95,8 @@
      height: 100%;
 
      &.selected {
-         background: var(--color-yellow-200);
+         background: var(--comfy-widget-selected-background-fill);
      }
- }
- .container.selected {
-     background: var(--color-yellow-400);
  }
 
  .is-executing {
@@ -123,8 +123,10 @@
      background-color: #40404080;
  }
 
- .handle-widget:hover {
-     background-color: #add8e680;
+ .handle-widget {
+     &:hover, &.hovered {
+         background-color: #add8e680;
+     }
  }
 
  .node-type {
@@ -134,7 +136,5 @@
 
  .edit {
      border: 2px dashed var(--color-blue-400);
-     margin: 0.2em;
-     padding: 0.2em;
  }
 </style>

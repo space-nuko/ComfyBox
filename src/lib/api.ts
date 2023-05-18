@@ -1,9 +1,10 @@
-import type { Progress, SerializedPrompt, SerializedPromptInputs, SerializedPromptInputsAll, SerializedPromptOutput, SerializedPromptOutputs } from "./components/ComfyApp";
+import type { Progress, SerializedPrompt, SerializedPromptInputs, SerializedPromptInputsAll, SerializedPromptOutputs } from "./components/ComfyApp";
 import type TypedEmitter from "typed-emitter";
 import EventEmitter from "events";
-import type { ComfyExecutionResult, ComfyImageLocation } from "./nodes/ComfyWidgetNodes";
+import type { ComfyImageLocation } from "$lib/utils";
 import type { SerializedLGraph, UUID } from "@litegraph-ts/core";
 import type { SerializedLayoutState } from "./stores/layoutState";
+import type { ComfyNodeDef } from "./ComfyNodeDef";
 
 export type ComfyPromptRequest = {
     client_id?: string,
@@ -30,7 +31,7 @@ export type ComfyAPIQueueResponse = {
     error?: string
 }
 
-export type NodeID = UUID;
+export type ComfyNodeID = UUID; // To distinguish from Litegraph NodeID
 export type PromptID = UUID; // UUID
 
 export type ComfyAPIHistoryItem = [
@@ -38,7 +39,7 @@ export type ComfyAPIHistoryItem = [
     PromptID,
     SerializedPromptInputsAll,
     ComfyBoxPromptExtraData,
-    NodeID[]  // good outputs
+    ComfyNodeID[]  // good outputs
 ]
 
 export type ComfyAPIPromptResponse = {
@@ -76,9 +77,10 @@ type ComfyAPIEvents = {
     progress: (progress: Progress) => void,
     reconnecting: () => void,
     reconnected: () => void,
-    executing: (promptID: PromptID | null, runningNodeID: NodeID | null) => void,
-    executed: (promptID: PromptID, nodeID: NodeID, output: SerializedPromptOutput) => void,
-    execution_cached: (promptID: PromptID, nodes: NodeID[]) => void,
+    executing: (promptID: PromptID | null, runningNodeID: ComfyNodeID | null) => void,
+    executed: (promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutputs) => void,
+    execution_start: (promptID: PromptID) => void,
+    execution_cached: (promptID: PromptID, nodes: ComfyNodeID[]) => void,
     execution_error: (promptID: PromptID, message: string) => void,
 }
 
@@ -182,6 +184,9 @@ export default class ComfyAPI {
                     case "executed":
                         this.eventBus.emit("executed", msg.data.prompt_id, msg.data.node, msg.data.output);
                         break;
+                    case "execution_start":
+                        this.eventBus.emit("execution_start", msg.data.prompt_id);
+                        break;
                     case "execution_cached":
                         this.eventBus.emit("execution_cached", msg.data.prompt_id, msg.data.nodes);
                         break;
@@ -226,7 +231,7 @@ export default class ComfyAPI {
      * Loads node object definitions for the graph
      * @returns The node definitions
      */
-    async getNodeDefs(): Promise<any> {
+    async getNodeDefs(): Promise<Record<ComfyNodeID, ComfyNodeDef>> {
         return fetch(this.getBackendUrl() + "/object_info", { cache: "no-store" })
             .then(resp => resp.json())
     }
@@ -248,7 +253,7 @@ export default class ComfyAPI {
             postBody = JSON.stringify(body)
         }
         catch (error) {
-            return Promise.reject({ error })
+            return Promise.reject({ error: error.toString() })
         }
 
         return fetch(this.getBackendUrl() + "/prompt", {
@@ -260,12 +265,12 @@ export default class ComfyAPI {
         })
             .then(async (res) => {
                 if (res.status != 200) {
-                    throw await res.text()
+                    throw await res.json()
                 }
                 return res.json()
             })
             .then(raw => { return { promptID: raw.prompt_id } })
-            .catch(error => { return { error } })
+            .catch(error => { return error })
     }
 
     /**

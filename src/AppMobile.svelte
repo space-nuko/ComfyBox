@@ -53,7 +53,6 @@
 
  onMount(async () => {
      await app.setup();
-     (window as any).app = app;
      window.addEventListener("backbutton", onBackKeyDown, false);
      window.addEventListener("popstate", onBackKeyDown, false);
  });

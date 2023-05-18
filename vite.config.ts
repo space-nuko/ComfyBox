@@ -72,6 +72,13 @@ export default defineConfig({
         // }
     },
     test: {
-        include: ['litegraph/packages/tests/src/main.ts']
+        environment: 'jsdom',
+        deps: {
+            inline: [/^svelte/, /^@floating-ui/, /dist/, "skeleton-elements", "mdn-polyfills", "loupe"]
+        },
+        include: [
+            'litegraph/packages/tests/src/main.ts',
+            'src/tests/main.ts'
+        ]
     }
 });

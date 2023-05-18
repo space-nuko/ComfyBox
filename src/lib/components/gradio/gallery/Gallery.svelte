@@ -21,19 +21,20 @@
 		object_fit: "cover",
 		height: "auto"
 	};
- export let imageWidth: number = 1;
- export let imageHeight: number = 1;
+ export let imageWidth: number = 0;
+ export let imageHeight: number = 0;
 
 	const dispatch = createEventDispatcher<{
 		select: SelectData;
+        clicked: HTMLImageElement
 	}>();
 
 	// tracks whether the value of the gallery was reset
 	let was_reset: boolean = true;
 
     $: if (selected_image == null || was_reset) {
-        imageWidth = 1;
-        imageHeight = 1;
+        imageWidth = 0;
+        imageHeight = 0;
     }
 
 	$: was_reset = value == null || value.length == 0 ? true : was_reset;
@@ -142,6 +143,14 @@
 
 	let height = 0;
 	let window_height = 0;
+
+    let imgElem = null;
+
+    function onClick() {
+        // selected_image = next
+        if (imgElem)
+            dispatch("clicked", imgElem)
+    }
 </script>
 
 <svelte:window bind:innerHeight={window_height} />
@@ -166,7 +175,8 @@
 			<ModifyUpload on:clear={() => (selected_image = null)} />
 
 			<img
-				on:click={() => (selected_image = next)}
+				on:click={onClick}
+                bind:this={imgElem}
 				src={_value[selected_image][0].data}
 				alt={_value[selected_image][1] || ""}
 				title={_value[selected_image][1] || null}

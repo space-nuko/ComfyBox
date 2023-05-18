@@ -6,12 +6,12 @@
  import { StaticImage } from "$lib/components/gradio/image";
  import type { Styles } from "@gradio/utils";
  import type { WidgetLayout } from "$lib/stores/layoutState";
- import type { Writable } from "svelte/store";
- import type { ComfyGalleryNode } from "$lib/nodes/ComfyWidgetNodes";
+ import { writable, type Writable } from "svelte/store";
  import type { FileData as GradioFileData } from "@gradio/upload";
  import type { SelectData as GradioSelectData } from "@gradio/utils";
  import { clamp, comfyBoxImageToComfyURL, type ComfyBoxImageMetadata } from "$lib/utils";
  import { f7 } from "framework7-svelte";
+ import type { ComfyGalleryNode } from "$lib/nodes/widgets";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -19,8 +19,8 @@
  let nodeValue: Writable<ComfyBoxImageMetadata[]> | null = null;
  let propsChanged: Writable<number> | null = null;
  let option: number | null = null;
- let imageWidth: number = 1;
- let imageHeight: number = 1;
+ let imageWidth: Writable<number> = writable(0);
+ let imageHeight: Writable<number> = writable(0);
  let selected_image: number | null = null;
 
  $: widget && setNodeValue(widget);
@@ -30,6 +30,8 @@
          node = widget.node as ComfyGalleryNode
          nodeValue = node.value;
          propsChanged = node.propsChanged;
+         imageWidth = node.imageWidth
+         imageHeight = node.imageHeight
 
          if ($nodeValue != null) {
              if (node.properties.index < 0 || node.properties.index >= $nodeValue.length) {
@@ -45,18 +47,9 @@
  }
  let element: HTMLDivElement;
 
- $: if (node) {
-     if (imageWidth > 1 || imageHeight > 1) {
-         node.imageSize = [imageWidth, imageHeight]
-     }
-     else {
-         node.imageSize = [1, 1]
-     }
- }
-
  let mobileLightbox = null;
 
- function showMobileLightbox(event: Event) {
+ function showMobileLightbox(source: HTMLImageElement) {
      if (!f7)
          return
 
@@ -65,16 +58,14 @@
          mobileLightbox = null;
      }
 
-     const source = (event.target || event.srcElement) as HTMLImageElement;
      const galleryElem = source.closest<HTMLDivElement>("div.block")
-     console.debug("[ImageViewer] showModal", event, source, galleryElem);
+     console.debug("[ImageViewer] showModal", source, galleryElem);
      if (!galleryElem || ImageViewer.all_gallery_buttons(galleryElem).length === 0) {
          console.error("No buttons found on gallery element!", galleryElem)
          return;
      }
 
      const allGalleryButtons = ImageViewer.all_gallery_buttons(galleryElem);
-     const selectedSource = source.src
 
      const images = allGalleryButtons.map(button => {
          return {
@@ -91,55 +82,28 @@
          type: 'popup',
      });
      mobileLightbox.open(selected_image)
-
-     event.stopPropagation()
  }
 
- function setupImageForMobileLightbox(e: HTMLImageElement) {
-     if (e.dataset.modded === "true")
-         return;
-
-     e.dataset.modded = "true";
-     e.style.cursor = "pointer";
-     e.style.userSelect = "none";
-
-     var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
-
-     // For Firefox, listening on click first switched to next image then shows the lightbox.
-     // If you know how to fix this without switching to mousedown event, please.
-     // For other browsers the event is click to make it possiblr to drag picture.
-     var event = isFirefox ? 'mousedown' : 'click'
-
-     e.addEventListener(event, (evt) => {
-         evt.preventDefault()
-         showMobileLightbox(evt)
-     }, true);
+ function onClicked(e: CustomEvent<HTMLImageElement>) {
+     if (isMobile) {
+         showMobileLightbox(e.detail)
+     }
+     else {
+         ImageViewer.instance.showLightbox(e.detail)
+     }
  }
 
  function onSelect(e: CustomEvent<GradioSelectData>) {
-     // Setup lightbox
-     // Wait for gradio gallery to show the large preview image, if no timeout then
-     // the event might fire too early
-
-     const callback = isMobile ? setupImageForMobileLightbox
-                    : ImageViewer.instance.setupGalleryImageForLightbox.bind(ImageViewer.instance)
-
-     setTimeout(() => {
-         const images = element.querySelectorAll<HTMLImageElement>('div.block div > img')
-         if (images != null) {
-             images.forEach(callback);
-         }
-         ImageViewer.instance.refreshImages();
-     }, 200)
-
      // Update index
      node.setProperty("index", e.detail.index as number)
  }
 
  $: if ($propsChanged > -1 && widget && $nodeValue) {
      if (widget.attrs.variant === "image") {
-         selected_image = $nodeValue.length - 1
          node.setProperty("index", selected_image)
+     }
+     else {
+         node.setProperty("index", $nodeValue.length > 0 ? 0 : null)
      }
  }
  else {
@@ -160,8 +124,8 @@
                         value={url}
                         show_label={widget.attrs.title != ""}
                         label={widget.attrs.title}
-                        bind:imageWidth
-                        bind:imageHeight
+                        bind:imageWidth={$imageWidth}
+                        bind:imageHeight={$imageHeight}
                     />
                 {:else}
                     <Empty size="large" unpadded_box={true}><Image /></Empty>
@@ -181,8 +145,9 @@
                         root={""}
                         root_url={""}
                         on:select={onSelect}
-                        bind:imageWidth
-                        bind:imageHeight
+                        on:clicked={onClicked}
+                        bind:imageWidth={$imageWidth}
+                        bind:imageHeight={$imageHeight}
                         bind:selected_image
                     />
                 </div>
