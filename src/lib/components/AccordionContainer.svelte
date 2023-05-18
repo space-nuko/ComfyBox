@@ -61,7 +61,7 @@
  }
 </script>
 
-{#if container && children}
+{#if container && Array.isArray(children)}
     {@const selected = $uiState.uiUnlocked && $selectionState.currentSelection.includes(container.id)}
     <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')} z-index{zIndex}"
          class:hide-block={container.attrs.containerVariant === "hidden"}

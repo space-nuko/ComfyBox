@@ -27,6 +27,7 @@ export default class ComfyImageUploadNode extends ComfyWidgetNode<ComfyBoxImageM
 
     override svelteComponentType = ImageUploadWidget;
     override defaultValue = [];
+    override outputSlotName = "images";
     override storeActionName = "store";
     override saveUserState = false;
 

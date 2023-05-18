@@ -5,7 +5,7 @@ import { comfyFileToAnnotatedFilepath, type ComfyBoxImageMetadata } from "$lib/u
 export default class ComfyPickImageNode extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
         inputs: [
-            { name: "images", type: "COMFYBOX_IMAGES" },
+            { name: "images", type: "COMFYBOX_IMAGES,COMFYBOX_IMAGE" },
         ],
         outputs: [
             { name: "image", type: "COMFYBOX_IMAGE" },
@@ -35,9 +35,13 @@ export default class ComfyPickImageNode extends ComfyGraphNode {
     _path: string | null = null;
     _index: number = 0;
 
-    private setValue(value: ComfyBoxImageMetadata[] | null) {
+    private setValue(value: ComfyBoxImageMetadata[] | ComfyBoxImageMetadata | null) {
+        if (value != null && !Array.isArray(value)) {
+            value = [value]
+            this._index = 0;
+        }
         const changed = this._value != value;
-        this._value = value;
+        this._value = value as ComfyBoxImageMetadata[];
         if (changed) {
             if (value && value[this._index] != null) {
                 this._image = value[this._index]
@@ -55,6 +59,7 @@ export default class ComfyPickImageNode extends ComfyGraphNode {
                 this.widthWidget.value = 0
                 this.heightWidget.value = 0
             }
+            console.log("SET", value, this._image, this._path)
         }
     }
 

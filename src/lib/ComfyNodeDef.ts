@@ -17,12 +17,20 @@ export type ComfyNodeDefInputs = {
     optional?: Record<string, ComfyNodeDefInput>
 }
 export type ComfyNodeDefInput = [ComfyNodeDefInputType, ComfyNodeDefInputOptions | null]
+
+
+/**
+ * - Array: Combo widget. Usually the values are strings but they can also be other stuff like booleans.
+ * - "INT"/"FLOAT"/etc.: Non-combo type widgets. See ComfyWidgets type.
+ * - other string: Must be an input type, usually something lke "IMAGE" or "LATENT".
+ */
 export type ComfyNodeDefInputType = any[] | keyof typeof ComfyWidgets | string
+
 export type ComfyNodeDefInputOptions = {
     forceInput?: boolean
 }
 
-// TODO when comfy refactors
+// TODO if/when comfy refactors
 export type ComfyNodeDefOutput = {
     type: string,
     name: string,

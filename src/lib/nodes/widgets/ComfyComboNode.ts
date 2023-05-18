@@ -113,11 +113,15 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
         const comfyInput = input as IComfyInputSlot;
         const otherProps = comfyInput.config;
 
+        console.warn("CHECK COMBO CONNECTION", otherProps, thisProps)
+
         // Ensure combo options match
         if (!(otherProps.values instanceof Array))
             return false;
         if (thisProps.values.find((v, i) => otherProps.values.indexOf(v) === -1))
             return false;
+
+        console.warn("PASSED")
 
         return true;
     }

@@ -59,7 +59,7 @@ LiteGraph.registerNodeType({
     class: ComfyQueueEvents,
     title: "Comfy.QueueEvents",
     desc: "Triggers a 'bang' event when a prompt is queued.",
-    type: "actions/queue_events"
+    type: "events/queue_events"
 })
 
 export interface ComfyStoreImagesActionProperties extends ComfyGraphNodeProperties {
@@ -469,7 +469,7 @@ export class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
     }
 
     private getModeChanges(action: TagAction, enable: boolean, nodeChanges: Record<string, NodeMode>, widgetChanges: Record<DragItemID, boolean>) {
-        for (const node of this.graph._nodes) {
+        for (const node of this.graph.iterateNodesInOrderRecursive()) {
             if ("tags" in node.properties) {
                 const comfyNode = node as ComfyGraphNode;
                 const hasTag = comfyNode.properties.tags.indexOf(action.tag) != -1;
@@ -482,9 +482,6 @@ export class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
                         newMode = NodeMode.NEVER;
                     }
                     nodeChanges[node.id] = newMode
-                    node.changeMode(newMode);
-                    if ("notifyPropsChanged" in node)
-                        (node as ComfyWidgetNode).notifyPropsChanged();
                 }
             }
         }
@@ -530,8 +527,7 @@ export class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
         }
 
         for (const [nodeId, newMode] of Object.entries(nodeChanges)) {
-            // NOTE: Only applies to this subgraph, not parent/child graphs.
-            this.graph.getNodeById(nodeId).changeMode(newMode);
+            this.graph.getNodeByIdRecursive(nodeId).changeMode(newMode);
         }
 
         const layout = get(layoutState);

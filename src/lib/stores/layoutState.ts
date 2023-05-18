@@ -314,7 +314,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "widget",
                 defaultValue: "",
                 editable: true,
-                onChanged: setNodeTitle
+                // onChanged: setNodeTitle
             },
             {
                 name: "hidden",
@@ -679,6 +679,7 @@ type LayoutStateOps = {
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode, options: LGraphAddNodeOptions) => void,
     nodeRemoved: (node: LGraphNode, options: LGraphRemoveNodeOptions) => void,
+    moveItem: (target: IDragItem, to: ContainerLayout, index?: number) => void,
     groupItems: (dragItemIDs: DragItemID[], attrs?: Partial<Attributes>) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
     findLayoutEntryForNode: (nodeId: ComfyNodeID) => DragItemEntry | null,
@@ -922,7 +923,7 @@ function nodeRemoved(node: LGraphNode, options: LGraphRemoveNodeOptions) {
 function moveItem(target: IDragItem, to: ContainerLayout, index?: number) {
     const state = get(store)
     const entry = state.allItems[target.id]
-    if (entry.parent && entry.parent.id === to.id)
+    if (!entry || (entry.parent && entry.parent.id === to.id && entry.children.indexOf(target) === index))
         return;
 
     if (entry.parent) {
@@ -1175,6 +1176,7 @@ const layoutStateStore: WritableLayoutStateStore =
     updateChildren,
     nodeAdded,
     nodeRemoved,
+    moveItem,
     groupItems,
     findLayoutEntryForNode,
     findLayoutForNode,

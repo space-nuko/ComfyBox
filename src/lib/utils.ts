@@ -206,9 +206,10 @@ export function getNodeInfo(nodeId: ComfyNodeID): string {
     if (!app || !app.lGraph)
         return String(nodeId);
 
-    // TODO subgraph support
+    const displayNodeID = nodeId ? (nodeId.split("-")[0]) : String(nodeId);
+
     const title = app.lGraph.getNodeByIdRecursive(nodeId)?.title || String(nodeId);
-    return title + " (" + nodeId + ")"
+    return title + " (" + displayNodeID + ")"
 }
 
 export const debounce = (callback: Function, wait = 250) => {

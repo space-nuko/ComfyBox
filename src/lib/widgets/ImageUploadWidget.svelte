@@ -3,7 +3,7 @@
  import { Block } from "@gradio/atoms";
  import { TextBox } from "@gradio/form";
  import Row from "$lib/components/gradio/app/Row.svelte";
- import { get, type Writable } from "svelte/store";
+ import { get, writable, type Writable } from "svelte/store";
  import Modal from "$lib/components/Modal.svelte";
  import { Button } from "@gradio/button";
  import { Embed as Klecks } from "klecks";
@@ -21,16 +21,18 @@
  let nodeValue: Writable<ComfyBoxImageMetadata[]> | null = null;
  let attrsChanged: Writable<number> | null = null;
 
- let imgWidth: number = 0;
- let imgHeight: number = 0;
+ let imgWidth: Writable<number> = writable(0);
+ let imgHeight: Writable<number> = writable(0);
 
  $: widget && setNodeValue(widget);
 
+ $: console.warn("IMGSIZE2!!!", $imgWidth, $imgHeight)
+
  $: if ($nodeValue && $nodeValue.length > 0) {
      // TODO improve
-     if (imgWidth > 0 && imgHeight > 0) {
-         $nodeValue[0].width = imgWidth
-         $nodeValue[0].height = imgHeight
+     if ($imgWidth > 0 && $imgHeight > 0) {
+         $nodeValue[0].width = $imgWidth
+         $nodeValue[0].height = $imgHeight
      }
      else {
          $nodeValue[0].width = 0
@@ -232,8 +234,8 @@
 <div class="wrapper comfy-image-editor">
     {#if widget.attrs.variant === "fileUpload" || isMobile}
         <ImageUpload value={_value}
-                     bind:imgWidth
-                     bind:imgHeight
+                     bind:imgWidth={$imgWidth}
+                     bind:imgHeight={$imgHeight}
                      fileCount={"single"}
                      elem_classes={[]}
                      style={""}
@@ -248,8 +250,8 @@
     {:else}
         <div class="comfy-image-editor-panel">
             <ImageUpload value={_value}
-                         bind:imgWidth
-                         bind:imgHeight
+                         bind:imgWidth={$imgWidth}
+                         bind:imgHeight={$imgHeight}
                          fileCount={"single"}
                          elem_classes={[]}
                          style={""}

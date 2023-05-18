@@ -554,7 +554,7 @@ export default class ComfyApp {
     }
 
     runDefaultQueueAction() {
-        for (const node of this.lGraph.iterateNodesInOrder()) {
+        for (const node of this.lGraph.iterateNodesInOrderRecursive()) {
             if ("onDefaultQueueAction" in node) {
                 (node as ComfyGraphNode).onDefaultQueueAction()
             }
@@ -684,8 +684,7 @@ export default class ComfyApp {
                         break;
                     }
 
-                    for (const n of p.workflow.nodes) {
-                        const node = this.lGraph.getNodeByIdRecursive(n.id);
+                    for (const node of this.lGraph.iterateNodesInOrderRecursive()) {
                         if ("afterQueued" in node) {
                             (node as ComfyGraphNode).afterQueued(p, tag);
                         }

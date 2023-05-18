@@ -1,20 +1,12 @@
 <script lang="ts">
- import { Block, BlockTitle } from "@gradio/atoms";
  import uiState from "$lib/stores/uiState";
  import selectionState from "$lib/stores/selectionState";
- import WidgetContainer from "./WidgetContainer.svelte"
  import BlockContainer from "./BlockContainer.svelte"
  import AccordionContainer from "./AccordionContainer.svelte"
  import TabsContainer from "./TabsContainer.svelte"
 
- import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
-
- import {fade} from 'svelte/transition';
  // notice - fade in works fine but don't add svelte's fade-out (known issue)
- import {cubicIn} from 'svelte/easing';
- import { flip } from 'svelte/animate';
- import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
- import { startDrag, stopDrag } from "$lib/utils"
+ import { type ContainerLayout } from "$lib/stores/layoutState";
  import type { Writable } from "svelte/store";
  import { isHidden } from "$lib/widgets/utils";
 
@@ -23,7 +15,7 @@
  export let classes: string[] = [];
  export let showHandles: boolean = false;
  export let isMobile: boolean = false
- let attrsChanged: Writable<boolean> | null = null;
+ let attrsChanged: Writable<number> | null = null;
 
  $: if (container) {
      attrsChanged = container.attrsChanged

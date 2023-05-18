@@ -9,11 +9,16 @@ function hasTag(node: LGraphNode, tag: string): boolean {
     return "tags" in node.properties && node.properties.tags.indexOf(tag) !== -1
 }
 
+function isGraphInputOutput(node: LGraphNode): boolean {
+    return node.is(GraphInput) || node.is(GraphOutput)
+}
+
 export function isActiveNode(node: LGraphNode, tag: string | null = null): boolean {
     if (!node)
         return false;
 
-    if (tag && !hasTag(node, tag)) {
+    // Check tags but not on graph inputs/outputs
+    if (!isGraphInputOutput(node) && (tag && !hasTag(node, tag))) {
         console.debug("Skipping tagged node", tag, node.properties.tags, node)
         return false;
     }

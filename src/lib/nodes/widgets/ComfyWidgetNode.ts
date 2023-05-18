@@ -73,12 +73,14 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     // shownInputProperties: string[] = []
 
     /** Names of properties to add as outputs */
-    private shownOutputProperties: Record<string, { type: string, index: number }> = {}
+    private shownOutputProperties: Record<string, { type: string, outputName: string }> = {}
     outputProperties: { name: string, type: string }[] = []
 
     override isBackendNode = false;
     override serialize_widgets = true;
 
+    // input slots
+    inputSlotName: string | null = "value";
     storeActionName: string | null = "store";
 
     // output slots
@@ -105,15 +107,16 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     addPropertyAsOutput(propertyName: string, type: string) {
-        if (this.shownOutputProperties["@" + propertyName])
+        if (this.shownOutputProperties[propertyName])
             return;
 
         if (!(propertyName in this.properties)) {
             throw `No property named ${propertyName} found!`
         }
 
-        this.shownOutputProperties["@" + propertyName] = { type, index: this.outputs.length }
-        this.addOutput("@" + propertyName, type)
+        const outputName = "@" + propertyName;
+        this.shownOutputProperties[propertyName] = { type, outputName }
+        this.addOutput(outputName, type)
     }
 
     formatValue(value: any): string {
@@ -174,8 +177,11 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     override onPropertyChanged(property: string, value: any, prevValue?: any) {
         if (this.shownOutputProperties != null) {
             const data = this.shownOutputProperties[property]
-            if (data)
-                this.setOutputData(data.index, value)
+            if (data) {
+                const index = this.findOutputSlotIndexByName(data.outputName)
+                if (index !== -1)
+                    this.setOutputData(index, value)
+            }
         }
     }
 
@@ -183,6 +189,15 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
      * Logic to run if this widget can be treated as output (slider, combo, text)
      */
     override onExecute(param: any, options: object) {
+        if (this.inputSlotName != null) {
+            const inputIndex = this.findInputSlotIndexByName(this.inputSlotName)
+            if (inputIndex !== -1) {
+                const data = this.getInputData(inputIndex)
+                if (data != null) { // TODO can "null" be a legitimate value here?
+                    this.setValue(data)
+                }
+            }
+        }
         if (this.outputSlotName != null) {
             const outputIndex = this.findOutputSlotIndexByName(this.outputSlotName)
             if (outputIndex !== -1)
@@ -190,7 +205,9 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         }
         for (const propName in this.shownOutputProperties) {
             const data = this.shownOutputProperties[propName]
-            this.setOutputData(data.index, this.properties[propName])
+            const index = this.findOutputSlotIndexByName(data.outputName)
+            if (index !== -1)
+                this.setOutputData(index, this.properties[propName])
         }
 
         // Fire a pending change event after one full step of the graph has

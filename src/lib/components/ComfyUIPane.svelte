@@ -30,6 +30,51 @@
      // TODO
  }
 
+ function moveTo(delta: number | ((cur: number, total: number) => number)) {
+     const dragItemID = $selectionState.currentSelection[0];
+     const entry = $layoutState.allItems[dragItemID];
+     if (!entry) {
+         return
+     }
+
+     const dragItem = entry.dragItem;
+     const containing = entry.parent
+     if (containing == null || containing.type !== "container") {
+         return
+     }
+
+     const containingEntry = $layoutState.allItems[containing.id];
+     const oldIndex = containingEntry.children.findIndex(c => c.id === dragItem.id)
+     if (oldIndex === -1) {
+         return;
+     }
+
+     let newIndex: number;
+     if (typeof delta === "number")
+         newIndex = oldIndex + delta;
+     else
+         newIndex = delta(oldIndex, containingEntry.children.length);
+
+     layoutState.moveItem(dragItem, containing as ContainerLayout, newIndex)
+     $layoutState = $layoutState
+ }
+
+ function moveUp() {
+     moveTo(-1)
+ }
+
+ function moveDown() {
+     moveTo(1)
+ }
+
+ function sendToTop() {
+     moveTo(() => 0)
+ }
+
+ function sendToBottom() {
+     moveTo((cur: number, total: number) => total - 1)
+ }
+
  function groupWidgets(horizontal: boolean) {
      const items = $selectionState.currentSelection
      $selectionState.currentSelection = []
@@ -110,6 +155,23 @@
 
 {#if showMenu}
     <Menu {...menuPos} on:click={closeMenu} on:clickoutside={closeMenu}>
+        <MenuOption
+            isDisabled={$selectionState.currentSelection.length !== 1}
+            on:click={() => moveUp()}
+            text="Move Up" />
+        <MenuOption
+            isDisabled={$selectionState.currentSelection.length !== 1}
+            on:click={() => moveDown()}
+            text="Move Down" />
+        <MenuOption
+            isDisabled={$selectionState.currentSelection.length !== 1}
+            on:click={() => sendToTop()}
+            text="Send to Top" />
+        <MenuOption
+            isDisabled={$selectionState.currentSelection.length !== 1}
+            on:click={() => sendToBottom()}
+            text="Send to Bottom" />
+        <MenuDivider/>
         <MenuOption
             isDisabled={$selectionState.currentSelection.length === 0}
             on:click={() => groupWidgets(false)}

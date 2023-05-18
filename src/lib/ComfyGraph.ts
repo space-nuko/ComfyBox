@@ -9,6 +9,7 @@ import type ComfyGraphNode from "./nodes/ComfyGraphNode";
 import type IComfyInputSlot from "./IComfyInputSlot";
 import type { ComfyBackendNode } from "./nodes/ComfyBackendNode";
 import type { ComfyComboNode, ComfyWidgetNode } from "./nodes/widgets";
+import selectionState from "./stores/selectionState";
 
 type ComfyGraphEvents = {
     configured: (graph: LGraph) => void
@@ -115,7 +116,7 @@ export default class ComfyGraph extends LGraph {
                         if (comfyInput.defaultWidgetNode) {
                             const widgetNode = LiteGraph.createNode(comfyInput.defaultWidgetNode)
                             const inputPos = comfyNode.getConnectionPos(true, index);
-                            this.add(widgetNode)
+                            node.graph.add(widgetNode)
                             widgetNode.connect(0, comfyNode, index);
                             widgetNode.collapse();
                             widgetNode.pos = [inputPos[0] - 140, inputPos[1] + LiteGraph.NODE_SLOT_HEIGHT / 2];
@@ -150,6 +151,7 @@ export default class ComfyGraph extends LGraph {
     }
 
     override onNodeRemoved(node: LGraphNode, options: LGraphRemoveNodeOptions) {
+        selectionState.clear(); // safest option
         layoutState.nodeRemoved(node, options);
 
         // Handle subgraphs being removed

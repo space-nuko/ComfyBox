@@ -16,6 +16,7 @@ export default class ComfyTextNode extends ComfyWidgetNode<string> {
 
     static slotLayout: SlotLayout = {
         inputs: [
+            { name: "value", type: "string" },
             { name: "store", type: BuiltInSlotType.ACTION }
         ],
         outputs: [
@@ -24,6 +25,7 @@ export default class ComfyTextNode extends ComfyWidgetNode<string> {
         ]
     }
 
+    override inputSlotName = "value";
     override svelteComponentType = TextWidget
     override defaultValue = "";
 

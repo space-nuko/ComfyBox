@@ -9,7 +9,8 @@ export interface ComfyValueControlProperties extends ComfyGraphNodeProperties {
     action: "fixed" | "increment" | "decrement" | "randomize",
     min: number,
     max: number,
-    step: number
+    step: number,
+    ignoreStepWhenRandom: boolean
 }
 
 const INT_MAX = 1125899906842624;
@@ -21,7 +22,8 @@ export default class ComfyValueControl extends ComfyGraphNode {
         action: "fixed",
         min: -INT_MAX,
         max: INT_MAX,
-        step: 1
+        step: 1,
+        ignoreStepWhenRandom: false
     }
 
     static slotLayout: SlotLayout = {
@@ -61,15 +63,11 @@ export default class ComfyValueControl extends ComfyGraphNode {
     }
 
     override onExecute() {
-        this.setProperty("action", this.getInputData(2) || "fixed")
-        this.setProperty("min", this.getInputData(3))
-        this.setProperty("max", this.getInputData(4))
-        this.setProperty("step", this.getInputData(5) || 1)
-
         if (this._aboutToChange > 0) {
             this._aboutToChange -= 1;
             if (this._aboutToChange <= 0) {
                 const value = this._aboutToChangeValue;
+                console.warn("ABOUTTOCHANGE", value)
                 this._aboutToChange = 0;
                 this._aboutToChangeValue = null;
                 this.triggerSlot(1, value)
@@ -82,8 +80,26 @@ export default class ComfyValueControl extends ComfyGraphNode {
         if (typeof v !== "number")
             return
 
-        let min = this.properties.min
-        let max = this.properties.max
+        let action_ = this.getInputData(2);
+        if (action_ == null)
+            action_ = "fixed"
+        let min = this.getInputData(3);
+        if (min == null)
+            min = -INT_MAX
+        let max = this.getInputData(4);
+        if (max == null)
+            max = INT_MAX
+        let step = this.getInputData(5);
+        if (step == null)
+            step = 1
+
+        this.setProperty("action", action_)
+        this.setProperty("min", min)
+        this.setProperty("max", max)
+        this.setProperty("step", step)
+
+        min = this.properties.min
+        max = this.properties.max
         if (min == null) min = -INT_MAX
         if (max == null) max = INT_MAX
 
@@ -103,7 +119,8 @@ export default class ComfyValueControl extends ComfyGraphNode {
                 v -= this.properties.step;
                 break;
             case "randomize":
-                v = Math.floor(Math.random() * range) * (this.properties.step) + min;
+                const step = this.properties.ignoreStepWhenRandom ? 1 : this.properties.step
+                v = Math.floor(Math.random() * range) * step + min;
             default:
                 break;
         }

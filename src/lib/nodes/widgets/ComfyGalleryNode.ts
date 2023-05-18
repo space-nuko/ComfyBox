@@ -72,6 +72,9 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
     }
 
     override parseValue(param: any): ComfyBoxImageMetadata[] {
+        if (param == null)
+            return []
+
         const meta = parseWhateverIntoImageMetadata(param) || [];
 
         console.debug("[ComfyGalleryNode] Received output!", param)
@@ -81,6 +84,7 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
             return currentValue.concat(meta)
         }
         else {
+            this.notifyPropsChanged();
             return meta;
         }
     }
