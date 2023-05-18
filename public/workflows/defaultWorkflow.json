@@ -96,7 +96,7 @@
         "properties": {
           "tags": [],
           "defaultValue": null,
-          "index": 3,
+          "index": null,
           "updateMode": "append"
         },
         "widgets_values": [],
@@ -989,7 +989,7 @@
         "properties": {
           "tags": [],
           "defaultValue": null,
-          "index": 0,
+          "index": null,
           "updateMode": "append"
         },
         "widgets_values": [],
@@ -10444,1330 +10444,6 @@
         }
       },
       {
-        "id": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
-        "type": "graph/subgraph",
-        "pos": [
-          393,
-          318
-        ],
-        "size": [
-          200,
-          70
-        ],
-        "flags": {},
-        "order": 31,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "model",
-            "type": "MODEL",
-            "link": "3130f01b-569e-41ee-8a0a-d91b374f21e7",
-            "properties": {}
-          },
-          {
-            "name": "positive",
-            "type": "CONDITIONING",
-            "link": "a0072557-0d6b-470e-b93a-d58b5dbf1c4a",
-            "properties": {}
-          },
-          {
-            "name": "negative",
-            "type": "CONDITIONING",
-            "link": "482abd71-9f0c-4dcb-bfb6-6b5643145d89",
-            "properties": {}
-          }
-        ],
-        "outputs": [
-          {
-            "name": "positive",
-            "type": "CONDITIONING",
-            "links": [
-              "7627d820-6bba-4263-b023-906c0752410a",
-              "e1a75b66-2558-41f5-b604-3d152d28d154"
-            ],
-            "properties": {},
-            "slot_index": 1
-          },
-          {
-            "name": "negative",
-            "type": "CONDITIONING",
-            "links": [
-              "2da0832c-5de3-4989-bf49-b5c3e7a0196d",
-              "65c3a5fd-0bfd-4162-ac80-5373a4a3d258"
-            ],
-            "properties": {},
-            "slot_index": 2
-          }
-        ],
-        "title": "ControlNet",
-        "properties": {
-          "enabled": true,
-          "tags": [
-            "gen",
-            "hr"
-          ]
-        },
-        "color": "#2a363b",
-        "bgColor": "#3f5159",
-        "subgraph": {
-          "last_node_id": 0,
-          "last_link_id": 0,
-          "nodes": [
-            {
-              "id": "14a8903c-4011-4f35-8e5e-2222eee6cc1e",
-              "type": "ui/combo",
-              "pos": [
-                576.8020629882812,
-                300
-              ],
-              "size": [
-                210,
-                78
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 0,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "store",
-                  "type": -1,
-                  "link": null,
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "value",
-                  "type": "string",
-                  "links": [
-                    "2e4084a3-e483-4ece-934d-e4b86778fd36"
-                  ],
-                  "properties": {}
-                },
-                {
-                  "name": "changed",
-                  "type": -2,
-                  "links": [],
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "title": "UI.Combo",
-              "properties": {
-                "tags": [
-                  "controlnet"
-                ],
-                "defaultValue": null,
-                "values": [],
-                "convertValueToLabelCode": ""
-              },
-              "widgets_values": [],
-              "color": "#223",
-              "bgColor": "#335",
-              "comfyValue": "A",
-              "shownOutputProperties": {},
-              "saveUserState": false
-            },
-            {
-              "id": "10cbb926-c5f9-4870-996d-0bd4cfdfd45f",
-              "type": "ui/number",
-              "pos": [
-                1000.8020629882812,
-                239
-              ],
-              "size": [
-                210,
-                158
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 1,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "store",
-                  "type": -1,
-                  "link": null,
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "value",
-                  "type": "number",
-                  "links": [
-                    "6c755243-7893-4ca3-ae10-329b69abc7ba"
-                  ],
-                  "properties": {}
-                },
-                {
-                  "name": "changed",
-                  "type": -2,
-                  "links": [],
-                  "properties": {},
-                  "shape": 1
-                },
-                {
-                  "name": "@min",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "@max",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "@step",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "@precision",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                }
-              ],
-              "title": "UI.Number",
-              "properties": {
-                "tags": [
-                  "controlnet"
-                ],
-                "defaultValue": 1,
-                "min": 0,
-                "max": 2,
-                "step": 0.01,
-                "precision": 0
-              },
-              "widgets_values": [
-                "0.550"
-              ],
-              "color": "#223",
-              "bgColor": "#335",
-              "comfyValue": 0.55,
-              "shownOutputProperties": {
-                "min": {
-                  "type": "number",
-                  "outputName": "@min"
-                },
-                "max": {
-                  "type": "number",
-                  "outputName": "@max"
-                },
-                "step": {
-                  "type": "number",
-                  "outputName": "@step"
-                },
-                "precision": {
-                  "type": "number",
-                  "outputName": "@precision"
-                }
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "c9e61616-a12c-48ab-8be4-71a783908ff9",
-              "type": "ui/number",
-              "pos": [
-                1004,
-                420
-              ],
-              "size": [
-                210,
-                158
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 2,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "store",
-                  "type": -1,
-                  "link": null,
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "value",
-                  "type": "number",
-                  "links": [
-                    "f40eb893-53d2-42b1-bf75-8f4ddcbf5a64"
-                  ],
-                  "properties": {}
-                },
-                {
-                  "name": "changed",
-                  "type": -2,
-                  "links": [],
-                  "properties": {},
-                  "shape": 1
-                },
-                {
-                  "name": "@min",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "@max",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "@step",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "@precision",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                }
-              ],
-              "title": "UI.Number",
-              "properties": {
-                "tags": [
-                  "controlnet"
-                ],
-                "defaultValue": 1,
-                "min": 0,
-                "max": 2,
-                "step": 0.01,
-                "precision": 0
-              },
-              "widgets_values": [
-                "0.000"
-              ],
-              "color": "#223",
-              "bgColor": "#335",
-              "comfyValue": 0,
-              "shownOutputProperties": {
-                "min": {
-                  "type": "number",
-                  "outputName": "@min"
-                },
-                "max": {
-                  "type": "number",
-                  "outputName": "@max"
-                },
-                "step": {
-                  "type": "number",
-                  "outputName": "@step"
-                },
-                "precision": {
-                  "type": "number",
-                  "outputName": "@precision"
-                }
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "f587febd-0054-4ab2-9ffc-6306757927d7",
-              "type": "ControlNetApply",
-              "pos": [
-                1125,
-                95
-              ],
-              "size": [
-                211.6,
-                86
-              ],
-              "flags": {
-                "collapsed": false
-              },
-              "order": 14,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "conditioning",
-                  "type": "CONDITIONING",
-                  "link": "75b89374-323e-4eea-af04-89416703c73e",
-                  "properties": {},
-                  "slot_index": 0,
-                  "config": {}
-                },
-                {
-                  "name": "control_net",
-                  "type": "CONTROL_NET",
-                  "link": "9c32c2af-37f3-4541-bb51-caa30930dd21",
-                  "properties": {},
-                  "config": {}
-                },
-                {
-                  "name": "image",
-                  "type": "IMAGE",
-                  "link": "a952a83c-3870-4ee5-aee2-3fb64568efed",
-                  "properties": {},
-                  "config": {}
-                },
-                {
-                  "name": "strength",
-                  "type": "number",
-                  "link": "6c755243-7893-4ca3-ae10-329b69abc7ba",
-                  "properties": {},
-                  "config": {},
-                  "defaultWidgetNode": null,
-                  "widgetNodeType": "ui/number",
-                  "serialize": true
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "CONDITIONING",
-                  "type": "CONDITIONING",
-                  "links": [
-                    "7ecf9141-3774-45bf-96bc-fc09d9284710"
-                  ],
-                  "properties": {},
-                  "shape": 3
-                }
-              ],
-              "title": "Apply ControlNet",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr",
-                  "controlnet"
-                ]
-              },
-              "color": "#432",
-              "bgColor": "#653",
-              "saveUserState": true
-            },
-            {
-              "id": "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
-              "type": "ControlNetApply",
-              "pos": [
-                1134,
-                336
-              ],
-              "size": [
-                211.6,
-                86
-              ],
-              "flags": {
-                "collapsed": false
-              },
-              "order": 13,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "conditioning",
-                  "type": "CONDITIONING",
-                  "link": "741db1cc-287d-4741-ad23-c4454e5bd3ea",
-                  "properties": {},
-                  "config": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "control_net",
-                  "type": "CONTROL_NET",
-                  "link": "d1a178eb-1e57-4ec0-b6d2-d457477bc024",
-                  "properties": {},
-                  "config": {}
-                },
-                {
-                  "name": "image",
-                  "type": "IMAGE",
-                  "link": "bfb7e39e-782d-42b4-a397-5796a263b78c",
-                  "properties": {},
-                  "config": {}
-                },
-                {
-                  "name": "strength",
-                  "type": "number",
-                  "link": "f40eb893-53d2-42b1-bf75-8f4ddcbf5a64",
-                  "properties": {},
-                  "config": {},
-                  "defaultWidgetNode": null,
-                  "widgetNodeType": "ui/number",
-                  "serialize": true
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "CONDITIONING",
-                  "type": "CONDITIONING",
-                  "links": [
-                    "7426925b-ae20-4aa1-8c2d-9447c4acf5ea"
-                  ],
-                  "properties": {},
-                  "shape": 3
-                }
-              ],
-              "title": "Apply ControlNet",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr",
-                  "controlnet"
-                ]
-              },
-              "color": "#432",
-              "bgColor": "#653",
-              "saveUserState": true
-            },
-            {
-              "id": "f5e0644b-2ccd-4417-985e-3c400c61ae94",
-              "type": "DiffControlNetLoader",
-              "pos": [
-                707,
-                256
-              ],
-              "size": [
-                236.8,
-                46
-              ],
-              "flags": {},
-              "order": 10,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "model",
-                  "type": "MODEL",
-                  "link": "082b07f6-01f9-421d-b7c7-63484088f53f",
-                  "properties": {},
-                  "slot_index": 0,
-                  "config": {}
-                },
-                {
-                  "name": "control_net_name",
-                  "type": "string",
-                  "link": "2e4084a3-e483-4ece-934d-e4b86778fd36",
-                  "properties": {},
-                  "config": {},
-                  "defaultWidgetNode": null,
-                  "widgetNodeType": "ui/combo",
-                  "serialize": true
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "CONTROL_NET",
-                  "type": "CONTROL_NET",
-                  "links": [
-                    "9c32c2af-37f3-4541-bb51-caa30930dd21",
-                    "d1a178eb-1e57-4ec0-b6d2-d457477bc024"
-                  ],
-                  "properties": {},
-                  "shape": 3,
-                  "slot_index": 0
-                }
-              ],
-              "title": "Load ControlNet Model (diff)",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr",
-                  "controlnet"
-                ]
-              },
-              "color": "#432",
-              "bgColor": "#653",
-              "saveUserState": true
-            },
-            {
-              "id": "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
-              "type": "LoadImage",
-              "pos": [
-                702,
-                374
-              ],
-              "size": [
-                140,
-                46
-              ],
-              "flags": {},
-              "order": 12,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "image",
-                  "type": "string",
-                  "link": "0d61a1e6-67b5-48a2-9c73-4c944bee9a83",
-                  "properties": {},
-                  "config": {},
-                  "defaultWidgetNode": null,
-                  "widgetNodeType": "ui/combo",
-                  "serialize": true,
-                  "slot_index": 0
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "IMAGE",
-                  "type": "IMAGE",
-                  "links": [
-                    "bfb7e39e-782d-42b4-a397-5796a263b78c",
-                    "a952a83c-3870-4ee5-aee2-3fb64568efed"
-                  ],
-                  "properties": {},
-                  "shape": 3,
-                  "slot_index": 0
-                },
-                {
-                  "name": "MASK",
-                  "type": "MASK",
-                  "links": [],
-                  "properties": {},
-                  "shape": 3
-                }
-              ],
-              "title": "Load Image",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr",
-                  "controlnet"
-                ]
-              },
-              "color": "#432",
-              "bgColor": "#653",
-              "saveUserState": true
-            },
-            {
-              "id": "929ac2c4-63a7-4c87-97b3-01256b491ef5",
-              "type": "graph/output",
-              "pos": [
-                1623,
-                352
-              ],
-              "size": [
-                210,
-                62
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 17,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "",
-                  "type": "CONDITIONING",
-                  "link": "1ef6dca2-0385-4a48-b859-4e3f53d97801",
-                  "properties": {}
-                }
-              ],
-              "outputs": [],
-              "title": "Output",
-              "properties": {
-                "name": "negative",
-                "type": "CONDITIONING",
-                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
-                "tags": []
-              }
-            },
-            {
-              "id": "5609d422-1b11-4de7-a076-bffed63be521",
-              "type": "actions/set_node_mode",
-              "pos": [
-                995.2960000000002,
-                -111.97200000000004
-              ],
-              "size": [
-                210,
-                102
-              ],
-              "flags": {},
-              "order": 9,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "enabled",
-                  "type": "boolean",
-                  "link": "837e1074-9ccd-4026-8729-70eb916c9518",
-                  "properties": {}
-                },
-                {
-                  "name": "set",
-                  "type": -1,
-                  "link": "9ac235e8-33f1-4ae1-8928-2f728ddda7ae",
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [],
-              "title": "Comfy.SetNodeModeAction",
-              "properties": {
-                "targetTags": "controlnet",
-                "enable": false,
-                "tags": []
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
-              "type": "utils/pick_first",
-              "pos": [
-                1368,
-                91
-              ],
-              "size": [
-                210,
-                122
-              ],
-              "flags": {},
-              "order": 16,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "A",
-                  "type": "*",
-                  "link": "7ecf9141-3774-45bf-96bc-fc09d9284710",
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "B",
-                  "type": "*",
-                  "link": "ba0a0894-24c4-4093-9bfe-241d9d2d987a",
-                  "properties": {}
-                },
-                {
-                  "name": "C",
-                  "type": "*",
-                  "link": null,
-                  "properties": {}
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "CONDITIONING",
-                  "links": [
-                    "8433f10b-112a-488f-b34d-29156b692bde"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "Comfy.PickFirst",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr"
-                ],
-                "mode": "anyActiveLink"
-              },
-              "color": "#232",
-              "bgColor": "#353",
-              "saveUserState": true
-            },
-            {
-              "id": "b423640f-f39d-47ab-8e79-150b04f98ca9",
-              "type": "utils/pick_first",
-              "pos": [
-                1380,
-                331
-              ],
-              "size": [
-                210,
-                122
-              ],
-              "flags": {},
-              "order": 15,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "A",
-                  "type": "*",
-                  "link": "7426925b-ae20-4aa1-8c2d-9447c4acf5ea",
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "B",
-                  "type": "*",
-                  "link": "4d830e2b-2999-4e91-aa61-ad0885489ec5",
-                  "properties": {}
-                },
-                {
-                  "name": "C",
-                  "type": "*",
-                  "link": null,
-                  "properties": {}
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "CONDITIONING",
-                  "links": [
-                    "1ef6dca2-0385-4a48-b859-4e3f53d97801"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "Comfy.PickFirst",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr"
-                ],
-                "mode": "anyActiveLink"
-              },
-              "color": "#232",
-              "bgColor": "#353",
-              "saveUserState": true
-            },
-            {
-              "id": "3e449b25-d413-460a-a394-356a1908febe",
-              "type": "graph/output",
-              "pos": [
-                1613,
-                117
-              ],
-              "size": [
-                210,
-                62
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 18,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "",
-                  "type": "CONDITIONING",
-                  "link": "8433f10b-112a-488f-b34d-29156b692bde",
-                  "properties": {}
-                }
-              ],
-              "outputs": [],
-              "title": "Output",
-              "properties": {
-                "name": "positive",
-                "type": "CONDITIONING",
-                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
-                "tags": []
-              }
-            },
-            {
-              "id": "cc4a59b6-fff0-43a1-a349-f25f6c004fe2",
-              "type": "ui/image_upload",
-              "pos": [
-                316,
-                401
-              ],
-              "size": [
-                210,
-                78
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 3,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "store",
-                  "type": -1,
-                  "link": null,
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "images",
-                  "type": "COMFYBOX_IMAGES",
-                  "links": [
-                    "42b27afc-9093-46dd-b612-863db283ef00"
-                  ],
-                  "properties": {}
-                },
-                {
-                  "name": "changed",
-                  "type": -2,
-                  "links": [],
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "title": "UI.ImageUpload",
-              "properties": {
-                "defaultValue": null,
-                "tags": [
-                  "controlnet"
-                ]
-              },
-              "widgets_values": [],
-              "color": "#223",
-              "bgColor": "#335",
-              "comfyValue": [],
-              "shownOutputProperties": {},
-              "saveUserState": false
-            },
-            {
-              "id": "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
-              "type": "image/pick_image",
-              "pos": [
-                464,
-                376
-              ],
-              "size": [
-                210,
-                190
-              ],
-              "flags": {
-                "collapsed": false
-              },
-              "order": 8,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "images",
-                  "type": "COMFYBOX_IMAGES,COMFYBOX_IMAGE",
-                  "link": "42b27afc-9093-46dd-b612-863db283ef00",
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "index",
-                  "type": "number",
-                  "link": null,
-                  "properties": {}
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "image",
-                  "type": "COMFYBOX_IMAGE",
-                  "links": [
-                    "84687a04-1bf3-4ffd-b9dc-dfe6fb3ec4b0"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "filename",
-                  "type": "string",
-                  "links": [
-                    "0d61a1e6-67b5-48a2-9c73-4c944bee9a83"
-                  ],
-                  "properties": {},
-                  "slot_index": 1
-                },
-                {
-                  "name": "width",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "height",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                }
-              ],
-              "title": "Comfy.PickImage",
-              "properties": {
-                "tags": []
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "897e70d8-f807-45e4-9018-0b2138bf9b33",
-              "type": "actions/set_prompt_thumbnails",
-              "pos": [
-                810,
-                480
-              ],
-              "size": [
-                260.4,
-                26
-              ],
-              "flags": {},
-              "order": 11,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "filenames",
-                  "type": "*",
-                  "link": "84687a04-1bf3-4ffd-b9dc-dfe6fb3ec4b0",
-                  "properties": {}
-                }
-              ],
-              "outputs": [],
-              "title": "Comfy.SetPromptThumbnailsAction",
-              "properties": {
-                "tags": [
-                  "controlnet",
-                  "gen",
-                  "hr"
-                ],
-                "defaultFolderType": "input"
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "280e84f4-49b0-43e3-93ef-3964800b4d2c",
-              "type": "ui/checkbox",
-              "pos": [
-                732,
-                -107
-              ],
-              "size": [
-                210,
-                78
-              ],
-              "flags": {},
-              "order": 4,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "store",
-                  "type": -1,
-                  "link": null,
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "value",
-                  "type": "boolean",
-                  "links": [
-                    "837e1074-9ccd-4026-8729-70eb916c9518"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "changed",
-                  "type": -2,
-                  "links": [
-                    "9ac235e8-33f1-4ae1-8928-2f728ddda7ae"
-                  ],
-                  "properties": {},
-                  "shape": 1,
-                  "slot_index": 1
-                }
-              ],
-              "title": "UI.Checkbox",
-              "properties": {
-                "tags": [],
-                "defaultValue": false
-              },
-              "widgets_values": [
-                "false"
-              ],
-              "color": "#223",
-              "bgColor": "#335",
-              "comfyValue": false,
-              "shownOutputProperties": {},
-              "saveUserState": true
-            },
-            {
-              "id": "8d960d27-859e-4fa9-98e5-a224b28ee16f",
-              "type": "graph/input",
-              "pos": [
-                998,
-                49
-              ],
-              "size": [
-                210,
-                86
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 5,
-              "mode": 0,
-              "inputs": [],
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "CONDITIONING",
-                  "links": [
-                    "75b89374-323e-4eea-af04-89416703c73e",
-                    "ba0a0894-24c4-4093-9bfe-241d9d2d987a"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "Input",
-              "properties": {
-                "name": "positive",
-                "type": "CONDITIONING",
-                "value": null,
-                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
-                "tags": []
-              }
-            },
-            {
-              "id": "8836b415-101e-41b2-b048-82e7319909f6",
-              "type": "graph/input",
-              "pos": [
-                1024,
-                286
-              ],
-              "size": [
-                210,
-                86
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 6,
-              "mode": 0,
-              "inputs": [],
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "CONDITIONING",
-                  "links": [
-                    "741db1cc-287d-4741-ad23-c4454e5bd3ea",
-                    "4d830e2b-2999-4e91-aa61-ad0885489ec5"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "Input",
-              "properties": {
-                "name": "negative",
-                "type": "CONDITIONING",
-                "value": null,
-                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
-                "tags": []
-              }
-            },
-            {
-              "id": "39db9118-34cf-406e-a2d5-1c06b18b637a",
-              "type": "graph/input",
-              "pos": [
-                584,
-                276
-              ],
-              "size": [
-                210,
-                86
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 7,
-              "mode": 0,
-              "inputs": [],
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "MODEL",
-                  "links": [
-                    "082b07f6-01f9-421d-b7c7-63484088f53f"
-                  ],
-                  "properties": {}
-                }
-              ],
-              "title": "Input",
-              "properties": {
-                "name": "model",
-                "type": "MODEL",
-                "value": null,
-                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
-                "tags": []
-              }
-            }
-          ],
-          "links": [
-            [
-              "2e4084a3-e483-4ece-934d-e4b86778fd36",
-              "14a8903c-4011-4f35-8e5e-2222eee6cc1e",
-              0,
-              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
-              1,
-              "string"
-            ],
-            [
-              "082b07f6-01f9-421d-b7c7-63484088f53f",
-              "39db9118-34cf-406e-a2d5-1c06b18b637a",
-              0,
-              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
-              0,
-              "MODEL"
-            ],
-            [
-              "6c755243-7893-4ca3-ae10-329b69abc7ba",
-              "10cbb926-c5f9-4870-996d-0bd4cfdfd45f",
-              0,
-              "f587febd-0054-4ab2-9ffc-6306757927d7",
-              3,
-              "number"
-            ],
-            [
-              "f40eb893-53d2-42b1-bf75-8f4ddcbf5a64",
-              "c9e61616-a12c-48ab-8be4-71a783908ff9",
-              0,
-              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
-              3,
-              "number"
-            ],
-            [
-              "42b27afc-9093-46dd-b612-863db283ef00",
-              "cc4a59b6-fff0-43a1-a349-f25f6c004fe2",
-              0,
-              "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
-              0,
-              "COMFYBOX_IMAGES,COMFYBOX_IMAGE"
-            ],
-            [
-              "0d61a1e6-67b5-48a2-9c73-4c944bee9a83",
-              "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
-              1,
-              "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
-              0,
-              "string"
-            ],
-            [
-              "bfb7e39e-782d-42b4-a397-5796a263b78c",
-              "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
-              0,
-              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
-              2,
-              "IMAGE"
-            ],
-            [
-              "a952a83c-3870-4ee5-aee2-3fb64568efed",
-              "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
-              0,
-              "f587febd-0054-4ab2-9ffc-6306757927d7",
-              2,
-              "IMAGE"
-            ],
-            [
-              "9c32c2af-37f3-4541-bb51-caa30930dd21",
-              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
-              0,
-              "f587febd-0054-4ab2-9ffc-6306757927d7",
-              1,
-              "CONTROL_NET"
-            ],
-            [
-              "d1a178eb-1e57-4ec0-b6d2-d457477bc024",
-              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
-              0,
-              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
-              1,
-              "CONTROL_NET"
-            ],
-            [
-              "75b89374-323e-4eea-af04-89416703c73e",
-              "8d960d27-859e-4fa9-98e5-a224b28ee16f",
-              0,
-              "f587febd-0054-4ab2-9ffc-6306757927d7",
-              0,
-              "CONDITIONING"
-            ],
-            [
-              "741db1cc-287d-4741-ad23-c4454e5bd3ea",
-              "8836b415-101e-41b2-b048-82e7319909f6",
-              0,
-              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
-              0,
-              "CONDITIONING"
-            ],
-            [
-              "7426925b-ae20-4aa1-8c2d-9447c4acf5ea",
-              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
-              0,
-              "b423640f-f39d-47ab-8e79-150b04f98ca9",
-              0,
-              "*"
-            ],
-            [
-              "7ecf9141-3774-45bf-96bc-fc09d9284710",
-              "f587febd-0054-4ab2-9ffc-6306757927d7",
-              0,
-              "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
-              0,
-              "*"
-            ],
-            [
-              "ba0a0894-24c4-4093-9bfe-241d9d2d987a",
-              "8d960d27-859e-4fa9-98e5-a224b28ee16f",
-              0,
-              "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
-              1,
-              "CONDITIONING"
-            ],
-            [
-              "4d830e2b-2999-4e91-aa61-ad0885489ec5",
-              "8836b415-101e-41b2-b048-82e7319909f6",
-              0,
-              "b423640f-f39d-47ab-8e79-150b04f98ca9",
-              1,
-              "CONDITIONING"
-            ],
-            [
-              "8433f10b-112a-488f-b34d-29156b692bde",
-              "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
-              0,
-              "3e449b25-d413-460a-a394-356a1908febe",
-              0,
-              "CONDITIONING"
-            ],
-            [
-              "1ef6dca2-0385-4a48-b859-4e3f53d97801",
-              "b423640f-f39d-47ab-8e79-150b04f98ca9",
-              0,
-              "929ac2c4-63a7-4c87-97b3-01256b491ef5",
-              0,
-              "CONDITIONING"
-            ],
-            [
-              "837e1074-9ccd-4026-8729-70eb916c9518",
-              "280e84f4-49b0-43e3-93ef-3964800b4d2c",
-              0,
-              "5609d422-1b11-4de7-a076-bffed63be521",
-              0,
-              "boolean"
-            ],
-            [
-              "9ac235e8-33f1-4ae1-8928-2f728ddda7ae",
-              "280e84f4-49b0-43e3-93ef-3964800b4d2c",
-              1,
-              "5609d422-1b11-4de7-a076-bffed63be521",
-              1,
-              -1
-            ],
-            [
-              "84687a04-1bf3-4ffd-b9dc-dfe6fb3ec4b0",
-              "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
-              0,
-              "897e70d8-f807-45e4-9018-0b2138bf9b33",
-              0,
-              "*"
-            ]
-          ],
-          "groups": [],
-          "config": {},
-          "extra": {},
-          "version": 10
-        }
-      },
-      {
         "id": "f8051ab6-d9f7-44fe-898a-ad26cfde916e",
         "type": "graph/subgraph",
         "pos": [
@@ -11902,7 +10578,7 @@
               "title": "Comfy.ValueControl",
               "properties": {
                 "tags": [],
-                "value": 718345094702636,
+                "value": 964758853482048,
                 "action": "randomize",
                 "min": 0,
                 "max": 18446744073709552000,
@@ -11995,11 +10671,11 @@
                 "precision": 0
               },
               "widgets_values": [
-                "718345094702636.000"
+                "0.000"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": 718345094702636,
+              "comfyValue": 0,
               "shownOutputProperties": {
                 "min": {
                   "type": "number",
@@ -19649,7 +18325,7 @@
               ],
               "title": "GenericCompare",
               "properties": {
-                "A": "ComfyUI_04185_.png [output]",
+                "A": null,
                 "B": "",
                 "OP": "==",
                 "enabled": true,
@@ -20123,7 +18799,7 @@
                     ],
                     "title": "Operation",
                     "properties": {
-                      "A": 512,
+                      "A": 0,
                       "B": 2,
                       "OP": "*",
                       "tags": []
@@ -20172,7 +18848,7 @@
                     ],
                     "title": "Operation",
                     "properties": {
-                      "A": 832,
+                      "A": 0,
                       "B": 2,
                       "OP": "*",
                       "tags": []
@@ -20603,11 +19279,11 @@
                       "multiline": false
                     },
                     "widgets_values": [
-                      "1024"
+                      "0"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "1024",
+                    "comfyValue": "0",
                     "shownOutputProperties": {},
                     "saveUserState": true
                   },
@@ -20667,11 +19343,11 @@
                       "multiline": false
                     },
                     "widgets_values": [
-                      "1664"
+                      "0"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "1664",
+                    "comfyValue": "0",
                     "shownOutputProperties": {},
                     "saveUserState": true
                   }
@@ -22033,6 +20709,1333 @@
               "d1316cca-081d-4e6a-857e-958d796580e7",
               1,
               "VAE"
+            ]
+          ],
+          "groups": [],
+          "config": {},
+          "extra": {},
+          "version": 10
+        }
+      },
+      {
+        "id": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
+        "type": "graph/subgraph",
+        "pos": [
+          393,
+          318
+        ],
+        "size": [
+          200,
+          70
+        ],
+        "flags": {},
+        "order": 31,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "model",
+            "type": "MODEL",
+            "link": "3130f01b-569e-41ee-8a0a-d91b374f21e7",
+            "properties": {}
+          },
+          {
+            "name": "positive",
+            "type": "CONDITIONING",
+            "link": "a0072557-0d6b-470e-b93a-d58b5dbf1c4a",
+            "properties": {}
+          },
+          {
+            "name": "negative",
+            "type": "CONDITIONING",
+            "link": "482abd71-9f0c-4dcb-bfb6-6b5643145d89",
+            "properties": {}
+          }
+        ],
+        "outputs": [
+          {
+            "name": "positive",
+            "type": "CONDITIONING",
+            "links": [
+              "7627d820-6bba-4263-b023-906c0752410a",
+              "e1a75b66-2558-41f5-b604-3d152d28d154"
+            ],
+            "properties": {},
+            "slot_index": 1
+          },
+          {
+            "name": "negative",
+            "type": "CONDITIONING",
+            "links": [
+              "2da0832c-5de3-4989-bf49-b5c3e7a0196d",
+              "65c3a5fd-0bfd-4162-ac80-5373a4a3d258"
+            ],
+            "properties": {},
+            "slot_index": 2
+          }
+        ],
+        "title": "ControlNet",
+        "properties": {
+          "enabled": true,
+          "tags": [
+            "gen",
+            "hr"
+          ]
+        },
+        "color": "#2a363b",
+        "bgColor": "#3f5159",
+        "subgraph": {
+          "last_node_id": 0,
+          "last_link_id": 0,
+          "nodes": [
+            {
+              "id": "14a8903c-4011-4f35-8e5e-2222eee6cc1e",
+              "type": "ui/combo",
+              "pos": [
+                576.8020629882812,
+                300
+              ],
+              "size": [
+                210,
+                78
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 0,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "value",
+                  "type": "string",
+                  "links": [
+                    "2e4084a3-e483-4ece-934d-e4b86778fd36"
+                  ],
+                  "properties": {}
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "title": "UI.Combo",
+              "properties": {
+                "tags": [
+                  "controlnet"
+                ],
+                "defaultValue": null,
+                "values": [],
+                "convertValueToLabelCode": ""
+              },
+              "widgets_values": [],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": "A",
+              "shownOutputProperties": {},
+              "saveUserState": false
+            },
+            {
+              "id": "10cbb926-c5f9-4870-996d-0bd4cfdfd45f",
+              "type": "ui/number",
+              "pos": [
+                1000.8020629882812,
+                239
+              ],
+              "size": [
+                210,
+                158
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 1,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "value",
+                  "type": "number",
+                  "links": [
+                    "6c755243-7893-4ca3-ae10-329b69abc7ba"
+                  ],
+                  "properties": {}
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "@min",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "@max",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "@step",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "@precision",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                }
+              ],
+              "title": "UI.Number",
+              "properties": {
+                "tags": [
+                  "controlnet"
+                ],
+                "defaultValue": 1,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "precision": 0
+              },
+              "widgets_values": [
+                "0.550"
+              ],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": 0.55,
+              "shownOutputProperties": {
+                "min": {
+                  "type": "number",
+                  "outputName": "@min"
+                },
+                "max": {
+                  "type": "number",
+                  "outputName": "@max"
+                },
+                "step": {
+                  "type": "number",
+                  "outputName": "@step"
+                },
+                "precision": {
+                  "type": "number",
+                  "outputName": "@precision"
+                }
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "c9e61616-a12c-48ab-8be4-71a783908ff9",
+              "type": "ui/number",
+              "pos": [
+                1004,
+                420
+              ],
+              "size": [
+                210,
+                158
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 2,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "value",
+                  "type": "number",
+                  "links": [
+                    "f40eb893-53d2-42b1-bf75-8f4ddcbf5a64"
+                  ],
+                  "properties": {}
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "@min",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "@max",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "@step",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "@precision",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                }
+              ],
+              "title": "UI.Number",
+              "properties": {
+                "tags": [
+                  "controlnet"
+                ],
+                "defaultValue": 1,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "precision": 0
+              },
+              "widgets_values": [
+                "0.000"
+              ],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": 0,
+              "shownOutputProperties": {
+                "min": {
+                  "type": "number",
+                  "outputName": "@min"
+                },
+                "max": {
+                  "type": "number",
+                  "outputName": "@max"
+                },
+                "step": {
+                  "type": "number",
+                  "outputName": "@step"
+                },
+                "precision": {
+                  "type": "number",
+                  "outputName": "@precision"
+                }
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "f587febd-0054-4ab2-9ffc-6306757927d7",
+              "type": "ControlNetApply",
+              "pos": [
+                1125,
+                95
+              ],
+              "size": [
+                211.6,
+                86
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 14,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "conditioning",
+                  "type": "CONDITIONING",
+                  "link": "75b89374-323e-4eea-af04-89416703c73e",
+                  "properties": {},
+                  "slot_index": 0,
+                  "config": {}
+                },
+                {
+                  "name": "control_net",
+                  "type": "CONTROL_NET",
+                  "link": "9c32c2af-37f3-4541-bb51-caa30930dd21",
+                  "properties": {},
+                  "config": {}
+                },
+                {
+                  "name": "image",
+                  "type": "IMAGE",
+                  "link": "a952a83c-3870-4ee5-aee2-3fb64568efed",
+                  "properties": {},
+                  "config": {}
+                },
+                {
+                  "name": "strength",
+                  "type": "number",
+                  "link": "6c755243-7893-4ca3-ae10-329b69abc7ba",
+                  "properties": {},
+                  "config": {},
+                  "defaultWidgetNode": null,
+                  "widgetNodeType": "ui/number",
+                  "serialize": true
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "CONDITIONING",
+                  "type": "CONDITIONING",
+                  "links": [
+                    "7ecf9141-3774-45bf-96bc-fc09d9284710"
+                  ],
+                  "properties": {},
+                  "shape": 3
+                }
+              ],
+              "title": "Apply ControlNet",
+              "properties": {
+                "tags": [
+                  "gen",
+                  "hr",
+                  "controlnet"
+                ]
+              },
+              "color": "#432",
+              "bgColor": "#653",
+              "saveUserState": true
+            },
+            {
+              "id": "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
+              "type": "ControlNetApply",
+              "pos": [
+                1134,
+                336
+              ],
+              "size": [
+                211.6,
+                86
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 13,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "conditioning",
+                  "type": "CONDITIONING",
+                  "link": "741db1cc-287d-4741-ad23-c4454e5bd3ea",
+                  "properties": {},
+                  "config": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "control_net",
+                  "type": "CONTROL_NET",
+                  "link": "d1a178eb-1e57-4ec0-b6d2-d457477bc024",
+                  "properties": {},
+                  "config": {}
+                },
+                {
+                  "name": "image",
+                  "type": "IMAGE",
+                  "link": "bfb7e39e-782d-42b4-a397-5796a263b78c",
+                  "properties": {},
+                  "config": {}
+                },
+                {
+                  "name": "strength",
+                  "type": "number",
+                  "link": "f40eb893-53d2-42b1-bf75-8f4ddcbf5a64",
+                  "properties": {},
+                  "config": {},
+                  "defaultWidgetNode": null,
+                  "widgetNodeType": "ui/number",
+                  "serialize": true
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "CONDITIONING",
+                  "type": "CONDITIONING",
+                  "links": [
+                    "7426925b-ae20-4aa1-8c2d-9447c4acf5ea"
+                  ],
+                  "properties": {},
+                  "shape": 3
+                }
+              ],
+              "title": "Apply ControlNet",
+              "properties": {
+                "tags": [
+                  "gen",
+                  "hr",
+                  "controlnet"
+                ]
+              },
+              "color": "#432",
+              "bgColor": "#653",
+              "saveUserState": true
+            },
+            {
+              "id": "f5e0644b-2ccd-4417-985e-3c400c61ae94",
+              "type": "DiffControlNetLoader",
+              "pos": [
+                707,
+                256
+              ],
+              "size": [
+                236.8,
+                46
+              ],
+              "flags": {},
+              "order": 10,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "model",
+                  "type": "MODEL",
+                  "link": "082b07f6-01f9-421d-b7c7-63484088f53f",
+                  "properties": {},
+                  "slot_index": 0,
+                  "config": {}
+                },
+                {
+                  "name": "control_net_name",
+                  "type": "string",
+                  "link": "2e4084a3-e483-4ece-934d-e4b86778fd36",
+                  "properties": {},
+                  "config": {},
+                  "defaultWidgetNode": null,
+                  "widgetNodeType": "ui/combo",
+                  "serialize": true
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "CONTROL_NET",
+                  "type": "CONTROL_NET",
+                  "links": [
+                    "9c32c2af-37f3-4541-bb51-caa30930dd21",
+                    "d1a178eb-1e57-4ec0-b6d2-d457477bc024"
+                  ],
+                  "properties": {},
+                  "shape": 3,
+                  "slot_index": 0
+                }
+              ],
+              "title": "Load ControlNet Model (diff)",
+              "properties": {
+                "tags": [
+                  "gen",
+                  "hr",
+                  "controlnet"
+                ]
+              },
+              "color": "#432",
+              "bgColor": "#653",
+              "saveUserState": true
+            },
+            {
+              "id": "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
+              "type": "LoadImage",
+              "pos": [
+                702,
+                374
+              ],
+              "size": [
+                140,
+                46
+              ],
+              "flags": {},
+              "order": 12,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "image",
+                  "type": "string",
+                  "link": "0d61a1e6-67b5-48a2-9c73-4c944bee9a83",
+                  "properties": {},
+                  "config": {},
+                  "defaultWidgetNode": null,
+                  "widgetNodeType": "ui/combo",
+                  "serialize": true,
+                  "slot_index": 0
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "IMAGE",
+                  "type": "IMAGE",
+                  "links": [
+                    "bfb7e39e-782d-42b4-a397-5796a263b78c",
+                    "a952a83c-3870-4ee5-aee2-3fb64568efed"
+                  ],
+                  "properties": {},
+                  "shape": 3,
+                  "slot_index": 0
+                },
+                {
+                  "name": "MASK",
+                  "type": "MASK",
+                  "links": [],
+                  "properties": {},
+                  "shape": 3
+                }
+              ],
+              "title": "Load Image",
+              "properties": {
+                "tags": [
+                  "gen",
+                  "hr",
+                  "controlnet"
+                ]
+              },
+              "color": "#432",
+              "bgColor": "#653",
+              "saveUserState": true
+            },
+            {
+              "id": "5609d422-1b11-4de7-a076-bffed63be521",
+              "type": "actions/set_node_mode",
+              "pos": [
+                995.2960000000002,
+                -111.97200000000004
+              ],
+              "size": [
+                210,
+                102
+              ],
+              "flags": {},
+              "order": 9,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "enabled",
+                  "type": "boolean",
+                  "link": "837e1074-9ccd-4026-8729-70eb916c9518",
+                  "properties": {}
+                },
+                {
+                  "name": "set",
+                  "type": -1,
+                  "link": "9ac235e8-33f1-4ae1-8928-2f728ddda7ae",
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [],
+              "title": "Comfy.SetNodeModeAction",
+              "properties": {
+                "targetTags": "controlnet",
+                "enable": false,
+                "tags": []
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
+              "type": "utils/pick_first",
+              "pos": [
+                1368,
+                91
+              ],
+              "size": [
+                210,
+                122
+              ],
+              "flags": {},
+              "order": 16,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "A",
+                  "type": "*",
+                  "link": "7ecf9141-3774-45bf-96bc-fc09d9284710",
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "B",
+                  "type": "*",
+                  "link": "ba0a0894-24c4-4093-9bfe-241d9d2d987a",
+                  "properties": {}
+                },
+                {
+                  "name": "C",
+                  "type": "*",
+                  "link": null,
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "number",
+                  "links": [
+                    "8433f10b-112a-488f-b34d-29156b692bde"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "Comfy.PickFirst",
+              "properties": {
+                "tags": [
+                  "gen",
+                  "hr"
+                ],
+                "mode": "anyActiveLink"
+              },
+              "color": "#232",
+              "bgColor": "#353",
+              "saveUserState": true
+            },
+            {
+              "id": "3e449b25-d413-460a-a394-356a1908febe",
+              "type": "graph/output",
+              "pos": [
+                1613,
+                117
+              ],
+              "size": [
+                210,
+                62
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 18,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "",
+                  "type": "CONDITIONING",
+                  "link": "8433f10b-112a-488f-b34d-29156b692bde",
+                  "properties": {}
+                }
+              ],
+              "outputs": [],
+              "title": "Output",
+              "properties": {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
+                "tags": []
+              }
+            },
+            {
+              "id": "cc4a59b6-fff0-43a1-a349-f25f6c004fe2",
+              "type": "ui/image_upload",
+              "pos": [
+                316,
+                401
+              ],
+              "size": [
+                210,
+                78
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 3,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "images",
+                  "type": "COMFYBOX_IMAGES",
+                  "links": [
+                    "42b27afc-9093-46dd-b612-863db283ef00"
+                  ],
+                  "properties": {}
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "title": "UI.ImageUpload",
+              "properties": {
+                "defaultValue": null,
+                "tags": [
+                  "controlnet"
+                ]
+              },
+              "widgets_values": [],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": [],
+              "shownOutputProperties": {},
+              "saveUserState": false
+            },
+            {
+              "id": "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
+              "type": "image/pick_image",
+              "pos": [
+                464,
+                376
+              ],
+              "size": [
+                210,
+                190
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 8,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "images",
+                  "type": "COMFYBOX_IMAGES,COMFYBOX_IMAGE",
+                  "link": "42b27afc-9093-46dd-b612-863db283ef00",
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "index",
+                  "type": "number",
+                  "link": null,
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "image",
+                  "type": "COMFYBOX_IMAGE",
+                  "links": [
+                    "84687a04-1bf3-4ffd-b9dc-dfe6fb3ec4b0"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "filename",
+                  "type": "string",
+                  "links": [
+                    "0d61a1e6-67b5-48a2-9c73-4c944bee9a83"
+                  ],
+                  "properties": {},
+                  "slot_index": 1
+                },
+                {
+                  "name": "width",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "height",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                }
+              ],
+              "title": "Comfy.PickImage",
+              "properties": {
+                "tags": []
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "897e70d8-f807-45e4-9018-0b2138bf9b33",
+              "type": "actions/set_prompt_thumbnails",
+              "pos": [
+                810,
+                480
+              ],
+              "size": [
+                260.4,
+                26
+              ],
+              "flags": {},
+              "order": 11,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "filenames",
+                  "type": "*",
+                  "link": "84687a04-1bf3-4ffd-b9dc-dfe6fb3ec4b0",
+                  "properties": {}
+                }
+              ],
+              "outputs": [],
+              "title": "Comfy.SetPromptThumbnailsAction",
+              "properties": {
+                "tags": [
+                  "controlnet",
+                  "gen",
+                  "hr"
+                ],
+                "defaultFolderType": "input"
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "280e84f4-49b0-43e3-93ef-3964800b4d2c",
+              "type": "ui/checkbox",
+              "pos": [
+                732,
+                -107
+              ],
+              "size": [
+                210,
+                78
+              ],
+              "flags": {},
+              "order": 4,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "value",
+                  "type": "boolean",
+                  "links": [
+                    "837e1074-9ccd-4026-8729-70eb916c9518"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [
+                    "9ac235e8-33f1-4ae1-8928-2f728ddda7ae"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 1
+                }
+              ],
+              "title": "UI.Checkbox",
+              "properties": {
+                "tags": [],
+                "defaultValue": false
+              },
+              "widgets_values": [
+                "false"
+              ],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": false,
+              "shownOutputProperties": {},
+              "saveUserState": true
+            },
+            {
+              "id": "8d960d27-859e-4fa9-98e5-a224b28ee16f",
+              "type": "graph/input",
+              "pos": [
+                998,
+                49
+              ],
+              "size": [
+                210,
+                86
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 5,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "CONDITIONING",
+                  "links": [
+                    "75b89374-323e-4eea-af04-89416703c73e",
+                    "ba0a0894-24c4-4093-9bfe-241d9d2d987a"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "Input",
+              "properties": {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "value": null,
+                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
+                "tags": []
+              }
+            },
+            {
+              "id": "8836b415-101e-41b2-b048-82e7319909f6",
+              "type": "graph/input",
+              "pos": [
+                1024,
+                286
+              ],
+              "size": [
+                210,
+                86
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 6,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "CONDITIONING",
+                  "links": [
+                    "741db1cc-287d-4741-ad23-c4454e5bd3ea",
+                    "cb0c53cb-9ef2-4421-9341-631818541ad8"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "Input",
+              "properties": {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "value": null,
+                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
+                "tags": []
+              }
+            },
+            {
+              "id": "39db9118-34cf-406e-a2d5-1c06b18b637a",
+              "type": "graph/input",
+              "pos": [
+                584,
+                276
+              ],
+              "size": [
+                210,
+                86
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 7,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "MODEL",
+                  "links": [
+                    "082b07f6-01f9-421d-b7c7-63484088f53f"
+                  ],
+                  "properties": {}
+                }
+              ],
+              "title": "Input",
+              "properties": {
+                "name": "model",
+                "type": "MODEL",
+                "value": null,
+                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
+                "tags": []
+              }
+            },
+            {
+              "id": "b423640f-f39d-47ab-8e79-150b04f98ca9",
+              "type": "utils/pick_first",
+              "pos": [
+                1380,
+                331
+              ],
+              "size": [
+                210,
+                122
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 15,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "A",
+                  "type": "*",
+                  "link": "7426925b-ae20-4aa1-8c2d-9447c4acf5ea",
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "B",
+                  "type": "*",
+                  "link": "cb0c53cb-9ef2-4421-9341-631818541ad8",
+                  "properties": {}
+                },
+                {
+                  "name": "C",
+                  "type": "*",
+                  "link": null,
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "CONDITIONING",
+                  "links": [
+                    "b72d7a78-1e85-423d-9332-0c2be7c6fd84"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "Comfy.PickFirst",
+              "properties": {
+                "tags": [
+                  "gen",
+                  "hr"
+                ],
+                "mode": "anyActiveLink"
+              },
+              "color": "#232",
+              "bgColor": "#353",
+              "saveUserState": true
+            },
+            {
+              "id": "929ac2c4-63a7-4c87-97b3-01256b491ef5",
+              "type": "graph/output",
+              "pos": [
+                1612,
+                357
+              ],
+              "size": [
+                210,
+                62
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 17,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "",
+                  "type": "CONDITIONING",
+                  "link": "b72d7a78-1e85-423d-9332-0c2be7c6fd84",
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "outputs": [],
+              "title": "Output",
+              "properties": {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
+                "tags": []
+              }
+            }
+          ],
+          "links": [
+            [
+              "2e4084a3-e483-4ece-934d-e4b86778fd36",
+              "14a8903c-4011-4f35-8e5e-2222eee6cc1e",
+              0,
+              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
+              1,
+              "string"
+            ],
+            [
+              "082b07f6-01f9-421d-b7c7-63484088f53f",
+              "39db9118-34cf-406e-a2d5-1c06b18b637a",
+              0,
+              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
+              0,
+              "MODEL"
+            ],
+            [
+              "6c755243-7893-4ca3-ae10-329b69abc7ba",
+              "10cbb926-c5f9-4870-996d-0bd4cfdfd45f",
+              0,
+              "f587febd-0054-4ab2-9ffc-6306757927d7",
+              3,
+              "number"
+            ],
+            [
+              "f40eb893-53d2-42b1-bf75-8f4ddcbf5a64",
+              "c9e61616-a12c-48ab-8be4-71a783908ff9",
+              0,
+              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
+              3,
+              "number"
+            ],
+            [
+              "42b27afc-9093-46dd-b612-863db283ef00",
+              "cc4a59b6-fff0-43a1-a349-f25f6c004fe2",
+              0,
+              "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
+              0,
+              "COMFYBOX_IMAGES,COMFYBOX_IMAGE"
+            ],
+            [
+              "0d61a1e6-67b5-48a2-9c73-4c944bee9a83",
+              "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
+              1,
+              "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
+              0,
+              "string"
+            ],
+            [
+              "bfb7e39e-782d-42b4-a397-5796a263b78c",
+              "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
+              0,
+              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
+              2,
+              "IMAGE"
+            ],
+            [
+              "a952a83c-3870-4ee5-aee2-3fb64568efed",
+              "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
+              0,
+              "f587febd-0054-4ab2-9ffc-6306757927d7",
+              2,
+              "IMAGE"
+            ],
+            [
+              "9c32c2af-37f3-4541-bb51-caa30930dd21",
+              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
+              0,
+              "f587febd-0054-4ab2-9ffc-6306757927d7",
+              1,
+              "CONTROL_NET"
+            ],
+            [
+              "d1a178eb-1e57-4ec0-b6d2-d457477bc024",
+              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
+              0,
+              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
+              1,
+              "CONTROL_NET"
+            ],
+            [
+              "75b89374-323e-4eea-af04-89416703c73e",
+              "8d960d27-859e-4fa9-98e5-a224b28ee16f",
+              0,
+              "f587febd-0054-4ab2-9ffc-6306757927d7",
+              0,
+              "CONDITIONING"
+            ],
+            [
+              "741db1cc-287d-4741-ad23-c4454e5bd3ea",
+              "8836b415-101e-41b2-b048-82e7319909f6",
+              0,
+              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
+              0,
+              "CONDITIONING"
+            ],
+            [
+              "7426925b-ae20-4aa1-8c2d-9447c4acf5ea",
+              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
+              0,
+              "b423640f-f39d-47ab-8e79-150b04f98ca9",
+              0,
+              "*"
+            ],
+            [
+              "7ecf9141-3774-45bf-96bc-fc09d9284710",
+              "f587febd-0054-4ab2-9ffc-6306757927d7",
+              0,
+              "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
+              0,
+              "*"
+            ],
+            [
+              "ba0a0894-24c4-4093-9bfe-241d9d2d987a",
+              "8d960d27-859e-4fa9-98e5-a224b28ee16f",
+              0,
+              "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
+              1,
+              "CONDITIONING"
+            ],
+            [
+              "8433f10b-112a-488f-b34d-29156b692bde",
+              "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
+              0,
+              "3e449b25-d413-460a-a394-356a1908febe",
+              0,
+              "CONDITIONING"
+            ],
+            [
+              "837e1074-9ccd-4026-8729-70eb916c9518",
+              "280e84f4-49b0-43e3-93ef-3964800b4d2c",
+              0,
+              "5609d422-1b11-4de7-a076-bffed63be521",
+              0,
+              "boolean"
+            ],
+            [
+              "9ac235e8-33f1-4ae1-8928-2f728ddda7ae",
+              "280e84f4-49b0-43e3-93ef-3964800b4d2c",
+              1,
+              "5609d422-1b11-4de7-a076-bffed63be521",
+              1,
+              -1
+            ],
+            [
+              "84687a04-1bf3-4ffd-b9dc-dfe6fb3ec4b0",
+              "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
+              0,
+              "897e70d8-f807-45e4-9018-0b2138bf9b33",
+              0,
+              "*"
+            ],
+            [
+              "cb0c53cb-9ef2-4421-9341-631818541ad8",
+              "8836b415-101e-41b2-b048-82e7319909f6",
+              0,
+              "b423640f-f39d-47ab-8e79-150b04f98ca9",
+              1,
+              "*"
+            ],
+            [
+              "b72d7a78-1e85-423d-9332-0c2be7c6fd84",
+              "b423640f-f39d-47ab-8e79-150b04f98ca9",
+              0,
+              "929ac2c4-63a7-4c87-97b3-01256b491ef5",
+              0,
+              "CONDITIONING"
             ]
           ],
           "groups": [],
