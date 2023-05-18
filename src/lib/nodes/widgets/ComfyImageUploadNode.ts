@@ -5,6 +5,7 @@ import { BuiltInSlotType, LiteGraph, type SlotLayout } from "@litegraph-ts/core"
 import ImageUploadWidget from "$lib/widgets/ImageUploadWidget.svelte";
 import type { ComfyWidgetProperties } from "./ComfyWidgetNode";
 import ComfyWidgetNode from "./ComfyWidgetNode";
+import { get, writable, type Writable } from "svelte/store";
 
 export interface ComfyImageUploadNodeProperties extends ComfyWidgetProperties {
 }
@@ -31,8 +32,20 @@ export default class ComfyImageUploadNode extends ComfyWidgetNode<ComfyBoxImageM
     override storeActionName = "store";
     override saveUserState = false;
 
+    imgWidth: Writable<number> = writable(0);
+    imgHeight: Writable<number> = writable(0);
+
     constructor(name?: string) {
         super(name, [])
+    }
+
+    override onExecute() {
+        // TODO better way of getting image size?
+        const value = get(this.value)
+        if (value && value.length > 0) {
+            value[0].width = get(this.imgWidth)
+            value[0].height = get(this.imgHeight)
+        }
     }
 
     override parseValue(value: any): ComfyBoxImageMetadata[] {

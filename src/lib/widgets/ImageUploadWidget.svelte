@@ -28,23 +28,13 @@
 
  $: console.warn("IMGSIZE2!!!", $imgWidth, $imgHeight)
 
- $: if ($nodeValue && $nodeValue.length > 0) {
-     // TODO improve
-     if ($imgWidth > 0 && $imgHeight > 0) {
-         $nodeValue[0].width = $imgWidth
-         $nodeValue[0].height = $imgHeight
-     }
-     else {
-         $nodeValue[0].width = 0
-         $nodeValue[0].height = 0
-     }
- }
-
  function setNodeValue(widget: WidgetLayout) {
      if (widget) {
          node = widget.node as ComfyImageEditorNode
          nodeValue = node.value;
          attrsChanged = widget.attrsChanged;
+         imgWidth = node.imgWidth
+         imgHeight = node.imgHeight
          status = $nodeValue && $nodeValue.length > 0 ? "uploaded" : "empty"
      }
  };

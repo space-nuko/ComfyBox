@@ -48,16 +48,12 @@ export default class ComfyPickImageNode extends ComfyGraphNode {
                 this._path = comfyFileToAnnotatedFilepath(this._image.comfyUIFile);
                 this.filepathWidget.value = this._image.comfyUIFile.filename
                 this.folderWidget.value = this._image.comfyUIFile.type
-                this.widthWidget.value = this._image.width
-                this.heightWidget.value = this._image.height
             }
             else {
                 this._image = null;
                 this._path = null;
                 this.filepathWidget.value = "(None)"
                 this.folderWidget.value = ""
-                this.widthWidget.value = 0
-                this.heightWidget.value = 0
             }
             console.log("SET", value, this._image, this._path)
         }
@@ -72,12 +68,18 @@ export default class ComfyPickImageNode extends ComfyGraphNode {
             this.setOutputData(1, null)
             this.setOutputData(2, 0)
             this.setOutputData(3, 0)
+
+            this.widthWidget.value = 0
+            this.heightWidget.value = 0
         }
         else {
             this.setOutputData(0, this._image);
             this.setOutputData(1, this._path);
             this.setOutputData(2, this._image.width);
             this.setOutputData(3, this._image.height);
+
+            this.widthWidget.value = this._image.width
+            this.heightWidget.value = this._image.height
         }
     }
 }
