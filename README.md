@@ -41,7 +41,7 @@ git clone https://github.com/space-nuko/ComfyBox --recursive
 ```
 
 2. `pnpm install`
-4. `pnpm build:css`
+4. `pnpm prebuild`
 5. `pnpm dev`
 6. Start ComfyUI with `python main.py --enable-cors-header`
 7. Visit `http://localhost:3000` in your browser
