@@ -142,7 +142,7 @@
 
      const name = spec.name
 
-     console.debug("[ComfyProperties] updateAttribute", spec, value, name, node)
+     // console.debug("[ComfyProperties] updateAttribute", spec, value, name, node)
      if (spec.deserialize)
          value = spec.deserialize(value)
 
@@ -179,7 +179,7 @@
          return
 
      const name = spec.name
-     console.warn("[ComfyProperties] updateProperty", name, value)
+     // console.warn("[ComfyProperties] updateProperty", name, value)
 
      if (spec.deserialize)
          value = spec.deserialize(value)
@@ -215,7 +215,7 @@
 
      const name = spec.name
 
-     console.debug("[ComfyProperties] updateVar", spec, value, name, node)
+     // console.debug("[ComfyProperties] updateVar", spec, value, name, node)
      if (spec.deserialize)
          value = spec.deserialize(value)
 
@@ -250,7 +250,7 @@
          return;
 
      const name = spec.name
-     console.warn("[ComfyProperties] updateWorkflowAttribute", name, value)
+     // console.warn("[ComfyProperties] updateWorkflowAttribute", name, value)
 
      const prevValue = value
      $layoutState.attrs[name] = value
