@@ -59,8 +59,15 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
         if (values == null)
             return;
 
-        const changed = this.properties.values != values;
+        let changed = this.properties.values != values;
         this.properties.values = values;
+
+        const oldValue = get(this.value)
+        if (this.properties.values.indexOf(oldValue) === -1) {
+            changed = true;
+            this.value.set(this.properties.values[0])
+        }
+
         if (lightUp && get(this.firstLoad) && changed)
             this.lightUp.set(true)
 
@@ -116,10 +123,13 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
         console.warn("CHECK COMBO CONNECTION", otherProps, thisProps)
 
         // Ensure combo options match
-        if (!(otherProps.values instanceof Array))
+        if (!(otherProps.values instanceof Array) || otherProps.values.length === 0)
             return false;
-        if (thisProps.values.find((v, i) => otherProps.values.indexOf(v) === -1))
-            return false;
+
+        thisProps.values = Array.from(otherProps.values);
+        const value = get(this.value)
+        if (thisProps.values.indexOf(value) === -1)
+            this.setValue(thisProps.values[0])
 
         console.warn("PASSED")
 
