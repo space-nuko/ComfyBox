@@ -2,6 +2,7 @@ import convertA1111ToStdPrompt from "$lib/convertA1111ToStdPrompt";
 import { expect } from 'vitest';
 import UnitTest from "./UnitTest";
 import type { A1111ParsedInfotext } from "$lib/parseA1111";
+import ComfyBoxStdPrompt from "$lib/ComfyBoxStdPrompt";
 
 export default class convertA1111ToStdPromptTests extends UnitTest {
     test__convertsBasic() {
@@ -32,9 +33,9 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
         const converted = convertA1111ToStdPrompt(infotext);
 
         expect(converted).toEqual({
+            version: 1,
             prompt: {
                 metadata: {
-                    version: 1,
                     created_with: "stable-diffusion-webui",
                     extra_data: {}
                 },
@@ -66,6 +67,8 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                 }
             }
         })
+
+        expect(ComfyBoxStdPrompt.safeParse(converted).success).toEqual(true);
     }
 
     test__convertsExtraNetworks() {
@@ -101,9 +104,9 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
         const converted = convertA1111ToStdPrompt(infotext);
 
         expect(converted).toEqual({
+            version: 1,
             prompt: {
                 metadata: {
-                    version: 1,
                     created_with: "stable-diffusion-webui",
                     extra_data: {}
                 },
@@ -159,6 +162,8 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                 }
             }
         })
+
+        expect(ComfyBoxStdPrompt.safeParse(converted).success).toEqual(true);
     }
 
     test__convertsAdditionalNetworks() {
@@ -199,9 +204,9 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
         const converted = convertA1111ToStdPrompt(infotext)
 
         expect(converted).toEqual({
+            version: 1,
             prompt: {
                 metadata: {
-                    version: 1,
                     created_with: "stable-diffusion-webui",
                     extra_data: {}
                 },
@@ -254,5 +259,7 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                 }
             }
         })
+
+        expect(ComfyBoxStdPrompt.safeParse(converted).success).toEqual(true);
     }
 }

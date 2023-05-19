@@ -38,7 +38,7 @@ const GroupKSampler = z.object({
     steps: z.number(),
     sampler_name: z.string(),
     scheduler: z.string(),
-    denoise: z.number().default(1.0)
+    denoise: z.number().default(1.0),
     type: z.enum(["empty", "image", "upscale"]).optional()
 })
 export type ComfyBoxStdGroupKSampler = z.infer<typeof GroupKSampler>
@@ -61,6 +61,12 @@ const GroupSDUpscale = z.object({
     overlap: z.number(),
 })
 export type ComfyBoxStdGroupSDUpscale = z.infer<typeof GroupSDUpscale>
+
+const GroupSelfAttentionGuidance = z.object({
+    guidance_scale: z.number(),
+    mask_threshold: z.number(),
+})
+export type ComfyBoxStdGroupSelfAttentionGuidance = z.infer<typeof GroupSelfAttentionGuidance>
 
 const GroupHypernetwork = z.object({
     model_name: z.string(),
@@ -102,7 +108,7 @@ const GroupDynamicThresholding = z.object({
     mimic_scale: z.number(),
     threshold_percentile: z.number(),
     mimic_mode: z.string(),
-    mimic_scale_min: z.number(),
+    mimic_scale_minimum: z.number(),
     cfg_mode: z.string(),
     cfg_scale_minimum: z.number()
 })
@@ -120,6 +126,23 @@ const GroupAestheticEmbedding = z.object({
 })
 export type ComfyBoxStdGroupAestheticEmbedding = z.infer<typeof GroupAestheticEmbedding>
 
+const GroupDDetailer = z.object({
+    positive_prompt: z.string(),
+    negative_prompt: z.string(),
+    bitwise: z.string(),
+    model: z.string().optional(),
+    model_hashes: ModelHashes.optional(),
+    conf: z.number(),
+    mask_blur: z.number(),
+    denoise: z.number(),
+    dilation: z.number(),
+    offset_x: z.number(),
+    offset_y: z.number(),
+    inpaint_full: z.number(),
+    inpaint_padding: z.number(),
+})
+export type ComfyBoxStdGroupDDetailer = z.infer<typeof GroupDDetailer>
+
 const group = (s: ZodTypeAny) => z.optional(z.array(s).nonempty());
 
 const Parameters = z.object({
@@ -133,7 +156,9 @@ const Parameters = z.object({
     hypernetwork: group(GroupHypernetwork),
     lora: group(GroupLoRA),
     control_net: group(GroupControlNet),
-    dynamic_thresholding: group(GroupDynamicThresholding)
+    dynamic_thresholding: group(GroupDynamicThresholding),
+    self_attention_guidance: group(GroupSelfAttentionGuidance),
+    ddetailer: group(GroupDDetailer)
 }).partial()
 export type ComfyBoxStdParameters = z.infer<typeof Parameters>
 
@@ -141,14 +166,19 @@ const ComfyBoxExtraData = z.object({
     workflows: z.array(z.string())
 })
 
+const A1111ExtraData = z.object({
+    params: z.any()
+})
+
 const ExtraData = z.object({
-    comfybox: ComfyBoxExtraData.optional()
+    comfybox: ComfyBoxExtraData.optional(),
+    a1111: A1111ExtraData.optional()
 })
 
 const Metadata = z.object({
-    version: z.number(),
     created_with: z.string(),
     author: z.string().optional(),
+    app_version: z.string().optional(),
     commit_hash: z.string().optional(),
     extra_data: ExtraData
 })
@@ -159,6 +189,7 @@ const Prompt = z.object({
 })
 
 const ComfyBoxStdPrompt = z.object({
+    version: z.number(),
     prompt: Prompt,
 })
 

@@ -73,6 +73,9 @@ importers:
       '@tsconfig/svelte':
         specifier: ^4.0.1
         version: 4.0.1
+      '@zerodevx/svelte-json-view':
+        specifier: ^1.0.5
+        version: 1.0.5(svelte@3.58.0)
       events:
         specifier: ^3.3.0
         version: 3.3.0
@@ -3373,6 +3376,14 @@ packages:
       concordance: 5.0.4
       loupe: 2.3.6
       pretty-format: 27.5.1
+    dev: false
+
+  /@zerodevx/svelte-json-view@1.0.5(svelte@3.58.0):
+    resolution: {integrity: sha512-oQDI9v0dJEte6PYVDVjLOjU58AOoWLYRXjghKggFpZXrglWJJqoMeDe14Jrd0cs6NPcPogT/aR/LtkuW2Z1GkQ==}
+    peerDependencies:
+      svelte: ^3.55.1
+    dependencies:
+      svelte: 3.58.0
     dev: false
 
   /@zerodevx/svelte-toast@0.9.3(svelte@3.58.0):

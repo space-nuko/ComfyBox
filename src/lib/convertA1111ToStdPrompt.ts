@@ -1,4 +1,4 @@
-import type { ComfyBoxStdGroupCheckpoint, ComfyBoxStdGroupHypernetwork, ComfyBoxStdGroupKSampler, ComfyBoxStdGroupLatentImage, ComfyBoxStdGroupLoRA, ComfyBoxStdParameters, ComfyBoxStdPrompt } from "./ComfyBoxStdPrompt";
+import type { ComfyBoxStdGroupCheckpoint, ComfyBoxStdGroupDDetailer, ComfyBoxStdGroupDynamicThresholding, ComfyBoxStdGroupHypernetwork, ComfyBoxStdGroupKSampler, ComfyBoxStdGroupLatentImage, ComfyBoxStdGroupLoRA, ComfyBoxStdGroupSelfAttentionGuidance, ComfyBoxStdParameters, ComfyBoxStdPrompt } from "./ComfyBoxStdPrompt";
 import type { A1111ParsedInfotext } from "./parseA1111";
 
 function getSamplerAndScheduler(a1111Sampler: string): [string, string] {
@@ -14,14 +14,30 @@ function getSamplerAndScheduler(a1111Sampler: string): [string, string] {
 }
 
 const reAddNetModelName = /^([^(]+)\(([^)]+)\)$/;
-const reParens = /\(([^)]+)\)/;
 
-function parseAddNetModelNameAndHash(name: string): [string | null, string | null] {
+function parseAddNetModelNameAndHash(name: string | null): [string | undefined, string | undefined] {
+    if (!name)
+        return [undefined, undefined]
+
     const match = name.match(reAddNetModelName);
     if (match) {
         return [match[1], match[2]]
     }
-    return [null, null]
+    return [undefined, undefined]
+}
+
+const reDDetailerModelName = /(.+)\s\[(.+)\]/;
+
+function parseDDetailerModelNameAndHash(name: string | null): [string | undefined, string | undefined] {
+    if (!name || name === "None")
+        return [undefined, undefined]
+
+    // bbox\mmdet_anime-face_yolov3.pth [51e1af4a]
+    const match = name.match(reDDetailerModelName);
+    if (match) {
+        return [match[1], match[2]]
+    }
+    return [undefined, undefined]
 }
 
 export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): ComfyBoxStdPrompt {
@@ -47,12 +63,6 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
     let hrHeight = undefined
     if (hrSz) {
         [hrWidth, hrHeight] = hrSz.split(hrSz).map(parseInt);
-    }
-
-    if (hrMethod != null && hrMethod.startsWith("Latent (")) {
-        const result = reParens.exec(hrMethod)
-        if (result)
-            hrMethod = String(result[1])
     }
 
     const latent_image: ComfyBoxStdGroupLatentImage = {
@@ -127,20 +137,99 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
         parameters.checkpoint = [checkpoint]
     }
 
-    const clipSkip = popOpt("clip skip")
-    if (clipSkip != null) {
+    if ("clip skip" in infotext.extraParams) {
+        const clipSkip = popOpt("clip skip")
         parameters.clip = [{
             clip_skip: parseInt(clipSkip)
         }]
     }
 
-    const sdUpscaleUpscaler = popOpt("sd upscale upscaler")
-    if (sdUpscaleUpscaler != null) {
+    if ("sd upscale upscaler" in infotext.extraParams) {
+        const sdUpscaleUpscaler = popOpt("sd upscale upscaler")
         const sdUpscaleOverlap = popOpt("sd upscale overlap") || "64"
         parameters.sd_upscale = [{
             upscaler: sdUpscaleUpscaler,
             overlap: parseInt(sdUpscaleOverlap)
         }]
+    }
+
+    if ("dynamic thresholding enabled" in infotext.extraParams) {
+        const dtEnabled = popOpt("dynamic thresholding enabled")
+        if (dtEnabled === "True") {
+            const dynamic_thresholding: ComfyBoxStdGroupDynamicThresholding = {
+                mimic_scale: parseInt(popOpt("mimic scale")),
+                threshold_percentile: parseFloat(popOpt("threshold percentile")),
+                mimic_mode: popOpt("mimic mode"),
+                mimic_scale_minimum: parseFloat(popOpt("mimic scale minimum")),
+                cfg_mode: popOpt("cfg mode"),
+                cfg_scale_minimum: parseFloat(popOpt("cfg scale minimum")),
+            }
+            parameters.dynamic_thresholding = [dynamic_thresholding]
+        }
+    }
+
+    if ("sag guidance scale" in infotext.extraParams) {
+        const self_attention_guidance: ComfyBoxStdGroupSelfAttentionGuidance = {
+            guidance_scale: parseFloat(popOpt("sag guidance scale")),
+            mask_threshold: parseFloat(popOpt("sag mask threshold")),
+        }
+        parameters.self_attention_guidance = [self_attention_guidance]
+    }
+
+    if ("ddetailer prompt" in infotext.extraParams) {
+        const positive_prompt = popOpt("ddetailer prompt")
+        const negative_prompt = popOpt("ddetailer neg prompt")
+        const bitwise = popOpt("ddetailer bitwise")
+        const denoise = parseFloat(popOpt("ddetailer denoising"))
+        const inpaint_full = popOpt("ddetailer inpaint full") === "True"
+        const inpaint_padding = parseInt(popOpt("ddetailer inpaint padding"))
+        const mask_blur = parseFloat(popOpt("ddetailer mask blur"))
+        const cfg = parseFloat(popOpt("ddetailer cfg"))
+
+        const preprocess_b = popOpt("ddetailer preprocess b") === "True"
+
+        const [model_a, model_a_shorthash] = parseDDetailerModelNameAndHash(popOpt("ddetailer model a"))
+        const [model_b, model_b_shorthash] = parseDDetailerModelNameAndHash(popOpt("ddetailer model b"))
+
+        const ddetailer_a: ComfyBoxStdGroupDDetailer = {
+            positive_prompt,
+            negative_prompt,
+            bitwise,
+            denoise,
+            inpaint_full,
+            inpaint_padding,
+            mask_blur,
+            cfg,
+            model: model_a,
+            model_hashes: model_a_shorthash ? {
+                a1111_shorthash: model_a_shorthash
+            } : undefined,
+            preprocess: !preprocess_b,
+            conf: parseFloat(popOpt("ddetailer conf a")),
+            dilation: parseFloat(popOpt("ddetailer dilation a")),
+            offset_x: parseFloat(popOpt("ddetailer offset x a")),
+            offset_y: parseFloat(popOpt("ddetailer offset y a")),
+        }
+        const ddetailer_b: ComfyBoxStdGroupDDetailer = {
+            positive_prompt,
+            negative_prompt,
+            bitwise,
+            denoise,
+            inpaint_full,
+            inpaint_padding,
+            mask_blur,
+            cfg,
+            model: model_b,
+            model_hashes: model_b_shorthash ? {
+                a1111_shorthash: model_b_shorthash
+            } : undefined,
+            preprocess: preprocess_b,
+            conf: parseFloat(popOpt("ddetailer conf b")),
+            dilation: parseFloat(popOpt("ddetailer dilation b")),
+            offset_x: parseFloat(popOpt("ddetailer offset x b")),
+            offset_y: parseFloat(popOpt("ddetailer offset y b")),
+        }
+        parameters.ddetailer = [ddetailer_a, ddetailer_b]
     }
 
     // TODO ControlNet
@@ -150,8 +239,11 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
             let strength;
             switch (extraNetworkType.toLowerCase()) {
                 case "lora":
+                case "locon":
+                case "lyco":
                     strength = parseFloat(extraNetworkParams.items[1]);
                     const lora: ComfyBoxStdGroupLoRA = {
+                        module_name: extraNetworkType.toLowerCase(),
                         model_name: extraNetworkParams.items[0],
                         strength_unet: strength,
                         strength_tenc: strength,
@@ -231,12 +323,19 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
         found = infotext.extraParams[`addnet model ${index}`]
     }
 
+    let app_version = popOpt("version")
+
     const prompt: ComfyBoxStdPrompt = {
+        version: 1,
         prompt: {
             metadata: {
-                version: 1,
                 created_with: "stable-diffusion-webui",
-                extra_data: {}
+                app_version,
+                extra_data: {
+                    a1111: {
+                        params: infotext.extraParams
+                    }
+                }
             },
             parameters
         }

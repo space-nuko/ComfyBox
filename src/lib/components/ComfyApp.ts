@@ -26,7 +26,7 @@ import layoutState from "$lib/stores/layoutState";
 import { toast } from '@zerodevx/svelte-toast'
 import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
-import { get } from "svelte/store";
+import { get, writable, type Writable } from "svelte/store";
 import { tick } from "svelte";
 import uiState from "$lib/stores/uiState";
 import { download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
@@ -37,6 +37,9 @@ import type { ComfyExecutionResult } from "$lib/utils";
 import ComfyPromptSerializer, { UpstreamNodeLocator, isActiveBackendNode } from "./ComfyPromptSerializer";
 import { iterateNodeDefInputs, type ComfyNodeDef, isBackendNodeDefInputType, iterateNodeDefOutputs } from "$lib/ComfyNodeDef";
 import { ComfyComboNode } from "$lib/nodes/widgets";
+import parseA1111, { type A1111ParsedInfotext } from "$lib/parseA1111";
+import convertA1111ToStdPrompt from "$lib/convertA1111ToStdPrompt";
+import type { ComfyBoxStdPrompt } from "$lib/ComfyBoxStdPrompt";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -53,6 +56,13 @@ if (typeof window !== "undefined") {
 type QueueItem = {
     num: number,
     batchCount: number
+}
+
+export type A1111PromptAndInfo = {
+    infotext: string,
+    parsedInfotext: A1111ParsedInfotext,
+    stdPrompt: ComfyBoxStdPrompt,
+    imageFile: File
 }
 
 /*
@@ -128,10 +138,11 @@ export default class ComfyApp {
     shiftDown: boolean = false;
     ctrlDown: boolean = false;
     selectedGroupMoving: boolean = false;
+    alreadySetup: Writable<boolean> = writable(false);
+    a1111Prompt: Writable<A1111PromptAndInfo | null> = writable(null);
 
     private queueItems: QueueItem[] = [];
     private processingQueue: boolean = false;
-    private alreadySetup = false;
     private promptSerializer: ComfyPromptSerializer;
 
     constructor() {
@@ -140,7 +151,7 @@ export default class ComfyApp {
     }
 
     async setup(): Promise<void> {
-        if (this.alreadySetup) {
+        if (get(this.alreadySetup)) {
             console.error("Already setup")
             return;
         }
@@ -183,7 +194,6 @@ export default class ComfyApp {
         // setInterval(this.saveStateToLocalStorage.bind(this), 1000);
 
         this.addApiUpdateHandlers();
-        this.addDropHandler();
         this.addPasteHandler();
         this.addKeyboardHandler();
 
@@ -197,7 +207,7 @@ export default class ComfyApp {
 
         this.requestPermissions();
 
-        this.alreadySetup = true;
+        this.alreadySetup.set(true);
 
         return Promise.resolve();
     }
@@ -318,70 +328,28 @@ export default class ComfyApp {
         }
     }
 
-    private showDropZone() {
-        if (this.dropZone)
-            this.dropZone.style.display = "block";
-    }
-
-    private hideDropZone() {
-        if (this.dropZone)
-            this.dropZone.style.display = "none";
-    }
-
-    private allowDrag(event: DragEvent) {
-        if (event.dataTransfer.items?.length > 0) {
-            event.dataTransfer.dropEffect = 'copy';
-            this.showDropZone();
-            event.preventDefault();
-        }
-    }
-
-    private async handleDrop(event: DragEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.hideDropZone();
-
-        if (event.dataTransfer.files.length > 0) {
-            await this.handleFile(event.dataTransfer.files[0]);
-        }
-    }
-
-    private addDropHandler() {
-        // this.dropZone = document.getElementById("dropzone");
-
-        // if (this.dropZone) {
-        //     window.addEventListener('dragenter', this.allowDrag.bind(this));
-        //     this.dropZone.addEventListener('dragover', this.allowDrag.bind(this));
-        //     this.dropZone.addEventListener('dragleave', this.hideDropZone.bind(this));
-        //     this.dropZone.addEventListener('drop', this.handleDrop.bind(this));
-        // }
-        // else {
-        //     console.warn("No dropzone detected (probably on mobile).")
-        // }
-    }
-
     /**
      * Adds a handler on paste that extracts and loads workflows from pasted JSON data
      */
     private addPasteHandler() {
-        // document.addEventListener("paste", (e) => {
-        //     let data = (e.clipboardData || (window as any).clipboardData).getData("text/plain");
-        //     let workflow;
-        //     try {
-        //         data = data.slice(data.indexOf("{"));
-        //         workflow = JSON.parse(data);
-        //     } catch (err) {
-        //         try {
-        //             data = data.slice(data.indexOf("workflow\n"));
-        //             data = data.slice(data.indexOf("{"));
-        //             workflow = JSON.parse(data);
-        //         } catch (error) { }
-        //     }
+        document.addEventListener("paste", (e) => {
+            let data = (e.clipboardData || (window as any).clipboardData).getData("text/plain");
+            let workflow;
+            try {
+                data = data.slice(data.indexOf("{"));
+                workflow = JSON.parse(data);
+            } catch (err) {
+                try {
+                    data = data.slice(data.indexOf("workflow\n"));
+                    data = data.slice(data.indexOf("{"));
+                    workflow = JSON.parse(data);
+                } catch (error) { }
+            }
 
-        //     if (workflow && workflow.version && workflow.nodes && workflow.extra) {
-        //         this.loadGraphData(workflow);
-        //     }
-        // });
+            if (workflow && workflow.version && workflow.nodes && workflow.extra) {
+                this.loadGraphData(workflow);
+            }
+        });
     }
 
     /**
@@ -745,8 +713,18 @@ export default class ComfyApp {
                 if (pngInfo.comfyBoxConfig) {
                     this.deserialize(JSON.parse(pngInfo.comfyBoxConfig));
                 } else if (pngInfo.parameters) {
-                    throw "TODO A111 import!"
-                    // importA1111(this.lGraph, pngInfo.parameters, this.api);
+                    const parsed = parseA1111(pngInfo.parameters)
+                    if ("error" in parsed) {
+                        notify(`Couldn't parse webui prompt: ${parsed.error}`, { type: "error" })
+                        return;
+                    }
+                    const converted = convertA1111ToStdPrompt(parsed)
+                    this.a1111Prompt.set({
+                        infotext: pngInfo.parameters,
+                        parsedInfotext: parsed,
+                        stdPrompt: converted,
+                        imageFile: file
+                    })
                 }
                 else {
                     console.error("No metadata found in image file.", pngInfo)
@@ -890,5 +868,6 @@ export default class ComfyApp {
      */
     clean() {
         this.nodeOutputs = {};
+        this.a1111Prompt.set(null);
     }
 }

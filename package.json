@@ -65,6 +65,7 @@
     "@litegraph-ts/tsconfig": "workspace:*",
     "@sveltejs/vite-plugin-svelte": "^2.1.1",
     "@tsconfig/svelte": "^4.0.1",
+    "@zerodevx/svelte-json-view": "^1.0.5",
     "events": "^3.3.0",
     "framework7": "^8.0.3",
     "framework7-svelte": "^8.0.3",
