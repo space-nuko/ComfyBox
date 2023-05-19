@@ -124,15 +124,27 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                     }],
                     k_sampler: [{
                         cfg_scale: 12,
-                        denoise: 0.55,
+                        denoise: 1,
                         sampler_name: "dpmpp_2m",
                         scheduler: "karras",
                         seed: 2416682767,
                         steps: 40
+                    }, {
+                        type: "upscale",
+                        cfg_scale: 12,
+                        denoise: 0.55,
+                        sampler_name: "dpmpp_2m",
+                        scheduler: "karras",
+                        seed: 2416682767,
+                        steps: 20
                     }],
                     latent_image: [{
                         width: 640,
                         height: 512,
+                    }, {
+                        type: "upscale",
+                        width: 1280,
+                        height: 1024,
                         upscale_by: 2,
                         upscale_method: "Latent"
                     }]

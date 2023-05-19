@@ -35,7 +35,9 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
 
     const hrUp = popOpt("hires upscale");
     const hrSz = popOpt("hires resize");
+    let hrScaleBy = hrUp ? parseFloat(hrUp) : undefined;
     let hrMethod = popOpt("hires upscaler");
+    let hrSteps = popOpt("hires steps");
     let hrWidth = undefined
     let hrHeight = undefined
     if (hrSz) {
@@ -51,10 +53,7 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
     const latent_image: ComfyBoxStdGroupLatentImage = {
         width: infotext.width,
         height: infotext.height,
-        upscale_method: hrMethod,
-        upscale_by: hrUp ? parseFloat(hrUp) : undefined,
-        upscale_width: hrWidth,
-        upscale_height: hrHeight,
+        // type: "empty", // detect txt2img???
         batch_count: infotext.batchSize,
         batch_pos: infotext.batchPos,
     }
@@ -65,17 +64,53 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
 
     parameters.latent_image = [latent_image];
 
+    if (hrMethod != null) {
+        let uw, uh;
+        if (hrScaleBy) {
+            uw = infotext.width * hrScaleBy;
+            uh = infotext.height * hrScaleBy;
+        } else {
+            if (hrWidth == null || hrHeight == null)
+                throw new Error("Highres prompt didn't have width/height!")
+            uw = +hrWidth;
+            uh = +hrHeight;
+        }
+        const hr_image: ComfyBoxStdGroupLatentImage = {
+            type: "upscale",
+            width: uw,
+            height: uh,
+            upscale_by: hrScaleBy,
+            batch_count: infotext.batchSize,
+            batch_pos: infotext.batchPos,
+            upscale_method: hrMethod
+        }
+        parameters.latent_image.push(hr_image)
+    }
+
     const [sampler_name, scheduler] = getSamplerAndScheduler(infotext.sampler)
 
     const k_sampler: ComfyBoxStdGroupKSampler = {
         steps: infotext.steps,
         seed: infotext.seed,
         cfg_scale: infotext.cfgScale,
-        denoise: infotext.denoise || 1.0,
+        denoise: hrMethod != null ? 1.0 : infotext.denoise || 1.0, // detect img2img???
         sampler_name,
         scheduler,
     }
     parameters.k_sampler = [k_sampler];
+
+    if (hrMethod != null) {
+        const k_sampler_hr: ComfyBoxStdGroupKSampler = {
+            type: "upscale",
+            steps: hrSteps != null ? parseInt(hrSteps) : infotext.steps,
+            seed: infotext.seed,
+            cfg_scale: infotext.cfgScale,
+            denoise: infotext.denoise || 1.0,
+            sampler_name,
+            scheduler,
+        }
+        parameters.k_sampler.push(k_sampler_hr)
+    }
 
     if (infotext.modelHash || infotext.modelName) {
         const checkpoint: ComfyBoxStdGroupCheckpoint = {

@@ -39,17 +39,16 @@ const GroupKSampler = z.object({
     sampler_name: z.string(),
     scheduler: z.string(),
     denoise: z.number().default(1.0)
+    type: z.enum(["empty", "image", "upscale"]).optional()
 })
 export type ComfyBoxStdGroupKSampler = z.infer<typeof GroupKSampler>
 
 const GroupLatentImage = z.object({
     width: z.number(),
     height: z.number(),
-    type: z.enum(["empty", "image", "image_upscale"]).optional(),
+    type: z.enum(["empty", "image", "upscale"]).optional(),
     upscale_method: z.string().optional(),
     upscale_by: z.number().optional(),
-    upscale_width: z.number().optional(),
-    upscale_height: z.number().optional(),
     crop: z.string().optional(),
     mask_blur: z.number().optional(),
     batch_count: z.number().default(1).optional(),
