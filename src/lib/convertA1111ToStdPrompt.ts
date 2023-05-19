@@ -49,10 +49,20 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
 
     const parameters: ComfyBoxStdParameters = {}
 
-    parameters.prompt = [{
-        positive: infotext.positive,
-        negative: infotext.negative,
-    }]
+    parameters.conditioning = [
+        {
+            "^meta": {
+                types: ["positive"]
+            },
+            text: infotext.positive,
+        },
+        {
+            "^meta": {
+                types: ["negative"]
+            },
+            text: infotext.negative,
+        }
+    ]
 
     const hrUp = popOpt("hires upscale");
     const hrSz = popOpt("hires resize");
@@ -327,18 +337,16 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
 
     const prompt: ComfyBoxStdPrompt = {
         version: 1,
-        prompt: {
-            metadata: {
-                created_with: "stable-diffusion-webui",
-                app_version,
-                extra_data: {
-                    a1111: {
-                        params: infotext.extraParams
-                    }
+        metadata: {
+            created_with: "stable-diffusion-webui",
+            app_version,
+            extra_data: {
+                a1111: {
+                    params: infotext.extraParams
                 }
-            },
-            parameters
-        }
+            }
+        },
+        parameters
     }
 
     console.warn("Unhandled A1111 parameters:", infotext.extraParams, infotext.extraNetworks)

@@ -40,6 +40,7 @@ import { ComfyComboNode } from "$lib/nodes/widgets";
 import parseA1111, { type A1111ParsedInfotext } from "$lib/parseA1111";
 import convertA1111ToStdPrompt from "$lib/convertA1111ToStdPrompt";
 import type { ComfyBoxStdPrompt } from "$lib/ComfyBoxStdPrompt";
+import ComfyBoxStdPromptSerializer from "./ComfyBoxStdPromptSerializer";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -86,19 +87,21 @@ export type SerializedAppState = {
 /** [link_origin, link_slot_index] | input_value */
 export type SerializedPromptInput = [ComfyNodeID, number] | any
 
+export type SerializedPromptInputs = Record<string, SerializedPromptInput>;
+
 /*
  * A single node in the prompt and its input values.
  */
-export type SerializedPromptInputs = {
+export type SerializedPromptInputsForNode = {
     /* property name -> value or link */
-    inputs: Record<string, SerializedPromptInput>,
+    inputs: SerializedPromptInputs,
     class_type: string
 }
 
 /*
  * All nodes in the graph and their input values.
  */
-export type SerializedPromptInputsAll = Record<ComfyNodeID, SerializedPromptInputs>
+export type SerializedPromptInputsAll = Record<ComfyNodeID, SerializedPromptInputsForNode>
 
 export type SerializedPrompt = {
     workflow: SerializedLGraph,
@@ -144,10 +147,12 @@ export default class ComfyApp {
     private queueItems: QueueItem[] = [];
     private processingQueue: boolean = false;
     private promptSerializer: ComfyPromptSerializer;
+    private stdPromptSerializer: ComfyBoxStdPromptSerializer;
 
     constructor() {
         this.api = new ComfyAPI();
         this.promptSerializer = new ComfyPromptSerializer();
+        this.stdPromptSerializer = new ComfyBoxStdPromptSerializer();
     }
 
     async setup(): Promise<void> {
@@ -648,6 +653,9 @@ export default class ComfyApp {
                     const l = layoutState.serialize();
                     console.debug(graphToGraphVis(this.lGraph))
                     console.debug(promptToGraphVis(p))
+
+                    const stdPrompt = this.stdPromptSerializer.serialize(p);
+                    console.warn("STD", stdPrompt);
 
                     const extraData: ComfyBoxPromptExtraData = {
                         extra_pnginfo: {

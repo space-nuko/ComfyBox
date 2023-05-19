@@ -2,7 +2,7 @@ import type ComfyGraph from "$lib/ComfyGraph";
 import type { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import { GraphInput, GraphOutput, LGraph, LGraphNode, LLink, NodeMode, Subgraph, type SlotIndex } from "@litegraph-ts/core";
-import type { SerializedPrompt, SerializedPromptInput, SerializedPromptInputs, SerializedPromptInputsAll } from "./ComfyApp";
+import type { SerializedPrompt, SerializedPromptInput, SerializedPromptInputsForNode, SerializedPromptInputsAll, SerializedPromptInputs } from "./ComfyApp";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 
 function hasTag(node: LGraphNode, tag: string): boolean {
@@ -150,7 +150,7 @@ export class UpstreamNodeLocator {
 }
 
 export default class ComfyPromptSerializer {
-    serializeInputValues(node: ComfyBackendNode): Record<string, SerializedPromptInput> {
+    serializeInputValues(node: ComfyBackendNode): SerializedPromptInputs {
         // Store input values passed by frontend-only nodes
         if (!node.inputs) {
             return {}

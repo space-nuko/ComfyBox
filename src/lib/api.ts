@@ -1,4 +1,4 @@
-import type { Progress, SerializedPrompt, SerializedPromptInputs, SerializedPromptInputsAll, SerializedPromptOutputs } from "./components/ComfyApp";
+import type { Progress, SerializedPrompt, SerializedPromptInputsForNode, SerializedPromptInputsAll, SerializedPromptOutputs } from "./components/ComfyApp";
 import type TypedEmitter from "typed-emitter";
 import EventEmitter from "events";
 import type { ComfyImageLocation } from "$lib/utils";

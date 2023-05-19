@@ -7,11 +7,10 @@ const ModelHashes = z.object({
     a1111_shorthash !== undefined || sha256 !== undefined,
     { message: "At least one model hash must be specified" })
 
-const GroupPrompt = z.object({
-    positive: z.string(),
-    negative: z.string()
+const GroupConditioning = z.object({
+    text: z.string(),
 })
-export type ComfyBoxStdGroupPrompt = z.infer<typeof GroupPrompt>
+export type ComfyBoxStdGroupConditioning = z.infer<typeof GroupConditioning>
 
 const GroupCheckpoint = z.object({
     model_name: z.string().optional(),
@@ -138,15 +137,46 @@ const GroupDDetailer = z.object({
     dilation: z.number(),
     offset_x: z.number(),
     offset_y: z.number(),
-    inpaint_full: z.number(),
+    preprocess: z.boolean(),
+    inpaint_full: z.boolean(),
     inpaint_padding: z.number(),
+    cfg: z.number()
 })
 export type ComfyBoxStdGroupDDetailer = z.infer<typeof GroupDDetailer>
 
-const group = (s: ZodTypeAny) => z.optional(z.array(s).nonempty());
+/*
+ * This metadata can be attached to each entry in a group to assist in
+ * identifying the correct nodes to apply it to.
+ *
+ * As an example, positive and negative conditioning are deployed as two
+ * separate nodes in ComfyUI. This makes bundling them into a { positive,
+ * negative } entry difficult as either one can be missing. So instead they're
+ * tagged like
+ *
+ * {
+ *   conditioning: [
+ *     { text: "masterpiece",   "$meta": { types: ["positive"] } },
+ *     { text: "worst quality", "$meta": { types: ["negative"] } },
+ *   ]
+ * }
+ *
+ * The reasoning is the "types" information isn't required to reinstantiate
+ * the node, it's only semantic information describing how the node is used in
+ * the encompassing workflow. When the prompt is loaded the workflow can be
+ * searched for a node with the compatible type to attach the information to.
+ */
+const GroupMetadata = z.object({
+    types: z.array(z.string()).nonempty().optional()
+})
+export type ComfyBoxStdGroupMetadata = z.infer<typeof GroupMetadata>
+
+const group = (entry: ZodTypeAny) => {
+    const groupEntry = entry.and(z.object({ "$meta": GroupMetadata }))
+    return z.optional(z.array(groupEntry).nonempty());
+}
 
 const Parameters = z.object({
-    prompt: group(GroupPrompt),
+    conditioning: group(GroupConditioning),
     checkpoint: group(GroupCheckpoint),
     vae: group(GroupVAE),
     k_sampler: group(GroupKSampler),
@@ -183,22 +213,40 @@ const Metadata = z.object({
     extra_data: ExtraData
 })
 
-const Prompt = z.object({
-    metadata: Metadata,
-    parameters: Parameters
-})
-
 const ComfyBoxStdPrompt = z.object({
     version: z.number(),
-    prompt: Prompt,
+    metadata: Metadata,
+    parameters: Parameters
 })
 
 export default ComfyBoxStdPrompt
 
 /*
- * A standardized Stable Diffusion prompt and parameter format, to be used with
- * an encompassing workflow. Aims to encompass an arbitrary number of parameter
+ * A standardized Stable Diffusion parameter format that should be used with an
+ * encompassing workflow. Aims to encompass an arbitrary number of parameter
  * counts and types, so that most ComfyUI workflows can have parts of their
  * prompts transferred between each other.
+ *
+ * This format does *not* describe how the information should be used in the
+ * underlying workflow, i.e. it does not specify the structure of a ComfyUI
+ * execution graph. It only gives hints via tagged input types on each input
+ * entry as to where the data should be inserted. To recreate a ComfyBox
+ * workflow with the exact state of the UI intact, the `SerializedAppState` type
+ * should be used instead. It suffices to embed data of that type in the output
+ * PNGs for recreating their workflows. This type is meant as an interchange
+ * format *between* workflows so their inputs can be copied to and from each
+ * other in a sane-enough manner. (In ComfyBox, copying workflow outputs like
+ * images to other workflows is handled separately, since this type does not
+ * retain the actual image data.)
+ *
+ * In contrast with a serialized workflow, which is concerned with the
+ * connections between nodes and the state of the frontend's UI, this format
+ * concerns itself with the exact values that the execution backend receives,
+ * after the data in the UI have finished processing.
+ *
+ * (Take for example a "scale by" slider that adjusts the width and height of an
+ * img2img input image of 512 x 512 resolution by 2x. The backend will only
+ * "see" width 1024 and height 1024, even though the only parameter exposed from
+ * the frontend was the scale of 2.)
  */
 export type ComfyBoxStdPrompt = z.infer<typeof ComfyBoxStdPrompt>
