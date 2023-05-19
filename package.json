@@ -80,6 +80,7 @@
     "tailwindcss": "^3.3.1",
     "typed-emitter": "github:andywer/typed-emitter",
     "uuid": "^9.0.0",
-    "vite-plugin-full-reload": "^1.0.5"
+    "vite-plugin-full-reload": "^1.0.5",
+    "zod": "^3.21.4"
   }
 }
