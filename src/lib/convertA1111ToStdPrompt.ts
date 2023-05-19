@@ -33,6 +33,11 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
 
     const parameters: ComfyBoxStdParameters = {}
 
+    parameters.prompt = [{
+        positive: infotext.positive,
+        negative: infotext.negative,
+    }]
+
     const hrUp = popOpt("hires upscale");
     const hrSz = popOpt("hires resize");
     let hrScaleBy = hrUp ? parseFloat(hrUp) : undefined;
@@ -138,6 +143,8 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
         }]
     }
 
+    // TODO ControlNet
+
     for (const [extraNetworkType, extraNetworks] of Object.entries(infotext.extraNetworks)) {
         for (const extraNetworkParams of extraNetworks) {
             let strength;
@@ -222,13 +229,6 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
 
         index += 1;
         found = infotext.extraParams[`addnet model ${index}`]
-    }
-
-    for (const [key, value] of Object.entries(infotext.extraParams)) {
-        if (key.startsWith("addnet model ")) {
-            const index = key.replace("addnet module ", "")
-            // delete infotext.extraParams[key];
-        }
     }
 
     const prompt: ComfyBoxStdPrompt = {

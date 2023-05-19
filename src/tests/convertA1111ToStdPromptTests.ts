@@ -44,6 +44,10 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                             a1111_shorthash: "925997e9",
                         }
                     }],
+                    prompt: [{
+                        positive: "highest quality, masterpiece, best quality, masterpiece, asuka langley sitting cross legged on a chair",
+                        negative: "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts,signature, watermark, username, blurry, artist name"
+                    }],
                     clip: [{
                         clip_skip: 2,
                     }],
@@ -109,6 +113,10 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                         model_hashes: {
                             a1111_shorthash: "0f0eaaa61e",
                         }
+                    }],
+                    prompt: [{
+                        positive: "dreamlike fantasy landscape where everything is a shade of pink,\n dog ",
+                        negative: "(worst quality:1.4), (low quality:1.4) , (monochrome:1.1)"
                     }],
                     clip: [{
                         clip_skip: 2,
@@ -203,6 +211,10 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                         model_hashes: {
                             a1111_shorthash: "0873291ac5",
                         }
+                    }],
+                    prompt: [{
+                        positive: "1girl, pink hair",
+                        negative: "(worst quality, low quality:1.4)",
                     }],
                     lora: [{
                         module_name: "LoRA",

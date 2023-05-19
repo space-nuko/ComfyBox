@@ -108,6 +108,18 @@ const GroupDynamicThresholding = z.object({
 })
 export type ComfyBoxStdGroupDynamicThresholding = z.infer<typeof GroupDynamicThresholding>
 
+const GroupAestheticEmbedding = z.object({
+    model_name: z.string(),
+    lr: z.number(),
+    slerp: z.boolean(),
+    slerp_angle: z.number(),
+    steps: z.number(),
+    positive: z.string(),
+    negative: z.string(),
+    weight: z.number(),
+})
+export type ComfyBoxStdGroupAestheticEmbedding = z.infer<typeof GroupAestheticEmbedding>
+
 const group = (s: ZodTypeAny) => z.optional(z.array(s).nonempty());
 
 const Parameters = z.object({
@@ -151,4 +163,11 @@ const ComfyBoxStdPrompt = z.object({
 })
 
 export default ComfyBoxStdPrompt
+
+/*
+ * A standardized Stable Diffusion prompt and parameter format, to be used with
+ * an encompassing workflow. Aims to encompass an arbitrary number of parameter
+ * counts and types, so that most ComfyUI workflows can have parts of their
+ * prompts transferred between each other.
+ */
 export type ComfyBoxStdPrompt = z.infer<typeof ComfyBoxStdPrompt>
