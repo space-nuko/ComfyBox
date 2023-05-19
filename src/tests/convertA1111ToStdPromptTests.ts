@@ -45,13 +45,13 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                     }
                 }],
                 conditioning: [{
-                    "^meta": {
+                    "$meta": {
                         types: ["positive"]
                     },
                     text: "highest quality, masterpiece, best quality, masterpiece, asuka langley sitting cross legged on a chair",
                 }, {
-                    "^meta": {
-                        types: ["positive"]
+                    "$meta": {
+                        types: ["negative"]
                     },
                     text: "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts,signature, watermark, username, blurry, artist name"
                 }],
@@ -69,11 +69,21 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                 latent_image: [{
                     width: 512,
                     height: 512,
+                }],
+                aesthetic_embedding: [{
+                    lr: 0.0005,
+                    model_name: "Belle",
+                    text: "",
+                    text_negative: false,
+                    slerp: false,
+                    slerp_angle: 0.1,
+                    steps: 15,
+                    weight: 0.9
                 }]
             }
         })
 
-        expect(ComfyBoxStdPrompt.safeParse(converted).success).toEqual(true);
+        expect(() => ComfyBoxStdPrompt.parse(converted)).not.toThrow();
     }
 
     test__convertsExtraNetworks() {
@@ -112,7 +122,13 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
             version: 1,
             metadata: {
                 created_with: "stable-diffusion-webui",
-                extra_data: {}
+                extra_data: {
+                    a1111: {
+                        params: {
+                            "ensd": "31337"
+                        }
+                    }
+                }
             },
             parameters: {
                 checkpoint: [{
@@ -122,12 +138,12 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                     }
                 }],
                 conditioning: [{
-                    "^meta": {
+                    "$meta": {
                         types: ["positive"]
                     },
                     text: "dreamlike fantasy landscape where everything is a shade of pink,\n dog ",
                 }, {
-                    "^meta": {
+                    "$meta": {
                         types: ["negative"]
                     },
                     text: "(worst quality:1.4), (low quality:1.4) , (monochrome:1.1)"
@@ -141,6 +157,7 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                 }],
                 lora: [{
                     model_name: "asdfg",
+                    module_name: "lora",
                     strength_unet: 0.8,
                     strength_tenc: 0.8,
                 }],
@@ -152,7 +169,9 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                     seed: 2416682767,
                     steps: 40
                 }, {
-                    type: "upscale",
+                    "$meta": {
+                        types: ["upscale"]
+                    },
                     cfg_scale: 12,
                     denoise: 0.55,
                     sampler_name: "dpmpp_2m",
@@ -163,8 +182,8 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                 latent_image: [{
                     width: 640,
                     height: 512,
-                }, {
-                    type: "upscale",
+                }],
+                latent_upscale: [{
                     width: 1280,
                     height: 1024,
                     upscale_by: 2,
@@ -173,7 +192,7 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
             }
         })
 
-        expect(ComfyBoxStdPrompt.safeParse(converted).success).toEqual(true);
+        expect(() => ComfyBoxStdPrompt.parse(converted)).not.toThrow();
     }
 
     test__convertsAdditionalNetworks() {
@@ -217,7 +236,16 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
             version: 1,
             metadata: {
                 created_with: "stable-diffusion-webui",
-                extra_data: {}
+                extra_data: {
+                    a1111: {
+                        params: {
+                            "ensd": "31337",
+                            // TODO
+                            "template": "1girl",
+                            "negative template": "(worst quality",
+                        }
+                    }
+                }
             },
             parameters: {
                 checkpoint: [{
@@ -227,12 +255,12 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
                     }
                 }],
                 conditioning: [{
-                    "^meta": {
+                    "$meta": {
                         types: ["positive"]
                     },
                     text: "1girl, pink hair",
                 }, {
-                    "^meta": {
+                    "$meta": {
                         types: ["negative"]
                     },
                     text: "(worst quality, low quality:1.4)",
@@ -275,6 +303,6 @@ export default class convertA1111ToStdPromptTests extends UnitTest {
             }
         })
 
-        expect(ComfyBoxStdPrompt.safeParse(converted).success).toEqual(true);
+        expect(() => ComfyBoxStdPrompt.parse(converted)).not.toThrow();
     }
 }

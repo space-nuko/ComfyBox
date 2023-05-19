@@ -11,6 +11,9 @@ const isProduction = process.env.NODE_ENV === "production";
 console.log("Production build: " + isProduction)
 
 export default defineConfig({
+    define: {
+        "__GIT_COMMIT_HASH__": '"asdf"'
+    },
     clearScreen: false,
     base: "./",
     plugins: [

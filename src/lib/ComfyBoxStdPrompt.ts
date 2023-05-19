@@ -1,149 +1,5 @@
 import { z, type ZodTypeAny } from "zod"
 
-const ModelHashes = z.object({
-    a1111_shorthash: z.string().optional(),
-    sha256: z.string().optional(),
-}).refine(({ a1111_shorthash, sha256 }) =>
-    a1111_shorthash !== undefined || sha256 !== undefined,
-    { message: "At least one model hash must be specified" })
-
-const GroupConditioning = z.object({
-    text: z.string(),
-})
-export type ComfyBoxStdGroupConditioning = z.infer<typeof GroupConditioning>
-
-const GroupCheckpoint = z.object({
-    model_name: z.string().optional(),
-    model_hashes: ModelHashes.optional(),
-}).refine(({ model_name, model_hashes }) =>
-    model_name !== undefined || model_hashes !== undefined,
-    { message: "Must include either model name or model hash" }
-)
-export type ComfyBoxStdGroupCheckpoint = z.infer<typeof GroupCheckpoint>
-
-const GroupVAE = z.object({
-    model_name: z.string().optional(),
-    model_hashes: ModelHashes.optional(),
-    type: z.enum(["internal", "external"])
-}).refine(({ model_name, model_hashes }) =>
-    model_name !== undefined || model_hashes !== undefined,
-    { message: "Must include either model name or model hashes" }
-)
-export type ComfyBoxStdGroupVAE = z.infer<typeof GroupVAE>
-
-const GroupKSampler = z.object({
-    cfg_scale: z.number(),
-    seed: z.number(),
-    steps: z.number(),
-    sampler_name: z.string(),
-    scheduler: z.string(),
-    denoise: z.number().default(1.0),
-    type: z.enum(["empty", "image", "upscale"]).optional()
-})
-export type ComfyBoxStdGroupKSampler = z.infer<typeof GroupKSampler>
-
-const GroupLatentImage = z.object({
-    width: z.number(),
-    height: z.number(),
-    type: z.enum(["empty", "image", "upscale"]).optional(),
-    upscale_method: z.string().optional(),
-    upscale_by: z.number().optional(),
-    crop: z.string().optional(),
-    mask_blur: z.number().optional(),
-    batch_count: z.number().default(1).optional(),
-    batch_pos: z.number().default(0).optional()
-})
-export type ComfyBoxStdGroupLatentImage = z.infer<typeof GroupLatentImage>
-
-const GroupSDUpscale = z.object({
-    upscaler: z.string(),
-    overlap: z.number(),
-})
-export type ComfyBoxStdGroupSDUpscale = z.infer<typeof GroupSDUpscale>
-
-const GroupSelfAttentionGuidance = z.object({
-    guidance_scale: z.number(),
-    mask_threshold: z.number(),
-})
-export type ComfyBoxStdGroupSelfAttentionGuidance = z.infer<typeof GroupSelfAttentionGuidance>
-
-const GroupHypernetwork = z.object({
-    model_name: z.string(),
-    model_hashes: ModelHashes.optional(),
-    strength: z.number()
-})
-export type ComfyBoxStdGroupHypernetwork = z.infer<typeof GroupHypernetwork>
-
-const LoRAModelHashes = z.object({
-    addnet_shorthash: z.string().optional(),
-    addnet_shorthash_legacy: z.string().optional(),
-    sha256: z.string().optional(),
-}).refine(({ addnet_shorthash, addnet_shorthash_legacy, sha256 }) =>
-    addnet_shorthash !== undefined || addnet_shorthash_legacy !== undefined || sha256 !== undefined,
-    { message: "At least one model hash must be specified" })
-
-const GroupLoRA = z.object({
-    model_name: z.string(),
-    module_name: z.string().optional(),
-    model_hashes: LoRAModelHashes.optional(),
-    strength_unet: z.number(),
-    strength_tenc: z.number()
-})
-export type ComfyBoxStdGroupLoRA = z.infer<typeof GroupLoRA>
-
-const GroupControlNet = z.object({
-    model: z.string(),
-    model_hashes: ModelHashes.optional(),
-    strength: z.number(),
-})
-export type ComfyBoxStdGroupControlNet = z.infer<typeof GroupControlNet>
-
-const GroupCLIP = z.object({
-    clip_skip: z.number().optional()
-})
-export type ComfyBoxStdGroupCLIP = z.infer<typeof GroupCLIP>
-
-const GroupDynamicThresholding = z.object({
-    mimic_scale: z.number(),
-    threshold_percentile: z.number(),
-    mimic_mode: z.string(),
-    mimic_scale_minimum: z.number(),
-    cfg_mode: z.string(),
-    cfg_scale_minimum: z.number()
-})
-export type ComfyBoxStdGroupDynamicThresholding = z.infer<typeof GroupDynamicThresholding>
-
-const GroupAestheticEmbedding = z.object({
-    model_name: z.string(),
-    lr: z.number(),
-    slerp: z.boolean(),
-    slerp_angle: z.number(),
-    steps: z.number(),
-    positive: z.string(),
-    negative: z.string(),
-    weight: z.number(),
-})
-export type ComfyBoxStdGroupAestheticEmbedding = z.infer<typeof GroupAestheticEmbedding>
-
-const GroupDDetailer = z.object({
-    positive_prompt: z.string(),
-    negative_prompt: z.string(),
-    bitwise: z.string(),
-    model: z.string().optional(),
-    model_hashes: ModelHashes.optional(),
-    conf: z.number(),
-    mask_blur: z.number(),
-    denoise: z.number(),
-    dilation: z.number(),
-    offset_x: z.number(),
-    offset_y: z.number(),
-    preprocess: z.boolean(),
-    inpaint_full: z.boolean(),
-    inpaint_padding: z.number(),
-    cfg: z.number()
-})
-export type ComfyBoxStdGroupDDetailer = z.infer<typeof GroupDDetailer>
-
 /*
  * This metadata can be attached to each entry in a group to assist in
  * identifying the correct nodes to apply it to.
@@ -170,25 +26,180 @@ const GroupMetadata = z.object({
 })
 export type ComfyBoxStdGroupMetadata = z.infer<typeof GroupMetadata>
 
-const group = (entry: ZodTypeAny) => {
-    const groupEntry = entry.and(z.object({ "$meta": GroupMetadata }))
-    return z.optional(z.array(groupEntry).nonempty());
+const group = (obj: Record<string, any>): ZodTypeAny => {
+    const meta = z.object({ "$meta": GroupMetadata.optional() })
+    return z.object(obj).and(meta)
+}
+
+const ModelHashes = z.object({
+    a1111_shorthash: z.string().optional(),
+    sha256: z.string().optional(),
+}).refine(({ a1111_shorthash, sha256 }) =>
+    a1111_shorthash !== undefined || sha256 !== undefined,
+    { message: "At least one model hash must be specified" })
+
+const GroupConditioning = group({
+    text: z.string(),
+})
+export type ComfyBoxStdGroupConditioning = z.infer<typeof GroupConditioning>
+
+const GroupCheckpoint = group({
+    model_name: z.string().optional(),
+    model_hashes: ModelHashes.optional(),
+}).refine(({ model_name, model_hashes }) =>
+    model_name !== undefined || model_hashes !== undefined,
+    { message: "Must include either model name or model hash" }
+)
+export type ComfyBoxStdGroupCheckpoint = z.infer<typeof GroupCheckpoint>
+
+const GroupVAE = group({
+    model_name: z.string().optional(),
+    model_hashes: ModelHashes.optional(),
+    type: z.enum(["internal", "external"])
+}).refine(({ model_name, model_hashes }) =>
+    model_name !== undefined || model_hashes !== undefined,
+    { message: "Must include either model name or model hashes" }
+)
+export type ComfyBoxStdGroupVAE = z.infer<typeof GroupVAE>
+
+const GroupKSampler = group({
+    cfg_scale: z.number(),
+    seed: z.number(),
+    steps: z.number(),
+    sampler_name: z.string(),
+    scheduler: z.string(),
+    denoise: z.number().default(1.0),
+    type: z.enum(["empty", "image", "upscale"]).optional()
+})
+export type ComfyBoxStdGroupKSampler = z.infer<typeof GroupKSampler>
+
+const GroupLatentImage = group({
+    width: z.number(),
+    height: z.number(),
+    mask_blur: z.number().optional(),
+    batch_count: z.number().default(1).optional(),
+    batch_pos: z.number().default(0).optional()
+})
+export type ComfyBoxStdGroupLatentImage = z.infer<typeof GroupLatentImage>
+
+const GroupLatentUpscale = group({
+    width: z.number(),
+    height: z.number(),
+    upscale_method: z.string().optional(),
+    upscale_by: z.number().optional(),
+    crop: z.string().optional()
+})
+export type ComfyBoxStdGroupLatentUpscale = z.infer<typeof GroupLatentUpscale>
+
+const GroupSDUpscale = group({
+    upscaler: z.string(),
+    overlap: z.number(),
+})
+export type ComfyBoxStdGroupSDUpscale = z.infer<typeof GroupSDUpscale>
+
+const GroupSelfAttentionGuidance = group({
+    guidance_scale: z.number(),
+    mask_threshold: z.number(),
+})
+export type ComfyBoxStdGroupSelfAttentionGuidance = z.infer<typeof GroupSelfAttentionGuidance>
+
+const GroupHypernetwork = group({
+    model_name: z.string(),
+    model_hashes: ModelHashes.optional(),
+    strength: z.number()
+})
+export type ComfyBoxStdGroupHypernetwork = z.infer<typeof GroupHypernetwork>
+
+const LoRAModelHashes = z.object({
+    addnet_shorthash: z.string().optional(),
+    addnet_shorthash_legacy: z.string().optional(),
+    sha256: z.string().optional(),
+}).refine(({ addnet_shorthash, addnet_shorthash_legacy, sha256 }) =>
+    addnet_shorthash !== undefined || addnet_shorthash_legacy !== undefined || sha256 !== undefined,
+    { message: "At least one model hash must be specified" })
+
+const GroupLoRA = group({
+    model_name: z.string(),
+    module_name: z.string().optional(),
+    model_hashes: LoRAModelHashes.optional(),
+    strength_unet: z.number(),
+    strength_tenc: z.number()
+})
+export type ComfyBoxStdGroupLoRA = z.infer<typeof GroupLoRA>
+
+const GroupControlNet = group({
+    model: z.string(),
+    model_hashes: ModelHashes.optional(),
+    strength: z.number(),
+})
+export type ComfyBoxStdGroupControlNet = z.infer<typeof GroupControlNet>
+
+const GroupCLIP = group({
+    clip_skip: z.number().optional()
+})
+export type ComfyBoxStdGroupCLIP = z.infer<typeof GroupCLIP>
+
+const GroupDynamicThresholding = group({
+    mimic_scale: z.number(),
+    threshold_percentile: z.number(),
+    mimic_mode: z.string(),
+    mimic_scale_minimum: z.number(),
+    cfg_mode: z.string(),
+    cfg_scale_minimum: z.number()
+})
+export type ComfyBoxStdGroupDynamicThresholding = z.infer<typeof GroupDynamicThresholding>
+
+const GroupAestheticEmbedding = group({
+    model_name: z.string(),
+    lr: z.number(),
+    slerp: z.boolean(),
+    slerp_angle: z.number().optional(),
+    steps: z.number(),
+    text: z.string(),
+    text_negative: z.boolean(),
+    weight: z.number(),
+})
+export type ComfyBoxStdGroupAestheticEmbedding = z.infer<typeof GroupAestheticEmbedding>
+
+const GroupDDetailer = group({
+    positive_prompt: z.string(),
+    negative_prompt: z.string(),
+    bitwise: z.string(),
+    model: z.string().optional(),
+    model_hashes: ModelHashes.optional(),
+    conf: z.number(),
+    mask_blur: z.number(),
+    denoise: z.number(),
+    dilation: z.number(),
+    offset_x: z.number(),
+    offset_y: z.number(),
+    preprocess: z.boolean(),
+    inpaint_full: z.boolean(),
+    inpaint_padding: z.number(),
+    cfg: z.number()
+})
+export type ComfyBoxStdGroupDDetailer = z.infer<typeof GroupDDetailer>
+
+const groupArray = (entry: ZodTypeAny) => {
+    return z.optional(z.array(entry).nonempty());
 }
 
 const Parameters = z.object({
-    conditioning: group(GroupConditioning),
-    checkpoint: group(GroupCheckpoint),
-    vae: group(GroupVAE),
-    k_sampler: group(GroupKSampler),
-    clip: group(GroupCLIP),
-    latent_image: group(GroupLatentImage),
-    sd_upscale: group(GroupSDUpscale),
-    hypernetwork: group(GroupHypernetwork),
-    lora: group(GroupLoRA),
-    control_net: group(GroupControlNet),
-    dynamic_thresholding: group(GroupDynamicThresholding),
-    self_attention_guidance: group(GroupSelfAttentionGuidance),
-    ddetailer: group(GroupDDetailer)
+    conditioning: groupArray(GroupConditioning),
+    checkpoint: groupArray(GroupCheckpoint),
+    vae: groupArray(GroupVAE),
+    k_sampler: groupArray(GroupKSampler),
+    clip: groupArray(GroupCLIP),
+    latent_image: groupArray(GroupLatentImage),
+    latent_upscale: groupArray(GroupLatentUpscale),
+    sd_upscale: groupArray(GroupSDUpscale),
+    hypernetwork: groupArray(GroupHypernetwork),
+    lora: groupArray(GroupLoRA),
+    control_net: groupArray(GroupControlNet),
+    dynamic_thresholding: groupArray(GroupDynamicThresholding),
+    aesthetic_embedding: groupArray(GroupAestheticEmbedding),
+    self_attention_guidance: groupArray(GroupSelfAttentionGuidance),
+    ddetailer: groupArray(GroupDDetailer)
 }).partial()
 export type ComfyBoxStdParameters = z.infer<typeof Parameters>
 

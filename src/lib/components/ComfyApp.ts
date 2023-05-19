@@ -40,7 +40,7 @@ import { ComfyComboNode } from "$lib/nodes/widgets";
 import parseA1111, { type A1111ParsedInfotext } from "$lib/parseA1111";
 import convertA1111ToStdPrompt from "$lib/convertA1111ToStdPrompt";
 import type { ComfyBoxStdPrompt } from "$lib/ComfyBoxStdPrompt";
-import ComfyBoxStdPromptSerializer from "./ComfyBoxStdPromptSerializer";
+import ComfyBoxStdPromptSerializer from "$lib/ComfyBoxStdPromptSerializer";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 

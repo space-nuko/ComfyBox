@@ -1,4 +1,4 @@
-import type { ComfyBoxStdGroupCheckpoint, ComfyBoxStdGroupDDetailer, ComfyBoxStdGroupDynamicThresholding, ComfyBoxStdGroupHypernetwork, ComfyBoxStdGroupKSampler, ComfyBoxStdGroupLatentImage, ComfyBoxStdGroupLoRA, ComfyBoxStdGroupSelfAttentionGuidance, ComfyBoxStdParameters, ComfyBoxStdPrompt } from "./ComfyBoxStdPrompt";
+import type { ComfyBoxStdGroupAestheticEmbedding, ComfyBoxStdGroupCheckpoint, ComfyBoxStdGroupDDetailer, ComfyBoxStdGroupDynamicThresholding, ComfyBoxStdGroupHypernetwork, ComfyBoxStdGroupKSampler, ComfyBoxStdGroupLatentImage, ComfyBoxStdGroupLatentUpscale, ComfyBoxStdGroupLoRA, ComfyBoxStdGroupSelfAttentionGuidance, ComfyBoxStdParameters, ComfyBoxStdPrompt } from "./ComfyBoxStdPrompt";
 import type { A1111ParsedInfotext } from "./parseA1111";
 
 function getSamplerAndScheduler(a1111Sampler: string): [string, string] {
@@ -13,14 +13,14 @@ function getSamplerAndScheduler(a1111Sampler: string): [string, string] {
     return [name, scheduler]
 }
 
-const reAddNetModelName = /^([^(]+)\(([^)]+)\)$/;
+const reAddNetModelName = /^([^(]+)\((.+)\)$/;
 
 function parseAddNetModelNameAndHash(name: string | null): [string | undefined, string | undefined] {
     if (!name)
         return [undefined, undefined]
 
     const match = name.match(reAddNetModelName);
-    if (match) {
+    if (match != null) {
         return [match[1], match[2]]
     }
     return [undefined, undefined]
@@ -34,7 +34,7 @@ function parseDDetailerModelNameAndHash(name: string | null): [string | undefine
 
     // bbox\mmdet_anime-face_yolov3.pth [51e1af4a]
     const match = name.match(reDDetailerModelName);
-    if (match) {
+    if (match != null) {
         return [match[1], match[2]]
     }
     return [undefined, undefined]
@@ -51,13 +51,13 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
 
     parameters.conditioning = [
         {
-            "^meta": {
+            "$meta": {
                 types: ["positive"]
             },
             text: infotext.positive,
         },
         {
-            "^meta": {
+            "$meta": {
                 types: ["negative"]
             },
             text: infotext.negative,
@@ -100,16 +100,13 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
             uw = +hrWidth;
             uh = +hrHeight;
         }
-        const hr_image: ComfyBoxStdGroupLatentImage = {
-            type: "upscale",
+        const hr: ComfyBoxStdGroupLatentUpscale = {
             width: uw,
             height: uh,
             upscale_by: hrScaleBy,
-            batch_count: infotext.batchSize,
-            batch_pos: infotext.batchPos,
             upscale_method: hrMethod
         }
-        parameters.latent_image.push(hr_image)
+        parameters.latent_upscale = [hr];
     }
 
     const [sampler_name, scheduler] = getSamplerAndScheduler(infotext.sampler)
@@ -126,7 +123,9 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
 
     if (hrMethod != null) {
         const k_sampler_hr: ComfyBoxStdGroupKSampler = {
-            type: "upscale",
+            "$meta": {
+                types: ["upscale"]
+            },
             steps: hrSteps != null ? parseInt(hrSteps) : infotext.steps,
             seed: infotext.seed,
             cfg_scale: infotext.cfgScale,
@@ -161,6 +160,21 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
             upscaler: sdUpscaleUpscaler,
             overlap: parseInt(sdUpscaleOverlap)
         }]
+    }
+
+    if ("aesthetic embedding" in infotext.extraParams) {
+        const slerp = popOpt("aesthetic slerp") === "True"
+        const aesthetic_embedding: ComfyBoxStdGroupAestheticEmbedding = {
+            model_name: popOpt("aesthetic embedding"),
+            lr: parseFloat(popOpt("aesthetic lr")),
+            slerp,
+            slerp_angle: parseFloat(popOpt("aesthetic slerp angle")),
+            steps: parseInt(popOpt("aesthetic steps")),
+            text: popOpt("aesthetic text"),
+            text_negative: popOpt("aesthetic text negative") === "True",
+            weight: parseFloat(popOpt("aesthetic weight")),
+        }
+        parameters.aesthetic_embedding = [aesthetic_embedding]
     }
 
     if ("dynamic thresholding enabled" in infotext.extraParams) {
@@ -287,8 +301,15 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
         popOpt("addnet enabled")
         const moduleName = popOpt(`addnet module ${index}`)
         const modelName = popOpt(`addnet model ${index}`);
-        const weightA = popOpt(`addnet weight a ${index}`);
-        const weightB = popOpt(`addnet weight b ${index}`);
+        const weight = popOpt(`addnet weight ${index}`);
+        let weightA = popOpt(`addnet weight a ${index}`);
+        let weightB = popOpt(`addnet weight b ${index}`);
+
+        if (weightA == null || weightB == null) {
+            // linked weights before addnet version update
+            weightA = weight;
+            weightB = weight;
+        }
 
         if (moduleName == null || modelName == null || weightA == null || weightB == null) {
             throw new Error(`Error parsing addnet model params: ${moduleName} ${modelName} ${weightA} ${weightB}`)
@@ -300,7 +321,7 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
 
         const [name, hash] = parseAddNetModelNameAndHash(modelName);
         if (name == null || hash == null) {
-            throw new Error("Error parsing addnet model name: " + modelName);
+            throw new Error("Error parsing addnet model name: " + JSON.stringify(modelName));
         }
 
         let shorthash = undefined
@@ -335,16 +356,17 @@ export default function convertA1111ToStdPrompt(infotext: A1111ParsedInfotext): 
 
     let app_version = popOpt("version")
 
+    const extra_data: Record<string, any> = {};
+    if (Object.keys(infotext.extraParams).length > 0) {
+        extra_data.a1111 = { params: infotext.extraParams }
+    }
+
     const prompt: ComfyBoxStdPrompt = {
         version: 1,
         metadata: {
             created_with: "stable-diffusion-webui",
             app_version,
-            extra_data: {
-                a1111: {
-                    params: infotext.extraParams
-                }
-            }
+            extra_data
         },
         parameters
     }
