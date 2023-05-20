@@ -41,7 +41,7 @@
  }
 
  async function doRefreshCombos() {
-     await app.refreshComboInNodes(true)
+     await app.refreshComboInNodes(undefined, true)
  }
 
  function refreshView(event?: Event) {
@@ -120,14 +120,11 @@
  }
 
  function doSave(): void {
-     if (!app?.lGraph)
-         return;
-
      app.querySave()
  }
 
  function doLoad(): void {
-     if (!app?.lGraph || !fileInput)
+     if (!fileInput)
          return;
 
      fileInput.click();
@@ -139,9 +136,6 @@
  }
 
  function doSaveLocal(): void {
-     if (!app?.lGraph)
-         return;
-
      app.saveStateToLocalStorage();
  }
 
@@ -184,22 +178,11 @@
         </Pane>
     </Splitpanes>
     <div id="workflow-tabs">
-        <div class="workflow-tab selected">
-            txt2img
-            <!-- <Image /> -->
-        </div>
-        <div class="workflow-tab">
-            img2img
-            <!-- <Image /> -->
-        </div>
-        <div class="workflow-tab">
-            asdflkj
-            <!-- <Image /> -->
-        </div>
-        <div class="workflow-tab">
-            asdkajw
-            <!-- <Image /> -->
-        </div>
+        {#each app.openedWorkflows as workflow, index}
+            <button class="workflow-tab" class:selected={index === app.activeWorkflowIdx}>
+                {workflow.title}
+            </button>
+        {/each}
     </div>
     <div id="bottombar">
         <div class="bottombar-content">

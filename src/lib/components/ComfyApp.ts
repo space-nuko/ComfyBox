@@ -390,6 +390,11 @@ export default class ComfyApp {
     }
 
     saveStateToLocalStorage() {
+        if (this.activeWorkflow == null) {
+            notify("No active workflow!", { type: "error" })
+            return;
+        }
+
         try {
             uiState.update(s => { s.isSavingToLocalStorage = true; return s; })
             const savedWorkflow = this.serialize();
@@ -738,6 +743,11 @@ export default class ComfyApp {
     }
 
     querySave() {
+        if (this.activeWorkflow == null) {
+            notify("No active workflow!", { type: "error" })
+            return;
+        }
+
         const promptFilename = get(configState).promptForWorkflowName;
 
         let filename = "workflow.json";
@@ -931,7 +941,13 @@ export default class ComfyApp {
     /**
      * Refresh combo list on whole nodes
      */
-    async refreshComboInNodes(workflow: ComfyWorkflow, flashUI: boolean = false) {
+    async refreshComboInNodes(workflow?: ComfyWorkflow, flashUI: boolean = false) {
+        workflow ||= this.activeWorkflow;
+        if (workflow == null) {
+            notify("No active workflow!", { type: "error" })
+            return
+        }
+
         const defs = await this.api.getNodeDefs();
 
         const isComfyComboNode = (node: LGraphNode): node is ComfyComboNode => {

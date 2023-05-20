@@ -162,6 +162,10 @@
          position: relative;
          flex: 1 1 0%;
          max-width: 30vw;
+
+         > :global(.block) {
+             height: 100%;
+         }
      }
 
      .copy-button {

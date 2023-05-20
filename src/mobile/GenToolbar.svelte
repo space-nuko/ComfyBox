@@ -21,13 +21,13 @@
      app.runDefaultQueueAction()
  }
 
- function refreshCombos() {
+ async function refreshCombos() {
      navigator.vibrate(20)
-     app.refreshComboInNodes()
+     await app.refreshComboInNodes()
  }
 
  function doSave(): void {
-     if (!app?.lGraph || !fileInput)
+     if (!fileInput)
          return;
 
      navigator.vibrate(20)
@@ -35,7 +35,7 @@
  }
 
  function doLoad(): void {
-     if (!app?.lGraph || !fileInput)
+     if (!fileInput)
          return;
 
      navigator.vibrate(20)
@@ -48,9 +48,6 @@
 }
 
  function doSaveLocal(): void {
-     if (!app?.lGraph)
-         return;
-
      navigator.vibrate(20)
      app.saveStateToLocalStorage();
  }
