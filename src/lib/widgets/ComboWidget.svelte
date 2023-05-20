@@ -11,10 +11,10 @@
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfyComboNode | null = null;
- let nodeValue: Writable<string> | null = null;
+ let nodeValue: Writable<string> = writable("");
  let propsChanged: Writable<number> | null = null;
  let lightUp: Writable<boolean> = writable(false);
- let valuesForCombo: Writable<any[]> | null = null;
+ let valuesForCombo: Writable<any[]> = writable([])
  let lastConfigured: any = null;
  let option: any = null;
 
@@ -132,77 +132,69 @@
 </script>
 
 <div class="wrapper comfy-combo" class:mobile={isMobile} class:updated={$lightUp}>
-    {#key $valuesForCombo}
-        {#if node !== null && nodeValue !== null}
-            {#if $valuesForCombo == null}
-                <span>Loading...</span>
-            {:else}
-                <label>
-                    {#if widget.attrs.title !== ""}
-                        <BlockTitle show_label={true}>
-                            {widget.attrs.title}
-                            <span class="count-text">({$valuesForCombo.length})</span>
-                        </BlockTitle>
-                    {/if}
-                    <Select
-                        value={$nodeValue}
-                        bind:justValue={option}
-                        bind:hoverItemIndex
-                        bind:filterText
-                        bind:listOpen
-                        bind:input
-                        items={$valuesForCombo}
-                        disabled={isDisabled(widget)}
-                        clearable={false}
-                        showChevron={true}
-                        listAutoWidth={true}
-                        inputAttributes={{ autocomplete: 'off' }}
-                        on:change
-                        on:focus={onFocus}
-                        on:hoverItem={(e) => handleHover(e.detail)}
-                        on:select={(e) => handleSelect(e.detail.index)}
-                        on:blur
-                        on:filter={onFilter}>
-                        <div class="comfy-select-list" slot="list" let:filteredItems>
-                            {#if filteredItems.length > 0}
-                                {@const itemSize = isMobile ? 50 : 25}
-                                {@const itemsToShow = isMobile ? 10 : 30}
-                                <VirtualList
-                                    items={filteredItems}
-                                    width="100%"
-                                    height={Math.min(filteredItems.length, itemsToShow) * itemSize}
-                                    itemCount={filteredItems.length}
-                                    {itemSize}
-                                    overscanCount={5}
-                                    scrollToIndex={hoverItemIndex}>
-                                    <div slot="item"
-                                         class="comfy-select-item"
-                                         class:mobile={isMobile}
-                                         let:index={i}
-                                         let:style
-                                         {style}
-                                         class:active={activeIndex === filteredItems[i].index}
-                                         class:hover={hoverItemIndex === i}
-                                         on:click={() => handleSelect(filteredItems[i].index)}
-                                        on:focus={() => handleHover(i)}
-                                        on:mouseover={() => handleHover(i)}>
-                                        {@const item = filteredItems[i]}
-                                        <span class="comfy-select-label">
-                                            {item.label}
-                                        </span>
-                                    </div>
-                                </VirtualList>
-                            {:else}
-                                <div class="comfy-empty-list">
-                                    <span>(No items)</span>
-                                </div>
-                            {/if}
-                        </div>
-                    </Select>
-                </label>
-            {/if}
+    <label>
+        {#if widget.attrs.title !== ""}
+            <BlockTitle show_label={true}>
+                {widget.attrs.title}
+                <span class="count-text">({$valuesForCombo.length})</span>
+            </BlockTitle>
         {/if}
-    {/key}
+        <Select
+            value={$valuesForCombo.length === 0 ? "(Loading...)" : $nodeValue}
+            bind:justValue={option}
+            bind:hoverItemIndex
+            bind:filterText
+            bind:listOpen
+            bind:input
+            items={$valuesForCombo}
+            disabled={$valuesForCombo.length === 0 || isDisabled(widget)}
+            clearable={false}
+            showChevron={true}
+            listAutoWidth={true}
+            inputAttributes={{ autocomplete: 'off' }}
+            on:change
+            on:focus={onFocus}
+            on:hoverItem={(e) => handleHover(e.detail)}
+            on:select={(e) => handleSelect(e.detail.index)}
+            on:blur
+            on:filter={onFilter}>
+            <div class="comfy-select-list" slot="list" let:filteredItems>
+                {#if filteredItems.length > 0}
+                    {@const itemSize = isMobile ? 50 : 25}
+                    {@const itemsToShow = isMobile ? 10 : 30}
+                    <VirtualList
+                        items={filteredItems}
+                        width="100%"
+                        height={Math.min(filteredItems.length, itemsToShow) * itemSize}
+                        itemCount={filteredItems.length}
+                        {itemSize}
+                        overscanCount={5}
+                        scrollToIndex={hoverItemIndex}>
+                        <div slot="item"
+                                class="comfy-select-item"
+                                class:mobile={isMobile}
+                                let:index={i}
+                                let:style
+                                {style}
+                                class:active={activeIndex === filteredItems[i].index}
+                                class:hover={hoverItemIndex === i}
+                                on:click={() => handleSelect(filteredItems[i].index)}
+                            on:focus={() => handleHover(i)}
+                            on:mouseover={() => handleHover(i)}>
+                            {@const item = filteredItems[i]}
+                            <span class="comfy-select-label">
+                                {item.label}
+                            </span>
+                        </div>
+                    </VirtualList>
+                {:else}
+                    <div class="comfy-empty-list">
+                        <span>(No items)</span>
+                    </div>
+                {/if}
+            </div>
+        </Select>
+    </label>
 </div>
 
 <style lang="scss">
@@ -257,6 +249,15 @@
      --item-background-hover: var(--comfy-dropdown-item-background-hover);
      --item-color-active: var(--comfy-dropdown-item-color-active);
      --item-background-active: var(--comfy-dropdown-item-background-active);
+     --disabled-color: var(--comfy-disabled-textbox-text-color);
+     --disabled-border-color: var(--comfy-disabled-textbox-border-color);
+     --disabled-background: var(--comfy-disabled-textbox-background-fill);
+ }
+
+
+ :global(.svelte-select.disabled) {
+     --input-color: var(--comfy-disabled-textbox-text-color) !important;
+     --selected-item-color: var(--comfy-disabled-textbox-text-color) !important;
  }
 
  :global(.svelte-select-list) {
