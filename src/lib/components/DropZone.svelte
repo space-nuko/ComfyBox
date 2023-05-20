@@ -50,7 +50,7 @@
  }
 </script>
 
-<svelte:window on:dragenter={showDropZone} />
+<!-- <svelte:window on:dragenter={showDropZone} /> -->
 
 {#if !disabled}
     <div id="dropzone"
