@@ -28,18 +28,21 @@
 
 <div
 	id={elem_id}
-	class="tabitem {elem_classes.join(' ')}"
+	class="sidebar-item {elem_classes.join(' ')}"
 	style:display={$selected_tab === id ? "block" : "none"}
 >
-	<Column>
+	<div style:height="100%">
 		<slot />
-	</Column>
+	</div>
 </div>
 
 <style>
 	div {
-		display: flex;
 		position: relative;
-        width: calc(100% - 4rem);
 	}
+
+ .sidebar-item {
+     width: calc(100% - 4rem);
+     height: 100%;
+ }
 </style>

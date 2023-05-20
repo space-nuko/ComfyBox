@@ -128,6 +128,17 @@ type BackendComboNode = {
     backendNode: ComfyBackendNode
 }
 
+type CanvasState = {
+    canvasEl: HTMLCanvasElement,
+    canvasCtx: CanvasRenderingContext2D,
+    canvas: ComfyGraphCanvas,
+}
+
+type WorkflowState = {
+    title: string,
+    graph: ComfyGraph,
+}
+
 export default class ComfyApp {
     api: ComfyAPI;
     rootEl: HTMLDivElement | null = null;
