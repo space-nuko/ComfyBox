@@ -240,7 +240,7 @@
             </Pane>
             <Pane bind:size={queueSidebarSize}>
                 <div class="sidebar-wrapper pane-wrapper">
-                    <ComfyQueue />
+                    <ComfyQueue {app} />
                 </div>
             </Pane>
         </Splitpanes>

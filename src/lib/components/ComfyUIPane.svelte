@@ -9,7 +9,6 @@
  import layoutState, { type ContainerLayout, type DragItem, type IDragItem } from "$lib/stores/layoutState";
  import uiState from "$lib/stores/uiState";
  import selectionState from "$lib/stores/selectionState";
- import DropZone from "./DropZone.svelte";
 
  import Menu from './menu/Menu.svelte';
  import MenuOption from './menu/MenuOption.svelte';
@@ -151,7 +150,6 @@
 </script>
 
 <div id="comfy-ui-panes" on:contextmenu={onRightClick}>
-    <DropZone {app} />
     <WidgetContainer bind:dragItem={root} classes={["root-container"]} />
 </div>
 

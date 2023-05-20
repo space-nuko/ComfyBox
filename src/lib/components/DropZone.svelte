@@ -50,7 +50,7 @@
  }
 </script>
 
-<!-- <svelte:window on:dragenter={showDropZone} /> -->
+<svelte:window on:dragenter={showDropZone} />
 
 {#if !disabled}
     <div id="dropzone"
@@ -66,7 +66,7 @@
  .dropzone {
      box-sizing: border-box;
      display: none;
-     position: fixed;
+     position: absolute;
      width: 100%;
      height: 100%;
      left: 0;
