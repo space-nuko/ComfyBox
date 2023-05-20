@@ -98,7 +98,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         }
 
         if (color) {
-            this.drawNodeOutline(node, ctx, size, fgColor, bgColor, color, thickness)
+            this.drawNodeOutline(node, ctx, size, mouseOver, fgColor, bgColor, color, thickness)
         }
 
         if (isRunningNode && state.progress) {
@@ -108,27 +108,36 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         }
     }
 
-    private drawNodeOutline(node: LGraphNode, ctx: CanvasRenderingContext2D, size: Vector2, fgColor: string, bgColor: string, outlineColor: string, outlineThickness: number) {
+    private drawNodeOutline(node: LGraphNode, ctx: CanvasRenderingContext2D, size: Vector2, mouseOver: boolean, fgColor: string, bgColor: string, outlineColor: string, outlineThickness: number) {
         const shape = node.shape || BuiltInSlotShape.ROUND_SHAPE;
+
+        var render_title = true;
+        if (node.titleMode == TitleMode.TRANSPARENT_TITLE || node.titleMode == TitleMode.NO_TITLE) {
+            render_title = false;
+        } else if (node.titleMode == TitleMode.AUTOHIDE_TITLE && mouseOver) {
+            render_title = true;
+        }
+        const titleHeight = render_title ? LiteGraph.NODE_TITLE_HEIGHT : 0;
+
         ctx.lineWidth = outlineThickness;
         ctx.globalAlpha = 0.8;
         ctx.beginPath();
         if (shape == BuiltInSlotShape.BOX_SHAPE)
-            ctx.rect(-6, -6 + LiteGraph.NODE_TITLE_HEIGHT, 12 + size[0] + 1, 12 + size[1] + LiteGraph.NODE_TITLE_HEIGHT);
+            ctx.rect(-6, -6 + titleHeight, 12 + size[0] + 1, 12 + size[1] + titleHeight);
         else if (shape == BuiltInSlotShape.ROUND_SHAPE || (shape == BuiltInSlotShape.CARD_SHAPE && node.flags.collapsed))
             ctx.roundRect(
                 -6,
-                -6 - LiteGraph.NODE_TITLE_HEIGHT,
+                -6 - titleHeight,
                 12 + size[0] + 1,
-                12 + size[1] + LiteGraph.NODE_TITLE_HEIGHT,
+                12 + size[1] + titleHeight,
                 this.round_radius * 2
             );
         else if (shape == BuiltInSlotShape.CARD_SHAPE)
             ctx.roundRect(
                 -6,
-                -6 + LiteGraph.NODE_TITLE_HEIGHT,
+                -6 + titleHeight,
                 12 + size[0] + 1,
-                12 + size[1] + LiteGraph.NODE_TITLE_HEIGHT,
+                12 + size[1] + titleHeight,
                 this.round_radius * 2,
                 2
             );
