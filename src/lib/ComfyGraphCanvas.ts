@@ -20,6 +20,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
 
     constructor(
         app: ComfyApp,
+        graph: LGraph,
         canvas: HTMLCanvasElement | string,
         options: {
             skip_render?: boolean;
@@ -28,7 +29,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
             viewport?: Vector4;
         } = {}
     ) {
-        super(canvas, app.lGraph, options);
+        super(canvas, graph, options);
         this.app = app;
         this._unsubscribe = selectionState.subscribe(ss => {
             for (const node of Object.values(this.selected_nodes)) {

@@ -1,4 +1,4 @@
-import type SerializedAppState from "./ComfyApp"
+import type { SerializedAppState } from "./components/ComfyApp"
 
 const blankGraph: SerializedAppState = {
     createdBy: "ComfyBox",
@@ -13,7 +13,14 @@ const blankGraph: SerializedAppState = {
         extra: {},
         version: 0
     },
-    panes: {}
+    layout: {
+        root: null,
+        allItems: {},
+        attrs: {
+            queuePromptButtonName: "Queue Prompt",
+            queuePromptButtonRunWorkflow: true
+        }
+    }
 }
 
 export { blankGraph }

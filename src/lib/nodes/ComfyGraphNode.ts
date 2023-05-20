@@ -3,7 +3,7 @@ import type { SerializedPrompt } from "$lib/components/ComfyApp";
 import { LGraph, LGraphNode, LLink, LiteGraph, NodeMode, type INodeInputSlot, type SerializedLGraphNode, type Vector2, type INodeOutputSlot, LConnectionKind, type SlotType, LGraphCanvas, getStaticPropertyOnInstance, type PropertyLayout, type SlotLayout } from "@litegraph-ts/core";
 import type { SvelteComponentDev } from "svelte/internal";
 import type { ComfyWidgetNode } from "$lib/nodes/widgets";
-import type { ComfyExecutionResult, ComfyImageLocation } from "$lib/utils"
+import type { SerializedPromptOutput, ComfyImageLocation } from "$lib/utils"
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import uiState from "$lib/stores/uiState";
 import { get } from "svelte/store";
@@ -48,7 +48,7 @@ export default class ComfyGraphNode extends LGraphNode {
      * Triggered when the backend sends a finished output back with this node's ID.
      * Valid for output nodes like SaveImage and PreviewImage.
      */
-    onExecuted?(output: ComfyExecutionResult): void;
+    onExecuted?(output: SerializedPromptOutput): void;
 
     /*
      * When a prompt is queued, this will be called on the node if it can

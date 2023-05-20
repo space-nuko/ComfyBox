@@ -275,6 +275,12 @@
                 Error loading app
             </div>
             <div>{error}</div>
+            {#if error.stack}
+                {@const lines = error.stack.split("\n")}
+                {#each lines as line}
+                    <div style:font-size="16px">{line}</div>
+                {/each}
+            {/if}
         </div>
     {/await}
 {/if}

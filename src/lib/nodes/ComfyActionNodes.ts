@@ -8,7 +8,7 @@ import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode"
 import type { ComfyWidgetNode } from "$lib/nodes/widgets";
 import type { NotifyOptions } from "$lib/notify";
 import type { FileData as GradioFileData } from "@gradio/upload";
-import { type ComfyExecutionResult, type ComfyImageLocation, convertComfyOutputToGradio, type ComfyUploadImageAPIResponse, parseWhateverIntoComfyImageLocations } from "$lib/utils";
+import { type SerializedPromptOutput, type ComfyImageLocation, convertComfyOutputToGradio, type ComfyUploadImageAPIResponse, parseWhateverIntoComfyImageLocations } from "$lib/utils";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
@@ -63,7 +63,7 @@ LiteGraph.registerNodeType({
 })
 
 export interface ComfyStoreImagesActionProperties extends ComfyGraphNodeProperties {
-    images: ComfyExecutionResult | null
+    images: SerializedPromptOutput | null
 }
 
 export class ComfyStoreImagesAction extends ComfyGraphNode {
@@ -90,7 +90,7 @@ export class ComfyStoreImagesAction extends ComfyGraphNode {
         if (action !== "store" || !param || !("images" in param))
             return;
 
-        this.setProperty("images", param as ComfyExecutionResult)
+        this.setProperty("images", param as SerializedPromptOutput)
         this.setOutputData(0, this.properties.images)
     }
 }
@@ -223,7 +223,7 @@ export class ComfyNotifyAction extends ComfyGraphNode {
         // native notifications.
         if (param != null && typeof param === "object") {
             if ("images" in param) {
-                const output = param as ComfyExecutionResult;
+                const output = param as SerializedPromptOutput;
                 const converted = convertComfyOutputToGradio(output);
                 if (converted.length > 0)
                     options.imageUrl = converted[0].data;

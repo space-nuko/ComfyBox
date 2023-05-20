@@ -18,11 +18,11 @@
      lCanvas.draw(true, true);
  }
 
- $: if (app != null && app.lGraph && canvasEl != null) {
+ $: if (app?.activeGraph != null && canvasEl != null) {
      if (!lCanvas) {
-         lCanvas = new ComfyGraphCanvas(app, canvasEl);
+         lCanvas = new ComfyGraphCanvas(app, app.activeGraph, canvasEl);
          lCanvas.allow_interaction = false;
-         app.lGraph.eventBus.on("afterExecute", () => lCanvas.draw(true))
+         app.activeGraph.eventBus.on("afterExecute", () => lCanvas.draw(true))
      }
      resizeCanvas();
  }

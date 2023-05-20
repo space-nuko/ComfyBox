@@ -6,7 +6,7 @@ import { BuiltInSlotShape, BuiltInSlotType, type SerializedLGraphNode } from "@l
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import type { ComfyInputConfig } from "$lib/IComfyInputSlot";
 import { iterateNodeDefOutputs, type ComfyNodeDef, iterateNodeDefInputs } from "$lib/ComfyNodeDef";
-import type { ComfyExecutionResult } from "$lib/utils";
+import type { SerializedPromptOutput } from "$lib/utils";
 
 /*
  * Base class for any node with configuration sent by the backend.
@@ -111,7 +111,7 @@ export class ComfyBackendNode extends ComfyGraphNode {
         }
     }
 
-    override onExecuted(outputData: ComfyExecutionResult) {
+    override onExecuted(outputData: SerializedPromptOutput) {
         console.warn("onExecuted outputs", outputData)
         this.triggerSlot(0, outputData)
     }

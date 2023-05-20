@@ -1,5 +1,5 @@
 import type { ComfyAPIHistoryEntry, ComfyAPIHistoryItem, ComfyAPIHistoryResponse, ComfyAPIQueueResponse, ComfyAPIStatusResponse, ComfyBoxPromptExtraData, ComfyNodeID, PromptID } from "$lib/api";
-import type { Progress, SerializedPromptInputsAll, SerializedPromptOutputs } from "$lib/components/ComfyApp";
+import type { Progress, SerializedPromptInputsAll, SerializedPromptOutputs, WorkflowInstID } from "$lib/components/ComfyApp";
 import type { ComfyExecutionResult } from "$lib/nodes/ComfyWidgetNodes";
 import notify from "$lib/notify";
 import { get, writable, type Writable } from "svelte/store";
@@ -11,12 +11,13 @@ type QueueStateOps = {
     historyUpdated: (resp: ComfyAPIHistoryResponse) => void,
     statusUpdated: (status: ComfyAPIStatusResponse | null) => void,
     executionStart: (promptID: PromptID) => void,
-    executingUpdated: (promptID: PromptID | null, runningNodeID: ComfyNodeID | null) => void,
+    executingUpdated: (promptID: PromptID | null, runningNodeID: ComfyNodeID | null) => QueueEntry | null;
     executionCached: (promptID: PromptID, nodes: ComfyNodeID[]) => void,
     executionError: (promptID: PromptID, message: string) => void,
     progressUpdated: (progress: Progress) => void
-    afterQueued: (promptID: PromptID, number: number, prompt: SerializedPromptInputsAll, extraData: any) => void
-    onExecuted: (promptID: PromptID, nodeID: ComfyNodeID, output: ComfyExecutionResult) => void
+    getQueueEntry: (promptID: PromptID) => QueueEntry | null;
+    afterQueued: (workflowID: WorkflowInstID, promptID: PromptID, number: number, prompt: SerializedPromptInputsAll, extraData: any) => void
+    onExecuted: (promptID: PromptID, nodeID: ComfyNodeID, output: ComfyExecutionResult) => QueueEntry | null
 }
 
 /*
@@ -36,6 +37,8 @@ export type QueueEntry = {
 
     /*** Data not sent by ComfyUI's API, lost on page refresh ***/
 
+    /* Workflow tab that sent the prompt.  */
+    workflowID?: WorkflowInstID,
     /* Prompt outputs, collected while the prompt is still executing */
     outputs: SerializedPromptOutputs,
     /* Nodes of the workflow that have finished running so far. */
@@ -150,6 +153,21 @@ function statusUpdated(status: ComfyAPIStatusResponse | null) {
     })
 }
 
+function getQueueEntry(promptID: PromptID): QueueEntry | null {
+    const state = get(store);
+
+    let found = get(state.queuePending).find(e => e.promptID === promptID)
+    if (found != null) return found;
+
+    found = get(state.queueRunning).find(e => e.promptID === promptID)
+    if (found != null) return found;
+
+    let foundCompleted = get(state.queueCompleted).find(e => e.entry.promptID === promptID)
+    if (foundCompleted != null) return foundCompleted.entry;
+
+    return null;
+}
+
 function findEntryInPending(promptID: PromptID): [number, QueueEntry | null, Writable<QueueEntry[]> | null] {
     const state = get(store);
     let index = get(state.queuePending).findIndex(e => e.promptID === promptID)
@@ -180,8 +198,10 @@ function moveToCompleted(index: number, queue: Writable<QueueEntry[]>, status: Q
     store.set(state)
 }
 
-function executingUpdated(promptID: PromptID, runningNodeID: ComfyNodeID | null) {
+function executingUpdated(promptID: PromptID, runningNodeID: ComfyNodeID | null): QueueEntry | null {
     console.debug("[queueState] executingUpdated", promptID, runningNodeID)
+    let entry_ = null;
+
     store.update((s) => {
         s.progress = null;
 
@@ -214,8 +234,11 @@ function executingUpdated(promptID: PromptID, runningNodeID: ComfyNodeID | null)
             s.progress = null;
             s.runningNodeID = null;
         }
+        entry_ = entry;
         return s
     })
+
+    return entry_;
 }
 
 function executionCached(promptID: PromptID, nodes: ComfyNodeID[]) {
@@ -283,16 +306,18 @@ function executionStart(promptID: PromptID) {
     })
 }
 
-function afterQueued(promptID: PromptID, number: number, prompt: SerializedPromptInputsAll, extraData: any) {
+function afterQueued(workflowID: WorkflowInstID, promptID: PromptID, number: number, prompt: SerializedPromptInputsAll, extraData: any) {
     console.debug("[queueState] afterQueued", promptID, Object.keys(prompt))
     store.update(s => {
         const [index, entry, queue] = findEntryInPending(promptID);
         if (entry == null) {
             const entry = createNewQueueEntry(promptID, number, prompt, extraData);
+            entry.workflowID = workflowID;
             s.queuePending.update(qp => { qp.push(entry); return qp })
             console.debug("[queueState] ADD PROMPT", promptID)
         }
         else {
+            entry.workflowID = workflowID;
             entry.number = number;
             entry.prompt = prompt
             entry.extraData = extraData
@@ -304,19 +329,22 @@ function afterQueued(promptID: PromptID, number: number, prompt: SerializedPromp
     })
 }
 
-function onExecuted(promptID: PromptID, nodeID: ComfyNodeID, output: ComfyExecutionResult) {
-    console.debug("[queueState] onExecuted", promptID, nodeID, output)
+function onExecuted(promptID: PromptID, nodeID: ComfyNodeID, outputs: ComfyExecutionResult): QueueEntry | null {
+    console.debug("[queueState] onExecuted", promptID, nodeID, outputs)
+    let entry_ = null;
     store.update(s => {
         const [index, entry, queue] = findEntryInPending(promptID)
         if (entry != null) {
-            entry.outputs[nodeID] = output;
+            entry.outputs[nodeID] = outputs;
             queue.set(get(queue))
         }
         else {
             console.error("[queueState] Could not find in pending! (onExecuted)", promptID)
         }
+        entry_ = entry;
         return s
     })
+    return entry;
 }
 
 const queueStateStore: WritableQueueStateStore =
@@ -331,6 +359,7 @@ const queueStateStore: WritableQueueStateStore =
     executionCached,
     executionError,
     afterQueued,
+    getQueueEntry,
     onExecuted
 }
 export default queueStateStore;

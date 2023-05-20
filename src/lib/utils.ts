@@ -203,12 +203,12 @@ export function promptToGraphVis(prompt: SerializedPrompt): string {
 
 export function getNodeInfo(nodeId: ComfyNodeID): string {
     let app = (window as any).app;
-    if (!app || !app.lGraph)
+    if (!app?.activeGraph)
         return String(nodeId);
 
     const displayNodeID = nodeId ? (nodeId.split("-")[0]) : String(nodeId);
 
-    const title = app.lGraph.getNodeByIdRecursive(nodeId)?.title || String(nodeId);
+    const title = app.activeGraph.getNodeByIdRecursive(nodeId)?.title || String(nodeId);
     return title + " (" + displayNodeID + ")"
 }
 
@@ -222,7 +222,7 @@ export const debounce = (callback: Function, wait = 250) => {
     };
 };
 
-export function convertComfyOutputToGradio(output: ComfyExecutionResult): GradioFileData[] {
+export function convertComfyOutputToGradio(output: SerializedPromptOutput): GradioFileData[] {
     return output.images.map(convertComfyOutputEntryToGradio);
 }
 
@@ -329,11 +329,16 @@ export async function uploadImageToComfyUI(blob: Blob, filename: string, type: C
 }
 
 /** Raw output as received from ComfyUI's backend */
-export interface ComfyExecutionResult {
+export interface SerializedPromptOutput {
     // Technically this response can contain arbitrary data, but "images" is the
     // most frequently used as it's output by LoadImage and PreviewImage, the
     // only two output nodes in base ComfyUI.
     images: ComfyImageLocation[] | null,
+
+    /*
+     * Other data
+     */
+    [key: string]: any
 }
 
 /** Raw output entry as received from ComfyUI's backend */
@@ -375,7 +380,7 @@ export function isComfyBoxImageMetadataArray(value: any): value is ComfyBoxImage
     return Array.isArray(value) && value.every(isComfyBoxImageMetadata);
 }
 
-export function isComfyExecutionResult(value: any): value is ComfyExecutionResult {
+export function isComfyExecutionResult(value: any): value is SerializedPromptOutput {
     return value && typeof value === "object" && Array.isArray(value.images)
 }
 
@@ -415,7 +420,7 @@ export function comfyFileToAnnotatedFilepath(comfyUIFile: ComfyImageLocation): s
     return path;
 }
 
-export function executionResultToImageMetadata(result: ComfyExecutionResult): ComfyBoxImageMetadata[] {
+export function executionResultToImageMetadata(result: SerializedPromptOutput): ComfyBoxImageMetadata[] {
     return result.images.map(comfyFileToComfyBoxMetadata)
 }
 
