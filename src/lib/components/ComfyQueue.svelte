@@ -11,7 +11,10 @@
  import { Button } from "@gradio/button";
  import type ComfyApp from "./ComfyApp";
  import { tick } from "svelte";
-	import Modal from "./Modal.svelte";
+ import Modal from "./Modal.svelte";
+ import DropZone from "./DropZone.svelte";
+
+ export let app: ComfyApp;
 
  let queuePending: Writable<QueueEntry[]> | null = null;
  let queueRunning: Writable<QueueEntry[]> | null = null;
@@ -197,6 +200,7 @@
 </Modal>
 
 <div class="queue">
+    <DropZone {app} />
     <div class="queue-entries {mode}-mode" bind:this={queueList}>
         {#if _entries.length > 0}
             {#each _entries as entry}

@@ -26,7 +26,7 @@ import layoutState from "$lib/stores/layoutState";
 import { toast } from '@zerodevx/svelte-toast'
 import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
-import { get } from "svelte/store";
+import { get, writable, type Writable } from "svelte/store";
 import { tick } from "svelte";
 import uiState from "$lib/stores/uiState";
 import { download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
@@ -37,6 +37,10 @@ import type { ComfyExecutionResult } from "$lib/utils";
 import ComfyPromptSerializer, { UpstreamNodeLocator, isActiveBackendNode } from "./ComfyPromptSerializer";
 import { iterateNodeDefInputs, type ComfyNodeDef, isBackendNodeDefInputType, iterateNodeDefOutputs } from "$lib/ComfyNodeDef";
 import { ComfyComboNode } from "$lib/nodes/widgets";
+import parseA1111, { type A1111ParsedInfotext } from "$lib/parseA1111";
+import convertA1111ToStdPrompt from "$lib/convertA1111ToStdPrompt";
+import type { ComfyBoxStdPrompt } from "$lib/ComfyBoxStdPrompt";
+import ComfyBoxStdPromptSerializer from "$lib/ComfyBoxStdPromptSerializer";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -45,32 +49,68 @@ if (typeof window !== "undefined") {
     nodes.ComfyReroute.setDefaultTextVisibility(!!localStorage["Comfy.ComfyReroute.DefaultVisibility"]);
 }
 
-type QueueItem = { num: number, batchCount: number }
+/*
+ * Queued prompt that hasn't been sent to the backend yet.
+ * TODO: Assumes the currently active graph will be serialized, needs to change
+ * for multiple loaded workflow support
+ */
+type QueueItem = {
+    num: number,
+    batchCount: number
+}
 
+export type A1111PromptAndInfo = {
+    infotext: string,
+    parsedInfotext: A1111ParsedInfotext,
+    stdPrompt: ComfyBoxStdPrompt,
+    imageFile: File
+}
+
+/*
+ * Represents a single workflow that can be loaded into the program from JSON.
+ */
 export type SerializedAppState = {
+    /** Program identifier, should always be "ComfyBox" */
     createdBy: "ComfyBox",
+    /** Serial version, should be incremented on breaking changes */
     version: number,
+    /** Commit hash if found */
+    commitHash?: string,
+    /** Graph state */
     workflow: SerializedLGraph,
+    /** UI state */
     layout: SerializedLayoutState,
+    /** Position/offset of the canvas at the time of saving */
     canvas: SerializedGraphCanvasState
 }
 
-/** [link origin, link index] | value */
+/** [link_origin, link_slot_index] | input_value */
 export type SerializedPromptInput = [ComfyNodeID, number] | any
 
-export type SerializedPromptInputs = {
+export type SerializedPromptInputs = Record<string, SerializedPromptInput>;
+
+/*
+ * A single node in the prompt and its input values.
+ */
+export type SerializedPromptInputsForNode = {
     /* property name -> value or link */
-    inputs: Record<string, SerializedPromptInput>,
+    inputs: SerializedPromptInputs,
     class_type: string
 }
 
-export type SerializedPromptInputsAll = Record<ComfyNodeID, SerializedPromptInputs>
+/*
+ * All nodes in the graph and their input values.
+ */
+export type SerializedPromptInputsAll = Record<ComfyNodeID, SerializedPromptInputsForNode>
 
 export type SerializedPrompt = {
     workflow: SerializedLGraph,
     output: SerializedPromptInputsAll
 }
 
+/*
+ * Outputs for each node.
+ */
 export type SerializedPromptOutputs = Record<ComfyNodeID, ComfyExecutionResult>
 
 export type Progress = {
@@ -78,6 +118,10 @@ export type Progress = {
     max: number
 }
 
+/*
+ * A combo node and the backend node that will send an updated config over, for
+ * refreshing lists of model files
+ */
 type BackendComboNode = {
     comboNode: ComfyComboNode,
     comfyInput: IComfyInputSlot,
@@ -95,20 +139,24 @@ export default class ComfyApp {
     nodeOutputs: Record<string, any> = {};
 
     shiftDown: boolean = false;
+    ctrlDown: boolean = false;
     selectedGroupMoving: boolean = false;
+    alreadySetup: Writable<boolean> = writable(false);
+    a1111Prompt: Writable<A1111PromptAndInfo | null> = writable(null);
 
     private queueItems: QueueItem[] = [];
     private processingQueue: boolean = false;
-    private alreadySetup = false;
     private promptSerializer: ComfyPromptSerializer;
+    private stdPromptSerializer: ComfyBoxStdPromptSerializer;
 
     constructor() {
         this.api = new ComfyAPI();
         this.promptSerializer = new ComfyPromptSerializer();
+        this.stdPromptSerializer = new ComfyBoxStdPromptSerializer();
     }
 
     async setup(): Promise<void> {
-        if (this.alreadySetup) {
+        if (get(this.alreadySetup)) {
             console.error("Already setup")
             return;
         }
@@ -151,7 +199,6 @@ export default class ComfyApp {
         // setInterval(this.saveStateToLocalStorage.bind(this), 1000);
 
         this.addApiUpdateHandlers();
-        this.addDropHandler();
         this.addPasteHandler();
         this.addKeyboardHandler();
 
@@ -165,7 +212,7 @@ export default class ComfyApp {
 
         this.requestPermissions();
 
-        this.alreadySetup = true;
+        this.alreadySetup.set(true);
 
         return Promise.resolve();
     }
@@ -286,70 +333,28 @@ export default class ComfyApp {
         }
     }
 
-    private showDropZone() {
-        if (this.dropZone)
-            this.dropZone.style.display = "block";
-    }
-
-    private hideDropZone() {
-        if (this.dropZone)
-            this.dropZone.style.display = "none";
-    }
-
-    private allowDrag(event: DragEvent) {
-        if (event.dataTransfer.items?.length > 0) {
-            event.dataTransfer.dropEffect = 'copy';
-            this.showDropZone();
-            event.preventDefault();
-        }
-    }
-
-    private async handleDrop(event: DragEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.hideDropZone();
-
-        if (event.dataTransfer.files.length > 0) {
-            await this.handleFile(event.dataTransfer.files[0]);
-        }
-    }
-
-    private addDropHandler() {
-        // this.dropZone = document.getElementById("dropzone");
-
-        // if (this.dropZone) {
-        //     window.addEventListener('dragenter', this.allowDrag.bind(this));
-        //     this.dropZone.addEventListener('dragover', this.allowDrag.bind(this));
-        //     this.dropZone.addEventListener('dragleave', this.hideDropZone.bind(this));
-        //     this.dropZone.addEventListener('drop', this.handleDrop.bind(this));
-        // }
-        // else {
-        //     console.warn("No dropzone detected (probably on mobile).")
-        // }
-    }
-
     /**
      * Adds a handler on paste that extracts and loads workflows from pasted JSON data
      */
     private addPasteHandler() {
-        // document.addEventListener("paste", (e) => {
-        //     let data = (e.clipboardData || (window as any).clipboardData).getData("text/plain");
-        //     let workflow;
-        //     try {
-        //         data = data.slice(data.indexOf("{"));
-        //         workflow = JSON.parse(data);
-        //     } catch (err) {
-        //         try {
-        //             data = data.slice(data.indexOf("workflow\n"));
-        //             data = data.slice(data.indexOf("{"));
-        //             workflow = JSON.parse(data);
-        //         } catch (error) { }
-        //     }
+        document.addEventListener("paste", (e) => {
+            let data = (e.clipboardData || (window as any).clipboardData).getData("text/plain");
+            let workflow;
+            try {
+                data = data.slice(data.indexOf("{"));
+                workflow = JSON.parse(data);
+            } catch (err) {
+                try {
+                    data = data.slice(data.indexOf("workflow\n"));
+                    data = data.slice(data.indexOf("{"));
+                    workflow = JSON.parse(data);
+                } catch (error) { }
+            }
 
-        //     if (workflow && workflow.version && workflow.nodes && workflow.extra) {
-        //         this.loadGraphData(workflow);
-        //     }
-        // });
+            if (workflow && workflow.version && workflow.nodes && workflow.extra) {
+                this.loadGraphData(workflow);
+            }
+        });
     }
 
     /**
@@ -406,6 +411,7 @@ export default class ComfyApp {
     private addKeyboardHandler() {
         window.addEventListener("keydown", (e) => {
             this.shiftDown = e.shiftKey;
+            this.ctrlDown = e.ctrlKey;
 
             // Queue prompt using ctrl or command + enter
             if ((e.ctrlKey || e.metaKey) && (e.key === "Enter" || e.keyCode === 13 || e.keyCode === 10)) {
@@ -414,6 +420,7 @@ export default class ComfyApp {
         });
         window.addEventListener("keyup", (e) => {
             this.shiftDown = e.shiftKey;
+            this.ctrlDown = e.ctrlKey;
         });
     }
 
@@ -561,7 +568,9 @@ export default class ComfyApp {
         }
 
         if (get(layoutState).attrs.queuePromptButtonRunWorkflow) {
-            this.queuePrompt(0, 1);
+            // Hold control to queue at the front
+            const num = this.ctrlDown ? -1 : 0;
+            this.queuePrompt(num, 1);
         }
     }
 
@@ -645,6 +654,9 @@ export default class ComfyApp {
                     console.debug(graphToGraphVis(this.lGraph))
                     console.debug(promptToGraphVis(p))
 
+                    const stdPrompt = this.stdPromptSerializer.serialize(p);
+                    console.warn("STD", stdPrompt);
+
                     const extraData: ComfyBoxPromptExtraData = {
                         extra_pnginfo: {
                             workflow: p.workflow,
@@ -709,8 +721,18 @@ export default class ComfyApp {
                 if (pngInfo.comfyBoxConfig) {
                     this.deserialize(JSON.parse(pngInfo.comfyBoxConfig));
                 } else if (pngInfo.parameters) {
-                    throw "TODO A111 import!"
-                    // importA1111(this.lGraph, pngInfo.parameters, this.api);
+                    const parsed = parseA1111(pngInfo.parameters)
+                    if ("error" in parsed) {
+                        notify(`Couldn't parse webui prompt: ${parsed.error}`, { type: "error" })
+                        return;
+                    }
+                    const converted = convertA1111ToStdPrompt(parsed)
+                    this.a1111Prompt.set({
+                        infotext: pngInfo.parameters,
+                        parsedInfotext: parsed,
+                        stdPrompt: converted,
+                        imageFile: file
+                    })
                 }
                 else {
                     console.error("No metadata found in image file.", pngInfo)
@@ -854,5 +876,6 @@ export default class ComfyApp {
      */
     clean() {
         this.nodeOutputs = {};
+        this.a1111Prompt.set(null);
     }
 }

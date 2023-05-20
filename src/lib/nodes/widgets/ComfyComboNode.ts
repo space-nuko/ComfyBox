@@ -40,13 +40,13 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
     // Wait until the initial graph load for combo to be valid.
     firstLoad: Writable<boolean>;
     lightUp: Writable<boolean>;
-    valuesForCombo: Writable<any[] | null>; // Changed when the combo box has values.
+    valuesForCombo: Writable<any[]>; // Changed when the combo box has values.
 
     constructor(name?: string) {
         super(name, "A")
         this.firstLoad = writable(false)
         this.lightUp = writable(true)
-        this.valuesForCombo = writable(null)
+        this.valuesForCombo = writable([])
     }
 
     override onPropertyChanged(property: any, value: any) {

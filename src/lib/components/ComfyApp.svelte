@@ -5,13 +5,12 @@
  import { Button } from "@gradio/button";
  import { BlockTitle } from "@gradio/atoms";
  import ComfyUIPane from "./ComfyUIPane.svelte";
- import ComfyApp, { type SerializedAppState } from "./ComfyApp";
+ import ComfyApp, { type A1111PromptAndInfo, type SerializedAppState } from "./ComfyApp";
  import { Checkbox, TextBox } from "@gradio/form"
  import uiState from "$lib/stores/uiState";
  import layoutState from "$lib/stores/layoutState";
  import selectionState from "$lib/stores/selectionState";
  import { ImageViewer } from "$lib/ImageViewer";
- import type { ComfyAPIStatus } from "$lib/api";
  import { SvelteToast, toast } from '@zerodevx/svelte-toast'
 
  import { LGraph } from "@litegraph-ts/core";
@@ -20,14 +19,18 @@
  import ComfyProperties from "./ComfyProperties.svelte";
  import queueState from "$lib/stores/queueState";
  import ComfyUnlockUIButton from "./ComfyUnlockUIButton.svelte";
-	import ComfyGraphView from "./ComfyGraphView.svelte";
-	import { download, jsonToJsObject } from "$lib/utils";
-	import notify from "$lib/notify";
+ import ComfyGraphView from "./ComfyGraphView.svelte";
+ import { download, jsonToJsObject } from "$lib/utils";
+ import notify from "$lib/notify";
+ import Modal from "./Modal.svelte";
+ import ComfyBoxStdPrompt from "$lib/ComfyBoxStdPrompt";
+ import A1111PromptDisplay from "./A1111PromptDisplay.svelte";
+ import type { A1111ParsedInfotext } from "$lib/parseA1111";
 
  export let app: ComfyApp = undefined;
- let queue: ComfyQueue = undefined;
+ let alreadySetup: Writable<boolean> = writable(false);
+ let a1111Prompt: Writable<A1111PromptAndInfo | null> = writable(null);
  let mainElem: HTMLDivElement;
- let uiPane: ComfyUIPane = undefined;
  let props: ComfyProperties = undefined;
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
@@ -42,6 +45,11 @@
      theme: {
          '--toastBarHeight': 0
      }
+ }
+
+ $: if(app) {
+     alreadySetup = app.alreadySetup;
+     a1111Prompt = app.a1111Prompt;
  }
 
  function refreshView(event?: Event) {
@@ -188,6 +196,10 @@
  else {
      document.getElementById("app-root").classList.remove("dark")
  }
+
+ let showModal: boolean = false;
+
+ $: showModal = $a1111Prompt != null
 </script>
 
 <svelte:head>
@@ -196,8 +208,19 @@
     {/if}
 </svelte:head>
 
+<Modal bind:showModal on:close={() => ($a1111Prompt = null)}>
+    <div slot="header" class="prompt-modal-header">
+        <h1 style="padding-bottom: 1rem;">A1111 Prompt Details</h1>
+    </div>
+    <A1111PromptDisplay prompt={$a1111Prompt} />
+    <div slot="buttons" let:closeDialog>
+        <Button variant="secondary" on:click={closeDialog}>
+            Close
+        </Button>
+    </div>
+</Modal>
+
 <div id="main" class:dark={uiTheme === "gradio-dark"}>
-    <div id="dropzone" class="dropzone"></div>
     <div id="container" bind:this={containerElem}>
         <Splitpanes theme="comfy" on:resize={refreshView}>
             <Pane bind:size={propsSidebarSize}>
@@ -208,7 +231,7 @@
             <Pane>
                 <Splitpanes theme="comfy" on:resize={refreshView} horizontal="{true}">
                     <Pane>
-                        <ComfyUIPane bind:this={uiPane} {app} />
+                        <ComfyUIPane {app} />
                     </Pane>
                     <Pane bind:size={graphSize}>
                         <ComfyGraphView {app} transitioning={graphTransitioning} />
@@ -217,7 +240,7 @@
             </Pane>
             <Pane bind:size={queueSidebarSize}>
                 <div class="sidebar-wrapper pane-wrapper">
-                    <ComfyQueue bind:this={queue} />
+                    <ComfyQueue {app} />
                 </div>
             </Pane>
         </Splitpanes>
@@ -225,35 +248,35 @@
     <div id="bottombar">
         <div class="left">
             {#if $layoutState.attrs.queuePromptButtonName != ""}
-                <Button variant="primary" on:click={queuePrompt}>
+                <Button variant="primary" disabled={!$alreadySetup} on:click={queuePrompt}>
                     {$layoutState.attrs.queuePromptButtonName}
                 </Button>
             {/if}
-            <Button variant="secondary" on:click={toggleGraph}>
+            <Button variant="secondary" disabled={!$alreadySetup} on:click={toggleGraph}>
                 Toggle Graph
             </Button>
-            <Button variant="secondary" on:click={toggleProps}>
+            <Button variant="secondary" disabled={!$alreadySetup} on:click={toggleProps}>
                 Toggle Props
             </Button>
-            <Button variant="secondary" on:click={toggleQueue}>
+            <Button variant="secondary" disabled={!$alreadySetup} on:click={toggleQueue}>
                 Toggle Queue
             </Button>
-            <Button variant="secondary" on:click={doSave}>
+            <Button variant="secondary" disabled={!$alreadySetup} on:click={doSave}>
                 Save
             </Button>
-            <Button variant="secondary" on:click={doSaveLocal}>
+            <Button variant="secondary" disabled={!$alreadySetup} on:click={doSaveLocal}>
                 Save Local
             </Button>
-            <Button variant="secondary" on:click={doLoad}>
+            <Button variant="secondary" disabled={!$alreadySetup} on:click={doLoad}>
                 Load
             </Button>
-            <Button variant="secondary" on:click={doClear}>
+            <Button variant="secondary" disabled={!$alreadySetup} on:click={doClear}>
                 Clear
             </Button>
-            <Button variant="secondary" on:click={doLoadDefault}>
+            <Button variant="secondary" disabled={!$alreadySetup} on:click={doLoadDefault}>
                 Load Default
             </Button>
-            <Button variant="secondary" on:click={doRefreshCombos}>
+            <Button variant="secondary" disabled={!$alreadySetup} on:click={doRefreshCombos}>
                 🔄
             </Button>
             <!-- <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
@@ -323,19 +346,6 @@
  .sidebar-wrapper {
      width: 100%;
      height: 100%;
- }
-
- .dropzone {
-     box-sizing: border-box;
-     display: none;
-     position: fixed;
-     width: 100%;
-     height: 100%;
-     left: 0;
-     top: 0;
-     z-index: 99999;
-     background: #60a7dc80;
-     border: 4px dashed #60a7dc;
  }
 
  :global(html, body) {

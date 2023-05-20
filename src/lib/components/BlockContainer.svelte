@@ -24,7 +24,7 @@
  export let isMobile: boolean = false;
 
  let attrsChanged: Writable<number> | null = null;
- let children: IDragItem[] | null = null;
+ let children: IDragItem[] = [];
  const flipDurationMs = 100;
 
  $: if (container) {
@@ -35,12 +35,12 @@
      }
      else {
          container = null;
-         children = null;
+         children = [];
          attrsChanged = null;
      }
  }
  else {
-     children = null;
+     children = [];
      attrsChanged = null
  }
 
@@ -55,7 +55,7 @@
  };
 </script>
 
-{#if container && Array.isArray(children)}
+{#if container}
     {@const selected = $uiState.uiUnlocked && $selectionState.currentSelection.includes(container.id)}
     <div class="container {container.attrs.direction} {container.attrs.classes} {classes.join(' ')} z-index{zIndex}"
          class:hide-block={container.attrs.containerVariant === "hidden"}

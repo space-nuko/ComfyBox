@@ -312,7 +312,9 @@ export class ComfyExecuteSubgraphAction extends ComfyGraphNode {
         if (!app)
             return;
 
-        app.queuePrompt(0, 1, tag);
+        // Hold control to queue at the front
+        const num = app.ctrlDown ? -1 : 0;
+        app.queuePrompt(num, 1, tag);
     }
 }
 

@@ -2,7 +2,7 @@ import type ComfyGraph from "$lib/ComfyGraph";
 import type { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import { GraphInput, GraphOutput, LGraph, LGraphNode, LLink, NodeMode, Subgraph, type SlotIndex } from "@litegraph-ts/core";
-import type { SerializedPrompt, SerializedPromptInput, SerializedPromptInputs, SerializedPromptInputsAll } from "./ComfyApp";
+import type { SerializedPrompt, SerializedPromptInput, SerializedPromptInputsForNode, SerializedPromptInputsAll, SerializedPromptInputs } from "./ComfyApp";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 
 function hasTag(node: LGraphNode, tag: string): boolean {
@@ -113,7 +113,7 @@ export class UpstreamNodeLocator {
         }
 
         // If there are non-target nodes between us and another
-        // backend node, we have to traverse them first. This
+        // target node, we have to traverse them first. This
         // behavior is dependent on the type of node. Reroute nodes
         // will simply follow their single input, while branching
         // nodes have conditional logic that determines which link
@@ -150,7 +150,7 @@ export class UpstreamNodeLocator {
 }
 
 export default class ComfyPromptSerializer {
-    serializeInputValues(node: ComfyBackendNode): Record<string, SerializedPromptInput> {
+    serializeInputValues(node: ComfyBackendNode): SerializedPromptInputs {
         // Store input values passed by frontend-only nodes
         if (!node.inputs) {
             return {}
