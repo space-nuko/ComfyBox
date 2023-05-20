@@ -12,7 +12,7 @@ console.log("Production build: " + isProduction)
 
 export default defineConfig({
     define: {
-        "__GIT_COMMIT_HASH__": '"asdf"'
+        "__GIT_COMMIT_HASH__": '"test"'
     },
     clearScreen: false,
     base: "./",
