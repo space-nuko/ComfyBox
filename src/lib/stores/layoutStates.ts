@@ -1208,7 +1208,7 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
 
 function remove(workflowID: WorkflowInstID) {
     const state = get(layoutStates)
-    if (layoutStates[workflowID] == null)
+    if (state.all[workflowID] == null)
         throw new Error(`No workflow with ID registered! ${workflowID}`)
     delete state.all[workflowID];
 }

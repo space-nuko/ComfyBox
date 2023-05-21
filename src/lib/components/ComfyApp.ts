@@ -80,6 +80,8 @@ export type SerializedAppState = {
     commitHash?: string,
     /** Graph state */
     workflow: SerializedLGraph,
+    /** Workflow name */
+    workflowName: string,
     /** UI state */
     layout: SerializedLayoutState,
     /** Position/offset of the canvas at the time of saving */
@@ -197,7 +199,7 @@ export default class ComfyApp {
 
         // We failed to restore a workflow so load the default
         if (!restored) {
-            await this.initDefaultGraph();
+            await this.initDefaultWorkflow();
         }
 
         workflowState.createNewWorkflow(this.lCanvas);
@@ -522,7 +524,12 @@ export default class ComfyApp {
         selectionState.clear();
     }
 
-    async initDefaultGraph() {
+    closeWorkflow(index: number) {
+        workflowState.closeWorkflow(this.lCanvas, index);
+        selectionState.clear();
+    }
+
+    async initDefaultWorkflow() {
         let state = null;
         try {
             const graphResponse = await fetch("/workflows/defaultWorkflow.json");

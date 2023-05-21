@@ -144,17 +144,16 @@
  }
 
  async function doLoadDefault() {
-     var confirmed = confirm("Are you sure you want to clear the current workflow and load the default graph?");
+     var confirmed = confirm("Would you like to load the default workflow in a new tab?");
      if (confirmed) {
-         await app.initDefaultGraph();
+         await app.initDefaultWorkflow();
      }
  }
 
- function doClear(): void {
-     var confirmed = confirm("Are you sure you want to clear the current workflow?");
-     if (confirmed) {
-         app.clear();
-     }
+ function closeWorkflow(event: Event, index: number) {
+     event.preventDefault();
+     event.stopImmediatePropagation()
+     app.closeWorkflow(index);
  }
 </script>
 
@@ -190,7 +189,11 @@
             <button class="workflow-tab"
                     class:selected={index === $workflowState.activeWorkflowIdx}
                     on:click={() => app.setActiveWorkflow(index)}>
-                {workflow.title}
+                <span class="workflow-tab-title">{workflow.title}</span>
+                <button class="workflow-close-button"
+                        on:click={(e) => closeWorkflow(e, index)}>
+                    X
+                </button>
             </button>
         {/each}
     </div>
@@ -219,9 +222,6 @@
                 </Button>
                 <Button variant="secondary" disabled={!$alreadySetup} on:click={doLoad}>
                     Load
-                </Button>
-                <Button variant="secondary" disabled={!$alreadySetup} on:click={doClear}>
-                    Clear
                 </Button>
                 <Button variant="secondary" disabled={!$alreadySetup} on:click={doLoadDefault}>
                     Load Default
@@ -371,14 +371,15 @@
          border-left: 1px solid var(--neutral-600);
 
          display: flex;
-         flex-direction: column;
+         flex-direction: row;
          justify-content: center;
+         gap: var(--size-2);
 
          &:last-child {
              border-right: 1px solid var(--neutral-600);
          }
 
-         &:hover {
+         &:hover:not(:has(.workflow-close-button:hover)) {
              background: var(--neutral-700);
              color: var(--neutral-300);
          }
@@ -387,6 +388,20 @@
              background: var(--neutral-700);
              color: var(--neutral-300);
              border-top-color: var(--primary-500);
+         }
+
+         > .workflow-close-button {
+             display:block;
+             width: 1.5rem;
+             height: 1.5rem;
+             border-radius: 50%;
+             background: var(--neutral-500);
+             color: var(--neutral-300);
+
+             &:hover {
+                 background: var(--neutral-400);
+                 color: var(--neutral-100);
+             }
          }
      }
  }

@@ -6,9 +6,9 @@
  export let app: ComfyApp | null = null;
 
  async function doLoadDefault() {
-     var confirmed = confirm("Are you sure you want to clear the current workflow and load the default graph?");
+     var confirmed = confirm("Would you like to load the default workflow in a new tab?");
      if (confirmed) {
-         await app.initDefaultGraph();
+         await app.initDefaultWorkflow();
      }
  }
 </script>

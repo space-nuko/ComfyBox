@@ -3,6 +3,7 @@ import type { SerializedAppState } from "./components/ComfyApp"
 const blankGraph: SerializedAppState = {
     createdBy: "ComfyBox",
     version: 1,
+    workflowName: "New Workflow",
     workflow: {
         last_node_id: 0,
         last_link_id: 0,
