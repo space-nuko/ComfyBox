@@ -39,9 +39,12 @@ export function isActiveBackendNode(node: LGraphNode, tag: string | null = null)
         return false;
 
     // Make sure this node is not contained in an inactive subgraph, even if the
-    // node itself is active
-    if (node.is(Subgraph) && !Array.from(node.iterateParentNodes()).every(n => isActiveNode(n, tag)))
-        return false;
+    // node itself is considered active
+    if (node.graph._is_subgraph) {
+        const isInsideDisabledSubgraph = Array.from(node.iterateParentSubgraphNodes()).some(n => !isActiveNode(n, tag))
+        if (isInsideDisabledSubgraph)
+            return false;
+    }
 
     return true;
 }
