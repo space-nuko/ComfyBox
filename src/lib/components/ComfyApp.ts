@@ -21,7 +21,7 @@ import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import queueState from "$lib/stores/queueState";
 import { type SvelteComponentDev } from "svelte/internal";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
-import type { LayoutState, SerializedLayoutState, WritableLayoutStateStore } from "$lib/stores/layoutStates";
+import { defaultWorkflowAttributes, type LayoutState, type SerializedLayoutState, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
 import { toast } from '@zerodevx/svelte-toast'
 import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
@@ -44,6 +44,7 @@ import selectionState from "$lib/stores/selectionState";
 import layoutStates from "$lib/stores/layoutStates";
 import { ComfyWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
 import workflowState from "$lib/stores/workflowState";
+import convertVanillaWorkflow, { type ComfyVanillaWorkflow } from "$lib/convertVanillaWorkflow";
 import convertVanillaWorkflow from "$lib/convertVanillaWorkflow";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
@@ -149,6 +150,11 @@ function isVanillaWorkflow(data: any): data is SerializedLGraph {
     return data != null && (typeof data === "object") && data.last_node_id != null;
 }
 
+type BackendNodeDef = {
+    ctor: new (title?: string) => ComfyBackendNode,
+    nodeDef: ComfyNodeDef
+}
+
 export default class ComfyApp {
     api: ComfyAPI;
 
@@ -239,13 +245,13 @@ export default class ComfyApp {
         this.lCanvas.draw(true, true);
     }
 
-    serialize(workflow: ComfyWorkflow): SerializedAppState {
+    serialize(workflow: ComfyWorkflow, canvas?: SerializedGraphCanvasState): SerializedAppState {
         const layoutState = layoutStates.getLayout(workflow.id);
         if (layoutState == null)
             throw new Error("Workflow has no layout!")
 
         const { graph, layout, attrs } = workflow.serialize(layoutState);
-        const canvas = this.lCanvas.serialize();
+        canvas ||= this.lCanvas.serialize();
 
         return {
             comfyBoxWorkflow: true,
@@ -257,6 +263,22 @@ export default class ComfyApp {
             layout,
             canvas
         }
+    }
+
+
+    convertVanillaWorkflow(workflow: ComfyVanillaWorkflow): SerializedAppState {
+        const attrs: WorkflowAttributes = {
+            ...defaultWorkflowAttributes,
+            title: "ComfyUI Workflow"
+        }
+
+        const canvas: SerializedGraphCanvasState = {
+            offset: [0, 0],
+            scale: 1
+        }
+
+        const comfyBoxWorkflow = convertVanillaWorkflow(workflow, attrs);
+        return this.serialize(comfyBoxWorkflow, canvas);
     }
 
     saveStateToLocalStorage() {
@@ -307,7 +329,11 @@ export default class ComfyApp {
     static node_type_overrides: Record<string, typeof ComfyBackendNode> = {}
     static widget_type_overrides: Record<string, typeof SvelteComponentDev> = {}
 
+    static knownBackendNodes: Record<string, BackendNodeDef> = {}
+
     private async registerNodes(defs: Record<ComfyNodeID, ComfyNodeDef>) {
+        ComfyApp.knownBackendNodes = {}
+
         // Register a node for each definition
         for (const [nodeId, nodeDef] of Object.entries(defs)) {
             const typeOverride = ComfyApp.node_type_overrides[nodeId]
@@ -330,6 +356,10 @@ export default class ComfyApp {
 
             LiteGraph.registerNodeType(node);
             node.category = nodeDef.category;
+            ComfyApp.knownBackendNodes[nodeId] = {
+                ctor,
+                nodeDef
+            }
 
             ComfyApp.registerDefaultSlotHandlers(nodeId, nodeDef)
         }
@@ -550,10 +580,10 @@ export default class ComfyApp {
     }
 
     async openVanillaWorkflow(data: SerializedLGraph) {
-        const converted = convertVanillaWorkflow(data)
+        const converted = this.convertVanillaWorkflow(data)
         console.info("WORKFLWO", converted)
         notify("Converted ComfyUI workflow to ComfyBox format.", { type: "info" })
-        // await this.openWorkflow(JSON.parse(pngInfo.workflow));
+        await this.openWorkflow(converted);
     }
 
     setActiveWorkflow(id: WorkflowInstID) {

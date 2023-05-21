@@ -15,6 +15,11 @@ export type AutoConfigOptions = {
     setWidgetTitle?: boolean
 }
 
+export type SerializedComfyWidgetNode = {
+    comfyValue?: any
+    shownOutputProperties?: ComfyWidgetNode["shownOutputProperties"]
+} & SerializedLGraphNode
+
 /*
  * NOTE: If you want to add a new widget but it has the same input/output type
  * as another one of the existing widgets, best to create a new "variant" of
@@ -33,6 +38,11 @@ export type AutoConfigOptions = {
 
 export interface ComfyWidgetProperties extends ComfyGraphNodeProperties {
     defaultValue: any
+}
+
+export type ShownOutputProperty = {
+    type: string,
+    outputName: string
 }
 
 /*
@@ -72,7 +82,7 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     // shownInputProperties: string[] = []
 
     /** Names of properties to add as outputs */
-    private shownOutputProperties: Record<string, { type: string, outputName: string }> = {}
+    private shownOutputProperties: Record<string, ShownOutputProperty> = {}
     outputProperties: { name: string, type: string }[] = []
 
     override isBackendNode = false;
@@ -328,7 +338,7 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
 
     clampOneConfig(input: IComfyInputSlot) { }
 
-    override onSerialize(o: SerializedLGraphNode) {
+    override onSerialize(o: SerializedComfyWidgetNode) {
         (o as any).comfyValue = get(this.value);
         (o as any).shownOutputProperties = this.shownOutputProperties
         super.onSerialize(o);

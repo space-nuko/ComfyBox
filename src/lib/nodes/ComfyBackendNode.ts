@@ -2,7 +2,7 @@ import LGraphCanvas from "@litegraph-ts/core/src/LGraphCanvas";
 import ComfyGraphNode from "./ComfyGraphNode";
 import ComfyWidgets from "$lib/widgets"
 import type { ComfyWidgetNode } from "$lib/nodes/widgets";
-import { BuiltInSlotShape, BuiltInSlotType, type SerializedLGraphNode } from "@litegraph-ts/core";
+import { BuiltInSlotShape, BuiltInSlotType, LiteGraph, type SerializedLGraphNode } from "@litegraph-ts/core";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import type { ComfyInputConfig } from "$lib/IComfyInputSlot";
 import { iterateNodeDefOutputs, type ComfyNodeDef, iterateNodeDefInputs } from "$lib/ComfyNodeDef";
@@ -13,20 +13,24 @@ import type { SerializedPromptOutput } from "$lib/utils";
  */
 export class ComfyBackendNode extends ComfyGraphNode {
     comfyClass: string;
+    comfyNodeDef: ComfyNodeDef;
     displayName: string | null;
 
-    constructor(title: string, comfyClass: string, nodeData: any) {
+    constructor(title: string, comfyClass: string, nodeDef: ComfyNodeDef) {
         super(title)
         this.type = comfyClass; // XXX: workaround dependency in LGraphNode.addInput()
-        this.displayName = nodeData.display_name;
+        this.displayName = nodeDef.display_name;
+        this.comfyNodeDef = nodeDef;
         this.comfyClass = comfyClass;
         this.isBackendNode = true;
 
         const color = LGraphCanvas.node_colors["yellow"];
-        this.color = color.color
-        this.bgColor = color.bgColor
+        if (this.color == null)
+            this.color = color.color
+        if (this.bgColor == null)
+            this.bgColor = color.bgColor
 
-        this.setup(nodeData)
+        this.setup(nodeDef)
 
         // ComfyUI has no obvious way to identify if a node will return outputs back to the frontend based on its properties.
         // It just returns a hash like { "ui": { "images": results } } internally.
@@ -55,13 +59,13 @@ export class ComfyBackendNode extends ComfyGraphNode {
             } else {
                 if (Array.isArray(type)) {
                     // Enums
-                    Object.assign(config, ComfyWidgets.COMBO(this, inputName, inputData) || {});
+                    Object.assign(config, ComfyWidgets.COMBO.callback(this, inputName, inputData) || {});
                 } else if (`${type}:${inputName}` in ComfyWidgets) {
                     // Support custom ComfyWidgets by Type:Name
-                    Object.assign(config, ComfyWidgets[`${type}:${inputName}`](this, inputName, inputData) || {});
+                    Object.assign(config, ComfyWidgets[`${type}:${inputName}`].callback(this, inputName, inputData) || {});
                 } else if (type in ComfyWidgets) {
                     // Standard type ComfyWidgets
-                    Object.assign(config, ComfyWidgets[type](this, inputName, inputData) || {});
+                    Object.assign(config, ComfyWidgets[type].callback(this, inputName, inputData) || {});
                 } else {
                     // Node connection inputs (backend)
                     this.addInput(inputName, type);

@@ -657,13 +657,19 @@ export interface WidgetLayout extends IDragItem {
     node: ComfyWidgetNode
 }
 
+export type DefaultLayout = {
+    root: ContainerLayout,
+    left: ContainerLayout,
+    right: ContainerLayout,
+}
+
 export type DragItemID = UUID;
 
 type LayoutStateOps = {
     workflow: ComfyWorkflow | null,
 
-    addContainer: (parent: ContainerLayout | null, attrs: Partial<Attributes>, index?: number) => ContainerLayout,
-    addWidget: (parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes>, index?: number) => WidgetLayout,
+    addContainer: (parent: ContainerLayout | null, attrs?: Partial<Attributes>, index?: number) => ContainerLayout,
+    addWidget: (parent: ContainerLayout, node: ComfyWidgetNode, attrs?: Partial<Attributes>, index?: number) => WidgetLayout,
     findDefaultContainerForInsertion: () => ContainerLayout | null,
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode, options: LGraphAddNodeOptions) => void,
@@ -675,7 +681,7 @@ type LayoutStateOps = {
     findLayoutForNode: (nodeId: ComfyNodeID) => IDragItem | null,
     serialize: () => SerializedLayoutState,
     deserialize: (data: SerializedLayoutState, graph: LGraph) => void,
-    initDefaultLayout: () => void,
+    initDefaultLayout: () => DefaultLayout,
     onStartConfigure: () => void
     notifyWorkflowModified: () => void
 }
@@ -1036,7 +1042,7 @@ function createRaw(workflow: ComfyWorkflow | null = null): WritableLayoutStateSt
         return found.dragItem as WidgetLayout
     }
 
-    function initDefaultLayout() {
+    function initDefaultLayout(): DefaultLayout {
         store.set({
             root: null,
             allItems: {},
@@ -1056,6 +1062,8 @@ function createRaw(workflow: ComfyWorkflow | null = null): WritableLayoutStateSt
         })
 
         console.debug("[layoutState] initDefault")
+
+        return { root, left, right }
     }
 
     function serialize(): SerializedLayoutState {

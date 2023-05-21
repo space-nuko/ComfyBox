@@ -1,51 +1,209 @@
-import { LGraph, type SerializedLGraph } from "@litegraph-ts/core";
+import { LGraph, type INodeInputSlot, type SerializedLGraph, type LinkID, type UUID, type NodeID, LiteGraph, BuiltInSlotType, type SerializedLGraphNode, type Vector2 } from "@litegraph-ts/core";
 import type { SerializedAppState } from "./components/ComfyApp";
 import layoutStates, { defaultWorkflowAttributes, type DragItemID, type SerializedDragEntry, type SerializedLayoutState } from "./stores/layoutStates";
-import type { WorkflowAttributes } from "./stores/workflowState";
+import { ComfyWorkflow, type WorkflowAttributes } from "./stores/workflowState";
 import type { SerializedGraphCanvasState } from "./ComfyGraphCanvas";
+import ComfyApp from "./components/ComfyApp";
+import { iterateNodeDefInputs } from "./ComfyNodeDef";
+import type { ComfyNodeDefInput } from "./ComfyNodeDef";
+import type IComfyInputSlot from "./IComfyInputSlot";
+import ComfyWidgets from "./widgets"
+import type { SerializedComfyWidgetNode } from "./nodes/widgets/ComfyWidgetNode";
+import { v4 as uuidv4 } from "uuid"
+import type ComfyWidgetNode from "./nodes/widgets/ComfyWidgetNode";
 
 /*
  * The workflow type used by base ComfyUI
  */
 export type ComfyVanillaWorkflow = SerializedLGraph;
 
-function addLayoutToVanillaWorkflow(workflow: ComfyVanillaWorkflow): SerializedLayoutState {
-    // easier to create a real layout first and then serialize it, then have to
-    // deal with manually constructing the serialized state from the ground up
-    const layoutState = layoutStates.createRaw();
-    const graph = new LGraph();
-    graph.configure(workflow)
-
-    for (const node of graph.iterateNodesInOrder()) {
-        console.warn("NODE", node)
-    }
-
-    return layoutState.serialize()
+/*
+ * The settings for a widget converted to an input slot via the widgetInputs.js
+ * frontend extension.
+ */
+type ComfyUIConvertedWidget = {
+    name: string,
+    config: ComfyNodeDefInput
 }
 
-export default function convertVanillaWorkflow(workflow: ComfyVanillaWorkflow): SerializedAppState {
-    const attrs: WorkflowAttributes = {
-        ...defaultWorkflowAttributes,
-        title: "ComfyUI Workflow"
+interface IComfyUINodeInputSlot extends INodeInputSlot {
+    widget?: ComfyUIConvertedWidget
+}
+
+/*
+ * ComfyUI frontend nodes that should be converted directly to another type.
+ */
+const vanillaToComfyBoxNodeMapping: Record<string, string> = {
+    "Reroute": "utils/reroute"
+}
+
+/*
+ * Version of LGraphNode.getConnectionPos but for serialized nodes.
+ *
+ * TODO handle other node types! (horizontal, hardcoded slot pos, collapsed...)
+ */
+function getConnectionPos(node: SerializedLGraphNode, is_input: boolean, slotNumber: number, out: Vector2 = [0, 0]): Vector2 {
+    var offset = LiteGraph.NODE_SLOT_HEIGHT * 0.5;
+
+    if (is_input) {
+        out[0] = node.pos[0] + offset;
+    } else {
+        out[0] = node.pos[0] + this.size[0] + 1 - offset;
+    }
+    out[1] =
+        node.pos[1] +
+        (slotNumber + 0.7) * LiteGraph.NODE_SLOT_HEIGHT +
+        ((node.constructor as any).slot_start_y || 0);
+    return out;
+}
+
+export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWorkflow, attrs: WorkflowAttributes): ComfyWorkflow {
+    const [comfyBoxWorkflow, layoutState] = ComfyWorkflow.create();
+    const { root, left, right } = layoutState.initDefaultLayout();
+
+    // TODO will need to convert IDs to UUIDs
+    const idToUUID: Record<NodeID | LinkID, UUID> = {}
+
+    for (const [id, node] of Object.entries(vanillaWorkflow.nodes)) {
+        const newType = vanillaToComfyBoxNodeMapping[node.type];
+        if (newType != null) {
+            node.type = newType;
+        }
+
+        // ComfyUI uses widgets on the node itself to change values. These are
+        // all made into input/output slots in ComfyBox. So we must convert
+        // serialized widgets into ComfyWidgetNodes, add new inputs/outputs,
+        // then attach the new nodes to the slots
+
+        const def = ComfyApp.knownBackendNodes[node.type];
+        if (def == null) {
+            console.error("Unknown backend node", node.type)
+            continue;
+        }
+
+        const group = layoutState.addContainer(left, { title: node.title })
+
+        for (const [inputName, [inputType, inputOpts]] of iterateNodeDefInputs(def.nodeDef)) {
+            // Detect if this input was a widget converted to an input
+            const convertedWidget = node.inputs?.find((i: IComfyUINodeInputSlot) => {
+                return i.widget?.name === inputName;
+            })
+
+            if (convertedWidget != null) {
+                // This input is an extra input slot on the node that should be
+                // accounted for.
+                const [value] = node.widgets_values.splice(0, 1);
+            }
+            else {
+                // This input is a widget, it should be converted to an input
+                // connected to a ComfyWidgetNode.
+
+                let widgetNodeType = null;
+                let widgetInputType = null;
+
+                if (Array.isArray(inputType)) {
+                    // Combo options of string[]
+                    widgetInputType = "string"
+                    widgetNodeType = "ui/combo";
+                }
+                else if (inputType in ComfyWidgets) {
+                    // Widget type
+                    const widgetFactory = ComfyWidgets[inputType]
+                    widgetInputType = widgetFactory.inputType
+                    widgetNodeType = widgetFactory.nodeType;
+                }
+                else if ("${inputType}:{inputName}" in ComfyWidgets) {
+                    // Widget type override for input of type with given name ("seed", "noise_seed")
+                    const widgetFactory = ComfyWidgets["${inputType}:{inputName}"]
+                    widgetInputType = widgetFactory.inputType
+                    widgetNodeType = widgetFactory.nodeType;
+                }
+                else {
+                    // Backend type, we can safely ignore this
+                    continue
+                }
+
+                const newInput: IComfyInputSlot = {
+                    name: inputName,
+                    link: null,
+                    type: widgetInputType,
+                    config: inputOpts,
+                    defaultWidgetNode: null,
+                    widgetNodeType,
+                    serialize: true,
+                    properties: {}
+                }
+
+                node.inputs ||= []
+                node.inputs.push(newInput);
+                const connInputIndex = node.inputs.length - 1;
+
+                // Now get the widget value.
+                const [value] = node.widgets_values.splice(0, 1);
+
+                const comfyWidgetNode = LiteGraph.createNode<ComfyWidgetNode>(widgetNodeType);
+                comfyWidgetNode.flags.collapsed = true;
+                const size: Vector2 = [0, 0];
+
+                // Compute collapsed size, sinze computeSize() ignores the collapsed flag
+                // LiteGraph only computes it if the node is rendered
+                const fontSize = LiteGraph.NODE_TEXT_SIZE;
+                size[0] = Math.min(
+                    comfyWidgetNode.size[0],
+                    comfyWidgetNode.title.length * fontSize +
+                    LiteGraph.NODE_TITLE_HEIGHT * 2
+                );
+
+                const serWidgetNode = comfyWidgetNode.serialize() as SerializedComfyWidgetNode;
+                serWidgetNode.comfyValue = value;
+                serWidgetNode.shownOutputProperties = {};
+                getConnectionPos(node, true, connInputIndex, serWidgetNode.pos);
+                serWidgetNode.pos[0] -= size[0] - 20;
+                serWidgetNode.pos[1] += LiteGraph.NODE_TITLE_HEIGHT / 2;
+                vanillaWorkflow.nodes.push(serWidgetNode)
+
+                layoutState.addWidget(group, comfyWidgetNode)
+
+                const connOutputIndex = serWidgetNode.outputs?.findIndex(o => o.name === comfyWidgetNode.outputSlotName)
+                if (connOutputIndex != null) {
+                    // Time to link
+                    const connOutput = serWidgetNode.outputs[connOutputIndex]
+                    const newLinkID = uuidv4();
+                    newInput.link = newLinkID
+                    connOutput.links ||= []
+                    connOutput.links.push(newLinkID);
+                    vanillaWorkflow.links ||= []
+                    vanillaWorkflow.links.push([newLinkID, serWidgetNode.id, connOutputIndex, node.id, connInputIndex, widgetInputType])
+                }
+                else {
+                    console.error("[convertVanillaWorkflow] No output to connect converted widget into!", comfyWidgetNode.outputSlotName, node)
+                }
+            }
+        }
+
+        // Add OUTPUT event slot to output nodes
+        // TODO needs to be generalized!
+        if (["PreviewImage", "SaveImage"].indexOf(node.type) !== -1) {
+            node.outputs ||= []
+            node.outputs.push({
+                name: "OUTPUT",
+                type: BuiltInSlotType.EVENT,
+                color_off: "rebeccapurple",
+                color_on: "rebeccapurple",
+                links: [],
+                properties: {},
+            })
+        }
     }
 
-    const canvas: SerializedGraphCanvasState = {
-        offset: [0, 0],
-        scale: 1
+    const layout = layoutState.serialize();
+    comfyBoxWorkflow.deserialize(layoutState, { graph: vanillaWorkflow, attrs, layout })
+
+    for (const node of comfyBoxWorkflow.graph.iterateNodesInOrder()) {
+        if ((node as any).isBackendNode) {
+            console.warn("BENDNODE", node)
+        }
     }
 
-    const layout = addLayoutToVanillaWorkflow(workflow);
-
-    const appState: SerializedAppState = {
-        comfyBoxWorkflow: true,
-        createdBy: "ComfyUI", // ???
-        version: 1,
-        workflow,
-        attrs,
-        canvas,
-        layout,
-        commitHash: null
-    }
-
-    return appState
+    return comfyBoxWorkflow
 }

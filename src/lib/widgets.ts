@@ -4,7 +4,16 @@ import type { ComfyInputConfig } from "./IComfyInputSlot";
 import { ComfyComboNode, ComfyNumberNode, ComfyTextNode } from "./nodes/widgets";
 import type { ComfyNodeDefInput } from "./ComfyNodeDef";
 
-type WidgetFactory = (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput) => IComfyInputSlot;
+type WidgetFactoryCallback = (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput) => IComfyInputSlot;
+
+type WidgetFactory = {
+    /* Creates the input */
+    callback: WidgetFactoryCallback,
+    /* Input type as used by litegraph */
+    inputType: string,
+    /* Node type to instantiate */
+    nodeType: string
+}
 
 function getNumberDefaults(inputData: ComfyNodeDefInput, defaultStep: number): ComfyInputConfig {
     let defaultValue = inputData[1].default;
@@ -34,34 +43,54 @@ function addComfyInput(node: LGraphNode, inputName: string, extraInfo: Partial<I
     return input;
 }
 
-const FLOAT: WidgetFactory = (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
-    const config = getNumberDefaults(inputData, 0.5);
-    return addComfyInput(node, inputName, { type: "number", config, defaultWidgetNode: ComfyNumberNode })
+const FLOAT: WidgetFactory = {
+    callback: (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
+        const config = getNumberDefaults(inputData, 0.5);
+        return addComfyInput(node, inputName, { type: "number", config, defaultWidgetNode: ComfyNumberNode })
+    },
+    inputType: "number",
+    nodeType: "ui/number"
 }
 
-const INT: WidgetFactory = (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
-    const config = getNumberDefaults(inputData, 1);
-    return addComfyInput(node, inputName, { type: "number", config, defaultWidgetNode: ComfyNumberNode })
-};
-
-const STRING: WidgetFactory = (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
-    const defaultValue = inputData[1].default || "";
-    const multiline = !!inputData[1].multiline;
-
-    return addComfyInput(node, inputName, { type: "string", config: { defaultValue, multiline }, defaultWidgetNode: ComfyTextNode })
-};
-
-const COMBO: WidgetFactory = (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
-    const type = inputData[0] as string[];
-    let defaultValue = type[0];
-    if (inputData[1] && inputData[1].default) {
-        defaultValue = inputData[1].default;
-    }
-    return addComfyInput(node, inputName, { type: "string", config: { values: type, defaultValue }, defaultWidgetNode: ComfyComboNode })
+const INT: WidgetFactory = {
+    callback: (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
+        const config = getNumberDefaults(inputData, 1);
+        return addComfyInput(node, inputName, { type: "number", config, defaultWidgetNode: ComfyNumberNode })
+    },
+    nodeType: "ui/number",
+    inputType: "number"
 }
 
-const IMAGEUPLOAD: WidgetFactory = (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
-    return addComfyInput(node, inputName, { type: "number", config: {} })
+const STRING: WidgetFactory = {
+    callback: (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
+        const defaultValue = inputData[1].default || "";
+        const multiline = !!inputData[1].multiline;
+
+        return addComfyInput(node, inputName, { type: "string", config: { defaultValue, multiline }, defaultWidgetNode: ComfyTextNode })
+    },
+    inputType: "number",
+    nodeType: "ui/text"
+}
+
+const COMBO: WidgetFactory = {
+    callback: (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
+        const type = inputData[0] as string[];
+        let defaultValue = type[0];
+        if (inputData[1] && inputData[1].default) {
+            defaultValue = inputData[1].default;
+        }
+        return addComfyInput(node, inputName, { type: "string", config: { values: type, defaultValue }, defaultWidgetNode: ComfyComboNode })
+    },
+    inputType: "number",
+    nodeType: "ui/combo"
+}
+
+const IMAGEUPLOAD: WidgetFactory = {
+    callback: (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
+        return addComfyInput(node, inputName, { type: "number", config: {} })
+    },
+    inputType: "COMFY_IMAGES",
+    nodeType: "ui/image_upload"
 }
 
 export type WidgetRepository = Record<string, WidgetFactory>
