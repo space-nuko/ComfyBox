@@ -1,5 +1,4 @@
-import type { IDragItem } from "$lib/stores/layoutState";
-import layoutState from "$lib/stores/layoutState";
+import type { IDragItem } from "$lib/stores/layoutStates";
 import { LGraphNode, NodeMode } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 

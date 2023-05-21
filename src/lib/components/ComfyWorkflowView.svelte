@@ -1,34 +1,23 @@
 <script lang="ts">
- import { tick } from 'svelte'
- import { get } from "svelte/store";
- import { LGraphNode, LGraph } from "@litegraph-ts/core";
- import type { IWidget } from "@litegraph-ts/core";
  import ComfyApp  from "./ComfyApp";
- import type { SerializedPanes } from "./ComfyApp"
  import WidgetContainer from "./WidgetContainer.svelte";
- import layoutState, { type ContainerLayout, type DragItem, type IDragItem } from "$lib/stores/layoutState";
+ import { type ContainerLayout, type IDragItem, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
  import uiState from "$lib/stores/uiState";
  import selectionState from "$lib/stores/selectionState";
 
  import Menu from './menu/Menu.svelte';
  import MenuOption from './menu/MenuOption.svelte';
  import MenuDivider from './menu/MenuDivider.svelte';
- import Icon from './menu/Icon.svelte'
+	import type { ComfyWorkflow } from "$lib/stores/workflowState";
 
  export let app: ComfyApp;
+ export let workflow: ComfyWorkflow;
+
+ let layoutState: WritableLayoutStateStore | null;
+
+ $: layoutState = workflow?.layout;
+
  let root: IDragItem | null;
- let dragConfigured: boolean = false;
-
- /*
-  * Serialize UI panel order so it can be restored when workflow is loaded
-  */
- export function serialize(): any {
-     // TODO
- }
-
- export function restore(panels: SerializedPanes) {
-     // TODO
- }
 
  function moveTo(delta: number | ((cur: number, total: number) => number)) {
      const dragItemID = $selectionState.currentSelection[0];
@@ -149,9 +138,11 @@
  }
 </script>
 
-<div id="comfy-ui-panes" on:contextmenu={onRightClick}>
-    <WidgetContainer bind:dragItem={root} classes={["root-container"]} />
-</div>
+{#if layoutState != null}
+    <div id="comfy-workflow-view" on:contextmenu={onRightClick}>
+        <WidgetContainer bind:dragItem={root} classes={["root-container"]} {layoutState} />
+    </div>
+{/if}
 
 {#if showMenu}
     <Menu {...menuPos} on:click={closeMenu} on:clickoutside={closeMenu}>
@@ -188,7 +179,7 @@
 {/if}
 
 <style lang="scss">
- #comfy-ui-panes {
+ #comfy-workflow-view {
      width: 100%;
      height: 100%;
      overflow: auto;

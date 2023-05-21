@@ -3,11 +3,14 @@ import type { SerializedPrompt } from "$lib/components/ComfyApp";
 import { LGraph, LGraphNode, LLink, LiteGraph, NodeMode, type INodeInputSlot, type SerializedLGraphNode, type Vector2, type INodeOutputSlot, LConnectionKind, type SlotType, LGraphCanvas, getStaticPropertyOnInstance, type PropertyLayout, type SlotLayout } from "@litegraph-ts/core";
 import type { SvelteComponentDev } from "svelte/internal";
 import type { ComfyWidgetNode } from "$lib/nodes/widgets";
-import type { ComfyExecutionResult, ComfyImageLocation } from "$lib/utils"
+import type { SerializedPromptOutput, ComfyImageLocation } from "$lib/utils"
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import uiState from "$lib/stores/uiState";
 import { get } from "svelte/store";
 import configState from "$lib/stores/configState";
+import type { WritableLayoutStateStore } from "$lib/stores/layoutStates";
+import layoutStates from "$lib/stores/layoutStates";
+import workflowStateStore, { ComfyWorkflow } from "$lib/stores/workflowState";
 
 export type DefaultWidgetSpec = {
     defaultWidgetNode: new (name?: string) => ComfyWidgetNode,
@@ -48,7 +51,7 @@ export default class ComfyGraphNode extends LGraphNode {
      * Triggered when the backend sends a finished output back with this node's ID.
      * Valid for output nodes like SaveImage and PreviewImage.
      */
-    onExecuted?(output: ComfyExecutionResult): void;
+    onExecuted?(output: SerializedPromptOutput): void;
 
     /*
      * When a prompt is queued, this will be called on the node if it can
@@ -98,6 +101,14 @@ export default class ComfyGraphNode extends LGraphNode {
      */
     getUpstreamLink(): LLink | null {
         return null;
+    }
+
+    get layoutState(): WritableLayoutStateStore | null {
+        return layoutStates.getLayoutByNode(this);
+    }
+
+    get workflow(): ComfyWorkflow | null {
+        return workflowStateStore.getWorkflowByNode(this);
     }
 
     constructor(title?: string) {

@@ -1,5 +1,4 @@
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
-import layoutState from "$lib/stores/layoutState";
 import { range } from "$lib/utils";
 import { LConnectionKind, LGraphCanvas, LLink, LiteGraph, NodeMode, type INodeInputSlot, type INodeOutputSlot, type ITextWidget, type LGraphNode, type SerializedLGraphNode, type Vector2 } from "@litegraph-ts/core";
 import { Watch } from "@litegraph-ts/nodes-basic";
@@ -269,7 +268,7 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         }
 
         if (options.setWidgetTitle) {
-            const widget = layoutState.findLayoutForNode(this.id as ComfyNodeID)
+            const widget = this.layoutState.findLayoutForNode(this.id as ComfyNodeID)
             if (widget && input.name !== "") {
                 widget.attrs.title = input.name;
             }
@@ -288,7 +287,7 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     notifyPropsChanged() {
-        const layoutEntry = layoutState.findLayoutEntryForNode(this.id as ComfyNodeID)
+        const layoutEntry = this.layoutState.findLayoutEntryForNode(this.id as ComfyNodeID)
         if (layoutEntry && layoutEntry.parent) {
             layoutEntry.parent.attrsChanged.set(get(layoutEntry.parent.attrsChanged) + 1)
         }

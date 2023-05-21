@@ -1,6 +1,6 @@
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
 import notify from "$lib/notify";
-import layoutState, { type DragItemID } from "$lib/stores/layoutState";
+import { type DragItemID } from "$lib/stores/layoutStates";
 import queueState from "$lib/stores/queueState";
 import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWidget, type SerializedLGraphNode, type SlotLayout, type PropertyLayout } from "@litegraph-ts/core";
 import { get } from "svelte/store";
@@ -8,7 +8,7 @@ import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode"
 import type { ComfyWidgetNode } from "$lib/nodes/widgets";
 import type { NotifyOptions } from "$lib/notify";
 import type { FileData as GradioFileData } from "@gradio/upload";
-import { type ComfyExecutionResult, type ComfyImageLocation, convertComfyOutputToGradio, type ComfyUploadImageAPIResponse, parseWhateverIntoComfyImageLocations } from "$lib/utils";
+import { type SerializedPromptOutput, type ComfyImageLocation, convertComfyOutputToGradio, type ComfyUploadImageAPIResponse, parseWhateverIntoComfyImageLocations } from "$lib/utils";
 
 export class ComfyQueueEvents extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
@@ -63,7 +63,7 @@ LiteGraph.registerNodeType({
 })
 
 export interface ComfyStoreImagesActionProperties extends ComfyGraphNodeProperties {
-    images: ComfyExecutionResult | null
+    images: SerializedPromptOutput | null
 }
 
 export class ComfyStoreImagesAction extends ComfyGraphNode {
@@ -90,7 +90,7 @@ export class ComfyStoreImagesAction extends ComfyGraphNode {
         if (action !== "store" || !param || !("images" in param))
             return;
 
-        this.setProperty("images", param as ComfyExecutionResult)
+        this.setProperty("images", param as SerializedPromptOutput)
         this.setOutputData(0, this.properties.images)
     }
 }
@@ -223,7 +223,7 @@ export class ComfyNotifyAction extends ComfyGraphNode {
         // native notifications.
         if (param != null && typeof param === "object") {
             if ("images" in param) {
-                const output = param as ComfyExecutionResult;
+                const output = param as SerializedPromptOutput;
                 const converted = convertComfyOutputToGradio(output);
                 if (converted.length > 0)
                     options.imageUrl = converted[0].data;
@@ -389,7 +389,7 @@ export class ComfySetNodeModeAction extends ComfyGraphNode {
             }
         }
 
-        for (const entry of Object.values(get(layoutState).allItems)) {
+        for (const entry of Object.values(get(this.layoutState).allItems)) {
             if (entry.dragItem.type === "container") {
                 const container = entry.dragItem;
                 const hasTag = tags.some(t => container.attrs.tags.indexOf(t) != -1);
@@ -488,7 +488,7 @@ export class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
             }
         }
 
-        for (const entry of Object.values(get(layoutState).allItems)) {
+        for (const entry of Object.values(get(this.layoutState).allItems)) {
             if (entry.dragItem.type === "container") {
                 const container = entry.dragItem;
                 const hasTag = container.attrs.tags.indexOf(action.tag) != -1;
@@ -532,7 +532,7 @@ export class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
             this.graph.getNodeByIdRecursive(nodeId).changeMode(newMode);
         }
 
-        const layout = get(layoutState);
+        const layout = get(this.layoutState);
         for (const [dragItemID, isHidden] of Object.entries(widgetChanges)) {
             const container = layout.allItems[dragItemID].dragItem
             container.attrs.hidden = isHidden;

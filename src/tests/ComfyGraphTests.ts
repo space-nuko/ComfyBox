@@ -7,13 +7,14 @@ import ComfyPromptSerializer from "$lib/components/ComfyPromptSerializer";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import { graphToGraphVis } from "$lib/utils";
-import layoutState from "$lib/stores/layoutState";
 import { ComfyNumberNode } from "$lib/nodes/widgets";
 import { get } from "svelte/store";
+import layoutStates from "$lib/stores/layoutStates";
+import { ComfyWorkflow } from "$lib/stores/workflowState";
 
 export default class ComfyGraphTests extends UnitTest {
     test__onNodeAdded__updatesLayoutState() {
-        const graph = new ComfyGraph();
+        const [{ graph }, layoutState] = ComfyWorkflow.create()
         layoutState.initDefaultLayout() // adds 3 containers
 
         const state = get(layoutState)
@@ -38,7 +39,7 @@ export default class ComfyGraphTests extends UnitTest {
     }
 
     test__onNodeAdded__handlesNodesAddedInSubgraphs() {
-        const graph = new ComfyGraph();
+        const [{ graph }, layoutState] = ComfyWorkflow.create()
         layoutState.initDefaultLayout()
 
         const subgraph = LiteGraph.createNode(Subgraph);
@@ -57,7 +58,7 @@ export default class ComfyGraphTests extends UnitTest {
     }
 
     test__onNodeAdded__handlesSubgraphsWithNodes() {
-        const graph = new ComfyGraph();
+        const [{ graph }, layoutState] = ComfyWorkflow.create()
         layoutState.initDefaultLayout()
 
         const state = get(layoutState)
@@ -75,7 +76,7 @@ export default class ComfyGraphTests extends UnitTest {
     }
 
     test__onNodeRemoved__updatesLayoutState() {
-        const graph = new ComfyGraph();
+        const [{ graph }, layoutState] = ComfyWorkflow.create()
         layoutState.initDefaultLayout()
 
         const widget = LiteGraph.createNode(ComfyNumberNode);

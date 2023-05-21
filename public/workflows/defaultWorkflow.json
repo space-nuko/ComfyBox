@@ -1,6 +1,11 @@
 {
   "createdBy": "ComfyBox",
   "version": 1,
+  "attrs": {
+    "title": "Default",
+    "queuePromptButtonName": "Queue txt2img",
+    "queuePromptButtonRunWorkflow": false
+  },
   "workflow": {
     "last_node_id": 0,
     "last_link_id": 0,
@@ -25709,10 +25714,6 @@
         ],
         "parent": "eae32e42-1ccc-4a4a-923f-7ab4ccdac97a"
       }
-    },
-    "attrs": {
-      "queuePromptButtonName": "Queue txt2img",
-      "queuePromptButtonRunWorkflow": false
     }
   },
   "canvas": {

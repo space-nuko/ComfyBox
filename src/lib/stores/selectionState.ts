@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
-import type { DragItemID, IDragItem } from './layoutState';
+import type { DragItemID, IDragItem } from './layoutStates';
 import type { LGraphNode, NodeID } from '@litegraph-ts/core';
 
 export type SelectionState = {

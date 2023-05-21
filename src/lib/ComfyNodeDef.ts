@@ -27,7 +27,18 @@ export type ComfyNodeDefInput = [ComfyNodeDefInputType, ComfyNodeDefInputOptions
 export type ComfyNodeDefInputType = any[] | keyof typeof ComfyWidgets | string
 
 export type ComfyNodeDefInputOptions = {
-    forceInput?: boolean
+    forceInput?: boolean;
+
+    // NOTE: For COMBO type inputs, the default value is always the first entry the list.
+    default?: any,
+
+    // INT/FLOAT options
+    min?: number,
+    max?: number,
+    step?: number,
+
+    // STRING options
+    multiline?: boolean,
 }
 
 // TODO if/when comfy refactors

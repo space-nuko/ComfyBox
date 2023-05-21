@@ -1,6 +1,6 @@
 <script lang="ts">
  import { TextBox } from "@gradio/form";
- import { type WidgetLayout } from "$lib/stores/layoutState";
+ import { type WidgetLayout } from "$lib/stores/layoutStates";
  import { type Writable } from "svelte/store";
  import { isDisabled } from "./utils"
  import type { ComfyTextNode } from "$lib/nodes/widgets";

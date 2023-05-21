@@ -1,4 +1,4 @@
-import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot, type NodeID, type NodeTypeSpec, type NodeTypeOpts, type SlotIndex } from "@litegraph-ts/core";
+import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot, type NodeID, type NodeTypeSpec, type NodeTypeOpts, type SlotIndex, type UUID } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
 import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyPromptRequest, type ComfyNodeID, type PromptID } from "$lib/api"
 import { getPngMetadata, importA1111 } from "$lib/pnginfo";
@@ -21,8 +21,7 @@ import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import queueState from "$lib/stores/queueState";
 import { type SvelteComponentDev } from "svelte/internal";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
-import type { SerializedLayoutState } from "$lib/stores/layoutState";
-import layoutState from "$lib/stores/layoutState";
+import type { LayoutState, SerializedLayoutState, WritableLayoutStateStore } from "$lib/stores/layoutStates";
 import { toast } from '@zerodevx/svelte-toast'
 import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
@@ -33,7 +32,7 @@ import { download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range, wor
 import notify from "$lib/notify";
 import configState from "$lib/stores/configState";
 import { blankGraph } from "$lib/defaultGraph";
-import type { ComfyExecutionResult } from "$lib/utils";
+import type { SerializedPromptOutput } from "$lib/utils";
 import ComfyPromptSerializer, { UpstreamNodeLocator, isActiveBackendNode } from "./ComfyPromptSerializer";
 import { iterateNodeDefInputs, type ComfyNodeDef, isBackendNodeDefInputType, iterateNodeDefOutputs } from "$lib/ComfyNodeDef";
 import { ComfyComboNode } from "$lib/nodes/widgets";
@@ -41,6 +40,10 @@ import parseA1111, { type A1111ParsedInfotext } from "$lib/parseA1111";
 import convertA1111ToStdPrompt from "$lib/convertA1111ToStdPrompt";
 import type { ComfyBoxStdPrompt } from "$lib/ComfyBoxStdPrompt";
 import ComfyBoxStdPromptSerializer from "$lib/ComfyBoxStdPromptSerializer";
+import selectionState from "$lib/stores/selectionState";
+import layoutStates from "$lib/stores/layoutStates";
+import { ComfyWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
+import workflowState from "$lib/stores/workflowState";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -51,12 +54,11 @@ if (typeof window !== "undefined") {
 
 /*
  * Queued prompt that hasn't been sent to the backend yet.
- * TODO: Assumes the currently active graph will be serialized, needs to change
- * for multiple loaded workflow support
  */
-type QueueItem = {
+type PromptQueueItem = {
     num: number,
     batchCount: number
+    workflow: ComfyWorkflow
 }
 
 export type A1111PromptAndInfo = {
@@ -78,6 +80,8 @@ export type SerializedAppState = {
     commitHash?: string,
     /** Graph state */
     workflow: SerializedLGraph,
+    /** Workflow attributes */
+    attrs: WorkflowAttributes,
     /** UI state */
     layout: SerializedLayoutState,
     /** Position/offset of the canvas at the time of saving */
@@ -111,7 +115,7 @@ export type SerializedPrompt = {
 /*
  * Outputs for each node.
  */
-export type SerializedPromptOutputs = Record<ComfyNodeID, ComfyExecutionResult>
+export type SerializedPromptOutputs = Record<ComfyNodeID, SerializedPromptOutput>
 
 export type Progress = {
     value: number,
@@ -128,15 +132,19 @@ type BackendComboNode = {
     backendNode: ComfyBackendNode
 }
 
+type CanvasState = {
+    canvasEl: HTMLCanvasElement,
+    canvasCtx: CanvasRenderingContext2D,
+    canvas: ComfyGraphCanvas,
+}
+
 export default class ComfyApp {
     api: ComfyAPI;
+
     rootEl: HTMLDivElement | null = null;
     canvasEl: HTMLCanvasElement | null = null;
     canvasCtx: CanvasRenderingContext2D | null = null;
-    lGraph: ComfyGraph | null = null;
     lCanvas: ComfyGraphCanvas | null = null;
-    dropZone: HTMLElement | null = null;
-    nodeOutputs: Record<string, any> = {};
 
     shiftDown: boolean = false;
     ctrlDown: boolean = false;
@@ -144,7 +152,7 @@ export default class ComfyApp {
     alreadySetup: Writable<boolean> = writable(false);
     a1111Prompt: Writable<A1111PromptAndInfo | null> = writable(null);
 
-    private queueItems: QueueItem[] = [];
+    private queueItems: PromptQueueItem[] = [];
     private processingQueue: boolean = false;
     private promptSerializer: ComfyPromptSerializer;
     private stdPromptSerializer: ComfyBoxStdPromptSerializer;
@@ -157,7 +165,7 @@ export default class ComfyApp {
 
     async setup(): Promise<void> {
         if (get(this.alreadySetup)) {
-            console.error("Already setup")
+            console.log("Already setup")
             return;
         }
 
@@ -165,7 +173,6 @@ export default class ComfyApp {
 
         this.rootEl = document.getElementById("app-root") as HTMLDivElement;
         this.canvasEl = document.getElementById("graph-canvas") as HTMLCanvasElement;
-        this.lGraph = new ComfyGraph();
         this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl);
         this.canvasCtx = this.canvasEl.getContext("2d");
 
@@ -174,17 +181,13 @@ export default class ComfyApp {
         this.lCanvas.allow_interaction = uiUnlocked;
 
         // await this.#invokeExtensionsAsync("init");
-        await this.registerNodes();
+        const defs = await this.api.getNodeDefs();
+        await this.registerNodes(defs);
 
         // Load previous workflow
         let restored = false;
         try {
-            const json = localStorage.getItem("workflow");
-            if (json) {
-                const state = JSON.parse(json) as SerializedAppState;
-                await this.deserialize(state)
-                restored = true;
-            }
+            restored = await this.loadStateFromLocalStorage(defs);
         } catch (err) {
             console.error("Error loading previous workflow", err);
             notify(`Error loading previous workflow:\n${err}`, { type: "error", timeout: null })
@@ -192,7 +195,7 @@ export default class ComfyApp {
 
         // We failed to restore a workflow so load the default
         if (!restored) {
-            await this.initDefaultGraph();
+            await this.initDefaultWorkflow(defs);
         }
 
         // Save current workflow automatically
@@ -225,12 +228,37 @@ export default class ComfyApp {
         this.lCanvas.draw(true, true);
     }
 
+    serialize(workflow: ComfyWorkflow): SerializedAppState {
+        const layoutState = layoutStates.getLayout(workflow.id);
+        if (layoutState == null)
+            throw new Error("Workflow has no layout!")
+
+        const { graph, layout, attrs } = workflow.serialize(layoutState);
+        const canvas = this.lCanvas.serialize();
+
+        return {
+            createdBy: "ComfyBox",
+            version: COMFYBOX_SERIAL_VERSION,
+            commitHash: __GIT_COMMIT_HASH__,
+            workflow: graph,
+            attrs,
+            layout,
+            canvas
+        }
+    }
+
     saveStateToLocalStorage() {
         try {
             uiState.update(s => { s.isSavingToLocalStorage = true; return s; })
-            const savedWorkflow = this.serialize();
-            const json = JSON.stringify(savedWorkflow);
-            localStorage.setItem("workflow", json)
+            const state = get(workflowState)
+            const workflows = state.openedWorkflows
+            const savedWorkflows = workflows.map(w => this.serialize(w));
+            const activeWorkflowIndex = workflows.findIndex(w => state.activeWorkflowID === w.id);
+            const json = JSON.stringify({ workflows: savedWorkflows, activeWorkflowIndex });
+            localStorage.setItem("workflows", json)
+            for (const workflow of workflows)
+                workflow.isModified = false;
+            workflowState.set(get(workflowState));
             notify("Saved to local storage.")
         }
         catch (err) {
@@ -241,13 +269,33 @@ export default class ComfyApp {
         }
     }
 
+    async loadStateFromLocalStorage(defs: Record<ComfyNodeID, ComfyNodeDef>): Promise<boolean> {
+        const json = localStorage.getItem("workflows");
+        if (!json) {
+            return false
+        }
+
+        const state = JSON.parse(json);
+        if (!("workflows" in state))
+            return false;
+
+        const workflows = state.workflows as SerializedAppState[];
+        for (const workflow of workflows) {
+            await this.openWorkflow(workflow, defs)
+        }
+
+        if (typeof state.activeWorkflowIndex === "number") {
+            workflowState.setActiveWorkflow(this.lCanvas, state.activeWorkflowIndex);
+            selectionState.clear();
+        }
+
+        return true;
+    }
+
     static node_type_overrides: Record<string, typeof ComfyBackendNode> = {}
     static widget_type_overrides: Record<string, typeof SvelteComponentDev> = {}
 
-    private async registerNodes() {
-        // Load node definitions from the backend
-        const defs = await this.api.getNodeDefs();
-
+    private async registerNodes(defs: Record<ComfyNodeID, ComfyNodeDef>) {
         // Register a node for each definition
         for (const [nodeId, nodeDef] of Object.entries(defs)) {
             const typeOverride = ComfyApp.node_type_overrides[nodeId]
@@ -351,8 +399,12 @@ export default class ComfyApp {
                 } catch (error) { }
             }
 
-            if (workflow && workflow.version && workflow.nodes && workflow.extra) {
-                this.loadGraphData(workflow);
+            if (workflow && workflow.createdBy === "ComfyBox") {
+                this.openWorkflow(workflow);
+            }
+            else {
+                // TODO handle vanilla workflows
+                throw new Error("Workflow was not in ComfyBox format!")
             }
         });
     }
@@ -375,21 +427,29 @@ export default class ComfyApp {
 
         this.api.addEventListener("progress", (progress: Progress) => {
             queueState.progressUpdated(progress);
-            this.lGraph.setDirtyCanvas(true, false);
+            workflowState.getActiveWorkflow()?.graph?.setDirtyCanvas(true, false); // TODO PromptID
         });
 
         this.api.addEventListener("executing", (promptID: PromptID | null, nodeID: ComfyNodeID | null) => {
-            queueState.executingUpdated(promptID, nodeID);
-            this.lGraph.setDirtyCanvas(true, false);
+            const queueEntry = queueState.executingUpdated(promptID, nodeID);
+            if (queueEntry != null) {
+                const workflow = workflowState.getWorkflow(queueEntry.workflowID);
+                workflow?.graph?.setDirtyCanvas(true, false);
+            }
         });
 
-        this.api.addEventListener("executed", (promptID: PromptID, nodeID: ComfyNodeID, output: ComfyExecutionResult) => {
-            this.nodeOutputs[nodeID] = output;
-            const node = this.lGraph.getNodeByIdRecursive(nodeID) as ComfyGraphNode;
-            if (node?.onExecuted) {
-                node.onExecuted(output);
+        this.api.addEventListener("executed", (promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutput) => {
+            const queueEntry = queueState.onExecuted(promptID, nodeID, output)
+            if (queueEntry != null) {
+                const workflow = workflowState.getWorkflow(queueEntry.workflowID);
+                if (workflow != null) {
+                    workflow.graph.setDirtyCanvas(true, false);
+                    const node = workflow.graph.getNodeByIdRecursive(nodeID) as ComfyGraphNode;
+                    if (node?.onExecuted) {
+                        node.onExecuted(output);
+                    }
+                }
             }
-            queueState.onExecuted(promptID, nodeID, output)
         });
 
         this.api.addEventListener("execution_start", (promptID: PromptID) => {
@@ -456,49 +516,49 @@ export default class ComfyApp {
         setColor(BuiltInSlotType.ACTION, "lightseagreen")
     }
 
-    serialize(): SerializedAppState {
-        const graph = this.lGraph;
-
-        const serializedGraph = graph.serialize()
-        const serializedLayout = layoutState.serialize()
-        const serializedCanvas = this.lCanvas.serialize();
-
-        return {
-            createdBy: "ComfyBox",
-            version: COMFYBOX_SERIAL_VERSION,
-            workflow: serializedGraph,
-            layout: serializedLayout,
-            canvas: serializedCanvas
-        }
-    }
-
-    async deserialize(data: SerializedAppState) {
+    async openWorkflow(data: SerializedAppState, refreshCombos: boolean | Record<string, ComfyNodeDef> = true): Promise<ComfyWorkflow> {
         if (data.version !== COMFYBOX_SERIAL_VERSION) {
             throw `Invalid ComfyBox saved data format: ${data.version}`
         }
+        this.clean();
 
-        // Ensure loadGraphData does not trigger any state changes in layoutState
-        // (isConfiguring is set to true here)
-        // lGraph.configure will add new nodes, triggering onNodeAdded, but we
-        // want to restore the layoutState ourselves
-        layoutState.onStartConfigure();
-
-        this.loadGraphData(data.workflow)
-
-        // Now restore the layout
-        // Subsequent added nodes will add the UI data to layoutState
-        layoutState.deserialize(data.layout, this.lGraph)
+        const workflow = workflowState.openWorkflow(this.lCanvas, data);
 
         // Restore canvas offset/zoom
         this.lCanvas.deserialize(data.canvas)
 
-        await this.refreshComboInNodes();
+        if (refreshCombos) {
+            let defs = null;
+            if (typeof refreshCombos === "object")
+                defs = refreshCombos;
+            await this.refreshComboInNodes(workflow, defs);
+        }
 
-        this.lGraph.start();
-        this.lGraph.eventBus.on("afterExecute", () => this.lCanvas.draw(true))
+        return workflow;
     }
 
-    async initDefaultGraph() {
+    setActiveWorkflow(id: WorkflowInstID) {
+        const index = get(workflowState).openedWorkflows.findIndex(w => w.id === id)
+        if (index === -1)
+            return;
+        workflowState.setActiveWorkflow(this.lCanvas, index);
+        selectionState.clear();
+    }
+
+    createNewWorkflow() {
+        workflowState.createNewWorkflow(this.lCanvas, undefined, true);
+        selectionState.clear();
+    }
+
+    closeWorkflow(id: WorkflowInstID) {
+        const index = get(workflowState).openedWorkflows.findIndex(w => w.id === id)
+        if (index === -1)
+            return;
+        workflowState.closeWorkflow(this.lCanvas, index);
+        selectionState.clear();
+    }
+
+    async initDefaultWorkflow(defs?: Record<string, ComfyNodeDef>) {
         let state = null;
         try {
             const graphResponse = await fetch("/workflows/defaultWorkflow.json");
@@ -509,50 +569,14 @@ export default class ComfyApp {
             notify(`Failed to load default graph: ${error}`, { type: "error" })
             state = structuredClone(blankGraph)
         }
-        await this.deserialize(state)
-    }
-
-    /**
-     * Populates the graph with the specified workflow data
-     * @param {*} graphData A serialized graph object
-     */
-    loadGraphData(graphData: SerializedLGraph) {
-        this.clean();
-
-        // Patch T2IAdapterLoader to ControlNetLoader since they are the same node now
-        for (let n of graphData.nodes) {
-            if (n.type == "T2IAdapterLoader") n.type = "ControlNetLoader";
-        }
-
-        this.lGraph.configure(graphData);
-
-        for (const node of this.lGraph._nodes) {
-            const size = node.computeSize();
-            size[0] = Math.max(node.size[0], size[0]);
-            size[1] = Math.max(node.size[1], size[1]);
-            node.size = size;
-            // this.#invokeExtensions("loadedGraphNode", node);
-        }
+        await this.openWorkflow(state, defs)
     }
 
     clear() {
         this.clean();
 
-        const blankGraph: SerializedLGraph = {
-            last_node_id: 0,
-            last_link_id: 0,
-            nodes: [],
-            links: [],
-            groups: [],
-            config: {},
-            extra: {},
-            version: 0
-        }
-
-        layoutState.onStartConfigure();
         this.lCanvas.closeAllSubgraphs();
-        this.lGraph.configure(blankGraph)
-        layoutState.initDefaultLayout();
+        workflowState.closeAllWorkflows(this.lCanvas);
         uiState.update(s => {
             s.uiUnlocked = true;
             s.uiEditMode = "widgets";
@@ -561,13 +585,17 @@ export default class ComfyApp {
     }
 
     runDefaultQueueAction() {
-        for (const node of this.lGraph.iterateNodesInOrderRecursive()) {
+        const workflow = workflowState.getActiveWorkflow();
+        if (workflow == null)
+            return;
+
+        for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
             if ("onDefaultQueueAction" in node) {
                 (node as ComfyGraphNode).onDefaultQueueAction()
             }
         }
 
-        if (get(layoutState).attrs.queuePromptButtonRunWorkflow) {
+        if (workflow.attrs.queuePromptButtonRunWorkflow) {
             // Hold control to queue at the front
             const num = this.ctrlDown ? -1 : 0;
             this.queuePrompt(num, 1);
@@ -575,6 +603,12 @@ export default class ComfyApp {
     }
 
     querySave() {
+        const workflow = workflowState.getActiveWorkflow();
+        if (workflow == null) {
+            notify("No active workflow!", { type: "error" })
+            return;
+        }
+
         const promptFilename = get(configState).promptForWorkflowName;
 
         let filename = "workflow.json";
@@ -592,9 +626,12 @@ export default class ComfyApp {
         }
 
         const indent = 2
-        const json = JSON.stringify(this.serialize(), null, indent)
+        const json = JSON.stringify(this.serialize(workflow), null, indent)
 
         download(filename, json, "application/json")
+
+        workflow.isModified = false;
+        workflowState.set(get(workflowState));
 
         console.debug(jsonToJsObject(json))
     }
@@ -603,12 +640,18 @@ export default class ComfyApp {
      * Converts the current graph workflow for sending to the API
      * @returns The workflow and node links
      */
-    graphToPrompt(tag: string | null = null): SerializedPrompt {
-        return this.promptSerializer.serialize(this.lGraph, tag)
+    graphToPrompt(workflow: ComfyWorkflow, tag: string | null = null): SerializedPrompt {
+        return this.promptSerializer.serialize(workflow.graph, tag)
     }
 
     async queuePrompt(num: number, batchCount: number = 1, tag: string | null = null) {
-        this.queueItems.push({ num, batchCount });
+        const activeWorkflow = workflowState.getActiveWorkflow();
+        if (activeWorkflow == null) {
+            notify("No workflow is opened!", { type: "error" })
+            return;
+        }
+
+        this.queueItems.push({ num, batchCount, workflow: activeWorkflow });
 
         // Only have one action process the items so each one gets a unique seed correctly
         if (this.processingQueue) {
@@ -619,13 +662,15 @@ export default class ComfyApp {
             tag = null;
 
         this.processingQueue = true;
+        let workflow;
+
         try {
             while (this.queueItems.length) {
-                ({ num, batchCount } = this.queueItems.pop());
+                ({ num, batchCount, workflow } = this.queueItems.pop());
                 console.debug(`Queue get! ${num} ${batchCount} ${tag}`);
 
                 const thumbnails = []
-                for (const node of this.lGraph.iterateNodesInOrderRecursive()) {
+                for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
                     if (node.mode !== NodeMode.ALWAYS
                         || (tag != null
                             && Array.isArray(node.properties.tags)
@@ -640,7 +685,7 @@ export default class ComfyApp {
                 }
 
                 for (let i = 0; i < batchCount; i++) {
-                    for (const node of this.lGraph.iterateNodesInOrderRecursive()) {
+                    for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
                         if (node.mode !== NodeMode.ALWAYS)
                             continue;
 
@@ -649,9 +694,9 @@ export default class ComfyApp {
                         }
                     }
 
-                    const p = this.graphToPrompt(tag);
-                    const l = layoutState.serialize();
-                    console.debug(graphToGraphVis(this.lGraph))
+                    const p = this.graphToPrompt(workflow, tag);
+                    const l = workflow.layout.serialize();
+                    console.debug(graphToGraphVis(workflow.graph))
                     console.debug(promptToGraphVis(p))
 
                     const stdPrompt = this.stdPromptSerializer.serialize(p);
@@ -681,7 +726,7 @@ export default class ComfyApp {
                             error = response.error;
                         }
                         else {
-                            queueState.afterQueued(response.promptID, num, p.output, extraData)
+                            queueState.afterQueued(workflow.id, response.promptID, num, p.output, extraData)
                         }
                     } catch (err) {
                         error = err?.toString();
@@ -690,13 +735,13 @@ export default class ComfyApp {
                     if (error != null) {
                         const mes: string = error;
                         notify(`Error queuing prompt:\n${mes}`, { type: "error" })
-                        console.error(graphToGraphVis(this.lGraph))
+                        console.error(graphToGraphVis(workflow.graph))
                         console.error(promptToGraphVis(p))
                         console.error("Error queuing prompt", error, num, p)
                         break;
                     }
 
-                    for (const node of this.lGraph.iterateNodesInOrderRecursive()) {
+                    for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
                         if ("afterQueued" in node) {
                             (node as ComfyGraphNode).afterQueued(p, tag);
                         }
@@ -719,7 +764,7 @@ export default class ComfyApp {
             const pngInfo = await getPngMetadata(file);
             if (pngInfo) {
                 if (pngInfo.comfyBoxConfig) {
-                    this.deserialize(JSON.parse(pngInfo.comfyBoxConfig));
+                    await this.openWorkflow(JSON.parse(pngInfo.comfyBoxConfig));
                 } else if (pngInfo.parameters) {
                     const parsed = parseA1111(pngInfo.parameters)
                     if ("error" in parsed) {
@@ -741,8 +786,8 @@ export default class ComfyApp {
             }
         } else if (file.type === "application/json" || file.name.endsWith(".json")) {
             const reader = new FileReader();
-            reader.onload = () => {
-                this.deserialize(JSON.parse(reader.result as string));
+            reader.onload = async () => {
+                await this.openWorkflow(JSON.parse(reader.result as string));
             };
             reader.readAsText(file);
         }
@@ -761,8 +806,15 @@ export default class ComfyApp {
     /**
      * Refresh combo list on whole nodes
      */
-    async refreshComboInNodes(flashUI: boolean = false) {
-        const defs = await this.api.getNodeDefs();
+    async refreshComboInNodes(workflow?: ComfyWorkflow, defs?: Record<string, ComfyNodeDef>, flashUI: boolean = false) {
+        workflow ||= workflowState.getActiveWorkflow();
+        if (workflow == null) {
+            notify("No active workflow!", { type: "error" })
+            return
+        }
+
+        if (defs == null)
+            defs = await this.api.getNodeDefs();
 
         const isComfyComboNode = (node: LGraphNode): node is ComfyComboNode => {
             return node
@@ -805,7 +857,7 @@ export default class ComfyApp {
             return result
         }
 
-        for (const node of this.lGraph.iterateNodesInOrderRecursive()) {
+        for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
             if (!isActiveBackendNode(node))
                 continue;
 
@@ -827,7 +879,7 @@ export default class ComfyApp {
         console.debug("[refreshComboInNodes] found:", backendUpdatedCombos.length, backendUpdatedCombos)
 
         // Mark combo nodes without backend configs as being loaded already.
-        for (const node of this.lGraph.iterateNodesOfClassRecursive(ComfyComboNode)) {
+        for (const node of workflow.graph.iterateNodesOfClassRecursive(ComfyComboNode)) {
             if (backendUpdatedCombos[node.id] != null) {
                 continue;
             }
@@ -859,12 +911,15 @@ export default class ComfyApp {
         // Load definitions from the backend.
         for (const { comboNode, comfyInput, backendNode } of Object.values(backendUpdatedCombos)) {
             const def = defs[backendNode.type];
-            const rawValues = def["input"]["required"][comfyInput.name][0];
+            const [rawValues, opts] = def.input.required[comfyInput.name];
 
             console.debug("[ComfyApp] Reconfiguring combo widget", backendNode.type, "=>", comboNode.type, rawValues.length)
             comboNode.doAutoConfig(comfyInput, { includeProperties: new Set(["values"]), setWidgetTitle: false })
 
-            comboNode.formatValues(rawValues as string[], true)
+            const values = rawValues as string[]
+            const defaultValue = rawValues[0];
+
+            comboNode.formatValues(values, defaultValue, true)
             if (!rawValues?.includes(get(comboNode.value))) {
                 comboNode.setValue(rawValues[0], comfyInput.config.defaultValue)
             }
@@ -875,7 +930,6 @@ export default class ComfyApp {
      * Clean current state
      */
     clean() {
-        this.nodeOutputs = {};
         this.a1111Prompt.set(null);
     }
 }

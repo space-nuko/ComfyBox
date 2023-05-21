@@ -2,11 +2,12 @@ import { LGraphNode, LiteGraph } from "@litegraph-ts/core";
 import type IComfyInputSlot from "./IComfyInputSlot";
 import type { ComfyInputConfig } from "./IComfyInputSlot";
 import { ComfyComboNode, ComfyNumberNode, ComfyTextNode } from "./nodes/widgets";
+import type { ComfyNodeDefInput } from "./ComfyNodeDef";
 
-type WidgetFactory = (node: LGraphNode, inputName: string, inputData: any) => IComfyInputSlot;
+type WidgetFactory = (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput) => IComfyInputSlot;
 
-function getNumberDefaults(inputData: any, defaultStep: number): ComfyInputConfig {
-    let defaultValue = inputData[1]["default"];
+function getNumberDefaults(inputData: ComfyNodeDefInput, defaultStep: number): ComfyInputConfig {
+    let defaultValue = inputData[1].default;
     let { min, max, step } = inputData[1];
 
     if (defaultValue == undefined) defaultValue = 0;
@@ -33,25 +34,25 @@ function addComfyInput(node: LGraphNode, inputName: string, extraInfo: Partial<I
     return input;
 }
 
-const FLOAT: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any): IComfyInputSlot => {
+const FLOAT: WidgetFactory = (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
     const config = getNumberDefaults(inputData, 0.5);
     return addComfyInput(node, inputName, { type: "number", config, defaultWidgetNode: ComfyNumberNode })
 }
 
-const INT: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any): IComfyInputSlot => {
+const INT: WidgetFactory = (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
     const config = getNumberDefaults(inputData, 1);
     return addComfyInput(node, inputName, { type: "number", config, defaultWidgetNode: ComfyNumberNode })
 };
 
-const STRING: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any): IComfyInputSlot => {
+const STRING: WidgetFactory = (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
     const defaultValue = inputData[1].default || "";
     const multiline = !!inputData[1].multiline;
 
     return addComfyInput(node, inputName, { type: "string", config: { defaultValue, multiline }, defaultWidgetNode: ComfyTextNode })
 };
 
-const COMBO: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any): IComfyInputSlot => {
-    const type = inputData[0];
+const COMBO: WidgetFactory = (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
+    const type = inputData[0] as string[];
     let defaultValue = type[0];
     if (inputData[1] && inputData[1].default) {
         defaultValue = inputData[1].default;
@@ -59,7 +60,7 @@ const COMBO: WidgetFactory = (node: LGraphNode, inputName: string, inputData: an
     return addComfyInput(node, inputName, { type: "string", config: { values: type, defaultValue }, defaultWidgetNode: ComfyComboNode })
 }
 
-const IMAGEUPLOAD: WidgetFactory = (node: LGraphNode, inputName: string, inputData: any): IComfyInputSlot => {
+const IMAGEUPLOAD: WidgetFactory = (node: LGraphNode, inputName: string, inputData: ComfyNodeDefInput): IComfyInputSlot => {
     return addComfyInput(node, inputName, { type: "number", config: {} })
 }
 

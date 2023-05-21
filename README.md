@@ -18,6 +18,8 @@ This project is *still under construction* and some features are missing, be awa
 
 This frontend isn't compatible with regular ComfyUI's workflow format since extra metadata is saved like panel layout, so you'll have to spend a bit of time recreating them. This project also isn't compatible with regular ComfyUI's frontend extension format, but useful extensions can be integrated into the base repo with some effort.
 
+Also note that the saved workflow format is subject to change until it's been finalized after enough testing, so be prepared to lose some of your work from time to time.
+
 ## Features
 - *No-Code UI Builder* - A novel system for creating your own Stable Diffusion user interfaces from the basic components.
 - *Extension Support* - All custom ComfyUI nodes are supported out of the box.

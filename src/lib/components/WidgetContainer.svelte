@@ -2,21 +2,22 @@
  import queueState from "$lib/stores/queueState";
  import uiState from "$lib/stores/uiState";
 
- import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
+ import { type ContainerLayout, type WidgetLayout, type IDragItem, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
  import selectionState from "$lib/stores/selectionState";
  import { startDrag, stopDrag } from "$lib/utils"
  import Container from "./Container.svelte"
- import { type Writable } from "svelte/store"
+ import { writable, type Writable } from "svelte/store"
  import type { ComfyWidgetNode } from "$lib/nodes/widgets";
  import { isHidden } from "$lib/widgets/utils";
 
+ export let layoutState: WritableLayoutStateStore;
  export let dragItem: IDragItem | null = null;
  export let zIndex: number = 0;
  export let classes: string[] = [];
  export let isMobile: boolean = false;
  let container: ContainerLayout | null = null;
- let attrsChanged: Writable<boolean> | null = null;
- let propsChanged: Writable<number> | null = null;
+ let attrsChanged: Writable<number> = writable(0);
+ let propsChanged: Writable<number> = writable(0);
  let widget: WidgetLayout | null = null;
  let showHandles: boolean = false;
 
@@ -24,8 +25,8 @@
      dragItem = null;
      container = null;
      widget = null;
-     attrsChanged = null;
-     propsChanged = null;
+     attrsChanged = writable(0);
+     propsChanged = writable(0);
  }
  else if (dragItem.type === "container") {
      container = dragItem as ContainerLayout;
@@ -40,7 +41,7 @@
      if (widget.node && "propsChanged" in widget.node)
          propsChanged = (widget.node as ComfyWidgetNode).propsChanged
      else
-         propsChanged = null;
+         propsChanged = writable(0);
  }
 
  $: showHandles = $uiState.uiUnlocked
@@ -57,12 +58,20 @@
      const title = widget.node.type.replace("/", "-").replace(".", "-")
      return `widget--${title}`
  }
+
+ function _startDrag(e: MouseEvent | TouchEvent) {
+     startDrag(e, layoutState)
+ }
+
+ function _stopDrag(e: MouseEvent | TouchEvent) {
+     stopDrag(e, layoutState)
+ }
 </script>
 
 
 {#if container}
     {#key $attrsChanged}
-        <Container {container} {classes} {zIndex} {showHandles} {isMobile} />
+        <Container {layoutState} {container} {classes} {zIndex} {showHandles} {isMobile} />
     {/key}
 {:else if widget && widget.node}
     {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets"}
@@ -78,13 +87,19 @@
                  class:is-executing={$queueState.runningNodeID && $queueState.runningNodeID == widget.node.id}
                  class:hidden={hidden}
             >
-                <svelte:component this={widget.node.svelteComponentType} {widget} {isMobile} />
+                <svelte:component this={widget.node.svelteComponentType} {layoutState} {widget} {isMobile} />
             </div>
             {#if hidden && edit}
                 <div class="handle handle-hidden" class:hidden={!edit} />
             {/if}
             {#if showHandles || hovered}
-                <div class="handle handle-widget" class:hovered data-drag-item-id={widget.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+                <div class="handle handle-widget"
+                     class:hovered
+                     data-drag-item-id={widget.id}
+                     on:mousedown={_startDrag}
+                     on:touchstart={_startDrag}
+                     on:mouseup={_stopDrag}
+                     on:touchend={_stopDrag}/>
             {/if}
         {/key}
     {/key}

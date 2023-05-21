@@ -1,10 +1,11 @@
-import layoutState, { type WidgetLayout } from "$lib/stores/layoutState";
+import { type WidgetLayout, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
 import selectionState from "$lib/stores/selectionState";
 import type { FileData as GradioFileData } from "@gradio/upload";
-import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID } from "@litegraph-ts/core";
+import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, type NodeID } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import type { ComfyNodeID } from "./api";
 import { type SerializedPrompt } from "./components/ComfyApp";
+import workflowState from "./stores/workflowState";
 
 export function clamp(n: number, min: number, max: number): number {
     return Math.min(Math.max(n, min), max)
@@ -39,7 +40,7 @@ export function download(filename: string, text: string, type: string = "text/pl
     }, 0);
 }
 
-export function startDrag(evt: MouseEvent) {
+export function startDrag(evt: MouseEvent, layoutState: WritableLayoutStateStore) {
     const dragItemId: string = evt.target.dataset["dragItemId"];
     const ss = get(selectionState)
     const ls = get(layoutState)
@@ -78,9 +79,11 @@ export function startDrag(evt: MouseEvent) {
 
     layoutState.set(ls)
     selectionState.set(ss)
+    layoutState.notifyWorkflowModified();
 };
 
-export function stopDrag(evt: MouseEvent) {
+export function stopDrag(evt: MouseEvent, layoutState: WritableLayoutStateStore) {
+    layoutState.notifyWorkflowModified();
 };
 
 export function graphToGraphVis(graph: LGraph): string {
@@ -175,23 +178,33 @@ export function workflowToGraphVis(workflow: SerializedLGraph): string {
 export function promptToGraphVis(prompt: SerializedPrompt): string {
     let out = "digraph {\n"
 
+    const ids: Record<NodeID, number> = {}
+    let nextID = 0;
+
     for (const pair of Object.entries(prompt.output)) {
         const [id, o] = pair;
-        const outNode = prompt.workflow.nodes.find(n => n.id == id)
-        if (outNode) {
+        if (ids[id] == null)
+            ids[id] = nextID++;
+
+        if ("class_type" in o) {
             for (const pair2 of Object.entries(o.inputs)) {
                 const [inpName, i] = pair2;
 
                 if (Array.isArray(i) && i.length === 2 && typeof i[0] === "string" && typeof i[1] === "number") {
                     // Link
-                    const inpNode = prompt.workflow.nodes.find(n => n.id == i[0])
+                    const [inpID, inpSlot] = i;
+                    if (ids[inpID] == null)
+                        ids[inpID] = nextID++;
+
+                    const inpNode = prompt.output[inpID]
                     if (inpNode) {
-                        out += `"${inpNode.title}" -> "${outNode.title}"\n`
+                        out += `"${ids[inpID]}_${inpNode.class_type}" -> "${ids[id]}_${o.class_type}"\n`
                     }
                 }
                 else {
+                    const value = String(i).substring(0, 20)
                     // Value
-                    out += `"${id}-${inpName}-${i}" -> "${outNode.title}"\n`
+                    out += `"${ids[id]}-${inpName}-${value}" -> "${ids[id]}_${o.class_type}"\n`
                 }
             }
         }
@@ -202,13 +215,15 @@ export function promptToGraphVis(prompt: SerializedPrompt): string {
 }
 
 export function getNodeInfo(nodeId: ComfyNodeID): string {
-    let app = (window as any).app;
-    if (!app || !app.lGraph)
-        return String(nodeId);
+    const workflow = workflowState.getWorkflowByNodeID(nodeId);
+    if (workflow == null)
+        return nodeId;
+
+    const title = workflow.graph?.getNodeByIdRecursive(nodeId)?.title;
+    if (title == null)
+        return nodeId;
 
     const displayNodeID = nodeId ? (nodeId.split("-")[0]) : String(nodeId);
-
-    const title = app.lGraph.getNodeByIdRecursive(nodeId)?.title || String(nodeId);
     return title + " (" + displayNodeID + ")"
 }
 
@@ -222,7 +237,7 @@ export const debounce = (callback: Function, wait = 250) => {
     };
 };
 
-export function convertComfyOutputToGradio(output: ComfyExecutionResult): GradioFileData[] {
+export function convertComfyOutputToGradio(output: SerializedPromptOutput): GradioFileData[] {
     return output.images.map(convertComfyOutputEntryToGradio);
 }
 
@@ -238,7 +253,7 @@ export function convertComfyOutputEntryToGradio(r: ComfyImageLocation): GradioFi
     return fileData
 }
 
-export function convertComfyOutputToComfyURL(output: FileNameOrGalleryData): string {
+export function convertComfyOutputToComfyURL(output: string | ComfyImageLocation): string {
     if (typeof output === "string")
         return output;
 
@@ -329,11 +344,16 @@ export async function uploadImageToComfyUI(blob: Blob, filename: string, type: C
 }
 
 /** Raw output as received from ComfyUI's backend */
-export interface ComfyExecutionResult {
+export interface SerializedPromptOutput {
     // Technically this response can contain arbitrary data, but "images" is the
     // most frequently used as it's output by LoadImage and PreviewImage, the
     // only two output nodes in base ComfyUI.
     images: ComfyImageLocation[] | null,
+
+    /*
+     * Other data
+     */
+    [key: string]: any
 }
 
 /** Raw output entry as received from ComfyUI's backend */
@@ -375,7 +395,7 @@ export function isComfyBoxImageMetadataArray(value: any): value is ComfyBoxImage
     return Array.isArray(value) && value.every(isComfyBoxImageMetadata);
 }
 
-export function isComfyExecutionResult(value: any): value is ComfyExecutionResult {
+export function isComfyExecutionResult(value: any): value is SerializedPromptOutput {
     return value && typeof value === "object" && Array.isArray(value.images)
 }
 
@@ -415,7 +435,7 @@ export function comfyFileToAnnotatedFilepath(comfyUIFile: ComfyImageLocation): s
     return path;
 }
 
-export function executionResultToImageMetadata(result: ComfyExecutionResult): ComfyBoxImageMetadata[] {
+export function executionResultToImageMetadata(result: SerializedPromptOutput): ComfyBoxImageMetadata[] {
     return result.images.map(comfyFileToComfyBoxMetadata)
 }
 

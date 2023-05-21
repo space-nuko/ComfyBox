@@ -3,11 +3,12 @@ import type ComfyApp from "./components/ComfyApp";
 import queueState from "./stores/queueState";
 import { get, type Unsubscriber } from "svelte/store";
 import uiState from "./stores/uiState";
-import layoutState from "./stores/layoutState";
 import { Watch } from "@litegraph-ts/nodes-basic";
 import { ComfyReroute } from "./nodes";
 import type { Progress } from "./components/ComfyApp";
 import selectionState from "./stores/selectionState";
+import type ComfyGraph from "./ComfyGraph";
+import layoutStates from "./stores/layoutStates";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
@@ -18,9 +19,14 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     app: ComfyApp | null;
     private _unsubscribe: Unsubscriber;
 
+    get comfyGraph(): ComfyGraph | null {
+        return this.graph as ComfyGraph;
+    }
+
     constructor(
         app: ComfyApp,
         canvas: HTMLCanvasElement | string,
+        graph?: ComfyGraph,
         options: {
             skip_render?: boolean;
             skip_events?: boolean;
@@ -28,7 +34,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
             viewport?: Vector4;
         } = {}
     ) {
-        super(canvas, app.lGraph, options);
+        super(canvas, graph, options);
         this.app = app;
         this._unsubscribe = selectionState.subscribe(ss => {
             for (const node of Object.values(this.selected_nodes)) {
@@ -281,11 +287,14 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         selectionState.update(ss => {
             ss.currentSelectionNodes = Object.values(nodes)
             ss.currentSelection = []
-            const ls = get(layoutState)
-            for (const node of ss.currentSelectionNodes) {
-                const widget = ls.allItemsByNode[node.id]
-                if (widget)
-                    ss.currentSelection.push(widget.dragItem.id)
+            const layoutState = layoutStates.getLayoutByGraph(this.graph);
+            if (layoutState) {
+                const ls = get(layoutState)
+                for (const node of ss.currentSelectionNodes) {
+                    const widget = ls.allItemsByNode[node.id]
+                    if (widget)
+                        ss.currentSelection.push(widget.dragItem.id)
+                }
             }
             return ss
         })
@@ -298,11 +307,14 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
                 ss.currentHoveredNodes.add(node.id)
             }
             ss.currentHovered.clear()
-            const ls = get(layoutState)
-            for (const nodeID of ss.currentHoveredNodes) {
-                const widget = ls.allItemsByNode[nodeID]
-                if (widget)
-                    ss.currentHovered.add(widget.dragItem.id)
+            const layoutState = layoutStates.getLayoutByGraph(this.graph);
+            if (layoutState) {
+                const ls = get(layoutState)
+                for (const nodeID of ss.currentHoveredNodes) {
+                    const widget = ls.allItemsByNode[nodeID]
+                    if (widget)
+                        ss.currentHovered.add(widget.dragItem.id)
+                }
             }
             return ss
         })

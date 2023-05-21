@@ -1,33 +1,35 @@
 <script lang="ts">
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
-	import notify from "$lib/notify";
- import uiState from "$lib/stores/uiState";
- import layoutState from "$lib/stores/layoutState";
  import queueState from "$lib/stores/queueState";
+ import workflowState, { ComfyWorkflow } from "$lib/stores/workflowState";
  import { getNodeInfo } from "$lib/utils"
 
  import { Link, Toolbar } from "framework7-svelte"
  import ProgressBar from "$lib/components/ProgressBar.svelte";
 	import Indicator from "./Indicator.svelte";
 	import interfaceState from "$lib/stores/interfaceState";
-	import LightboxModal from "$lib/components/LightboxModal.svelte";
+	import type { WritableLayoutStateStore } from "$lib/stores/layoutStates";
 
  export let subworkflowID: number = -1;
  export let app: ComfyApp = undefined;
+ let layoutState: WritableLayoutStateStore = null;
  let fileInput: HTMLInputElement = undefined;
+ let workflow: ComfyWorkflow | null = null;
+
+ $: workflow = $workflowState.activeWorkflow;
 
  function queuePrompt() {
      navigator.vibrate(20)
      app.runDefaultQueueAction()
  }
 
- function refreshCombos() {
+ async function refreshCombos() {
      navigator.vibrate(20)
-     app.refreshComboInNodes()
+     await app.refreshComboInNodes()
  }
 
  function doSave(): void {
-     if (!app?.lGraph || !fileInput)
+     if (!fileInput)
          return;
 
      navigator.vibrate(20)
@@ -35,7 +37,7 @@
  }
 
  function doLoad(): void {
-     if (!app?.lGraph || !fileInput)
+     if (!fileInput)
          return;
 
      navigator.vibrate(20)
@@ -48,9 +50,6 @@
 }
 
  function doSaveLocal(): void {
-     if (!app?.lGraph)
-         return;
-
      navigator.vibrate(20)
      app.saveStateToLocalStorage();
  }
@@ -74,9 +73,9 @@
     {/if}
 </div>
 <Toolbar bottom>
-    {#if $layoutState.attrs.queuePromptButtonName != ""}
+    {#if workflow != null && workflow.attrs.queuePromptButtonName != ""}
         <Link on:click={queuePrompt}>
-            {$layoutState.attrs.queuePromptButtonName}
+            {workflow.attrs.queuePromptButtonName}
         </Link>
     {/if}
     <Link on:click={refreshCombos}>🔄</Link>

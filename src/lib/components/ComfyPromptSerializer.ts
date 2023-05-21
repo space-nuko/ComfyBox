@@ -35,7 +35,18 @@ export function isActiveBackendNode(node: LGraphNode, tag: string | null = null)
     if (!(node as any).isBackendNode)
         return false;
 
-    return isActiveNode(node, tag);
+    if (!isActiveNode(node, tag))
+        return false;
+
+    // Make sure this node is not contained in an inactive subgraph, even if the
+    // node itself is considered active
+    if (node.graph._is_subgraph) {
+        const isInsideDisabledSubgraph = Array.from(node.iterateParentSubgraphNodes()).some(n => !isActiveNode(n, tag))
+        if (isInsideDisabledSubgraph)
+            return false;
+    }
+
+    return true;
 }
 
 export class UpstreamNodeLocator {
@@ -166,7 +177,7 @@ export default class ComfyPromptSerializer {
             // We don't check tags for non-backend nodes.
             // Just check for node inactivity (so you can toggle groups of
             // tagged frontend nodes on/off)
-            if (inputNode && inputNode.mode === NodeMode.NEVER) {
+            if (inputNode && inputNode.mode !== NodeMode.ALWAYS) {
                 console.debug("Skipping inactive node", inputNode)
                 continue;
             }
@@ -247,6 +258,8 @@ export default class ComfyPromptSerializer {
 
             const inputs = this.serializeInputValues(node);
             const links = this.serializeBackendLinks(node, tag);
+
+            console.warn("OUTPUT", node.id, node.comfyClass, node.mode)
 
             output[String(node.id)] = {
                 inputs: { ...inputs, ...links },
