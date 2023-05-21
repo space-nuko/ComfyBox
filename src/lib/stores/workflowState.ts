@@ -134,6 +134,7 @@ export class ComfyWorkflow {
             return;
         }
 
+        canvas.canvas.closeAllSubgraphs();
         this.graph.detachCanvas(canvas.canvas);
         this.graph.eventBus.removeListener("afterExecute", canvas.canvasHandler)
 
