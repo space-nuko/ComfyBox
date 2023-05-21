@@ -6,9 +6,9 @@ import { SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 import type { ComfyNodeID } from '$lib/api';
 import { v4 as uuidv4 } from "uuid";
 import type { ComfyWidgetNode } from '$lib/nodes/widgets';
-import type { ComfyWorkflow, WorkflowInstID } from '$lib/components/ComfyApp';
 import type ComfyGraph from '$lib/ComfyGraph';
-import type { WorkflowAttributes } from './workflowState';
+import type { ComfyWorkflow, WorkflowAttributes, WorkflowInstID } from './workflowState';
+import workflowState from './workflowState';
 
 function isComfyWidgetNode(node: LGraphNode): node is ComfyWidgetNode {
     return "svelteComponentType" in node
@@ -670,6 +670,7 @@ type LayoutStateOps = {
     deserialize: (data: SerializedLayoutState, graph: LGraph) => void,
     initDefaultLayout: () => void,
     onStartConfigure: () => void
+    notifyWorkflowModified: () => void
 }
 
 export type SerializedLayoutState = {
@@ -770,6 +771,7 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
 
         console.debug("[layoutState] addContainer", state)
         store.set(state)
+        notifyWorkflowModified();
         // runOnChangedForWidgetDefaults(dragItem)
         return dragItem;
     }
@@ -801,6 +803,7 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
 
         console.debug("[layoutState] addWidget", state)
         moveItem(dragItem, parent, index)
+        notifyWorkflowModified();
         // runOnChangedForWidgetDefaults(dragItem)
         return dragItem;
     }
@@ -834,6 +837,7 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
             delete state.allItemsByNode[widget.node.id]
         }
         delete state.allItems[id]
+        notifyWorkflowModified();
     }
 
     function nodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
@@ -946,6 +950,7 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
         state.allItems[target.id].parent = toEntry.dragItem;
 
         console.debug("[layoutState] Move child", target, toEntry, index)
+        notifyWorkflowModified();
 
         store.set(state)
     }
@@ -976,6 +981,7 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
 
         console.debug("[layoutState] Grouped", container, parent, state.allItems[container.id].children, index)
 
+        notifyWorkflowModified();
         store.set(state)
         return container
     }
@@ -1033,18 +1039,20 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
             allItems: {},
             allItemsByNode: {},
             isMenuOpen: false,
-            isConfiguring: false,
+            isConfiguring: true,
         })
 
         const root = addContainer(null, { direction: "horizontal", title: "" });
         const left = addContainer(root, { direction: "vertical", title: "" });
         const right = addContainer(root, { direction: "vertical", title: "" });
 
-        const state = get(store)
-        state.root = root;
-        store.set(state)
+        store.update(s => {
+            s.root = root;
+            s.isConfiguring = false;
+            return s;
+        })
 
-        console.debug("[layoutState] initDefault", state)
+        console.debug("[layoutState] initDefault")
     }
 
     function serialize(): SerializedLayoutState {
@@ -1143,6 +1151,11 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
         })
     }
 
+    function notifyWorkflowModified() {
+        if (!get(store).isConfiguring)
+            workflow.notifyModified();
+    }
+
     const layoutStateStore: WritableLayoutStateStore =
     {
         ...store,
@@ -1161,7 +1174,8 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
         initDefaultLayout,
         onStartConfigure,
         serialize,
-        deserialize
+        deserialize,
+        notifyWorkflowModified
     }
 
     layoutStates.update(s => {

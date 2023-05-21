@@ -12,6 +12,8 @@ import selectionState from "./stores/selectionState";
 import type { WritableLayoutStateStore } from "./stores/layoutStates";
 import type { WorkflowInstID } from "./components/ComfyApp";
 import layoutStates from "./stores/layoutStates";
+import type { ComfyWorkflow } from "./stores/workflowState";
+import workflowState from "./stores/workflowState";
 
 type ComfyGraphEvents = {
     configured: (graph: LGraph) => void
@@ -29,6 +31,12 @@ export default class ComfyGraph extends LGraph {
 
     workflowID: WorkflowInstID | null = null;
 
+    get workflow(): ComfyWorkflow | null {
+        if (this.workflowID == null)
+            return null;
+        return workflowState.getWorkflow(this.workflowID)
+    }
+
     constructor(workflowID?: WorkflowInstID) {
         super();
         this.workflowID = workflowID;
@@ -39,6 +47,9 @@ export default class ComfyGraph extends LGraph {
     }
 
     override onBeforeChange(graph: LGraph, info: any) {
+        if (this.workflow != null)
+            this.workflow.notifyModified()
+
         console.debug("BeforeChange", info);
     }
 
@@ -70,6 +81,9 @@ export default class ComfyGraph extends LGraph {
             this.doAddNode(node, layoutState, options);
         }
 
+        if (this.workflow != null)
+            this.workflow.notifyModified()
+
         this.eventBus.emit("nodeAdded", node);
     }
 
@@ -80,9 +94,9 @@ export default class ComfyGraph extends LGraph {
         layoutState.nodeAdded(node, options)
 
         // All nodes whether they come from base litegraph or ComfyBox should
-        // have tags added to them. Can't override serialization for existing
-        // node types to add `tags` as a new field so putting it in properties
-        // is better.
+        // have tags added to them. Can't override serialization for litegraph's
+        // base node types to add `tags` as a new field so putting it in
+        // properties is better.
         if (node.properties.tags == null)
             node.properties.tags = []
 
@@ -161,6 +175,9 @@ export default class ComfyGraph extends LGraph {
             }
         }
         // ************** RECURSION ALERT ! **************
+
+        if (this.workflow != null)
+            this.workflow.notifyModified()
     }
 
     override onNodeRemoved(node: LGraphNode, options: LGraphRemoveNodeOptions) {
@@ -182,10 +199,21 @@ export default class ComfyGraph extends LGraph {
             }
         }
 
+        if (this.workflow != null)
+            this.workflow.notifyModified()
+
         this.eventBus.emit("nodeRemoved", node);
     }
 
+    override onInputsOutputsChange() {
+        if (this.workflow != null)
+            this.workflow.notifyModified()
+    }
+
     override onNodeConnectionChange(kind: LConnectionKind, node: LGraphNode, slot: SlotIndex, targetNode: LGraphNode, targetSlot: SlotIndex) {
+        if (this.workflow != null)
+            this.workflow.notifyModified()
+
         // console.debug("ConnectionChange", node);
         this.eventBus.emit("nodeConnectionChanged", kind, node, slot, targetNode, targetSlot);
     }

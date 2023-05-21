@@ -58,6 +58,14 @@
      const title = widget.node.type.replace("/", "-").replace(".", "-")
      return `widget--${title}`
  }
+
+ function _startDrag(e: MouseEvent | TouchEvent) {
+     startDrag(e, layoutState)
+ }
+
+ function _stopDrag(e: MouseEvent | TouchEvent) {
+     stopDrag(e, layoutState)
+ }
 </script>
 
 
@@ -85,7 +93,13 @@
                 <div class="handle handle-hidden" class:hidden={!edit} />
             {/if}
             {#if showHandles || hovered}
-                <div class="handle handle-widget" class:hovered data-drag-item-id={widget.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+                <div class="handle handle-widget"
+                     class:hovered
+                     data-drag-item-id={widget.id}
+                     on:mousedown={_startDrag}
+                     on:touchstart={_startDrag}
+                     on:mouseup={_stopDrag}
+                     on:touchend={_stopDrag}/>
             {/if}
         {/key}
     {/key}

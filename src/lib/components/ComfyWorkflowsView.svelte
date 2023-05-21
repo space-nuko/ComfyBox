@@ -150,9 +150,19 @@
      }
  }
 
- function closeWorkflow(event: Event, index: number) {
+ function createNewWorkflow() {
+     app.createNewWorkflow();
+ }
+
+ function closeWorkflow(event: Event, index: number, workflow: ComfyWorkflow) {
      event.preventDefault();
      event.stopImmediatePropagation()
+
+     if (workflow.isModified) {
+         if (!confirm("This workflow has unsaved changes. Are you sure you want to close it?"))
+             return;
+     }
+
      app.closeWorkflow(index);
  }
 </script>
@@ -189,13 +199,22 @@
             <button class="workflow-tab"
                     class:selected={index === $workflowState.activeWorkflowIdx}
                     on:click={() => app.setActiveWorkflow(index)}>
-                <span class="workflow-tab-title">{workflow.attrs.title}</span>
+                <span class="workflow-tab-title">
+                    {workflow.attrs.title}
+                    {#if workflow.isModified}
+                        *
+                    {/if}
+                </span>
                 <button class="workflow-close-button"
-                        on:click={(e) => closeWorkflow(e, index)}>
+                        on:click={(e) => closeWorkflow(e, index, workflow)}>
                     ✕
                 </button>
             </button>
         {/each}
+        <button class="workflow-add-new-button"
+                on:click={createNewWorkflow}>
+            ➕
+        </button>
     </div>
     <div id="bottombar">
         <div class="bottombar-content">
@@ -373,7 +392,7 @@
          display: flex;
          flex-direction: row;
          justify-content: center;
-         gap: var(--size-2);
+         gap: var(--size-4);
 
          &:last-child {
              border-right: 1px solid var(--neutral-600);
@@ -392,8 +411,10 @@
 
          > .workflow-close-button {
              display:block;
-             width: 1.5rem;
-             height: 1.5rem;
+             width: 1.2rem;
+             height: 1.2rem;
+             font-size: 13px;
+             margin: auto;
              border-radius: 50%;
              opacity: 50%;
              background: var(--neutral-500);
@@ -403,6 +424,25 @@
                  opacity: 100%;
                  color: var(--neutral-100);
              }
+         }
+     }
+
+     .workflow-add-new-button {
+         background: var(--neutral-700);
+         filter: brightness(80%);
+         color: var(--neutral-500);
+         padding: 0.5rem 1rem;
+         border-top: 3px solid var(--neutral-600);
+         border-left: 1px solid var(--neutral-600);
+
+         display: flex;
+         flex-direction: row;
+         justify-content: center;
+         gap: var(--size-4);
+
+         &:hover {
+             filter: brightness(100%);
+             border-top-color: var(--neutral-600);
          }
      }
  }

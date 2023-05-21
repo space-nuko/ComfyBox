@@ -170,6 +170,8 @@
      if (spec.refreshPanelOnChange) {
          doRefreshPanel()
      }
+
+     workflow.notifyModified()
  }
 
  function getProperty(node: LGraphNode, spec: AttributesSpec) {
@@ -205,6 +207,8 @@
 
      if (spec.refreshPanelOnChange)
          doRefreshPanel()
+
+     workflow.notifyModified()
  }
 
  function getVar(node: LGraphNode, spec: AttributesSpec) {
@@ -241,6 +245,8 @@
      if (spec.refreshPanelOnChange) {
          doRefreshPanel()
      }
+
+     workflow.notifyModified()
  }
 
  function getWorkflowAttribute(spec: AttributesSpec): any {
@@ -275,6 +281,8 @@
 
      // if (spec.refreshPanelOnChange)
          doRefreshPanel()
+
+     workflow.notifyModified()
  }
 
  function doRefreshPanel() {

@@ -186,12 +186,7 @@ export default class ComfyApp {
         // Load previous workflow
         let restored = false;
         try {
-            const json = localStorage.getItem("workflow");
-            if (json) {
-                const state = JSON.parse(json) as SerializedAppState;
-                await this.openWorkflow(state)
-                restored = true;
-            }
+            restored = await this.loadStateFromLocalStorage();
         } catch (err) {
             console.error("Error loading previous workflow", err);
             notify(`Error loading previous workflow:\n${err}`, { type: "error", timeout: null })
@@ -201,10 +196,6 @@ export default class ComfyApp {
         if (!restored) {
             await this.initDefaultWorkflow();
         }
-
-        workflowState.createNewWorkflow(this.lCanvas);
-        workflowState.createNewWorkflow(this.lCanvas);
-        workflowState.createNewWorkflow(this.lCanvas);
 
         // Save current workflow automatically
         // setInterval(this.saveStateToLocalStorage.bind(this), 1000);
@@ -256,17 +247,15 @@ export default class ComfyApp {
     }
 
     saveStateToLocalStorage() {
-        const workflow = workflowState.getActiveWorkflow();
-        if (workflow == null) {
-            notify("No active workflow!", { type: "error" })
-            return;
-        }
-
         try {
             uiState.update(s => { s.isSavingToLocalStorage = true; return s; })
-            const savedWorkflow = this.serialize(workflow);
-            const json = JSON.stringify(savedWorkflow);
-            localStorage.setItem("workflow", json)
+            const workflows = get(workflowState).openedWorkflows
+            const savedWorkflows = workflows.map(w => this.serialize(w));
+            const json = JSON.stringify(savedWorkflows);
+            localStorage.setItem("workflows", json)
+            for (const workflow of workflows)
+                workflow.isModified = false;
+            workflowState.set(get(workflowState));
             notify("Saved to local storage.")
         }
         catch (err) {
@@ -275,6 +264,17 @@ export default class ComfyApp {
         finally {
             uiState.update(s => { s.isSavingToLocalStorage = false; return s; })
         }
+    }
+
+    async loadStateFromLocalStorage(): Promise<boolean> {
+        const json = localStorage.getItem("workflows");
+        if (!json) {
+            return false
+        }
+        const workflows = JSON.parse(json) as SerializedAppState[];
+        for (const workflow of workflows)
+            await this.openWorkflow(workflow)
+        return true;
     }
 
     static node_type_overrides: Record<string, typeof ComfyBackendNode> = {}
@@ -525,6 +525,11 @@ export default class ComfyApp {
         selectionState.clear();
     }
 
+    createNewWorkflow(index: number) {
+        workflowState.createNewWorkflow(this.lCanvas, undefined, true);
+        selectionState.clear();
+    }
+
     closeWorkflow(index: number) {
         workflowState.closeWorkflow(this.lCanvas, index);
         selectionState.clear();
@@ -601,6 +606,9 @@ export default class ComfyApp {
         const json = JSON.stringify(this.serialize(workflow), null, indent)
 
         download(filename, json, "application/json")
+
+        workflow.isModified = false;
+        workflowState.set(get(workflowState));
 
         console.debug(jsonToJsObject(json))
     }

@@ -8,6 +8,7 @@ import { ComfyReroute } from "./nodes";
 import type { Progress } from "./components/ComfyApp";
 import selectionState from "./stores/selectionState";
 import type ComfyGraph from "./ComfyGraph";
+import layoutStates from "./stores/layoutStates";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
@@ -286,11 +287,14 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         selectionState.update(ss => {
             ss.currentSelectionNodes = Object.values(nodes)
             ss.currentSelection = []
-            const ls = get(this.comfyGraph.layoutState)
-            for (const node of ss.currentSelectionNodes) {
-                const widget = ls.allItemsByNode[node.id]
-                if (widget)
-                    ss.currentSelection.push(widget.dragItem.id)
+            const layoutState = layoutStates.getLayoutByGraph(this.graph);
+            if (layoutState) {
+                const ls = get(layoutState)
+                for (const node of ss.currentSelectionNodes) {
+                    const widget = ls.allItemsByNode[node.id]
+                    if (widget)
+                        ss.currentSelection.push(widget.dragItem.id)
+                }
             }
             return ss
         })
@@ -303,11 +307,14 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
                 ss.currentHoveredNodes.add(node.id)
             }
             ss.currentHovered.clear()
-            const ls = get(this.comfyGraph.layoutState)
-            for (const nodeID of ss.currentHoveredNodes) {
-                const widget = ls.allItemsByNode[nodeID]
-                if (widget)
-                    ss.currentHovered.add(widget.dragItem.id)
+            const layoutState = layoutStates.getLayoutByGraph(this.graph);
+            if (layoutState) {
+                const ls = get(layoutState)
+                for (const nodeID of ss.currentHoveredNodes) {
+                    const widget = ls.allItemsByNode[nodeID]
+                    if (widget)
+                        ss.currentHovered.add(widget.dragItem.id)
+                }
             }
             return ss
         })

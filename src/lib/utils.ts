@@ -79,9 +79,11 @@ export function startDrag(evt: MouseEvent, layoutState: WritableLayoutStateStore
 
     layoutState.set(ls)
     selectionState.set(ss)
+    layoutState.notifyWorkflowModified();
 };
 
 export function stopDrag(evt: MouseEvent, layoutState: WritableLayoutStateStore) {
+    layoutState.notifyWorkflowModified();
 };
 
 export function graphToGraphVis(graph: LGraph): string {

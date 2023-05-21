@@ -69,7 +69,12 @@ export class ComfyWorkflow {
     /*
      * Global workflow attributes
      */
-    attrs: WorkflowAttributes
+    attrs: WorkflowAttributes;
+
+    /*
+     * True if an unsaved modification has been detected on this workflow
+     */
+    isModified: boolean = false;
 
     get layout(): WritableLayoutStateStore | null {
         return layoutStates.getLayout(this.id)
@@ -87,6 +92,11 @@ export class ComfyWorkflow {
             title,
         }
         this.graph = new ComfyGraph(this.id);
+    }
+
+    notifyModified() {
+        this.isModified = true;
+        store.set(get(store));
     }
 
     start(key: string, canvas: ComfyGraphCanvas) {
