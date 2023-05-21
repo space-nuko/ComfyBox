@@ -51,7 +51,7 @@
  }
 
  async function doRefreshCombos() {
-     await app.refreshComboInNodes(undefined, true)
+     await app.refreshComboInNodes(undefined, undefined, true)
  }
 
  function refreshView(event?: Event) {
