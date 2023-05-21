@@ -99,6 +99,11 @@ export class ComfyWorkflow {
         store.set(get(store));
     }
 
+    setAttribute<K extends keyof WorkflowAttributes>(key: K, value: WorkflowAttributes[K]) {
+        this.attrs[key] = value;
+        this.notifyModified();
+    }
+
     start(key: string, canvas: ComfyGraphCanvas) {
         if (this.canvases[key] != null)
             throw new Error(`This workflow is already being displayed on canvas ${key}`)
@@ -176,6 +181,7 @@ export class ComfyWorkflow {
         }
 
         this.graph.configure(data.graph);
+        this.graph.workflowID = this.id;
 
         for (const node of this.graph._nodes) {
             const size = node.computeSize();
@@ -228,9 +234,10 @@ function getWorkflow(id: WorkflowInstID): ComfyWorkflow | null {
 }
 
 function getWorkflowByGraph(graph: LGraph): ComfyWorkflow | null {
-    if ("workflowID" in graph && graph.workflowID != null)
-        return getWorkflow((graph as ComfyGraph).workflowID);
-    return null;
+    const workflowID = (graph.getRootGraph() as ComfyGraph)?.workflowID;
+    if (workflowID == null)
+        return null;
+    return getWorkflow(workflowID);
 }
 
 function getWorkflowByNode(node: LGraphNode): ComfyWorkflow | null {

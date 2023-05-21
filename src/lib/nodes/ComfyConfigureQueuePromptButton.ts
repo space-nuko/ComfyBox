@@ -30,9 +30,9 @@ export default class ComfyConfigureQueuePromptButton extends ComfyGraphNode {
             }
 
             if (typeof param === "string")
-                this.workflow.attrs.queuePromptButtonName = param || ""
+                this.workflow.setAttribute("queuePromptButtonName", param || "")
             else if (typeof param === "object" && "buttonName" in param)
-                this.workflow.attrs.queuePromptButtonName = param.buttonName || ""
+                this.workflow.setAttribute("queuePromptButtonName", param.buttonName || "")
         }
     }
 }

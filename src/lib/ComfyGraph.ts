@@ -32,9 +32,10 @@ export default class ComfyGraph extends LGraph {
     workflowID: WorkflowInstID | null = null;
 
     get workflow(): ComfyWorkflow | null {
-        if (this.workflowID == null)
+        const workflowID = (this.getRootGraph() as ComfyGraph)?.workflowID;
+        if (workflowID == null)
             return null;
-        return workflowState.getWorkflow(this.workflowID)
+        return workflowState.getWorkflow(workflowID)
     }
 
     constructor(workflowID?: WorkflowInstID) {
