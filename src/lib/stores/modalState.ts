@@ -5,16 +5,18 @@ import { v4 as uuidv4 } from "uuid";
 export type ModalButton = {
     name: string,
     variant: "primary" | "secondary",
-    onClick: () => void
+    onClick: () => void,
+    closeOnClick?: boolean
 }
 export interface ModalData {
     id: string,
-    title: string,
+    title?: string,
     onClose?: () => void,
     svelteComponent?: typeof SvelteComponentDev,
-    svelteProps?: Record<string, any>,
-    buttons?: ModalButton[],
-    showCloseButton?: boolean
+    svelteProps: Record<string, any>,
+    buttons: ModalButton[],
+    showCloseButton: boolean,
+    closeOnClick: boolean
 }
 export interface ModalState {
     activeModals: ModalData[]
@@ -34,7 +36,10 @@ const store: Writable<ModalState> = writable(
 
 function pushModal(data: Partial<ModalData>) {
     const modal: ModalData = {
-        title: "Modal",
+        showCloseButton: true,
+        closeOnClick: true,
+        buttons: [],
+        svelteProps: {},
         ...data,
         id: uuidv4(),
     }

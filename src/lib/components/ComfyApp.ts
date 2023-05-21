@@ -4,7 +4,10 @@ import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, ty
 import { importA1111, parsePNGMetadata } from "$lib/pnginfo";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
-import A1111PromptDisplay from "./A1111PromptDisplay.svelte";
+import A1111PromptModal from "./modal/A1111PromptModal.svelte";
+import MissingNodeTypesModal from "./modal/MissingNodeTypesModal.svelte";
+import WorkflowLoadErrorModal from "./modal/WorkflowLoadErrorModal.svelte";
+import ConfirmConvertWithMissingNodeTypesModal from "./modal/ConfirmConvertWithMissingNodeTypesModal.svelte";
 
 
 // Import nodes
@@ -149,6 +152,11 @@ export type WorkflowLoadError = {
     error: Error
 }
 
+export type VanillaWorkflowConvertResult = {
+    comfyBoxWorkflow: SerializedAppState,
+    missingNodeTypes: Set<string>
+}
+
 function isComfyBoxWorkflow(data: any): data is SerializedAppState {
     return data != null && (typeof data === "object") && data.comfyBoxWorkflow;
 }
@@ -271,22 +279,6 @@ export default class ComfyApp {
         }
     }
 
-
-    convertVanillaWorkflow(workflow: ComfyVanillaWorkflow, title: string): SerializedAppState {
-        const attrs: WorkflowAttributes = {
-            ...defaultWorkflowAttributes,
-            title
-        }
-
-        const canvas: SerializedGraphCanvasState = {
-            offset: [0, 0],
-            scale: 1
-        }
-
-        const comfyBoxWorkflow = convertVanillaWorkflow(workflow, attrs);
-        return this.serialize(comfyBoxWorkflow, canvas);
-    }
-
     saveStateToLocalStorage() {
         try {
             uiState.update(s => { s.isSavingToLocalStorage = true; return s; })
@@ -320,9 +312,12 @@ export default class ComfyApp {
             return false;
 
         const workflows = state.workflows as SerializedAppState[];
-        for (const workflow of workflows) {
-            await this.openWorkflow(workflow, defs)
-        }
+        await Promise.all(workflows.map(w => {
+            return this.openWorkflow(w, defs).catch(error => {
+                console.error("Failed restoring previous workflow", error)
+                notify(`Failed restoring previous workflow: ${error}`, { type: "error" })
+            })
+        }));
 
         if (typeof state.activeWorkflowIndex === "number") {
             workflowState.setActiveWorkflow(this.lCanvas, state.activeWorkflowIndex);
@@ -566,11 +561,35 @@ export default class ComfyApp {
 
     async openWorkflow(data: SerializedAppState, refreshCombos: boolean | Record<string, ComfyNodeDef> = true): Promise<ComfyWorkflow> {
         if (data.version !== COMFYBOX_SERIAL_VERSION) {
-            throw `Invalid ComfyBox saved data format: ${data.version}`
+            const mes = `Invalid ComfyBox saved data format: ${data.version}`
+            notify(mes, { type: "error" })
+            return Promise.reject(mes);
         }
+
         this.clean();
 
-        const workflow = workflowState.openWorkflow(this.lCanvas, data);
+        let workflow: ComfyWorkflow;
+        try {
+            workflow = workflowState.openWorkflow(this.lCanvas, data);
+        }
+        catch (error) {
+            modalState.pushModal({
+                svelteComponent: WorkflowLoadErrorModal,
+                svelteProps: {
+                    error
+                }
+            })
+            return Promise.reject(error)
+        }
+
+        if (workflow.missingNodeTypes.size > 0) {
+            modalState.pushModal({
+                svelteComponent: MissingNodeTypesModal,
+                svelteProps: {
+                    missingNodeTypes: workflow.missingNodeTypes
+                }
+            })
+        }
 
         // Restore canvas offset/zoom
         this.lCanvas.deserialize(data.canvas)
@@ -586,10 +605,53 @@ export default class ComfyApp {
     }
 
     async openVanillaWorkflow(data: SerializedLGraph, filename: string) {
-        const converted = this.convertVanillaWorkflow(data, basename(filename))
-        console.info("WORKFLWO", converted)
-        notify("Converted ComfyUI workflow to ComfyBox format.", { type: "info" })
-        await this.openWorkflow(converted);
+        const title = basename(filename)
+
+        const attrs: WorkflowAttributes = {
+            ...defaultWorkflowAttributes,
+            title
+        }
+
+        const canvas: SerializedGraphCanvasState = {
+            offset: [0, 0],
+            scale: 1
+        }
+
+        const [comfyBoxWorkflow, layoutState] = convertVanillaWorkflow(data, attrs);
+
+        const addWorkflow = () => {
+            notify("Converted ComfyUI workflow to ComfyBox format.", { type: "info" })
+            workflowState.addWorkflow(this.lCanvas, comfyBoxWorkflow)
+            this.lCanvas.deserialize(canvas);
+        }
+
+        if (comfyBoxWorkflow.missingNodeTypes.size > 0) {
+            modalState.pushModal({
+                svelteComponent: ConfirmConvertWithMissingNodeTypesModal,
+                svelteProps: {
+                    missingNodeTypes: comfyBoxWorkflow.missingNodeTypes
+                },
+                closeOnClick: false,
+                showCloseButton: false,
+                buttons: [
+                    {
+                        name: "Cancel",
+                        variant: "secondary",
+                        onClick: () => {
+                            layoutStates.remove(comfyBoxWorkflow.id)
+                        }
+                    },
+                    {
+                        name: "Convert",
+                        variant: "primary",
+                        onClick: addWorkflow
+                    },
+                ]
+            })
+        }
+        else {
+            addWorkflow()
+        }
     }
 
     setActiveWorkflow(id: WorkflowInstID) {
@@ -840,11 +902,10 @@ export default class ComfyApp {
                     }
                     modalState.pushModal({
                         title: "A1111 Prompt Details",
-                        svelteComponent: A1111PromptDisplay,
+                        svelteComponent: A1111PromptModal,
                         svelteProps: {
                             prompt: a1111Info
                         },
-                        showCloseButton: true
                     })
                 }
                 else {

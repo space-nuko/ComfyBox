@@ -137,12 +137,12 @@
      if (!fileInput)
          return;
 
+     fileInput.value = null;
      fileInput.click();
  }
 
  function loadWorkflow(): void {
      app.handleFile(fileInput.files[0]);
-     fileInput.files = null;
  }
 
  function doSaveLocal(): void {
@@ -327,7 +327,7 @@
                 Error loading app
             </div>
             <div>{error}</div>
-            {#if error.stack}
+            {#if error != null && error.stack}
                 {@const lines = error.stack.split("\n")}
                 {#each lines as line}
                     <div style:font-size="16px">{line}</div>

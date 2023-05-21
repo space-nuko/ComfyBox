@@ -1,6 +1,6 @@
 import { LGraph, type INodeInputSlot, type SerializedLGraph, type LinkID, type UUID, type NodeID, LiteGraph, BuiltInSlotType, type SerializedLGraphNode, type Vector2, BuiltInSlotShape, type INodeOutputSlot } from "@litegraph-ts/core";
 import type { SerializedAppState } from "./components/ComfyApp";
-import layoutStates, { defaultWorkflowAttributes, type ContainerLayout, type DragItemID, type SerializedDragEntry, type SerializedLayoutState } from "./stores/layoutStates";
+import layoutStates, { defaultWorkflowAttributes, type ContainerLayout, type DragItemID, type SerializedDragEntry, type SerializedLayoutState, type WritableLayoutStateStore } from "./stores/layoutStates";
 import { ComfyWorkflow, type WorkflowAttributes } from "./stores/workflowState";
 import type { SerializedGraphCanvasState } from "./ComfyGraphCanvas";
 import ComfyApp from "./components/ComfyApp";
@@ -158,7 +158,7 @@ function rewriteIDsInGraph(vanillaWorkflow: ComfyVanillaWorkflow) {
     }
 }
 
-export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWorkflow, attrs: WorkflowAttributes): ComfyWorkflow {
+export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWorkflow, attrs: WorkflowAttributes): [ComfyWorkflow, WritableLayoutStateStore] {
     const [comfyBoxWorkflow, layoutState] = ComfyWorkflow.create();
     const { root, left, right } = layoutState.initDefaultLayout();
 
@@ -335,11 +335,5 @@ export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWork
     const layout = layoutState.serialize();
     comfyBoxWorkflow.deserialize(layoutState, { graph: vanillaWorkflow, attrs, layout })
 
-    for (const node of comfyBoxWorkflow.graph.iterateNodesInOrder()) {
-        if ((node as any).isBackendNode) {
-            console.warn("BENDNODE", node)
-        }
-    }
-
-    return comfyBoxWorkflow
+    return [comfyBoxWorkflow, layoutState]
 }

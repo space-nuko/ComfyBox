@@ -50,7 +50,7 @@
     </div>
 </dialog>
 
-<style>
+<style lang="scss">
 	dialog {
 		max-width: 75vw;
 		border-radius: 0.2em;
@@ -93,7 +93,10 @@
  .button-row {
      display: flex;
      flex-direction: row;
-     gap: var(--spacing-sm);
      padding-top: 0.5em;
+ }
+
+ .button-row, .buttons {
+     gap: var(--spacing-sm);
  }
 </style>
