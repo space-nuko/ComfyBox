@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import type { ComfyWidgetNode } from '$lib/nodes/widgets';
 import type { ComfyWorkflow, WorkflowInstID } from '$lib/components/ComfyApp';
 import type ComfyGraph from '$lib/ComfyGraph';
+import type { WorkflowAttributes } from './workflowState';
 
 function isComfyWidgetNode(node: LGraphNode): node is ComfyWidgetNode {
     return "svelteComponentType" in node
@@ -29,24 +30,6 @@ type DragItemEntry = {
      * Parent of this drag item.
      */
     parent: IDragItem | null
-}
-
-/*
- * Global workflow attributes
- */
-export type LayoutAttributes = {
-    /*
-     * Name of the "Queue Prompt" button. Set to blank to hide the button.
-     */
-    queuePromptButtonName: string,
-
-    /*
-     * If true, clicking the "Queue Prompt" button will run the default
-     * subgraph. Set this to false if you need special behavior before running
-     * any subgraphs, and instead use the `onDefaultQueueAction` event of the
-     * Comfy.QueueEvents node.
-     */
-    queuePromptButtonRunWorkflow: boolean,
 }
 
 /*
@@ -82,11 +65,6 @@ export type LayoutState = {
      * If true, the right-click context menu is open
      */
     isMenuOpen: boolean,
-
-    /*
-     * Global workflow attributes
-     */
-    attrs: LayoutAttributes
 }
 
 /**
@@ -185,7 +163,7 @@ export type AttributesSpec = {
      * - "widget":    inside IDragNode.attrs
      * - "nodeProps": inside LGraphNode.properties
      * - "nodeVars":  an instance variable directly on an LGraphNode
-     * - "workflow":  inside $layoutState.attrs
+     * - "workflow":  inside $workflowState.activeWorkflow.attrs
      */
     location: "widget" | "nodeProps" | "nodeVars" | "workflow"
 
@@ -601,7 +579,7 @@ export { ALL_ATTRIBUTES };
 
 // TODO Should be nested by category for name uniqueness?
 const defaultWidgetAttributes: Attributes = {} as any
-const defaultWorkflowAttributes: LayoutAttributes = {} as any
+export const defaultWorkflowAttributes: WorkflowAttributes = {} as any
 for (const cat of Object.values(ALL_ATTRIBUTES)) {
     for (const spec of Object.values(cat.specs)) {
         if (spec.defaultValue != null) {
@@ -697,7 +675,6 @@ type LayoutStateOps = {
 export type SerializedLayoutState = {
     root: DragItemID | null,
     allItems: Record<DragItemID, SerializedDragEntry>,
-    attrs: LayoutAttributes
 }
 
 export type SerializedDragEntry = {
@@ -726,9 +703,6 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
         allItemsByNode: {},
         isMenuOpen: false,
         isConfiguring: true,
-        attrs: {
-            ...defaultWorkflowAttributes
-        }
     })
 
     function clear() {
@@ -738,9 +712,6 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
             allItemsByNode: {},
             isMenuOpen: false,
             isConfiguring: true,
-            attrs: {
-                ...defaultWorkflowAttributes
-            }
         })
     }
 
@@ -1063,9 +1034,6 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
             allItemsByNode: {},
             isMenuOpen: false,
             isConfiguring: false,
-            attrs: {
-                ...defaultWorkflowAttributes
-            }
         })
 
         const root = addContainer(null, { direction: "horizontal", title: "" });
@@ -1100,7 +1068,6 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
         return {
             root: state.root?.id,
             allItems,
-            attrs: state.attrs
         }
     }
 
@@ -1156,7 +1123,6 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
             allItemsByNode,
             isMenuOpen: false,
             isConfiguring: false,
-            attrs: { ...defaultWorkflowAttributes, ...data.attrs }
         }
 
         console.debug("[layoutState] deserialize", data, state, defaultWorkflowAttributes)

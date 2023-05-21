@@ -1,4 +1,4 @@
-import { LGraph, LiteGraph, Subgraph, type SlotLayout } from "@litegraph-ts/core"
+import { LGraph, LiteGraph, Subgraph, type SlotLayout, NodeMode } from "@litegraph-ts/core"
 import { Watch } from "@litegraph-ts/nodes-basic"
 import { expect } from 'vitest'
 import UnitTest from "./UnitTest"
@@ -134,6 +134,39 @@ export default class ComfyPromptSerializerTests extends UnitTest {
         expect(Object.keys(result.output)).toHaveLength(3);
         expect(result.output[input.id].inputs["in"]).toBeInstanceOf(Array)
         expect(result.output[input.id].inputs["in"][0]).toEqual(link.id)
+        expect(result.output[link.id].inputs["in"]).toBeInstanceOf(Array)
+        expect(result.output[link.id].inputs["in"][0]).toEqual(output.id)
+        expect(result.output[output.id].inputs).toEqual({})
+    }
+
+    test__serialize__shouldIgnoreInactiveSubgraphs() {
+        const ser = new ComfyPromptSerializer();
+        const graph = new ComfyGraph();
+
+        const output = LiteGraph.createNode(MockBackendOutput)
+        const link = LiteGraph.createNode(MockBackendLink)
+        const input = LiteGraph.createNode(MockBackendInput)
+
+        const subgraph = LiteGraph.createNode(Subgraph)
+        const graphInput = subgraph.addGraphInput("testIn", "number")
+        const graphOutput = subgraph.addGraphOutput("testOut", "number")
+
+        graph.add(subgraph)
+        graph.add(output)
+        subgraph.subgraph.add(link)
+        graph.add(input)
+
+        output.connect(0, subgraph, 0)
+        graphInput.innerNode.connect(0, link, 0)
+        link.connect(0, graphOutput.innerNode, 0)
+        subgraph.connect(0, input, 0)
+
+        subgraph.mode = NodeMode.NEVER;
+
+        const result = ser.serialize(graph)
+
+        expect(Object.keys(result.output)).toHaveLength(3);
+        expect(result.output[input.id].inputs["in"]).toBeUndefined();
         expect(result.output[link.id].inputs["in"]).toBeInstanceOf(Array)
         expect(result.output[link.id].inputs["in"][0]).toEqual(output.id)
         expect(result.output[output.id].inputs).toEqual({})

@@ -1,7 +1,7 @@
 import { type WidgetLayout, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
 import selectionState from "$lib/stores/selectionState";
 import type { FileData as GradioFileData } from "@gradio/upload";
-import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID } from "@litegraph-ts/core";
+import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, type NodeID } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import type { ComfyNodeID } from "./api";
 import { type SerializedPrompt } from "./components/ComfyApp";
@@ -176,23 +176,33 @@ export function workflowToGraphVis(workflow: SerializedLGraph): string {
 export function promptToGraphVis(prompt: SerializedPrompt): string {
     let out = "digraph {\n"
 
+    const ids: Record<NodeID, number> = {}
+    let nextID = 0;
+
     for (const pair of Object.entries(prompt.output)) {
         const [id, o] = pair;
-        const outNode = prompt.workflow.nodes.find(n => n.id == id)
-        if (outNode) {
+        if (ids[id] == null)
+            ids[id] = nextID++;
+
+        if ("class_type" in o) {
             for (const pair2 of Object.entries(o.inputs)) {
                 const [inpName, i] = pair2;
 
                 if (Array.isArray(i) && i.length === 2 && typeof i[0] === "string" && typeof i[1] === "number") {
                     // Link
-                    const inpNode = prompt.workflow.nodes.find(n => n.id == i[0])
+                    const [inpID, inpSlot] = i;
+                    if (ids[inpID] == null)
+                        ids[inpID] = nextID++;
+
+                    const inpNode = prompt.output[inpID]
                     if (inpNode) {
-                        out += `"${inpNode.title}" -> "${outNode.title}"\n`
+                        out += `"${ids[inpID]}_${inpNode.class_type}" -> "${ids[id]}_${o.class_type}"\n`
                     }
                 }
                 else {
+                    const value = String(i).substring(0, 20)
                     // Value
-                    out += `"${id}-${inpName}-${i}" -> "${outNode.title}"\n`
+                    out += `"${ids[id]}-${inpName}-${value}" -> "${ids[id]}_${o.class_type}"\n`
                 }
             }
         }

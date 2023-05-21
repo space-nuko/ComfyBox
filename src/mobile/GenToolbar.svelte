@@ -1,7 +1,7 @@
 <script lang="ts">
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
  import queueState from "$lib/stores/queueState";
- import workflowState from "$lib/stores/workflowState";
+ import workflowState, { ComfyWorkflow } from "$lib/stores/workflowState";
  import { getNodeInfo } from "$lib/utils"
 
  import { Link, Toolbar } from "framework7-svelte"
@@ -14,8 +14,9 @@
  export let app: ComfyApp = undefined;
  let layoutState: WritableLayoutStateStore = null;
  let fileInput: HTMLInputElement = undefined;
+ let workflow: ComfyWorkflow | null = null;
 
- $: layoutState = $workflowState.activeWorkflow?.layout;
+ $: workflow = $workflowState.activeWorkflow;
 
  function queuePrompt() {
      navigator.vibrate(20)
@@ -72,9 +73,9 @@
     {/if}
 </div>
 <Toolbar bottom>
-    {#if $layoutState.attrs.queuePromptButtonName != ""}
+    {#if workflow != null && workflow.attrs.queuePromptButtonName != ""}
         <Link on:click={queuePrompt}>
-            {$layoutState.attrs.queuePromptButtonName}
+            {workflow.attrs.queuePromptButtonName}
         </Link>
     {/if}
     <Link on:click={refreshCombos}>🔄</Link>

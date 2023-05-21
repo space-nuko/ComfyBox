@@ -42,7 +42,7 @@ import type { ComfyBoxStdPrompt } from "$lib/ComfyBoxStdPrompt";
 import ComfyBoxStdPromptSerializer from "$lib/ComfyBoxStdPromptSerializer";
 import selectionState from "$lib/stores/selectionState";
 import layoutStates from "$lib/stores/layoutStates";
-import { ComfyWorkflow } from "$lib/stores/workflowState";
+import { ComfyWorkflow, type WorkflowAttributes } from "$lib/stores/workflowState";
 import workflowState from "$lib/stores/workflowState";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
@@ -80,8 +80,8 @@ export type SerializedAppState = {
     commitHash?: string,
     /** Graph state */
     workflow: SerializedLGraph,
-    /** Workflow name */
-    workflowName: string,
+    /** Workflow attributes */
+    attrs: WorkflowAttributes,
     /** UI state */
     layout: SerializedLayoutState,
     /** Position/offset of the canvas at the time of saving */
@@ -165,7 +165,7 @@ export default class ComfyApp {
 
     async setup(): Promise<void> {
         if (get(this.alreadySetup)) {
-            console.error("Already setup")
+            console.log("Already setup")
             return;
         }
 
@@ -241,7 +241,7 @@ export default class ComfyApp {
         if (layoutState == null)
             throw new Error("Workflow has no layout!")
 
-        const { graph, layout } = workflow.serialize(layoutState);
+        const { graph, layout, attrs } = workflow.serialize(layoutState);
         const canvas = this.lCanvas.serialize();
 
         return {
@@ -249,6 +249,7 @@ export default class ComfyApp {
             version: COMFYBOX_SERIAL_VERSION,
             commitHash: __GIT_COMMIT_HASH__,
             workflow: graph,
+            attrs,
             layout,
             canvas
         }
@@ -566,7 +567,7 @@ export default class ComfyApp {
             }
         }
 
-        if (get(workflow.layout).attrs.queuePromptButtonRunWorkflow) {
+        if (workflow.attrs.queuePromptButtonRunWorkflow) {
             // Hold control to queue at the front
             const num = this.ctrlDown ? -1 : 0;
             this.queuePrompt(num, 1);

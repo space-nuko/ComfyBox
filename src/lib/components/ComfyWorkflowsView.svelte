@@ -10,7 +10,7 @@
  import { get, writable, type Writable } from "svelte/store";
  import ComfyProperties from "./ComfyProperties.svelte";
  import uiState from "$lib/stores/uiState";
- import workflowState from "$lib/stores/workflowState";
+ import workflowState, { ComfyWorkflow } from "$lib/stores/workflowState";
  import selectionState from "$lib/stores/selectionState";
  import type ComfyApp from './ComfyApp';
  import { onMount } from "svelte";
@@ -19,7 +19,7 @@
  export let app: ComfyApp;
  export let uiTheme: string = "gradio-dark" // TODO config
 
- let layoutState: WritableLayoutStateStore | null = null;
+ let workflow: ComfyWorkflow | null = null;
 
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
@@ -29,7 +29,7 @@
 
  let appSetupPromise: Promise<void> = null;
 
- $: layoutState = $workflowState.activeWorkflow?.layout;
+ $: workflow = $workflowState.activeWorkflow;
 
  onMount(async () => {
      appSetupPromise = app.setup().then(() => {
@@ -189,10 +189,10 @@
             <button class="workflow-tab"
                     class:selected={index === $workflowState.activeWorkflowIdx}
                     on:click={() => app.setActiveWorkflow(index)}>
-                <span class="workflow-tab-title">{workflow.title}</span>
+                <span class="workflow-tab-title">{workflow.attrs.title}</span>
                 <button class="workflow-close-button"
                         on:click={(e) => closeWorkflow(e, index)}>
-                    X
+                    ✕
                 </button>
             </button>
         {/each}
@@ -200,9 +200,9 @@
     <div id="bottombar">
         <div class="bottombar-content">
             <div class="left">
-                {#if layoutState != null && $layoutState.attrs.queuePromptButtonName != ""}
+                {#if workflow != null && workflow.attrs.queuePromptButtonName != ""}
                     <Button variant="primary" disabled={!$alreadySetup} on:click={queuePrompt}>
-                        {$layoutState.attrs.queuePromptButtonName}
+                        {workflow.attrs.queuePromptButtonName}
                     </Button>
                 {/if}
                 <Button variant="secondary" disabled={!$alreadySetup} on:click={toggleGraph}>
@@ -395,11 +395,12 @@
              width: 1.5rem;
              height: 1.5rem;
              border-radius: 50%;
+             opacity: 50%;
              background: var(--neutral-500);
              color: var(--neutral-300);
 
              &:hover {
-                 background: var(--neutral-400);
+                 opacity: 100%;
                  color: var(--neutral-100);
              }
          }

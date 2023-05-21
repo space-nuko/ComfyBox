@@ -118,7 +118,6 @@ export default class ComfyGraph extends LGraph {
         }
 
         if (get(uiState).autoAddUI) {
-            console.warn("ADD", node.type, options)
             if (!("svelteComponentType" in node) && options.addedBy == null) {
                 console.debug("[ComfyGraph] AutoAdd UI")
                 const comfyNode = node as ComfyGraphNode;
@@ -167,10 +166,10 @@ export default class ComfyGraph extends LGraph {
     override onNodeRemoved(node: LGraphNode, options: LGraphRemoveNodeOptions) {
         selectionState.clear(); // safest option
 
-        if (node.getRootGraph() != null && !this._is_subgraph && this.workflowID != null) {
+        if (!this._is_subgraph && this.workflowID != null) {
             const layoutState = get(layoutStates).all[this.workflowID]
             if (layoutState === null) {
-                throw new Error(`LGraph with workflow missing layout! ${this.workflowID}`)
+                throw new Error(`ComfyGraph with workflow missing layout! ${this.workflowID}`)
             }
 
             layoutState.nodeRemoved(node, options);

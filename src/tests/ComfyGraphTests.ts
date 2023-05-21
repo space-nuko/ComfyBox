@@ -10,7 +10,7 @@ import { graphToGraphVis } from "$lib/utils";
 import { ComfyNumberNode } from "$lib/nodes/widgets";
 import { get } from "svelte/store";
 import layoutStates from "$lib/stores/layoutStates";
-import { ComfyWorkflow } from "$lib/components/ComfyApp";
+import { ComfyWorkflow } from "$lib/stores/workflowState";
 
 export default class ComfyGraphTests extends UnitTest {
     test__onNodeAdded__updatesLayoutState() {

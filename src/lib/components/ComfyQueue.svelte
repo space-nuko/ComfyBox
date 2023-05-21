@@ -13,6 +13,7 @@
  import { tick } from "svelte";
  import Modal from "./Modal.svelte";
  import DropZone from "./DropZone.svelte";
+	import workflowState from "$lib/stores/workflowState";
 
  export let app: ComfyApp;
 
@@ -71,10 +72,17 @@
      const subgraphs: string[] | null = entry.extraData?.extra_pnginfo?.comfyBoxSubgraphs;
 
      let message = "Prompt";
-     if (subgraphs?.length > 0)
-         message = `Prompt: ${subgraphs.join(', ')}`
+     if (entry.workflowID != null) {
+         const workflow = workflowState.getWorkflow(entry.workflowID);
+         if (workflow != null && workflow.attrs.title) {
+             message = `Workflow: ${workflow.attrs.title}`
+         }
+         if (subgraphs?.length > 0)
+             message += ` (${subgraphs.join(', ')})`
+     }
 
      let submessage = `Nodes: ${Object.keys(entry.prompt).length}`
+
      if (Object.keys(entry.outputs).length > 0) {
          const imageCount = Object.values(entry.outputs).flatMap(o => o.images).length
          submessage = `Images: ${imageCount}`
@@ -84,7 +92,7 @@
          entry,
          message,
          submessage,
-         dateStr,
+         date: dateStr,
          status: "pending",
          images: []
      }
@@ -387,7 +395,7 @@
 
      &.all_cached, &.interrupted {
          filter: brightness(80%);
-         color: var(--neutral-300);
+         color: var(--comfy-accent-soft);
      }
  }
 

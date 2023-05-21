@@ -1,8 +1,8 @@
 import type { SerializedGraphCanvasState } from '$lib/ComfyGraphCanvas';
-import { clamp, type LGraphCanvas, type NodeID, type SerializedLGraph, type UUID } from '@litegraph-ts/core';
+import { clamp, LGraphNode, type LGraphCanvas, type NodeID, type SerializedLGraph, type UUID, LGraph } from '@litegraph-ts/core';
 import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
-import type { SerializedLayoutState, WritableLayoutStateStore } from './layoutStates';
+import { defaultWorkflowAttributes, type SerializedLayoutState, type WritableLayoutStateStore } from './layoutStates';
 import ComfyGraph from '$lib/ComfyGraph';
 import layoutStates from './layoutStates';
 import { v4 as uuidv4 } from "uuid";
@@ -18,7 +18,8 @@ type ActiveCanvas = {
 
 export type SerializedWorkflowState = {
     graph: SerializedLGraph,
-    layout: SerializedLayoutState
+    layout: SerializedLayoutState,
+    attrs: WorkflowAttributes
 }
 
 /*
@@ -31,6 +32,29 @@ export type SerializedWorkflowState = {
  */
 export type WorkflowInstID = UUID;
 
+/*
+ * Global workflow attributes
+ */
+export type WorkflowAttributes = {
+    /*
+     * Title of the workflow.
+     */
+    title: string,
+
+    /*
+     * Name of the "Queue Prompt" button. Set to blank to hide the button.
+     */
+    queuePromptButtonName: string,
+
+    /*
+     * If true, clicking the "Queue Prompt" button will run the default
+     * subgraph. Set this to false if you need special behavior before running
+     * any subgraphs, and instead use the `onDefaultQueueAction` event of the
+     * Comfy.QueueEvents node.
+     */
+    queuePromptButtonRunWorkflow: boolean,
+}
+
 export class ComfyWorkflow {
     /*
      * Used for uniquely identifying the instance of the opened workflow in the frontend.
@@ -38,14 +62,14 @@ export class ComfyWorkflow {
     id: WorkflowInstID;
 
     /*
-     * Human-readable name on the tab
-     */
-    title: string;
-
-    /*
      * Graph of this workflow, whose nodes are bound to the UI layout
      */
     graph: ComfyGraph;
+
+    /*
+     * Global workflow attributes
+     */
+    attrs: WorkflowAttributes
 
     get layout(): WritableLayoutStateStore | null {
         return layoutStates.getLayout(this.id)
@@ -58,7 +82,10 @@ export class ComfyWorkflow {
 
     constructor(title: string) {
         this.id = uuidv4();
-        this.title = title;
+        this.attrs = {
+            ...defaultWorkflowAttributes,
+            title,
+        }
         this.graph = new ComfyGraph(this.id);
     }
 
@@ -115,7 +142,8 @@ export class ComfyWorkflow {
 
         return {
             graph: serializedGraph,
-            layout: serializedLayout
+            layout: serializedLayout,
+            attrs: this.attrs
         }
     }
 
@@ -147,6 +175,8 @@ export class ComfyWorkflow {
             // this.#invokeExtensions("loadedGraphNode", node);
         }
 
+        this.attrs = data.attrs;
+
         // Now restore the layout
         // Subsequent added nodes will add the UI data to layoutState
         // TODO
@@ -163,6 +193,8 @@ export type WorkflowState = {
 
 type WorkflowStateOps = {
     getWorkflow: (id: WorkflowInstID) => ComfyWorkflow | null
+    getWorkflowByGraph: (graph: LGraph) => ComfyWorkflow | null
+    getWorkflowByNode: (node: LGraphNode) => ComfyWorkflow | null
     getWorkflowByNodeID: (id: NodeID) => ComfyWorkflow | null
     getActiveWorkflow: () => ComfyWorkflow | null
     createNewWorkflow: (canvas: ComfyGraphCanvas, title?: string, setActive?: boolean) => ComfyWorkflow,
@@ -183,6 +215,16 @@ const store: Writable<WorkflowState> = writable(
 
 function getWorkflow(id: WorkflowInstID): ComfyWorkflow | null {
     return get(store).openedWorkflowsByID[id];
+}
+
+function getWorkflowByGraph(graph: LGraph): ComfyWorkflow | null {
+    if ("workflowID" in graph && graph.workflowID != null)
+        return getWorkflow((graph as ComfyGraph).workflowID);
+    return null;
+}
+
+function getWorkflowByNode(node: LGraphNode): ComfyWorkflow | null {
+    return getWorkflowByGraph(node.graph);
 }
 
 function getWorkflowByNodeID(id: NodeID): ComfyWorkflow | null {
@@ -216,8 +258,8 @@ function createNewWorkflow(canvas: ComfyGraphCanvas, title: string = "New Workfl
 }
 
 function openWorkflow(canvas: ComfyGraphCanvas, data: SerializedAppState): ComfyWorkflow {
-    const [workflow, layoutState] = ComfyWorkflow.create(data.workflowName || "Workflow")
-    workflow.deserialize(layoutState, { graph: data.workflow, layout: data.layout })
+    const [workflow, layoutState] = ComfyWorkflow.create("Workflow")
+    workflow.deserialize(layoutState, { graph: data.workflow, layout: data.layout, attrs: data.attrs })
 
     const state = get(store);
     state.openedWorkflows.push(workflow);
@@ -285,6 +327,8 @@ const workflowStateStore: WritableWorkflowStateStore =
 {
     ...store,
     getWorkflow,
+    getWorkflowByGraph,
+    getWorkflowByNode,
     getWorkflowByNodeID,
     getActiveWorkflow,
     createNewWorkflow,

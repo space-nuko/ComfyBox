@@ -29,13 +29,10 @@ export default class ComfyConfigureQueuePromptButton extends ComfyGraphNode {
                 throw new Error(`Could not find layout attached to this node! ${this.id}`)
             }
 
-            this.layoutState.update(state => {
-                if (typeof param === "string")
-                    state.attrs.queuePromptButtonName = param || ""
-                else if (typeof param === "object" && "buttonName" in param)
-                    state.attrs.queuePromptButtonName = param.buttonName || ""
-                return state
-            })
+            if (typeof param === "string")
+                this.workflow.attrs.queuePromptButtonName = param || ""
+            else if (typeof param === "object" && "buttonName" in param)
+                this.workflow.attrs.queuePromptButtonName = param.buttonName || ""
         }
     }
 }

@@ -4,6 +4,7 @@
  import { LGraphNode } from "@litegraph-ts/core"
  import { type IDragItem, type WidgetLayout, ALL_ATTRIBUTES, type AttributesSpec, type WritableLayoutStateStore } from "$lib/stores/layoutStates"
  import uiState from "$lib/stores/uiState"
+ import workflowState from "$lib/stores/workflowState"
  import layoutStates from "$lib/stores/layoutStates"
  import selectionState from "$lib/stores/selectionState"
  import { get, type Writable, writable } from "svelte/store"
@@ -127,7 +128,10 @@
      if (spec.location !== "workflow")
          return false;
 
-     return spec.name in $layoutState.attrs
+     if (workflow == null)
+         return false;
+
+     return spec.name in workflow.attrs
  }
 
  function getAttribute(target: IDragItem, spec: AttributesSpec): any {
@@ -240,7 +244,10 @@
  }
 
  function getWorkflowAttribute(spec: AttributesSpec): any {
-     let value = $layoutState.attrs[spec.name]
+     if (workflow == null)
+         throw new Error("Active workflow is null!");
+
+     let value = workflow.attrs[spec.name]
      if (value == null)
          value = spec.defaultValue
      else if (spec.serialize)
@@ -253,17 +260,20 @@
      if (!spec.editable)
          return;
 
+     if (workflow == null)
+         throw new Error("Active workflow is null!");
+
      const name = spec.name
      // console.warn("[ComfyProperties] updateWorkflowAttribute", name, value)
 
      const prevValue = value
-     $layoutState.attrs[name] = value
-     $layoutState = $layoutState
+     workflow.attrs[name] = value
+     $workflowState = $workflowState;
 
      if (spec.onChanged)
          spec.onChanged($layoutState, value, prevValue)
 
-     if (spec.refreshPanelOnChange)
+     // if (spec.refreshPanelOnChange)
          doRefreshPanel()
  }
 
