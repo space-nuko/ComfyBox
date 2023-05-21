@@ -18,6 +18,7 @@
  import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
  import { fade } from 'svelte/transition';
  import { cubicIn } from 'svelte/easing';
+	import { truncateString } from '$lib/utils';
 
  export let app: ComfyApp;
  export let uiTheme: string = "gradio-dark" // TODO config
@@ -235,7 +236,7 @@
                         class:selected={item.id === $workflowState.activeWorkflowID}
                         on:click={() => app.setActiveWorkflow(item.id)}>
                     <span class="workflow-tab-title">
-                        {workflow.attrs.title}
+                        {truncateString(workflow.attrs.title, 32)}
                         {#if workflow.isModified}
                             *
                         {/if}

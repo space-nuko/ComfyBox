@@ -8,6 +8,7 @@
  import Gallery from "$lib/components/gradio/gallery/Gallery.svelte";
  import { ImageViewer } from "$lib/ImageViewer";
  import type { Styles } from "@gradio/utils";
+	import { countNewLines } from "$lib/utils";
 
  const splitLength = 50;
 
@@ -27,10 +28,6 @@
          && input.length === 2
          && typeof input[0] === "string"
          && typeof input[1] === "number"
- }
-
- function countNewLines(str: string): number {
-     return str.split(/\r\n|\r|\n/).length
  }
 
  function isMultiline(input: any): boolean {

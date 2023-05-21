@@ -19,6 +19,25 @@ export function range(size: number, startAt: number = 0): ReadonlyArray<number> 
     return [...Array(size).keys()].map(i => i + startAt);
 }
 
+export function countNewLines(str: string): number {
+    return str.split(/\r\n|\r|\n/).length
+}
+
+export function basename(filepath: string): string {
+    const filename = filepath.split('/').pop().split('\\').pop();
+    return filename.split('.').slice(0, -1).join('.');
+}
+
+export function truncateString(str: string, num: number): string {
+    if (num <= 0)
+        return "…";
+
+    if (str.length <= num) {
+        return str;
+    }
+    return str.slice(0, num) + "…";
+}
+
 export function* enumerate<T>(iterable: Iterable<T>): Iterable<[number, T]> {
     let index = 0;
     for (const value of iterable) {

@@ -35,8 +35,8 @@
             bind:value={$nodeValue}
             label={widget.attrs.title}
             disabled={isDisabled(widget)}
-            lines={node.properties.multiline ? 5 : 1}
-            max_lines={node.properties.multiline ? 5 : 1}
+            lines={node.properties.multiline ? node.properties.lines : 1}
+            max_lines={node.properties.multiline ? node.properties.maxLines : 1}
             show_label={widget.attrs.title !== ""}
             on:change
             on:submit

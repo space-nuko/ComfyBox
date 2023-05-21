@@ -1,9 +1,11 @@
 import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot, type NodeID, type NodeTypeSpec, type NodeTypeOpts, type SlotIndex, type UUID } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
 import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyPromptRequest, type ComfyNodeID, type PromptID } from "$lib/api"
-import { getPngMetadata, importA1111, parsePNGMetadata } from "$lib/pnginfo";
+import { importA1111, parsePNGMetadata } from "$lib/pnginfo";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
+import A1111PromptDisplay from "./A1111PromptDisplay.svelte";
+
 
 // Import nodes
 import "@litegraph-ts/nodes-basic"
@@ -28,7 +30,7 @@ import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import { get, writable, type Writable } from "svelte/store";
 import { tick } from "svelte";
 import uiState from "$lib/stores/uiState";
-import { download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
+import { basename, download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
 import notify from "$lib/notify";
 import configState from "$lib/stores/configState";
 import { blankGraph } from "$lib/defaultGraph";
@@ -45,7 +47,7 @@ import layoutStates from "$lib/stores/layoutStates";
 import { ComfyWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
 import workflowState from "$lib/stores/workflowState";
 import convertVanillaWorkflow, { type ComfyVanillaWorkflow } from "$lib/convertVanillaWorkflow";
-import convertVanillaWorkflow from "$lib/convertVanillaWorkflow";
+import modalState from "$lib/stores/modalState";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -142,6 +144,11 @@ type CanvasState = {
     canvas: ComfyGraphCanvas,
 }
 
+export type WorkflowLoadError = {
+    message: string,
+    error: Error
+}
+
 function isComfyBoxWorkflow(data: any): data is SerializedAppState {
     return data != null && (typeof data === "object") && data.comfyBoxWorkflow;
 }
@@ -167,7 +174,6 @@ export default class ComfyApp {
     ctrlDown: boolean = false;
     selectedGroupMoving: boolean = false;
     alreadySetup: Writable<boolean> = writable(false);
-    a1111Prompt: Writable<A1111PromptAndInfo | null> = writable(null);
 
     private queueItems: PromptQueueItem[] = [];
     private processingQueue: boolean = false;
@@ -266,10 +272,10 @@ export default class ComfyApp {
     }
 
 
-    convertVanillaWorkflow(workflow: ComfyVanillaWorkflow): SerializedAppState {
+    convertVanillaWorkflow(workflow: ComfyVanillaWorkflow, title: string): SerializedAppState {
         const attrs: WorkflowAttributes = {
             ...defaultWorkflowAttributes,
-            title: "ComfyUI Workflow"
+            title
         }
 
         const canvas: SerializedGraphCanvasState = {
@@ -579,8 +585,8 @@ export default class ComfyApp {
         return workflow;
     }
 
-    async openVanillaWorkflow(data: SerializedLGraph) {
-        const converted = this.convertVanillaWorkflow(data)
+    async openVanillaWorkflow(data: SerializedLGraph, filename: string) {
+        const converted = this.convertVanillaWorkflow(data, basename(filename))
         console.info("WORKFLWO", converted)
         notify("Converted ComfyUI workflow to ComfyBox format.", { type: "info" })
         await this.openWorkflow(converted);
@@ -818,7 +824,7 @@ export default class ComfyApp {
                     await this.openWorkflow(JSON.parse(pngInfo.comfyBoxWorkflow));
                 } else if (pngInfo.workflow) {
                     const workflow = JSON.parse(pngInfo.workflow);
-                    await this.openVanillaWorkflow(workflow);
+                    await this.openVanillaWorkflow(workflow, file.name);
                 } else if (pngInfo.parameters) {
                     const parsed = parseA1111(pngInfo.parameters)
                     if ("error" in parsed) {
@@ -826,11 +832,19 @@ export default class ComfyApp {
                         return;
                     }
                     const converted = convertA1111ToStdPrompt(parsed)
-                    this.a1111Prompt.set({
+                    const a1111Info: A1111PromptAndInfo = {
                         infotext: pngInfo.parameters,
                         parsedInfotext: parsed,
                         stdPrompt: converted,
                         imageFile: file
+                    }
+                    modalState.pushModal({
+                        title: "A1111 Prompt Details",
+                        svelteComponent: A1111PromptDisplay,
+                        svelteProps: {
+                            prompt: a1111Info
+                        },
+                        showCloseButton: true
                     })
                 }
                 else {
@@ -846,7 +860,7 @@ export default class ComfyApp {
                     await this.openWorkflow(result);
                 }
                 else if (isVanillaWorkflow(result)) {
-                    await this.openVanillaWorkflow(result);
+                    await this.openVanillaWorkflow(result, file.name);
                 }
             };
             reader.readAsText(file);
@@ -990,6 +1004,5 @@ export default class ComfyApp {
      * Clean current state
      */
     clean() {
-        this.a1111Prompt.set(null);
     }
 }

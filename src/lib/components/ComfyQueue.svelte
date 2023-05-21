@@ -4,7 +4,7 @@
  import Spinner from "./Spinner.svelte";
  import PromptDisplay from "./PromptDisplay.svelte";
  import { ListIcon as List } from "svelte-feather-icons";
- import { convertComfyOutputToComfyURL, convertFilenameToComfyURL, getNodeInfo } from "$lib/utils"
+ import { convertComfyOutputToComfyURL, convertFilenameToComfyURL, getNodeInfo, truncateString } from "$lib/utils"
  import type { Writable } from "svelte/store";
  import type { QueueItemType } from "$lib/api";
  import { ImageViewer } from "$lib/ImageViewer";
@@ -75,7 +75,7 @@
      if (entry.workflowID != null) {
          const workflow = workflowState.getWorkflow(entry.workflowID);
          if (workflow != null && workflow.attrs.title) {
-             message = `Workflow: ${workflow.attrs.title}`
+             message = `${workflow.attrs.title}`
          }
          if (subgraphs?.length > 0)
              message += ` (${subgraphs.join(', ')})`
@@ -208,7 +208,6 @@
 </Modal>
 
 <div class="queue">
-    <!-- <DropZone {app} /> -->
     <div class="queue-entries {mode}-mode" bind:this={queueList}>
         {#if _entries.length > 0}
             {#each _entries as entry}
@@ -230,7 +229,7 @@
                     {/if}
                     <div class="queue-entry-details">
                         <div class="queue-entry-message">
-                            {entry.message}
+                            {truncateString(entry.message, 20)}
                         </div>
                         <div class="queue-entry-submessage">
                             {entry.submessage}

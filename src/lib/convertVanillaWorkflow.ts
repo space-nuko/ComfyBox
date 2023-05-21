@@ -1,6 +1,6 @@
 import { LGraph, type INodeInputSlot, type SerializedLGraph, type LinkID, type UUID, type NodeID, LiteGraph, BuiltInSlotType, type SerializedLGraphNode, type Vector2, BuiltInSlotShape, type INodeOutputSlot } from "@litegraph-ts/core";
 import type { SerializedAppState } from "./components/ComfyApp";
-import layoutStates, { defaultWorkflowAttributes, type DragItemID, type SerializedDragEntry, type SerializedLayoutState } from "./stores/layoutStates";
+import layoutStates, { defaultWorkflowAttributes, type ContainerLayout, type DragItemID, type SerializedDragEntry, type SerializedLayoutState } from "./stores/layoutStates";
 import { ComfyWorkflow, type WorkflowAttributes } from "./stores/workflowState";
 import type { SerializedGraphCanvasState } from "./ComfyGraphCanvas";
 import ComfyApp from "./components/ComfyApp";
@@ -12,6 +12,7 @@ import type { SerializedComfyWidgetNode } from "./nodes/widgets/ComfyWidgetNode"
 import { v4 as uuidv4 } from "uuid"
 import type ComfyWidgetNode from "./nodes/widgets/ComfyWidgetNode";
 import { ComfyGalleryNode } from "./nodes/widgets";
+import { countNewLines } from "./utils";
 
 /*
  * The workflow type used by base ComfyUI
@@ -40,7 +41,6 @@ const vanillaToComfyBoxNodeMapping: Record<string, string> = {
 
 /*
  * Version of LGraphNode.getConnectionPos but for serialized nodes.
- *
  * TODO handle other node types! (horizontal, hardcoded slot pos, collapsed...)
  */
 function getConnectionPos(node: SerializedLGraphNode, is_input: boolean, slotNumber: number, out: Vector2 = [0, 0]): Vector2 {
@@ -63,7 +63,7 @@ function createSerializedWidgetNode(vanillaWorkflow: ComfyVanillaWorkflow, node:
     comfyWidgetNode.flags.collapsed = true;
     const size: Vector2 = [0, 0];
 
-    // Compute collapsed size, sinze computeSize() ignores the collapsed flag
+    // Compute collapsed size, since computeSize() ignores the collapsed flag
     // LiteGraph only computes it if the node is rendered
     const fontSize = LiteGraph.NODE_TEXT_SIZE;
     size[0] = Math.min(
@@ -81,6 +81,14 @@ function createSerializedWidgetNode(vanillaWorkflow: ComfyVanillaWorkflow, node:
     else
         serWidgetNode.pos[0] += 20;
     serWidgetNode.pos[1] += LiteGraph.NODE_TITLE_HEIGHT / 2;
+
+    if (widgetNodeType === "ui/text" && typeof value === "string" && value.indexOf("\n") != -1) {
+        const lineCount = countNewLines(value);
+        serWidgetNode.properties.multiline = true;
+        serWidgetNode.properties.lines = lineCount + 2
+        serWidgetNode.properties.maxLines = lineCount + 2
+    }
+
     vanillaWorkflow.nodes.push(serWidgetNode)
 
     return [comfyWidgetNode, serWidgetNode];
@@ -97,12 +105,67 @@ function connectSerializedNodes(vanillaWorkflow: ComfyVanillaWorkflow, originNod
     vanillaWorkflow.links.push([newLinkID, originNode.id, originSlot, targetNode.id, targetSlot, connInput.type])
 }
 
+/*
+ * Converts all the IDs in the serialized graph into UUID format
+ */
+function rewriteIDsInGraph(vanillaWorkflow: ComfyVanillaWorkflow) {
+    const nodeIDs: Record<NodeID, UUID> = {};
+    const linkIDs: Record<LinkID, UUID> = {};
+
+    const getNodeID = (id: NodeID): UUID => {
+        if (typeof id === "string")
+            return id
+        nodeIDs[id] ||= uuidv4();
+        return nodeIDs[id];
+    }
+
+    const getLinkID = (id: LinkID): UUID => {
+        if (typeof id === "string")
+            return id
+        linkIDs[id] ||= uuidv4();
+        return linkIDs[id];
+    }
+
+    for (const node of vanillaWorkflow.nodes) {
+        node.id = getNodeID(node.id);
+        if (node.inputs != null) {
+            for (const input of node.inputs) {
+                if (input.link != null) {
+                    input.link = getLinkID(input.link)
+                }
+            }
+        }
+        if (node.outputs != null) {
+            for (const output of node.outputs) {
+                if (output.links != null)
+                    output.links = output.links.map(getLinkID);
+            }
+        }
+    }
+
+    for (const link of vanillaWorkflow.links) {
+        link[0] = getLinkID(link[0])
+        link[1] = getNodeID(link[1])
+        link[3] = getNodeID(link[3])
+    }
+
+
+    // Recurse!
+    for (const node of vanillaWorkflow.nodes) {
+        if (node.type === "graph/subgraph") {
+            rewriteIDsInGraph((node as any).subgraph as SerializedLGraph)
+        }
+    }
+}
+
 export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWorkflow, attrs: WorkflowAttributes): ComfyWorkflow {
     const [comfyBoxWorkflow, layoutState] = ComfyWorkflow.create();
     const { root, left, right } = layoutState.initDefaultLayout();
 
     // TODO will need to convert IDs to UUIDs
     const idToUUID: Record<NodeID | LinkID, UUID> = {}
+
+    rewriteIDsInGraph(vanillaWorkflow);
 
     for (const [id, node] of Object.entries(vanillaWorkflow.nodes)) {
         const newType = vanillaToComfyBoxNodeMapping[node.type];
@@ -201,10 +264,22 @@ export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWork
                     widgetNodeType,
                     value);
 
+                switch (widgetNodeType) {
+                    case "ui/number":
+                        serWidgetNode.properties.min = inputOpts?.min || 0;
+                        serWidgetNode.properties.max = inputOpts?.max || 100;
+                        serWidgetNode.properties.step = inputOpts?.step || 1;
+                        break;
+                    case "ui/text":
+                        serWidgetNode.properties.multiline = inputOpts?.multiline || false;
+                        break;
+                }
+
                 if (group == null)
                     group = layoutState.addContainer(isOutputNode ? right : left, { title: node.title || node.type })
 
-                layoutState.addWidget(group, comfyWidgetNode)
+                const widget = layoutState.addWidget(group, comfyWidgetNode)
+                widget.attrs.title = inputName;
 
                 const connOutputIndex = serWidgetNode.outputs?.findIndex(o => o.name === comfyWidgetNode.outputSlotName)
                 if (connOutputIndex != null) {
@@ -244,7 +319,8 @@ export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWork
             if (group == null)
                 group = layoutState.addContainer(isOutputNode ? right : left, { title: node.title || node.type })
 
-            layoutState.addWidget(group, comfyGalleryNode)
+            const widget = layoutState.addWidget(group, comfyGalleryNode)
+            widget.attrs.title = "Output"
 
             const connInputIndex = serGalleryNode.inputs?.findIndex(o => o.name === comfyGalleryNode.storeActionName)
             if (connInputIndex != null) {

@@ -428,6 +428,38 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: "gallery",
                 refreshPanelOnChange: true
             },
+
+            // Text
+            {
+                name: "multiline",
+                type: "boolean",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/text"],
+                defaultValue: false
+            },
+            {
+                name: "lines",
+                type: "number",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/text"],
+                defaultValue: 5,
+                min: 1,
+                max: 100,
+                step: 1
+            },
+            {
+                name: "maxLines",
+                type: "number",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/text"],
+                defaultValue: 5,
+                min: 1,
+                max: 100,
+                step: 1
+            },
         ]
     },
     {
