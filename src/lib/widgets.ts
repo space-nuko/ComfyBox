@@ -12,7 +12,9 @@ type WidgetFactory = {
     /* Input type as used by litegraph */
     inputType: string,
     /* Node type to instantiate */
-    nodeType: string
+    nodeType: string,
+    /* Number of widgets this factory instantiates. */
+    addedWidgetCount: number
 }
 
 function getNumberDefaults(inputData: ComfyNodeDefInput, defaultStep: number): ComfyInputConfig {
@@ -49,7 +51,8 @@ const FLOAT: WidgetFactory = {
         return addComfyInput(node, inputName, { type: "number", config, defaultWidgetNode: ComfyNumberNode })
     },
     inputType: "number",
-    nodeType: "ui/number"
+    nodeType: "ui/number",
+    addedWidgetCount: 1
 }
 
 const INT: WidgetFactory = {
@@ -58,7 +61,8 @@ const INT: WidgetFactory = {
         return addComfyInput(node, inputName, { type: "number", config, defaultWidgetNode: ComfyNumberNode })
     },
     nodeType: "ui/number",
-    inputType: "number"
+    inputType: "number",
+    addedWidgetCount: 1
 }
 
 const STRING: WidgetFactory = {
@@ -69,7 +73,8 @@ const STRING: WidgetFactory = {
         return addComfyInput(node, inputName, { type: "string", config: { defaultValue, multiline }, defaultWidgetNode: ComfyTextNode })
     },
     inputType: "number",
-    nodeType: "ui/text"
+    nodeType: "ui/text",
+    addedWidgetCount: 1
 }
 
 const COMBO: WidgetFactory = {
@@ -82,7 +87,8 @@ const COMBO: WidgetFactory = {
         return addComfyInput(node, inputName, { type: "string", config: { values: type, defaultValue }, defaultWidgetNode: ComfyComboNode })
     },
     inputType: "number",
-    nodeType: "ui/combo"
+    nodeType: "ui/combo",
+    addedWidgetCount: 1
 }
 
 const IMAGEUPLOAD: WidgetFactory = {
@@ -90,14 +96,25 @@ const IMAGEUPLOAD: WidgetFactory = {
         return addComfyInput(node, inputName, { type: "number", config: {} })
     },
     inputType: "COMFY_IMAGES",
-    nodeType: "ui/image_upload"
+    nodeType: "ui/image_upload",
+    addedWidgetCount: 1
+}
+
+const INT_seed: WidgetFactory = {
+    ...INT,
+
+    // Adds a "randomize" combo box
+    // When converting from vanilla it should be skipped in the widgets_values
+    // array, so indicate this here
+    // litegraph really ought to key these by name instead of array indices...
+    addedWidgetCount: 2
 }
 
 export type WidgetRepository = Record<string, WidgetFactory>
 
 const ComfyWidgets: WidgetRepository = {
-    "INT:seed": INT,
-    "INT:noise_seed": INT,
+    "INT:seed": INT_seed,
+    "INT:noise_seed": INT_seed,
     FLOAT,
     INT,
     STRING,

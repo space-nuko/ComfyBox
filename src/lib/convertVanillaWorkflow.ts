@@ -169,41 +169,46 @@ function rewriteIDsInGraph(vanillaWorkflow: ComfyVanillaWorkflow) {
 }
 
 /*
- * Returns [nodeType, inputType] for a config type, like "FLOAT" -> ["ui/number", "number"]
+ * Returns [nodeType, inputType, addedWidgetCount] for a config type, like "FLOAT" -> ["ui/number", "number", 1]
+ * For "INT:seed" it's ["ui/number", "number", 2] since that type adds a randomizer combo widget
  */
-function getWidgetTypesFromConfig(inputType: ComfyNodeDefInputType): [string, SlotType] | null {
+function getWidgetTypesFromConfig(inputName: string, inputType: ComfyNodeDefInputType): [string, SlotType, number] | null {
     let widgetNodeType = null;
     let widgetInputType = null;
+    let addedWidgetCount = 1;
 
     if (Array.isArray(inputType)) {
         // Combo options of string[]
         widgetNodeType = "ui/combo";
         widgetInputType = "string"
+        addedWidgetCount = 1;
+    }
+    else if (`${inputType}:${inputName}` in ComfyWidgets) {
+        // Widget type override for input of type with given name ("seed", "noise_seed")
+        const widgetFactory = ComfyWidgets[`${inputType}:${inputName}`]
+        widgetNodeType = widgetFactory.nodeType;
+        widgetInputType = widgetFactory.inputType
+        addedWidgetCount = widgetFactory.addedWidgetCount
     }
     else if (inputType in ComfyWidgets) {
         // Widget type
         const widgetFactory = ComfyWidgets[inputType]
         widgetNodeType = widgetFactory.nodeType;
         widgetInputType = widgetFactory.inputType
-    }
-    else if ("${inputType}:{inputName}" in ComfyWidgets) {
-        // Widget type override for input of type with given name ("seed", "noise_seed")
-        const widgetFactory = ComfyWidgets["${inputType}:{inputName}"]
-        widgetNodeType = widgetFactory.nodeType;
-        widgetInputType = widgetFactory.inputType
+        addedWidgetCount = widgetFactory.addedWidgetCount
     }
     else {
         // Backend type, we can safely ignore this
         return null;
     }
 
-    return [widgetNodeType, widgetInputType]
+    return [widgetNodeType, widgetInputType, addedWidgetCount]
 }
 
 function configureWidgetNodeProperties(serWidgetNode: SerializedComfyWidgetNode, inputOpts?: ComfyNodeDefInputOptions) {
     inputOpts ||= {}
     switch (serWidgetNode.type) {
-        case "ui/number":
+        case `ui/number`:
             serWidgetNode.properties.min = inputOpts.min || 0;
             serWidgetNode.properties.max = inputOpts.max || 100;
             serWidgetNode.properties.step = inputOpts.step || 1;
@@ -240,17 +245,17 @@ function convertPrimitiveNode(vanillaWorkflow: ComfyVanillaWorkflow, node: Seria
         return false;
     }
 
-    let pair = getWidgetTypesFromConfig(widgetType);
+    let pair = getWidgetTypesFromConfig(widget.name, widgetType);
     if (pair == null) {
         // This should never happen! Primitive nodes only deal with frontend types!
         console.error("PrimitiveNode had a backend type configured!", node)
         return false;
     }
 
-    let [widgetNodeType, widgetInputType] = pair
+    let [widgetNodeType, widgetInputType, addedWidgetCount] = pair
 
     // PrimitiveNode will have a widget in the first slot with the actual value.
-    // The rest are configuration values for e.g. seed action onprompt queue.
+    // The rest are configuration values for e.g. seed action on prompt queue.
     const value = node.widgets_values[0];
 
     const [comfyWidgetNode, serWidgetNode] = createSerializedWidgetNode(
@@ -384,22 +389,25 @@ export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWork
                 return i.widget?.name === inputName;
             })
 
+
+            let pair = getWidgetTypesFromConfig(inputName, inputType);
+            if (pair == null) {
+                // Input type is backend-only, we can skip adding a UI node here
+                continue
+            }
+
+            let [widgetNodeType, widgetInputType, widgetCount] = pair
+
             if (convertedWidget != null) {
                 // This input is an extra input slot on the node that should be
                 // accounted for.
-                const [value] = node.widgets_values.splice(0, 1);
+                const values = node.widgets_values.splice(0, widgetCount);
+                const value = values[0]
+                // TODO
             }
             else {
                 // This input is a widget, it should be converted to an input
                 // connected to a ComfyWidgetNode.
-
-                let pair = getWidgetTypesFromConfig(inputType);
-                if (pair == null) {
-                    // Input type is backend-only, we can skip adding a UI node here
-                    continue
-                }
-
-                let [widgetNodeType, widgetInputType] = pair
 
                 const newInput: IComfyInputSlot = {
                     name: inputName,
@@ -417,7 +425,17 @@ export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWork
                 const connInputIndex = node.inputs.length - 1;
 
                 // Now get the widget value.
-                const [value] = node.widgets_values.splice(0, 1);
+                //
+                // Assumes the value is the first in the widget list for the
+                // case of e.g. the seed randomizer
+                // That input type adds a number widget and a combo widget so
+                // the widgets_values will have entries like
+                //
+                // [ 8, "randomize", ... ]
+                //
+                // Only care about 8 and want to skip "randomize", that's the purpose of `widgetCount`
+                const values = node.widgets_values.splice(0, widgetCount);
+                const value = values[0]
 
                 const [comfyWidgetNode, serWidgetNode] = createSerializedWidgetNode(
                     vanillaWorkflow,
