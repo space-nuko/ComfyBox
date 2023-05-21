@@ -165,10 +165,9 @@ export default class ComfyPromptSerializerTests extends UnitTest {
 
         const result = ser.serialize(graph)
 
-        expect(Object.keys(result.output)).toHaveLength(3);
+        expect(Object.keys(result.output)).toHaveLength(2);
         expect(result.output[input.id].inputs["in"]).toBeUndefined();
-        expect(result.output[link.id].inputs["in"]).toBeInstanceOf(Array)
-        expect(result.output[link.id].inputs["in"][0]).toEqual(output.id)
+        expect(result.output[link.id]).toBeUndefined();
         expect(result.output[output.id].inputs).toEqual({})
     }
 
@@ -209,6 +208,44 @@ export default class ComfyPromptSerializerTests extends UnitTest {
         expect(result.output[input.id].inputs["in"][0]).toEqual(link.id)
         expect(result.output[link.id].inputs["in"]).toBeInstanceOf(Array)
         expect(result.output[link.id].inputs["in"][0]).toEqual(output.id)
+        expect(result.output[output.id].inputs).toEqual({})
+    }
+
+    test__serialize__shouldIgnoreInactiveSubgraphsRecursively() {
+        const ser = new ComfyPromptSerializer();
+        const graph = new ComfyGraph();
+
+        const output = LiteGraph.createNode(MockBackendOutput)
+        const link = LiteGraph.createNode(MockBackendLink)
+        const input = LiteGraph.createNode(MockBackendInput)
+
+        const subgraphA = LiteGraph.createNode(Subgraph)
+        const subgraphB = LiteGraph.createNode(Subgraph)
+        const graphInputA = subgraphA.addGraphInput("testIn", "number")
+        const graphOutputA = subgraphA.addGraphOutput("testOut", "number")
+        const graphInputB = subgraphB.addGraphInput("testIn", "number")
+        const graphOutputB = subgraphB.addGraphOutput("testOut", "number")
+
+        graph.add(subgraphA)
+        subgraphA.subgraph.add(subgraphB)
+        graph.add(output)
+        subgraphB.subgraph.add(link)
+        graph.add(input)
+
+        output.connect(0, subgraphA, 0)
+        graphInputA.innerNode.connect(0, subgraphB, 0)
+        graphInputB.innerNode.connect(0, link, 0)
+        link.connect(0, graphOutputB.innerNode, 0)
+        subgraphB.connect(0, graphOutputA.innerNode, 0)
+        subgraphA.connect(0, input, 0)
+
+        subgraphA.mode = NodeMode.NEVER;
+
+        const result = ser.serialize(graph)
+
+        expect(Object.keys(result.output)).toHaveLength(2);
+        expect(result.output[input.id].inputs["in"]).toBeUndefined();
+        expect(result.output[link.id]).toBeUndefined();
         expect(result.output[output.id].inputs).toEqual({})
     }
 }
