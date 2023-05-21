@@ -166,7 +166,6 @@ function isVanillaWorkflow(data: any): data is SerializedLGraph {
 }
 
 type BackendNodeDef = {
-    ctor: new (title?: string) => ComfyBackendNode,
     nodeDef: ComfyNodeDef
 }
 
@@ -358,7 +357,6 @@ export default class ComfyApp {
             LiteGraph.registerNodeType(node);
             node.category = nodeDef.category;
             ComfyApp.knownBackendNodes[nodeId] = {
-                ctor,
                 nodeDef
             }
 
