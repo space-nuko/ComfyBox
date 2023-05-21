@@ -4,7 +4,7 @@ import { readFile } from "fs/promises"
 import { get } from "svelte/store";
 import convertVanillaWorkflow, { type ComfyVanillaWorkflow } from '$lib/convertVanillaWorkflow';
 import type { WorkflowAttributes } from '$lib/stores/workflowState';
-import { defaultWorkflowAttributes, type IDragItem, type WidgetLayout } from '$lib/stores/layoutStates';
+import layoutStates, { defaultWorkflowAttributes, type IDragItem, type WidgetLayout } from '$lib/stores/layoutStates';
 import ComfyApp from '$lib/components/ComfyApp';
 import { LiteGraph } from '@litegraph-ts/core';
 import type { ComfyNodeDef } from '$lib/ComfyNodeDef';
@@ -17,11 +17,11 @@ export default class convertVanillaWorkflowTests extends UnitTest {
         const workflow = LiteGraph.cloneObject(json1)
         const attrs: WorkflowAttributes = { ...defaultWorkflowAttributes }
 
-        const converted = convertVanillaWorkflow(workflow, attrs)
-
         ComfyApp.knownBackendNodes["KSampler"] = {
             nodeDef: objectInfo["KSampler"]
         }
+
+        const converted = convertVanillaWorkflow(workflow, attrs)
 
         expect(converted).toBeInstanceOf(Array)
 
@@ -29,11 +29,13 @@ export default class convertVanillaWorkflowTests extends UnitTest {
 
         const layout = get(convLayout)
 
-        expect(Object.keys(layout.allItems)).toHaveLength(4)
+        expect(Object.keys(layout.allItems)).toHaveLength(10)
 
-        const widget = Object.values(layout.allItems).find(di => di.dragItem.type === "widget")?.dragItem as WidgetLayout;
+        const widgets = Object.values(layout.allItems).filter(di => di.dragItem.type === "widget").map(di => di.dragItem);
+        expect(widgets).toHaveLength(6);
+
+        const widget = widgets.find(w => w.attrs.title === "cfg") as WidgetLayout | null;
         expect(widget).toBeDefined();
-        expect(widget.attrs.title).toEqual("cfg")
         expect(widget.node).toBeDefined();
         expect(widget.node.type).toEqual("ui/number")
         expect(convWorkflow.graph.getNodeById(widget.node.id)).toEqual(widget.node)
