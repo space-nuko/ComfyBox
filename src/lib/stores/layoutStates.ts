@@ -1233,7 +1233,14 @@ function getLayoutByNode(node: LGraphNode): WritableLayoutStateStore | null {
 }
 
 export type LayoutStateStores = {
+    /*
+     * Layouts associated with opened workflows
+     */
     all: Record<WorkflowInstID, WritableLayoutStateStore>,
+
+    /*
+     * Increment to force Svelte to re-render the props panel
+     */
     refreshPropsPanel: number
 }
 
@@ -1249,10 +1256,6 @@ export type WritableLayoutStateStores = Writable<LayoutStateStores> & LayoutStat
 
 const store = writable({
     all: {},
-
-    /*
-     * Increment to force Svelte to re-render the props panel
-     */
     refreshPropsPanel: 0
 })
 

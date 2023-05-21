@@ -488,7 +488,7 @@ export class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
             }
         }
 
-        for (const entry of Object.values(get(layoutState).allItems)) {
+        for (const entry of Object.values(get(this.layoutState).allItems)) {
             if (entry.dragItem.type === "container") {
                 const container = entry.dragItem;
                 const hasTag = container.attrs.tags.indexOf(action.tag) != -1;
@@ -532,7 +532,7 @@ export class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
             this.graph.getNodeByIdRecursive(nodeId).changeMode(newMode);
         }
 
-        const layout = get(layoutState);
+        const layout = get(this.layoutState);
         for (const [dragItemID, isHidden] of Object.entries(widgetChanges)) {
             const container = layout.allItems[dragItemID].dragItem
             container.attrs.hidden = isHidden;

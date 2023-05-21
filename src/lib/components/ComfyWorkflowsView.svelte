@@ -187,7 +187,9 @@
     </Splitpanes>
     <div id="workflow-tabs">
         {#each $workflowState.openedWorkflows as workflow, index}
-            <button class="workflow-tab" class:selected={index === $workflowState.activeWorkflowIdx}>
+            <button class="workflow-tab"
+                    class:selected={index === $workflowState.activeWorkflowIdx}
+                    on:click={() => app.setActiveWorkflow(index)}>
                 {workflow.title}
             </button>
         {/each}

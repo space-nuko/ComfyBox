@@ -203,14 +203,15 @@ export function promptToGraphVis(prompt: SerializedPrompt): string {
 }
 
 export function getNodeInfo(nodeId: ComfyNodeID): string {
-    let app = (window as any).app;
-    if (!app?.activeGraph)
-        return String(nodeId);
+    const workflow = workflowState.getWorkflowByNodeID(nodeId);
+    if (workflow == null)
+        return nodeId;
+
+    const title = workflow.graph?.getNodeByIdRecursive(nodeId)?.title;
+    if (title == null)
+        return nodeId;
 
     const displayNodeID = nodeId ? (nodeId.split("-")[0]) : String(nodeId);
-
-    const workflow = workflowState.getActiveWorkflow();
-    const title = workflow?.graph?.getNodeByIdRecursive(nodeId)?.title || String(nodeId);
     return title + " (" + displayNodeID + ")"
 }
 

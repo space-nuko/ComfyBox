@@ -200,6 +200,10 @@ export default class ComfyApp {
             await this.initDefaultGraph();
         }
 
+        workflowState.createNewWorkflow(this.lCanvas);
+        workflowState.createNewWorkflow(this.lCanvas);
+        workflowState.createNewWorkflow(this.lCanvas);
+
         // Save current workflow automatically
         // setInterval(this.saveStateToLocalStorage.bind(this), 1000);
 
@@ -503,7 +507,7 @@ export default class ComfyApp {
         }
         this.clean();
 
-        const workflow = workflowState.openWorkflow(data);
+        const workflow = workflowState.openWorkflow(this.lCanvas, data);
 
         // Restore canvas offset/zoom
         this.lCanvas.deserialize(data.canvas)
@@ -514,13 +518,7 @@ export default class ComfyApp {
     }
 
     setActiveWorkflow(index: number) {
-        const workflow = workflowState.setActiveWorkflow(index);
-
-        if (workflow != null) {
-            workflow.start("app", this.lCanvas);
-            this.lCanvas.deserialize(workflow.canvases["app"].state)
-        }
-
+        workflowState.setActiveWorkflow(this.lCanvas, index);
         selectionState.clear();
     }
 
@@ -542,7 +540,7 @@ export default class ComfyApp {
         this.clean();
 
         this.lCanvas.closeAllSubgraphs();
-        workflowState.closeAllWorkflows();
+        workflowState.closeAllWorkflows(this.lCanvas);
         uiState.update(s => {
             s.uiUnlocked = true;
             s.uiEditMode = "widgets";

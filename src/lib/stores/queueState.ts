@@ -344,7 +344,7 @@ function onExecuted(promptID: PromptID, nodeID: ComfyNodeID, outputs: ComfyExecu
         entry_ = entry;
         return s
     })
-    return entry;
+    return entry_;
 }
 
 const queueStateStore: WritableQueueStateStore =

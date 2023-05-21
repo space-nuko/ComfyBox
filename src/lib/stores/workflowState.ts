@@ -1,5 +1,5 @@
 import type { SerializedGraphCanvasState } from '$lib/ComfyGraphCanvas';
-import type { LGraphCanvas, SerializedLGraph, UUID } from '@litegraph-ts/core';
+import type { LGraphCanvas, NodeID, SerializedLGraph, UUID } from '@litegraph-ts/core';
 import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
 import type { SerializedLayoutState, WritableLayoutStateStore } from './layoutStates';
@@ -36,13 +36,24 @@ export class ComfyWorkflow {
      * Used for uniquely identifying the instance of the opened workflow in the frontend.
      */
     id: WorkflowInstID;
+
+    /*
+     * Human-readable name on the tab
+     */
     title: string;
+
+    /*
+     * Graph of this workflow, whose nodes are bound to the UI layout
+     */
     graph: ComfyGraph;
 
     get layout(): WritableLayoutStateStore | null {
         return layoutStates.getLayout(this.id)
     }
 
+    /*
+     * Graph canvases attached to the graph of this workflow
+     */
     canvases: Record<string, ActiveCanvas> = {};
 
     constructor(title: string) {
@@ -150,12 +161,13 @@ export type WorkflowState = {
 
 type WorkflowStateOps = {
     getWorkflow: (id: WorkflowInstID) => ComfyWorkflow | null
+    getWorkflowByNodeID: (id: NodeID) => ComfyWorkflow | null
     getActiveWorkflow: () => ComfyWorkflow | null
-    createNewWorkflow: () => ComfyWorkflow,
-    openWorkflow: (data: SerializedAppState) => ComfyWorkflow,
-    closeWorkflow: (index: number) => void,
-    closeAllWorkflows: () => void,
-    setActiveWorkflow: (index: number) => ComfyWorkflow | null
+    createNewWorkflow: (canvas: ComfyGraphCanvas, setActive?: boolean) => ComfyWorkflow,
+    openWorkflow: (canvas: ComfyGraphCanvas, data: SerializedAppState) => ComfyWorkflow,
+    closeWorkflow: (canvas: ComfyGraphCanvas, index: number) => void,
+    closeAllWorkflows: (canvas: ComfyGraphCanvas) => void,
+    setActiveWorkflow: (canvas: ComfyGraphCanvas, index: number) => ComfyWorkflow | null
 }
 
 export type WritableWorkflowStateStore = Writable<WorkflowState> & WorkflowStateOps;
@@ -163,11 +175,18 @@ const store: Writable<WorkflowState> = writable(
     {
         openedWorkflows: [],
         openedWorkflowsByID: {},
-        activeWorkflowIdx: -1
+        activeWorkflowIdx: -1,
+        activeWorkflow: null
     })
 
 function getWorkflow(id: WorkflowInstID): ComfyWorkflow | null {
     return get(store).openedWorkflowsByID[id];
+}
+
+function getWorkflowByNodeID(id: NodeID): ComfyWorkflow | null {
+    return Object.values(get(store).openedWorkflows).find(w => {
+        return w.graph.getNodeByIdRecursive(id) != null
+    })
 }
 
 function getActiveWorkflow(): ComfyWorkflow | null {
@@ -177,34 +196,36 @@ function getActiveWorkflow(): ComfyWorkflow | null {
     return state.openedWorkflows[state.activeWorkflowIdx];
 }
 
-function createNewWorkflow(): ComfyWorkflow {
+function createNewWorkflow(canvas: ComfyGraphCanvas, setActive: boolean = false): ComfyWorkflow {
     const workflow = new ComfyWorkflow("Workflow X");
     const layoutState = layoutStates.create(workflow);
-    workflow.deserialize(layoutState, { graph: blankGraph.workflow, layout: blankGraph.layout })
+    layoutState.initDefaultLayout();
 
     const state = get(store);
-    this.openedWorkflows.push(workflow);
-    setActiveWorkflow(state.openedWorkflows.length - 1)
+    state.openedWorkflows.push(workflow);
+
+    if (setActive)
+        setActiveWorkflow(canvas, state.openedWorkflows.length - 1)
 
     store.set(state)
 
     return workflow;
 }
 
-function openWorkflow(data: SerializedAppState): ComfyWorkflow {
+function openWorkflow(canvas: ComfyGraphCanvas, data: SerializedAppState): ComfyWorkflow {
     const [workflow, layoutState] = ComfyWorkflow.create("Workflow X")
     workflow.deserialize(layoutState, { graph: data.workflow, layout: data.layout })
 
     const state = get(store);
     state.openedWorkflows.push(workflow);
-    setActiveWorkflow(state.openedWorkflows.length - 1)
+    setActiveWorkflow(canvas, state.openedWorkflows.length - 1)
 
     store.set(state)
 
     return workflow;
 }
 
-function closeWorkflow(index: number) {
+function closeWorkflow(canvas: ComfyGraphCanvas, index: number) {
     const state = get(store);
 
     if (index < 0 || index >= state.openedWorkflows.length)
@@ -213,19 +234,21 @@ function closeWorkflow(index: number) {
     const workflow = state.openedWorkflows[index];
     workflow.stopAll();
 
+    layoutStates.remove(workflow.id)
+
     state.openedWorkflows.splice(index, 1)
-    setActiveWorkflow(0);
+    setActiveWorkflow(canvas, 0);
 
     store.set(state);
 }
 
-function closeAllWorkflows() {
+function closeAllWorkflows(canvas: ComfyGraphCanvas) {
     const state = get(store)
     while (state.openedWorkflows.length > 0)
-        closeWorkflow(0)
+        closeWorkflow(canvas, 0)
 }
 
-function setActiveWorkflow(index: number): ComfyWorkflow | null {
+function setActiveWorkflow(canvas: ComfyGraphCanvas, index: number): ComfyWorkflow | null {
     const state = get(store);
 
     if (state.openedWorkflows.length === 0) {
@@ -244,6 +267,11 @@ function setActiveWorkflow(index: number): ComfyWorkflow | null {
     state.activeWorkflowIdx = index;
     state.activeWorkflow = workflow;
 
+    workflow.start("app", canvas);
+    canvas.deserialize(workflow.canvases["app"].state)
+
+    store.set(state)
+
     return workflow;
 }
 
@@ -251,6 +279,7 @@ const workflowStateStore: WritableWorkflowStateStore =
 {
     ...store,
     getWorkflow,
+    getWorkflowByNodeID,
     getActiveWorkflow,
     createNewWorkflow,
     openWorkflow,
