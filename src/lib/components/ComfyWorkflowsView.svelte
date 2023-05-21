@@ -14,12 +14,15 @@
  import selectionState from "$lib/stores/selectionState";
  import type ComfyApp from './ComfyApp';
  import { onMount } from "svelte";
-	import type { WritableLayoutStateStore } from '$lib/stores/layoutStates';
+ import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
+ import { fade } from 'svelte/transition';
+ import { cubicIn } from 'svelte/easing';
 
  export let app: ComfyApp;
  export let uiTheme: string = "gradio-dark" // TODO config
 
  let workflow: ComfyWorkflow | null = null;
+ let openedWorkflows = []
 
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
@@ -30,6 +33,7 @@
  let appSetupPromise: Promise<void> = null;
 
  $: workflow = $workflowState.activeWorkflow;
+ $: openedWorkflows = $workflowState.openedWorkflows.map(w => { return { id: w.id } })
 
  onMount(async () => {
      appSetupPromise = app.setup().then(() => {
@@ -154,7 +158,7 @@
      app.createNewWorkflow();
  }
 
- function closeWorkflow(event: Event, index: number, workflow: ComfyWorkflow) {
+ function closeWorkflow(event: Event, workflow: ComfyWorkflow) {
      event.preventDefault();
      event.stopImmediatePropagation()
 
@@ -163,15 +167,33 @@
              return;
      }
 
-     app.closeWorkflow(index);
+     app.closeWorkflow(workflow.id);
  }
+
+ function handleConsider(evt: any) {
+     console.warn(openedWorkflows.length, openedWorkflows, evt.detail.items.length, evt.detail.items)
+     openedWorkflows = evt.detail.items;
+     // openedWorkflows = evt.detail.items.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID);
+     // workflowState.update(s => {
+     //     s.openedWorkflows = openedWorkflows.map(w => workflowState.getWorkflow(w.id));
+     //     return s;
+     // })
+ };
+
+ function handleFinalize(evt: any) {
+     openedWorkflows = evt.detail.items;
+     workflowState.update(s => {
+         s.openedWorkflows = openedWorkflows.filter(w => w.id !== SHADOW_PLACEHOLDER_ITEM_ID).map(w => workflowState.getWorkflow(w.id));
+         return s;
+     })
+ };
 </script>
 
 <div id="comfy-content" bind:this={containerElem} class:loading>
     <Splitpanes theme="comfy" on:resize={refreshView}>
         <Pane bind:size={propsSidebarSize}>
             <div class="sidebar-wrapper pane-wrapper">
-                <ComfyProperties layoutState={$workflowState.activeWorkflow} />
+                <ComfyProperties workflow={$workflowState.activeWorkflow} />
             </div>
         </Pane>
         <Pane>
@@ -195,22 +217,38 @@
         </Pane>
     </Splitpanes>
     <div id="workflow-tabs">
-        {#each $workflowState.openedWorkflows as workflow, index}
-            <button class="workflow-tab"
-                    class:selected={index === $workflowState.activeWorkflowIdx}
-                    on:click={() => app.setActiveWorkflow(index)}>
-                <span class="workflow-tab-title">
-                    {workflow.attrs.title}
-                    {#if workflow.isModified}
-                        *
+        <div class="workflow-tab-items"
+             use:dndzone="{{
+                  items: openedWorkflows,
+                  flipDurationMs: 200,
+                  type: "workflow-tab",
+                  morphDisabled: true,
+                  dropFromOthersDisabled: true,
+                  dropTargetStyle: {outline: "none"},
+                          }}"
+             on:consider={handleConsider}
+             on:finalize={handleFinalize}>
+            {#each openedWorkflows.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
+                {@const workflow = workflowState.getWorkflow(item.id)}
+                <button class="workflow-tab"
+                        class:selected={item.id === $workflowState.activeWorkflowID}
+                        on:click={() => app.setActiveWorkflow(item.id)}>
+                    <span class="workflow-tab-title">
+                        {workflow.attrs.title}
+                        {#if workflow.isModified}
+                            *
+                        {/if}
+                    </span>
+                    <button class="workflow-close-button"
+                            on:click={(e) => closeWorkflow(e, workflow)}>
+                        ✕
+                    </button>
+                    {#if workflow[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
+                        <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
                     {/if}
-                </span>
-                <button class="workflow-close-button"
-                        on:click={(e) => closeWorkflow(e, index, workflow)}>
-                    ✕
                 </button>
-            </button>
-        {/each}
+            {/each}
+        </div>
         <button class="workflow-add-new-button"
                 on:click={createNewWorkflow}>
             ➕
@@ -336,12 +374,16 @@
      }
  }
 
- #workflow-tabs {
+ #workflow-tabs, .workflow-tab-items {
      display: flex;
-     padding-right: 1em;
      margin-top: auto;
      overflow-x: auto;
  }
+
+ #workflow-tabs {
+     padding-right: 1em;
+ }
+
  /*
     #topbar {
     background: var(--neutral-900);
@@ -393,6 +435,7 @@
          flex-direction: row;
          justify-content: center;
          gap: var(--size-4);
+         cursor: pointer !important;
 
          &:last-child {
              border-right: 1px solid var(--neutral-600);
@@ -407,6 +450,7 @@
              background: var(--neutral-700);
              color: var(--neutral-300);
              border-top-color: var(--primary-500);
+             font-weight: bold;
          }
 
          > .workflow-close-button {
@@ -433,7 +477,6 @@
          color: var(--neutral-500);
          padding: 0.5rem 1rem;
          border-top: 3px solid var(--neutral-600);
-         border-left: 1px solid var(--neutral-600);
 
          display: flex;
          flex-direction: row;
@@ -535,5 +578,13 @@
 
  #comfy-file-input {
      display: none;
+ }
+
+ .drag-item-shadow {
+     visibility: visible;
+     border: 1px dashed grey;
+     background: lightblue;
+     opacity: 0.5;
+     margin: 0;
  }
 </style>

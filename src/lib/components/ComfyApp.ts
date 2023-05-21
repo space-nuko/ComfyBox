@@ -42,7 +42,7 @@ import type { ComfyBoxStdPrompt } from "$lib/ComfyBoxStdPrompt";
 import ComfyBoxStdPromptSerializer from "$lib/ComfyBoxStdPromptSerializer";
 import selectionState from "$lib/stores/selectionState";
 import layoutStates from "$lib/stores/layoutStates";
-import { ComfyWorkflow, type WorkflowAttributes } from "$lib/stores/workflowState";
+import { ComfyWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
 import workflowState from "$lib/stores/workflowState";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
@@ -181,12 +181,13 @@ export default class ComfyApp {
         this.lCanvas.allow_interaction = uiUnlocked;
 
         // await this.#invokeExtensionsAsync("init");
-        await this.registerNodes();
+        const defs = await this.api.getNodeDefs();
+        await this.registerNodes(defs);
 
         // Load previous workflow
         let restored = false;
         try {
-            restored = await this.loadStateFromLocalStorage();
+            restored = await this.loadStateFromLocalStorage(defs);
         } catch (err) {
             console.error("Error loading previous workflow", err);
             notify(`Error loading previous workflow:\n${err}`, { type: "error", timeout: null })
@@ -194,7 +195,7 @@ export default class ComfyApp {
 
         // We failed to restore a workflow so load the default
         if (!restored) {
-            await this.initDefaultWorkflow();
+            await this.initDefaultWorkflow(defs);
         }
 
         // Save current workflow automatically
@@ -249,9 +250,11 @@ export default class ComfyApp {
     saveStateToLocalStorage() {
         try {
             uiState.update(s => { s.isSavingToLocalStorage = true; return s; })
-            const workflows = get(workflowState).openedWorkflows
+            const state = get(workflowState)
+            const workflows = state.openedWorkflows
             const savedWorkflows = workflows.map(w => this.serialize(w));
-            const json = JSON.stringify(savedWorkflows);
+            const activeWorkflowIndex = workflows.findIndex(w => state.activeWorkflowID === w.id);
+            const json = JSON.stringify({ workflows: savedWorkflows, activeWorkflowIndex });
             localStorage.setItem("workflows", json)
             for (const workflow of workflows)
                 workflow.isModified = false;
@@ -266,24 +269,33 @@ export default class ComfyApp {
         }
     }
 
-    async loadStateFromLocalStorage(): Promise<boolean> {
+    async loadStateFromLocalStorage(defs: Record<ComfyNodeID, ComfyNodeDef>): Promise<boolean> {
         const json = localStorage.getItem("workflows");
         if (!json) {
             return false
         }
-        const workflows = JSON.parse(json) as SerializedAppState[];
-        for (const workflow of workflows)
-            await this.openWorkflow(workflow)
+
+        const state = JSON.parse(json);
+        if (!("workflows" in state))
+            return false;
+
+        const workflows = state.workflows as SerializedAppState[];
+        for (const workflow of workflows) {
+            await this.openWorkflow(workflow, defs)
+        }
+
+        if (typeof state.activeWorkflowIndex === "number") {
+            workflowState.setActiveWorkflow(this.lCanvas, state.activeWorkflowIndex);
+            selectionState.clear();
+        }
+
         return true;
     }
 
     static node_type_overrides: Record<string, typeof ComfyBackendNode> = {}
     static widget_type_overrides: Record<string, typeof SvelteComponentDev> = {}
 
-    private async registerNodes() {
-        // Load node definitions from the backend
-        const defs = await this.api.getNodeDefs();
-
+    private async registerNodes(defs: Record<ComfyNodeID, ComfyNodeDef>) {
         // Register a node for each definition
         for (const [nodeId, nodeDef] of Object.entries(defs)) {
             const typeOverride = ComfyApp.node_type_overrides[nodeId]
@@ -504,7 +516,7 @@ export default class ComfyApp {
         setColor(BuiltInSlotType.ACTION, "lightseagreen")
     }
 
-    async openWorkflow(data: SerializedAppState): Promise<ComfyWorkflow> {
+    async openWorkflow(data: SerializedAppState, refreshCombos: boolean | Record<string, ComfyNodeDef> = true): Promise<ComfyWorkflow> {
         if (data.version !== COMFYBOX_SERIAL_VERSION) {
             throw `Invalid ComfyBox saved data format: ${data.version}`
         }
@@ -515,27 +527,38 @@ export default class ComfyApp {
         // Restore canvas offset/zoom
         this.lCanvas.deserialize(data.canvas)
 
-        await this.refreshComboInNodes(workflow);
+        if (refreshCombos) {
+            let defs = null;
+            if (typeof refreshCombos === "object")
+                defs = refreshCombos;
+            await this.refreshComboInNodes(workflow, defs);
+        }
 
         return workflow;
     }
 
-    setActiveWorkflow(index: number) {
+    setActiveWorkflow(id: WorkflowInstID) {
+        const index = get(workflowState).openedWorkflows.findIndex(w => w.id === id)
+        if (index === -1)
+            return;
         workflowState.setActiveWorkflow(this.lCanvas, index);
         selectionState.clear();
     }
 
-    createNewWorkflow(index: number) {
+    createNewWorkflow() {
         workflowState.createNewWorkflow(this.lCanvas, undefined, true);
         selectionState.clear();
     }
 
-    closeWorkflow(index: number) {
+    closeWorkflow(id: WorkflowInstID) {
+        const index = get(workflowState).openedWorkflows.findIndex(w => w.id === id)
+        if (index === -1)
+            return;
         workflowState.closeWorkflow(this.lCanvas, index);
         selectionState.clear();
     }
 
-    async initDefaultWorkflow() {
+    async initDefaultWorkflow(defs?: Record<string, ComfyNodeDef>) {
         let state = null;
         try {
             const graphResponse = await fetch("/workflows/defaultWorkflow.json");
@@ -546,7 +569,7 @@ export default class ComfyApp {
             notify(`Failed to load default graph: ${error}`, { type: "error" })
             state = structuredClone(blankGraph)
         }
-        await this.openWorkflow(state)
+        await this.openWorkflow(state, defs)
     }
 
     clear() {
@@ -783,14 +806,15 @@ export default class ComfyApp {
     /**
      * Refresh combo list on whole nodes
      */
-    async refreshComboInNodes(workflow?: ComfyWorkflow, flashUI: boolean = false) {
+    async refreshComboInNodes(workflow?: ComfyWorkflow, defs?: Record<string, ComfyNodeDef>, flashUI: boolean = false) {
         workflow ||= workflowState.getActiveWorkflow();
         if (workflow == null) {
             notify("No active workflow!", { type: "error" })
             return
         }
 
-        const defs = await this.api.getNodeDefs();
+        if (defs == null)
+            defs = await this.api.getNodeDefs();
 
         const isComfyComboNode = (node: LGraphNode): node is ComfyComboNode => {
             return node

@@ -549,6 +549,13 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
 
             // Workflow
             {
+                name: "title",
+                type: "string",
+                location: "workflow",
+                editable: true,
+                defaultValue: "New Workflow"
+            },
+            {
                 name: "queuePromptButtonName",
                 type: "string",
                 location: "workflow",

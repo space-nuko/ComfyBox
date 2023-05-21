@@ -197,7 +197,7 @@ export class ComfyWorkflow {
 export type WorkflowState = {
     openedWorkflows: ComfyWorkflow[],
     openedWorkflowsByID: Record<WorkflowInstID, ComfyWorkflow>,
-    activeWorkflowIdx: number,
+    activeWorkflowID: WorkflowInstID | null,
     activeWorkflow: ComfyWorkflow | null,
 }
 
@@ -219,7 +219,7 @@ const store: Writable<WorkflowState> = writable(
     {
         openedWorkflows: [],
         openedWorkflowsByID: {},
-        activeWorkflowIdx: -1,
+        activeWorkflowID: null,
         activeWorkflow: null
     })
 
@@ -245,9 +245,9 @@ function getWorkflowByNodeID(id: NodeID): ComfyWorkflow | null {
 
 function getActiveWorkflow(): ComfyWorkflow | null {
     const state = get(store);
-    if (state.activeWorkflowIdx === -1)
+    if (state.activeWorkflowID == null)
         return null;
-    return state.openedWorkflows[state.activeWorkflowIdx];
+    return state.openedWorkflowsByID[state.activeWorkflowID];
 }
 
 function createNewWorkflow(canvas: ComfyGraphCanvas, title: string = "New Workflow", setActive: boolean = false): ComfyWorkflow {
@@ -292,9 +292,10 @@ function closeWorkflow(canvas: ComfyGraphCanvas, index: number) {
 
     layoutStates.remove(workflow.id)
 
+
     state.openedWorkflows.splice(index, 1)
     delete state.openedWorkflowsByID[workflow.id]
-    const newIndex = clamp(state.activeWorkflowIdx, 0, state.openedWorkflows.length - 1);
+    let newIndex = clamp(index, 0, state.openedWorkflows.length - 1)
     setActiveWorkflow(canvas, newIndex);
 
     store.set(state);
@@ -310,19 +311,22 @@ function setActiveWorkflow(canvas: ComfyGraphCanvas, index: number): ComfyWorkfl
     const state = get(store);
 
     if (state.openedWorkflows.length === 0) {
-        state.activeWorkflowIdx = -1;
+        state.activeWorkflowID = null;
         state.activeWorkflow = null
         return null;
     }
 
-    if (index < 0 || index >= state.openedWorkflows.length || state.activeWorkflowIdx === index)
+    if (index < 0 || index >= state.openedWorkflows.length)
         return state.activeWorkflow;
+
+    const workflow = state.openedWorkflows[index]
+    if (workflow.id === state.activeWorkflowID)
+        return;
 
     if (state.activeWorkflow != null)
         state.activeWorkflow.stop("app")
 
-    const workflow = state.openedWorkflows[index]
-    state.activeWorkflowIdx = index;
+    state.activeWorkflowID = workflow.id;
     state.activeWorkflow = workflow;
 
     workflow.start("app", canvas);
