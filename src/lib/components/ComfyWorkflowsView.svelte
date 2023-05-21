@@ -1,5 +1,6 @@
 <script lang="ts">
  import { Pane, Splitpanes } from 'svelte-splitpanes';
+ import { PlusSquareIcon as PlusSquare } from 'svelte-feather-icons';
  import { Button } from "@gradio/button";
  import { BlockTitle } from "@gradio/atoms";
  import ComfyWorkflowView from "./ComfyWorkflowView.svelte";
@@ -251,7 +252,7 @@
         </div>
         <button class="workflow-add-new-button"
                 on:click={createNewWorkflow}>
-            ➕
+            <PlusSquare size="100%" strokeWidth={1.5} />
         </button>
     </div>
     <div id="bottombar">
@@ -376,69 +377,30 @@
 
  #workflow-tabs, .workflow-tab-items {
      display: flex;
-     margin-top: auto;
      overflow-x: auto;
  }
 
  #workflow-tabs {
-     padding-right: 1em;
- }
-
- /*
-    #topbar {
-    background: var(--neutral-900);
-    height: 100%;
-    flex-direction: column;
-    float: left;
-    position: sticky;
-    top: 0px;
-    padding: 0;
-    width: 4rem;
-
-    .topbar-button {
-    background: var(--neutral-800);
-    color: var(--neutral-500);
-    padding: 0.5rem;
-    border-right: 3px solid transparent;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    &:last-child {
-    border-right: 1px solid var(--neutral-600);
-    }
-
-    &:hover {
-    background: var(--neutral-700);
-    color: var(--neutral-300);
-    }
-
-    &.selected {
-    background: var(--neutral-700);
-    color: var(--neutral-300);
-    border-right-color: var(--primary-500);
-    }
-    }
-    } */
-
- #workflow-tabs {
      background: var(--neutral-800);
+     padding-right: 1em;
+     height: 3rem;
      .workflow-tab {
          background: var(--neutral-800);
          color: var(--neutral-500);
          padding: 0.5rem 1rem;
-         border-top: 3px solid transparent;
+         border-top: 3px solid var(--neutral-600);
          border-left: 1px solid var(--neutral-600);
+         height: 100%;
 
          display: flex;
          flex-direction: row;
          justify-content: center;
+         text-align: center;
          gap: var(--size-4);
          cursor: pointer !important;
 
-         &:last-child {
-             border-right: 1px solid var(--neutral-600);
+         > span {
+             margin: auto;
          }
 
          &:hover:not(:has(.workflow-close-button:hover)) {
@@ -473,10 +435,12 @@
 
      .workflow-add-new-button {
          background: var(--neutral-700);
-         filter: brightness(80%);
-         color: var(--neutral-500);
-         padding: 0.5rem 1rem;
+         color: var(--neutral-400);
+         opacity: 50%;
+         padding: 0.5rem;
          border-top: 3px solid var(--neutral-600);
+         aspect-ratio: 1/1;
+         height: 100%;
 
          display: flex;
          flex-direction: row;
@@ -485,6 +449,7 @@
 
          &:hover {
              filter: brightness(100%);
+             opacity: 100%;
              border-top-color: var(--neutral-600);
          }
      }
