@@ -660,7 +660,7 @@ export interface WidgetLayout extends IDragItem {
 export type DragItemID = UUID;
 
 type LayoutStateOps = {
-    workflow: ComfyWorkflow,
+    workflow: ComfyWorkflow | null,
 
     addContainer: (parent: ContainerLayout | null, attrs: Partial<Attributes>, index?: number) => ContainerLayout,
     addWidget: (parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes>, index?: number) => WidgetLayout,
@@ -700,11 +700,7 @@ export type SerializedDragItem = {
 
 export type WritableLayoutStateStore = Writable<LayoutState> & LayoutStateOps;
 
-function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
-    if (get(layoutStates).all[workflow.id] != null) {
-        throw new Error(`Layout state already created! ${id}`)
-    }
-
+function createRaw(workflow: ComfyWorkflow | null = null): WritableLayoutStateStore {
     const store: Writable<LayoutState> = writable({
         root: null,
         allItems: {},
@@ -1160,7 +1156,7 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
 
     function notifyWorkflowModified() {
         if (!get(store).isConfiguring)
-            workflow.notifyModified();
+            workflow?.notifyModified();
     }
 
     const layoutStateStore: WritableLayoutStateStore =
@@ -1184,6 +1180,16 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
         deserialize,
         notifyWorkflowModified
     }
+
+    return layoutStateStore
+}
+
+function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
+    if (get(layoutStates).all[workflow.id] != null) {
+        throw new Error(`Layout state already created! ${id}`)
+    }
+
+    const layoutStateStore = createRaw(workflow);
 
     layoutStates.update(s => {
         s.all[workflow.id] = layoutStateStore;
@@ -1233,6 +1239,7 @@ export type LayoutStateStores = {
 
 export type LayoutStateStoresOps = {
     create: (workflow: ComfyWorkflow) => WritableLayoutStateStore,
+    createRaw: (workflow?: ComfyWorkflow | null) => WritableLayoutStateStore,
     remove: (workflowID: WorkflowInstID) => void,
     getLayout: (workflowID: WorkflowInstID) => WritableLayoutStateStore | null,
     getLayoutByGraph: (graph: LGraph) => WritableLayoutStateStore | null,
@@ -1249,6 +1256,7 @@ const store = writable({
 const layoutStates: WritableLayoutStateStores = {
     ...store,
     create,
+    createRaw,
     remove,
     getLayout,
     getLayoutByGraph,

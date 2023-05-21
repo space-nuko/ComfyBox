@@ -69,7 +69,7 @@
          dateStr = formatDate(date);
      }
 
-     const subgraphs: string[] | null = entry.extraData?.extra_pnginfo?.comfyBoxSubgraphs;
+     const subgraphs: string[] | null = entry.extraData?.extra_pnginfo?.comfyBoxPrompt?.subgraphs;
 
      let message = "Prompt";
      if (entry.workflowID != null) {
@@ -208,7 +208,7 @@
 </Modal>
 
 <div class="queue">
-    <DropZone {app} />
+    <!-- <DropZone {app} /> -->
     <div class="queue-entries {mode}-mode" bind:this={queueList}>
         {#if _entries.length > 0}
             {#each _entries as entry}
@@ -305,8 +305,9 @@
 <style lang="scss">
  $pending-height: 200px;
  $bottom-bar-height: 70px;
+ $workflow-tabs-height: 2.5rem;
  $mode-buttons-height: 30px;
- $queue-height: calc(100vh - #{$pending-height} - #{$mode-buttons-height} - #{$bottom-bar-height});
+ $queue-height: calc(100vh - #{$pending-height} - #{$mode-buttons-height} - #{$bottom-bar-height} - #{$workflow-tabs-height} - 0.9rem);
 
  .prompt-modal-header {
      padding-left: 0.2rem;

@@ -1,7 +1,7 @@
 import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot, type NodeID, type NodeTypeSpec, type NodeTypeOpts, type SlotIndex, type UUID } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
 import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyPromptRequest, type ComfyNodeID, type PromptID } from "$lib/api"
-import { getPngMetadata, importA1111 } from "$lib/pnginfo";
+import { getPngMetadata, importA1111, parsePNGMetadata } from "$lib/pnginfo";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
 
@@ -44,6 +44,7 @@ import selectionState from "$lib/stores/selectionState";
 import layoutStates from "$lib/stores/layoutStates";
 import { ComfyWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
 import workflowState from "$lib/stores/workflowState";
+import convertVanillaWorkflow from "$lib/convertVanillaWorkflow";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -72,8 +73,10 @@ export type A1111PromptAndInfo = {
  * Represents a single workflow that can be loaded into the program from JSON.
  */
 export type SerializedAppState = {
-    /** Program identifier, should always be "ComfyBox" */
-    createdBy: "ComfyBox",
+    /** For easy structural typing use */
+    comfyBoxWorkflow: true,
+    /** Program identifier, should be something like "ComfyBox" or "ComfyUI" */
+    createdBy: string,
     /** Serial version, should be incremented on breaking changes */
     version: number,
     /** Commit hash if found */
@@ -136,6 +139,14 @@ type CanvasState = {
     canvasEl: HTMLCanvasElement,
     canvasCtx: CanvasRenderingContext2D,
     canvas: ComfyGraphCanvas,
+}
+
+function isComfyBoxWorkflow(data: any): data is SerializedAppState {
+    return data != null && (typeof data === "object") && data.comfyBoxWorkflow;
+}
+
+function isVanillaWorkflow(data: any): data is SerializedLGraph {
+    return data != null && (typeof data === "object") && data.last_node_id != null;
 }
 
 export default class ComfyApp {
@@ -237,6 +248,7 @@ export default class ComfyApp {
         const canvas = this.lCanvas.serialize();
 
         return {
+            comfyBoxWorkflow: true,
             createdBy: "ComfyBox",
             version: COMFYBOX_SERIAL_VERSION,
             commitHash: __GIT_COMMIT_HASH__,
@@ -399,7 +411,7 @@ export default class ComfyApp {
                 } catch (error) { }
             }
 
-            if (workflow && workflow.createdBy === "ComfyBox") {
+            if (workflow && typeof workflow.createdBy === "string") {
                 this.openWorkflow(workflow);
             }
             else {
@@ -535,6 +547,13 @@ export default class ComfyApp {
         }
 
         return workflow;
+    }
+
+    async openVanillaWorkflow(data: SerializedLGraph) {
+        const converted = convertVanillaWorkflow(data)
+        console.info("WORKFLWO", converted)
+        notify("Converted ComfyUI workflow to ComfyBox format.", { type: "info" })
+        // await this.openWorkflow(JSON.parse(pngInfo.workflow));
     }
 
     setActiveWorkflow(id: WorkflowInstID) {
@@ -695,7 +714,7 @@ export default class ComfyApp {
                     }
 
                     const p = this.graphToPrompt(workflow, tag);
-                    const l = workflow.layout.serialize();
+                    const wf = this.serialize(workflow)
                     console.debug(graphToGraphVis(workflow.graph))
                     console.debug(promptToGraphVis(p))
 
@@ -704,9 +723,10 @@ export default class ComfyApp {
 
                     const extraData: ComfyBoxPromptExtraData = {
                         extra_pnginfo: {
-                            workflow: p.workflow,
-                            comfyBoxLayout: l,
-                            comfyBoxSubgraphs: [tag],
+                            comfyBoxWorkflow: wf,
+                            comfyBoxPrompt: {
+                                subgraphs: [tag]
+                            }
                         },
                         thumbnails
                     }
@@ -761,10 +781,14 @@ export default class ComfyApp {
      */
     async handleFile(file: File) {
         if (file.type === "image/png") {
-            const pngInfo = await getPngMetadata(file);
+            const buffer = await file.arrayBuffer();
+            const pngInfo = await parsePNGMetadata(buffer);
             if (pngInfo) {
-                if (pngInfo.comfyBoxConfig) {
-                    await this.openWorkflow(JSON.parse(pngInfo.comfyBoxConfig));
+                if (pngInfo.comfyBoxWorkflow) {
+                    await this.openWorkflow(JSON.parse(pngInfo.comfyBoxWorkflow));
+                } else if (pngInfo.workflow) {
+                    const workflow = JSON.parse(pngInfo.workflow);
+                    await this.openVanillaWorkflow(workflow);
                 } else if (pngInfo.parameters) {
                     const parsed = parseA1111(pngInfo.parameters)
                     if ("error" in parsed) {
@@ -787,7 +811,13 @@ export default class ComfyApp {
         } else if (file.type === "application/json" || file.name.endsWith(".json")) {
             const reader = new FileReader();
             reader.onload = async () => {
-                await this.openWorkflow(JSON.parse(reader.result as string));
+                const result = JSON.parse(reader.result as string)
+                if (isComfyBoxWorkflow(result)) {
+                    await this.openWorkflow(result);
+                }
+                else if (isVanillaWorkflow(result)) {
+                    await this.openVanillaWorkflow(result);
+                }
             };
             reader.readAsText(file);
         }

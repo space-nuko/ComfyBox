@@ -18,7 +18,7 @@
 
  let galleryStyle: Styles = {
      grid_cols: [2],
-     object_fit: "cover",
+     object_fit: "contain",
      height: "var(--size-96)"
  }
 
@@ -165,6 +165,11 @@
 
          > :global(.block) {
              height: 100%;
+
+             :global(> .preview) {
+                 height: 100%;
+                 max-height: none !important;
+             }
          }
      }
 

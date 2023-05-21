@@ -1,4 +1,4 @@
-import type { Progress, SerializedPrompt, SerializedPromptInputsForNode, SerializedPromptInputsAll, SerializedPromptOutputs } from "./components/ComfyApp";
+import type { Progress, SerializedPrompt, SerializedPromptInputsForNode, SerializedPromptInputsAll, SerializedPromptOutputs, SerializedAppState } from "./components/ComfyApp";
 import type TypedEmitter from "typed-emitter";
 import EventEmitter from "events";
 import type { ComfyImageLocation } from "$lib/utils";
@@ -57,10 +57,14 @@ export type ComfyAPIHistoryResponse = {
     error?: string
 }
 
+export type SerializedComfyBoxPromptData = {
+    subgraphs: string[]
+}
+
 export type ComfyPromptPNGInfo = {
-    workflow: SerializedLGraph,
-    comfyBoxLayout: SerializedLayoutState,
-    comfyBoxSubgraphs: string[],
+    workflow?: SerializedLGraph, // ComfyUI format
+    comfyBoxWorkflow: SerializedAppState,
+    comfyBoxPrompt: SerializedComfyBoxPromptData,
 }
 
 export type ComfyBoxPromptExtraData = ComfyUIPromptExtraData & {

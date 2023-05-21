@@ -203,7 +203,7 @@
                     {#if $workflowState.activeWorkflow != null}
                         <ComfyWorkflowView {app} workflow={$workflowState.activeWorkflow} />
                     {:else}
-                        <span>No workflow loaded</span>
+                        <span style:color="var(--body-text-color)">No workflow loaded</span>
                     {/if}
                 </Pane>
                 <Pane bind:size={graphSize}>
@@ -313,7 +313,7 @@
         </div>
     </div>
 </div>
-<input bind:this={fileInput} id="comfy-file-input" type="file" accept=".json" on:change={loadWorkflow} />
+<input bind:this={fileInput} id="comfy-file-input" type="file" accept="application/json,image/png" on:change={loadWorkflow} />
 
 {#if appSetupPromise}
     {#await appSetupPromise}
