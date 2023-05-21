@@ -1,5 +1,5 @@
 <script lang="ts">
- import { type WidgetLayout } from "$lib/stores/layoutState";
+ import { type WidgetLayout } from "$lib/stores/layoutStates";
  import { Block } from "@gradio/atoms";
  import { Radio } from "@gradio/form";
  import { get, type Writable, writable } from "svelte/store";

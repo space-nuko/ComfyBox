@@ -1,6 +1,6 @@
 import ComfyGraph from '$lib/ComfyGraph';
 import { LGraphCanvas, LiteGraph, Subgraph } from '@litegraph-ts/core';
-import layoutState from './stores/layoutState';
+import layoutStates from './stores/layoutStates';
 import { get } from 'svelte/store';
 
 export function configureLitegraph(isMobile: boolean = false) {
@@ -28,5 +28,5 @@ export function configureLitegraph(isMobile: boolean = false) {
 
     (window as any).LiteGraph = LiteGraph;
     (window as any).LGraphCanvas = LGraphCanvas;
-    (window as any).layoutState = get(layoutState)
+    (window as any).layoutStates = get(layoutStates)
 }

@@ -1,21 +1,29 @@
 <script lang="ts">
- import layoutState, { type IDragItem } from "$lib/stores/layoutState";
-
  import { Page, Navbar, Link, BlockTitle, Block, List, ListItem, Toolbar } from "framework7-svelte"
  import WidgetContainer from "$lib/components/WidgetContainer.svelte";
  import type ComfyApp from "$lib/components/ComfyApp";
+ import type { ComfyWorkflow } from "$lib/components/ComfyApp";
+ import { writable, type Writable } from "svelte/store";
+ import type { WritableLayoutStateStore } from "$lib/stores/layoutStates";
 
  export let subworkflowID: number = -1;
  export let app: ComfyApp
 
+ // TODO move
+ let workflow: ComfyWorkflow | null = null
+ let layoutState: WritableLayoutStateStore | null = null;
+
+ $: layoutState = workflow ? workflow.layout : null;
 </script>
 
 <Page name="subworkflow">
     <Navbar title="Workflow {subworkflowID}" backLink="Back" />
 
-    <div class="container">
-        <WidgetContainer bind:dragItem={$layoutState.root} isMobile={true} classes={["root-container", "mobile"]} />
-    </div>
+    {#if layoutState}
+        <div class="container">
+            <WidgetContainer bind:dragItem={$layoutState.root} {layoutState} isMobile={true} classes={["root-container", "mobile"]} />
+        </div>
+    {/if}
 </Page>
 
 <style lang="scss">

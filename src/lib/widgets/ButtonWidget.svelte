@@ -1,21 +1,23 @@
 <script lang="ts">
- import { type WidgetLayout } from "$lib/stores/layoutState";
+ import { type WidgetLayout } from "$lib/stores/layoutStates";
  import { Button } from "@gradio/button";
  import { get, type Writable, writable } from "svelte/store";
  import { isDisabled } from "./utils"
  import type { ComfyButtonNode } from "$lib/nodes/widgets";
+
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
+
  let node: ComfyButtonNode | null = null;
- let nodeValue: Writable<boolean> | null = null;
- let attrsChanged: Writable<boolean> | null = null;
+ // let nodeValue: Writable<boolean> = writable(false);
+ let attrsChanged: Writable<number> = writable(0);
 
  $: widget && setNodeValue(widget);
 
  function setNodeValue(widget: WidgetLayout) {
      if (widget) {
          node = widget.node as ComfyButtonNode
-         nodeValue = node.value;
+         // nodeValue = node.value;
          attrsChanged = widget.attrsChanged;
      }
  };
@@ -26,7 +28,7 @@
  }
 
  const style = {
-     full_width: "100%",
+     full_width: true
  }
 </script>
 

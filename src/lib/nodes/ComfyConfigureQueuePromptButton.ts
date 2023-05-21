@@ -1,13 +1,9 @@
-import layoutState from "$lib/stores/layoutState"
+import layoutStates from "$lib/stores/layoutStates"
 import { BuiltInSlotType, LGraphNode, LiteGraph, type ITextWidget, type OptionalSlots, type PropertyLayout, type SlotLayout, type Vector2 } from "@litegraph-ts/core"
+import { get } from "svelte/store"
+import ComfyGraphNode from "./ComfyGraphNode"
 
-export interface ComfyConfigureQueuePromptButtonProperties extends Record<string, any> {
-}
-
-export default class ComfyConfigureQueuePromptButton extends LGraphNode {
-    override properties: ComfyConfigureQueuePromptButtonProperties = {
-    }
-
+export default class ComfyConfigureQueuePromptButton extends ComfyGraphNode {
     static slotLayout: SlotLayout = {
         inputs: [
             { name: "config", type: BuiltInSlotType.ACTION },
@@ -28,7 +24,12 @@ export default class ComfyConfigureQueuePromptButton extends LGraphNode {
 
     override onAction(action: any, param: any, options: { action_call?: string }) {
         if (action === "config" && param != null) {
-            layoutState.update(state => {
+            if (this.layoutState == null) {
+                console.error(this, this.getRootGraph(), Object.keys(get(layoutStates).all))
+                throw new Error(`Could not find layout attached to this node! ${this.id}`)
+            }
+
+            this.layoutState.update(state => {
                 if (typeof param === "string")
                     state.attrs.queuePromptButtonName = param || ""
                 else if (typeof param === "object" && "buttonName" in param)

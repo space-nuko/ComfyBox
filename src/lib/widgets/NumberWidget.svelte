@@ -1,6 +1,6 @@
 <script lang="ts">
  import type { ComfyNumberNode } from "$lib/nodes/widgets";
- import { type WidgetLayout } from "$lib/stores/layoutState";
+ import { type WidgetLayout } from "$lib/stores/layoutStates";
  import { Range } from "$lib/components/gradio/form";
  import { get, type Writable } from "svelte/store";
  import { debounce } from "$lib/utils";

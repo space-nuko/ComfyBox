@@ -8,6 +8,8 @@ import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import uiState from "$lib/stores/uiState";
 import { get } from "svelte/store";
 import configState from "$lib/stores/configState";
+import type { WritableLayoutStateStore } from "$lib/stores/layoutStates";
+import layoutStates from "$lib/stores/layoutStates";
 
 export type DefaultWidgetSpec = {
     defaultWidgetNode: new (name?: string) => ComfyWidgetNode,
@@ -98,6 +100,10 @@ export default class ComfyGraphNode extends LGraphNode {
      */
     getUpstreamLink(): LLink | null {
         return null;
+    }
+
+    get layoutState(): WritableLayoutStateStore | null {
+        return layoutStates.getLayoutByNode(this);
     }
 
     constructor(title?: string) {

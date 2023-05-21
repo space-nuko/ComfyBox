@@ -21,8 +21,7 @@ import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import queueState from "$lib/stores/queueState";
 import { type SvelteComponentDev } from "svelte/internal";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
-import type { LayoutState, SerializedLayoutState, WritableLayoutStateStore } from "$lib/stores/layoutState";
-import layoutState from "$lib/stores/layoutState";
+import type { LayoutState, SerializedLayoutState, WritableLayoutStateStore } from "$lib/stores/layoutStates";
 import { toast } from '@zerodevx/svelte-toast'
 import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
@@ -41,7 +40,10 @@ import parseA1111, { type A1111ParsedInfotext } from "$lib/parseA1111";
 import convertA1111ToStdPrompt from "$lib/convertA1111ToStdPrompt";
 import type { ComfyBoxStdPrompt } from "$lib/ComfyBoxStdPrompt";
 import ComfyBoxStdPromptSerializer from "$lib/ComfyBoxStdPromptSerializer";
-import { v4 as uuidv4 } from "uuid";
+import selectionState from "$lib/stores/selectionState";
+import layoutStates from "$lib/stores/layoutStates";
+import { ComfyWorkflow } from "$lib/stores/workflowState";
+import workflowState from "$lib/stores/workflowState";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -134,133 +136,6 @@ type CanvasState = {
     canvas: ComfyGraphCanvas,
 }
 
-type ActiveCanvas = {
-    canvas: LGraphCanvas | null;
-    canvasHandler: () => void | null;
-    state: SerializedGraphCanvasState;
-}
-
-export type SerializedWorkflowState = {
-    graph: SerializedLGraph,
-    layout: SerializedLayoutState
-}
-
-/*
- * ID for an opened workflow.
- *
- * Unlike NodeID and PromptID, these are *not* saved to the workflow itself.
- * They are only used for identifying an open workflow in the program. If the
- * workflow is closed and reopened, a different workflow ID will be assigned to
- * it.
- */
-export type WorkflowInstID = UUID;
-
-export class ComfyWorkflow {
-    /*
-     * Used for uniquely identifying the instance of the opened workflow in the frontend.
-     */
-    id: WorkflowInstID;
-    title: string;
-    graph: ComfyGraph;
-    layout: WritableLayoutStateStore;
-
-    canvases: Record<string, ActiveCanvas> = {};
-
-    constructor(title: string, graph: ComfyGraph, layout: WritableLayoutStateStore) {
-        this.id = uuidv4();
-        this.title = title;
-        this.layout = layout;
-        this.graph = graph;
-    }
-
-    start(key: string, canvas: ComfyGraphCanvas) {
-        if (this.canvases[key] != null)
-            throw new Error(`This workflow is already being displayed on canvas ${key}`)
-
-        const canvasHandler = () => canvas.draw(true);
-
-        this.canvases[key] = {
-            canvas,
-            canvasHandler,
-            state: {
-                // TODO
-                offset: [0, 0],
-                scale: 1
-            }
-        }
-
-        this.graph.attachCanvas(canvas);
-        this.graph.eventBus.on("afterExecute", canvasHandler)
-
-        if (Object.keys(this.canvases).length === 1)
-            this.graph.start();
-    }
-
-    stop(key: string) {
-        const canvas = this.canvases[key]
-        if (canvas == null)
-            throw new Error(`This workflow is not being displayed on canvas ${key}`)
-
-        this.graph.detachCanvas(canvas.canvas);
-        this.graph.eventBus.removeListener("afterExecute", canvas.canvasHandler)
-
-        delete this.canvases[key]
-
-        if (Object.keys(this.canvases).length === 0)
-            this.graph.stop();
-    }
-
-    stopAll() {
-        for (const key of Object.keys(this.canvases))
-            this.stop(key)
-        this.graph.stop()
-    }
-
-    serialize(): SerializedWorkflowState {
-        const graph = this.graph;
-
-        const serializedGraph = graph.serialize()
-        const serializedLayout = this.layout.serialize()
-
-        return {
-            graph: serializedGraph,
-            layout: serializedLayout
-        }
-    }
-
-    static deserialize(data: SerializedWorkflowState): ComfyWorkflow {
-        const layout = layoutState; // TODO
-        // Ensure loadGraphData does not trigger any state changes in layoutState
-        // (isConfiguring is set to true here)
-        // lGraph.configure will add new nodes, triggering onNodeAdded, but we
-        // want to restore the layoutState ourselves
-        layout.onStartConfigure();
-
-        // Patch T2IAdapterLoader to ControlNetLoader since they are the same node now
-        for (let n of data.graph.nodes) {
-            if (n.type == "T2IAdapterLoader") n.type = "ControlNetLoader";
-        }
-
-        const graph = new ComfyGraph();
-        graph.configure(data.graph);
-
-        for (const node of graph._nodes) {
-            const size = node.computeSize();
-            size[0] = Math.max(node.size[0], size[0]);
-            size[1] = Math.max(node.size[1], size[1]);
-            node.size = size;
-            // this.#invokeExtensions("loadedGraphNode", node);
-        }
-
-        // Now restore the layout
-        // Subsequent added nodes will add the UI data to layoutState
-        // TODO
-        layout.deserialize(data.layout, graph)
-
-        return new ComfyWorkflow("Workflow X", graph, layout);
-    }
-}
-
 export default class ComfyApp {
     api: ComfyAPI;
 
@@ -268,22 +143,6 @@ export default class ComfyApp {
     canvasEl: HTMLCanvasElement | null = null;
     canvasCtx: CanvasRenderingContext2D | null = null;
     lCanvas: ComfyGraphCanvas | null = null;
-
-    openedWorkflows: ComfyWorkflow[] = [];
-    openedWorkflowsByID: Record<WorkflowInstID, ComfyWorkflow> = {};
-    activeWorkflowIdx: number = -1;
-
-    get activeWorkflow(): ComfyWorkflow | null {
-        return this.openedWorkflows[this.activeWorkflowIdx]
-    }
-
-    get activeGraph(): ComfyGraph | null {
-        return this.activeWorkflow?.graph;
-    }
-
-    getWorkflow(id: WorkflowInstID): ComfyWorkflow | null {
-        return this.openedWorkflowsByID[id];
-    }
 
     shiftDown: boolean = false;
     ctrlDown: boolean = false;
@@ -312,7 +171,7 @@ export default class ComfyApp {
 
         this.rootEl = document.getElementById("app-root") as HTMLDivElement;
         this.canvasEl = document.getElementById("graph-canvas") as HTMLCanvasElement;
-        this.lCanvas = new ComfyGraphCanvas(this, null, this.canvasEl);
+        this.lCanvas = new ComfyGraphCanvas(this, this.canvasEl);
         this.canvasCtx = this.canvasEl.getContext("2d");
 
         const uiUnlocked = get(uiState).uiUnlocked;
@@ -371,12 +230,12 @@ export default class ComfyApp {
         this.lCanvas.draw(true, true);
     }
 
-    serialize(): SerializedAppState {
-        const workflow = this.activeWorkflow
-        if (workflow == null)
-            throw new Error("No workflow active!")
+    serialize(workflow: ComfyWorkflow): SerializedAppState {
+        const layoutState = layoutStates.getLayout(workflow.id);
+        if (layoutState == null)
+            throw new Error("Workflow has no layout!")
 
-        const { graph, layout } = workflow.serialize();
+        const { graph, layout } = workflow.serialize(layoutState);
         const canvas = this.lCanvas.serialize();
 
         return {
@@ -390,14 +249,15 @@ export default class ComfyApp {
     }
 
     saveStateToLocalStorage() {
-        if (this.activeWorkflow == null) {
+        const workflow = workflowState.getActiveWorkflow();
+        if (workflow == null) {
             notify("No active workflow!", { type: "error" })
             return;
         }
 
         try {
             uiState.update(s => { s.isSavingToLocalStorage = true; return s; })
-            const savedWorkflow = this.serialize();
+            const savedWorkflow = this.serialize(workflow);
             const json = JSON.stringify(savedWorkflow);
             localStorage.setItem("workflow", json)
             notify("Saved to local storage.")
@@ -548,25 +408,27 @@ export default class ComfyApp {
 
         this.api.addEventListener("progress", (progress: Progress) => {
             queueState.progressUpdated(progress);
-            this.activeGraph?.setDirtyCanvas(true, false); // TODO PromptID
+            workflowState.getActiveWorkflow()?.graph?.setDirtyCanvas(true, false); // TODO PromptID
         });
 
         this.api.addEventListener("executing", (promptID: PromptID | null, nodeID: ComfyNodeID | null) => {
             const queueEntry = queueState.executingUpdated(promptID, nodeID);
             if (queueEntry != null) {
-                const workflow = this.getWorkflow(queueEntry.workflowID)
-                workflow?.graph.setDirtyCanvas(true, false);
+                const workflow = workflowState.getWorkflow(queueEntry.workflowID);
+                workflow?.graph?.setDirtyCanvas(true, false);
             }
         });
 
         this.api.addEventListener("executed", (promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutput) => {
             const queueEntry = queueState.onExecuted(promptID, nodeID, output)
             if (queueEntry != null) {
-                const workflow = this.getWorkflow(queueEntry.workflowID)
-                workflow?.graph.setDirtyCanvas(true, false);
-                const node = workflow?.graph.getNodeByIdRecursive(nodeID) as ComfyGraphNode;
-                if (node?.onExecuted) {
-                    node.onExecuted(output);
+                const workflow = workflowState.getWorkflow(queueEntry.workflowID);
+                if (workflow != null) {
+                    workflow.graph.setDirtyCanvas(true, false);
+                    const node = workflow.graph.getNodeByIdRecursive(nodeID) as ComfyGraphNode;
+                    if (node?.onExecuted) {
+                        node.onExecuted(output);
+                    }
                 }
             }
         });
@@ -635,68 +497,31 @@ export default class ComfyApp {
         setColor(BuiltInSlotType.ACTION, "lightseagreen")
     }
 
-    createNewWorkflow(): ComfyWorkflow {
-        // TODO remove
-        const workflow = ComfyWorkflow.deserialize({ graph: blankGraph.workflow, layout: blankGraph.layout })
-        this.openedWorkflows.push(workflow);
-        this.setActiveWorkflow(this.openedWorkflows.length - 1)
-        return workflow;
-    }
-
     async openWorkflow(data: SerializedAppState): Promise<ComfyWorkflow> {
         if (data.version !== COMFYBOX_SERIAL_VERSION) {
             throw `Invalid ComfyBox saved data format: ${data.version}`
         }
-
         this.clean();
 
-        const workflow = ComfyWorkflow.deserialize({ graph: data.workflow, layout: data.layout })
+        const workflow = workflowState.openWorkflow(data);
 
         // Restore canvas offset/zoom
         this.lCanvas.deserialize(data.canvas)
 
         await this.refreshComboInNodes(workflow);
 
-        this.openedWorkflows.push(workflow);
-        this.setActiveWorkflow(this.openedWorkflows.length - 1)
-
         return workflow;
     }
 
-    closeWorkflow(index: number) {
-        if (index < 0 || index >= this.openedWorkflows.length)
-            return;
-
-        const workflow = this.openedWorkflows[index];
-        workflow.stopAll();
-
-        this.openedWorkflows.splice(index, 1)
-        this.setActiveWorkflow(0);
-    }
-
-    closeAllWorkflows() {
-        while (this.openedWorkflows.length > 0)
-            this.closeWorkflow(0)
-    }
-
     setActiveWorkflow(index: number) {
-        if (this.openedWorkflows.length === 0) {
-            this.activeWorkflowIdx = -1;
-            return;
+        const workflow = workflowState.setActiveWorkflow(index);
+
+        if (workflow != null) {
+            workflow.start("app", this.lCanvas);
+            this.lCanvas.deserialize(workflow.canvases["app"].state)
         }
 
-        if (index < 0 || index >= this.openedWorkflows.length || this.activeWorkflowIdx === index)
-            return;
-
-        if (this.activeWorkflow != null)
-            this.activeWorkflow.stop("app")
-
-        const workflow = this.openedWorkflows[index]
-        this.activeWorkflowIdx = index;
-
-        console.warn("START")
-        workflow.start("app", this.lCanvas);
-        this.lCanvas.deserialize(workflow.canvases["app"].state)
+        selectionState.clear();
     }
 
     async initDefaultGraph() {
@@ -717,7 +542,7 @@ export default class ComfyApp {
         this.clean();
 
         this.lCanvas.closeAllSubgraphs();
-        this.closeAllWorkflows();
+        workflowState.closeAllWorkflows();
         uiState.update(s => {
             s.uiUnlocked = true;
             s.uiEditMode = "widgets";
@@ -726,16 +551,17 @@ export default class ComfyApp {
     }
 
     runDefaultQueueAction() {
-        if (this.activeWorkflow == null)
+        const workflow = workflowState.getActiveWorkflow();
+        if (workflow == null)
             return;
 
-        for (const node of this.activeGraph.iterateNodesInOrderRecursive()) {
+        for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
             if ("onDefaultQueueAction" in node) {
                 (node as ComfyGraphNode).onDefaultQueueAction()
             }
         }
 
-        if (get(layoutState).attrs.queuePromptButtonRunWorkflow) {
+        if (get(workflow.layout).attrs.queuePromptButtonRunWorkflow) {
             // Hold control to queue at the front
             const num = this.ctrlDown ? -1 : 0;
             this.queuePrompt(num, 1);
@@ -743,7 +569,8 @@ export default class ComfyApp {
     }
 
     querySave() {
-        if (this.activeWorkflow == null) {
+        const workflow = workflowState.getActiveWorkflow();
+        if (workflow == null) {
             notify("No active workflow!", { type: "error" })
             return;
         }
@@ -765,7 +592,7 @@ export default class ComfyApp {
         }
 
         const indent = 2
-        const json = JSON.stringify(this.serialize(), null, indent)
+        const json = JSON.stringify(this.serialize(workflow), null, indent)
 
         download(filename, json, "application/json")
 
@@ -781,12 +608,13 @@ export default class ComfyApp {
     }
 
     async queuePrompt(num: number, batchCount: number = 1, tag: string | null = null) {
-        if (this.activeWorkflow === null) {
+        const activeWorkflow = workflowState.getActiveWorkflow();
+        if (activeWorkflow == null) {
             notify("No workflow is opened!", { type: "error" })
             return;
         }
 
-        this.queueItems.push({ num, batchCount, workflow: this.activeWorkflow });
+        this.queueItems.push({ num, batchCount, workflow: activeWorkflow });
 
         // Only have one action process the items so each one gets a unique seed correctly
         if (this.processingQueue) {
@@ -830,7 +658,7 @@ export default class ComfyApp {
                     }
 
                     const p = this.graphToPrompt(workflow, tag);
-                    const l = layoutState.serialize();
+                    const l = workflow.layout.serialize();
                     console.debug(graphToGraphVis(workflow.graph))
                     console.debug(promptToGraphVis(p))
 
@@ -942,7 +770,7 @@ export default class ComfyApp {
      * Refresh combo list on whole nodes
      */
     async refreshComboInNodes(workflow?: ComfyWorkflow, flashUI: boolean = false) {
-        workflow ||= this.activeWorkflow;
+        workflow ||= workflowState.getActiveWorkflow();
         if (workflow == null) {
             notify("No active workflow!", { type: "error" })
             return

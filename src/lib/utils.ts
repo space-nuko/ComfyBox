@@ -1,10 +1,11 @@
-import layoutState, { type WidgetLayout } from "$lib/stores/layoutState";
+import { type WidgetLayout, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
 import selectionState from "$lib/stores/selectionState";
 import type { FileData as GradioFileData } from "@gradio/upload";
 import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import type { ComfyNodeID } from "./api";
 import { type SerializedPrompt } from "./components/ComfyApp";
+import workflowState from "./stores/workflowState";
 
 export function clamp(n: number, min: number, max: number): number {
     return Math.min(Math.max(n, min), max)
@@ -39,7 +40,7 @@ export function download(filename: string, text: string, type: string = "text/pl
     }, 0);
 }
 
-export function startDrag(evt: MouseEvent) {
+export function startDrag(evt: MouseEvent, layoutState: WritableLayoutStateStore) {
     const dragItemId: string = evt.target.dataset["dragItemId"];
     const ss = get(selectionState)
     const ls = get(layoutState)
@@ -80,7 +81,7 @@ export function startDrag(evt: MouseEvent) {
     selectionState.set(ss)
 };
 
-export function stopDrag(evt: MouseEvent) {
+export function stopDrag(evt: MouseEvent, layoutState: WritableLayoutStateStore) {
 };
 
 export function graphToGraphVis(graph: LGraph): string {
@@ -208,7 +209,8 @@ export function getNodeInfo(nodeId: ComfyNodeID): string {
 
     const displayNodeID = nodeId ? (nodeId.split("-")[0]) : String(nodeId);
 
-    const title = app.activeGraph.getNodeByIdRecursive(nodeId)?.title || String(nodeId);
+    const workflow = workflowState.getActiveWorkflow();
+    const title = workflow?.graph?.getNodeByIdRecursive(nodeId)?.title || String(nodeId);
     return title + " (" + displayNodeID + ")"
 }
 
@@ -238,7 +240,7 @@ export function convertComfyOutputEntryToGradio(r: ComfyImageLocation): GradioFi
     return fileData
 }
 
-export function convertComfyOutputToComfyURL(output: FileNameOrGalleryData): string {
+export function convertComfyOutputToComfyURL(output: string | ComfyImageLocation): string {
     if (typeof output === "string")
         return output;
 

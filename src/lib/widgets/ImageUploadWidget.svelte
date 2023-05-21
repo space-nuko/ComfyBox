@@ -1,5 +1,5 @@
 <script lang="ts">
- import { type WidgetLayout } from "$lib/stores/layoutState";
+ import { type WidgetLayout } from "$lib/stores/layoutStates";
  import { Block } from "@gradio/atoms";
  import { TextBox } from "@gradio/form";
  import Row from "$lib/components/gradio/app/Row.svelte";

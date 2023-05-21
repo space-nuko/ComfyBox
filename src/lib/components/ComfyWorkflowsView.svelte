@@ -2,7 +2,7 @@
  import { Pane, Splitpanes } from 'svelte-splitpanes';
  import { Button } from "@gradio/button";
  import { BlockTitle } from "@gradio/atoms";
- import ComfyUIPane from "./ComfyUIPane.svelte";
+ import ComfyWorkflowView from "./ComfyWorkflowView.svelte";
  import { Checkbox, TextBox } from "@gradio/form"
  import ComfyQueue from "./ComfyQueue.svelte";
  import ComfyUnlockUIButton from "./ComfyUnlockUIButton.svelte";
@@ -10,14 +10,16 @@
  import { get, writable, type Writable } from "svelte/store";
  import ComfyProperties from "./ComfyProperties.svelte";
  import uiState from "$lib/stores/uiState";
- import layoutState from "$lib/stores/layoutState";
+ import workflowState from "$lib/stores/workflowState";
  import selectionState from "$lib/stores/selectionState";
  import type ComfyApp from './ComfyApp';
  import { onMount } from "svelte";
-	import Spinner from './Spinner.svelte';
+	import type { WritableLayoutStateStore } from '$lib/stores/layoutStates';
 
  export let app: ComfyApp;
  export let uiTheme: string = "gradio-dark" // TODO config
+
+ let layoutState: WritableLayoutStateStore | null = null;
 
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
@@ -26,6 +28,8 @@
  let loading = true;
 
  let appSetupPromise: Promise<void> = null;
+
+ $: layoutState = $workflowState.activeWorkflow?.layout;
 
  onMount(async () => {
      appSetupPromise = app.setup().then(() => {
@@ -158,13 +162,17 @@
     <Splitpanes theme="comfy" on:resize={refreshView}>
         <Pane bind:size={propsSidebarSize}>
             <div class="sidebar-wrapper pane-wrapper">
-                <ComfyProperties />
+                <ComfyProperties layoutState={$workflowState.activeWorkflow} />
             </div>
         </Pane>
         <Pane>
             <Splitpanes theme="comfy" on:resize={refreshView} horizontal="{true}">
                 <Pane>
-                    <ComfyUIPane {app} />
+                    {#if $workflowState.activeWorkflow != null}
+                        <ComfyWorkflowView {app} workflow={$workflowState.activeWorkflow} />
+                    {:else}
+                        <span>No workflow loaded</span>
+                    {/if}
                 </Pane>
                 <Pane bind:size={graphSize}>
                     <ComfyGraphView {app} transitioning={graphTransitioning} />
@@ -178,8 +186,8 @@
         </Pane>
     </Splitpanes>
     <div id="workflow-tabs">
-        {#each app.openedWorkflows as workflow, index}
-            <button class="workflow-tab" class:selected={index === app.activeWorkflowIdx}>
+        {#each $workflowState.openedWorkflows as workflow, index}
+            <button class="workflow-tab" class:selected={index === $workflowState.activeWorkflowIdx}>
                 {workflow.title}
             </button>
         {/each}
@@ -187,7 +195,7 @@
     <div id="bottombar">
         <div class="bottombar-content">
             <div class="left">
-                {#if $layoutState.attrs.queuePromptButtonName != ""}
+                {#if layoutState != null && $layoutState.attrs.queuePromptButtonName != ""}
                     <Button variant="primary" disabled={!$alreadySetup} on:click={queuePrompt}>
                         {$layoutState.attrs.queuePromptButtonName}
                     </Button>

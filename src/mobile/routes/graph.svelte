@@ -18,21 +18,22 @@
      lCanvas.draw(true, true);
  }
 
- $: if (app?.activeGraph != null && canvasEl != null) {
-     if (!lCanvas) {
-         lCanvas = new ComfyGraphCanvas(app, app.activeGraph, canvasEl);
-         lCanvas.allow_interaction = false;
-         app.activeGraph.eventBus.on("afterExecute", () => lCanvas.draw(true))
-     }
-     resizeCanvas();
- }
+ // TODO
+ // $: if (app?.activeGraph != null && canvasEl != null) {
+ //     if (!lCanvas) {
+ //         lCanvas = new ComfyGraphCanvas(app, app.activeGraph, canvasEl);
+ //         lCanvas.allow_interaction = false;
+ //         app.activeGraph.eventBus.on("afterExecute", () => lCanvas.draw(true))
+ //     }
+ //     resizeCanvas();
+ // }
 
 </script>
 
 <Page>
   <Navbar title="Node Graph" backLink="Back" />
   <div class="canvas-wrapper pane-wrapper">
-      <canvas bind:this={canvasEl} id="extra-canvas" />
+      <!-- <canvas bind:this={canvasEl} id="extra-canvas" /> -->
   </div>
 </Page>
 

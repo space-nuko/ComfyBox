@@ -3,7 +3,7 @@ import type TypedEmitter from "typed-emitter";
 import EventEmitter from "events";
 import type { ComfyImageLocation } from "$lib/utils";
 import type { SerializedLGraph, UUID } from "@litegraph-ts/core";
-import type { SerializedLayoutState } from "./stores/layoutState";
+import type { SerializedLayoutState } from "./stores/layoutStates";
 import type { ComfyNodeDef } from "./ComfyNodeDef";
 
 export type ComfyPromptRequest = {

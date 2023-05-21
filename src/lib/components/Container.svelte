@@ -6,10 +6,11 @@
  import TabsContainer from "./TabsContainer.svelte"
 
  // notice - fade in works fine but don't add svelte's fade-out (known issue)
- import { type ContainerLayout } from "$lib/stores/layoutState";
+ import { type ContainerLayout, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
  import type { Writable } from "svelte/store";
  import { isHidden } from "$lib/widgets/utils";
 
+ export let layoutState: WritableLayoutStateStore;
  export let container: ContainerLayout | null = null;
  export let zIndex: number = 0;
  export let classes: string[] = [];
@@ -31,11 +32,11 @@
     {#key $attrsChanged}
         {#if edit || !isHidden(container)}
             {#if container.attrs.variant === "tabs"}
-                <TabsContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
+                <TabsContainer {layoutState} {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
             {:else if container.attrs.variant === "accordion"}
-                <AccordionContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
+                <AccordionContainer {layoutState} {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
             {:else}
-                <BlockContainer {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
+                <BlockContainer {layoutState} {container} {zIndex} {classes} {showHandles} {edit} {dragDisabled} {isMobile} />
             {/if}
         {/if}
     {/key}

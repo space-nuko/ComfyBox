@@ -1,20 +1,21 @@
 <script lang="ts">
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
-	import notify from "$lib/notify";
- import uiState from "$lib/stores/uiState";
- import layoutState from "$lib/stores/layoutState";
  import queueState from "$lib/stores/queueState";
+ import workflowState from "$lib/stores/workflowState";
  import { getNodeInfo } from "$lib/utils"
 
  import { Link, Toolbar } from "framework7-svelte"
  import ProgressBar from "$lib/components/ProgressBar.svelte";
 	import Indicator from "./Indicator.svelte";
 	import interfaceState from "$lib/stores/interfaceState";
-	import LightboxModal from "$lib/components/LightboxModal.svelte";
+	import type { WritableLayoutStateStore } from "$lib/stores/layoutStates";
 
  export let subworkflowID: number = -1;
  export let app: ComfyApp = undefined;
+ let layoutState: WritableLayoutStateStore = null;
  let fileInput: HTMLInputElement = undefined;
+
+ $: layoutState = $workflowState.activeWorkflow?.layout;
 
  function queuePrompt() {
      navigator.vibrate(20)

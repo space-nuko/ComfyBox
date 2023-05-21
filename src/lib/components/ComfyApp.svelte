@@ -2,7 +2,6 @@
  import { ListIcon as List, ImageIcon as Image, SettingsIcon as Settings } from "svelte-feather-icons";
  import ComfyApp, { type A1111PromptAndInfo, type SerializedAppState } from "./ComfyApp";
  import uiState from "$lib/stores/uiState";
- import layoutState from "$lib/stores/layoutState";
  import { SvelteToast, toast } from '@zerodevx/svelte-toast'
 
  import LightboxModal from "./LightboxModal.svelte";
@@ -18,8 +17,6 @@
  let hasShownUIHelpToast: boolean = false;
  let uiTheme: string = "gradio-dark";
 
- let debugLayout: boolean = false;
-
  const toastOptions = {
      intro: { duration: 200 },
      theme: {
@@ -30,12 +27,6 @@
  $: if ($uiState.uiUnlocked && !hasShownUIHelpToast) {
      hasShownUIHelpToast = true;
      notify("Right-click to open context menu.")
- }
-
- if (debugLayout) {
-     layoutState.subscribe(s => {
-         console.warn("UPDATESTATE", s)
-     })
  }
 
  $: if (uiTheme === "gradio-dark") {

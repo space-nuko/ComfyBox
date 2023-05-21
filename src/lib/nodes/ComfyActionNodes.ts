@@ -1,6 +1,6 @@
 import type { SerializedPrompt } from "$lib/components/ComfyApp";
 import notify from "$lib/notify";
-import layoutState, { type DragItemID } from "$lib/stores/layoutState";
+import { type DragItemID } from "$lib/stores/layoutStates";
 import queueState from "$lib/stores/queueState";
 import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWidget, type SerializedLGraphNode, type SlotLayout, type PropertyLayout } from "@litegraph-ts/core";
 import { get } from "svelte/store";
@@ -389,7 +389,7 @@ export class ComfySetNodeModeAction extends ComfyGraphNode {
             }
         }
 
-        for (const entry of Object.values(get(layoutState).allItems)) {
+        for (const entry of Object.values(get(this.layoutState).allItems)) {
             if (entry.dragItem.type === "container") {
                 const container = entry.dragItem;
                 const hasTag = tags.some(t => container.attrs.tags.indexOf(t) != -1);

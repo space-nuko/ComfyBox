@@ -11,11 +11,12 @@
  // notice - fade in works fine but don't add svelte's fade-out (known issue)
  import {cubicIn} from 'svelte/easing';
  import { flip } from 'svelte/animate';
- import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
+ import { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutStates";
  import { startDrag, stopDrag } from "$lib/utils"
  import { writable, type Writable } from "svelte/store";
  import { isHidden } from "$lib/widgets/utils";
 
+ export let layoutState: WritableLayoutStateStore;
  export let container: ContainerLayout | null = null;
  export let zIndex: number = 0;
  export let classes: string[] = [];
@@ -59,6 +60,14 @@
      navigator.vibrate(20)
      $isOpen = e.detail
  }
+
+ function _startDrag(e: MouseEvent | TouchEvent) {
+     startDrag(e, layoutState)
+ }
+
+ function _stopDrag(e: MouseEvent | TouchEvent) {
+     stopDrag(e, layoutState)
+ }
 </script>
 
 {#if container}
@@ -93,7 +102,7 @@
                                  animate:flip={{duration:flipDurationMs}}
                                  style={item?.attrs?.style || ""}
                             >
-                                <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
+                                <WidgetContainer {layoutState} dragItem={item} zIndex={zIndex+1} {isMobile} />
                                 {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
                                     <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
                                 {/if}
@@ -101,10 +110,18 @@
                         {/each}
                     </div>
                     {#if isHidden(container) && edit}
-                        <div class="handle handle-hidden" style="z-index: {zIndex+100}" class:hidden={!edit} />
+                        <div class="handle handle-hidden"
+                             style:z-index={zIndex+100}
+                             class:hidden={!edit} />
                     {/if}
                     {#if showHandles}
-                        <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+                        <div class="handle handle-container"
+                             style:z-index={zIndex+100}
+                             data-drag-item-id={container.id}
+                             on:mousedown={_startDrag}
+                             on:touchstart={_startDrag}
+                             on:mouseup={_stopDrag}
+                             on:touchend={_stopDrag}/>
                     {/if}
                 </Accordion>
             </Block>
@@ -112,7 +129,7 @@
             <Block elem_classes={["gradio-accordion"]}>
                 <Accordion label={container.attrs.title} open={$isOpen} on:click={handleClick}>
                     {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
-                        <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
+                        <WidgetContainer {layoutState} dragItem={item} zIndex={zIndex+1} {isMobile} />
                     {/each}
                 </Accordion>
             </Block>

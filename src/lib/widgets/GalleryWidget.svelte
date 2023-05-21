@@ -5,7 +5,7 @@
  import { Image } from "@gradio/icons";
  import { StaticImage } from "$lib/components/gradio/image";
  import type { Styles } from "@gradio/utils";
- import type { WidgetLayout } from "$lib/stores/layoutState";
+ import type { WidgetLayout } from "$lib/stores/layoutStates";
  import { writable, type Writable } from "svelte/store";
  import type { FileData as GradioFileData } from "@gradio/upload";
  import type { SelectData as GradioSelectData } from "@gradio/utils";

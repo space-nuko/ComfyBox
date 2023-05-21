@@ -2,7 +2,6 @@ import { LConnectionKind, LGraph, LGraphNode, type INodeSlot, type SlotIndex, Li
 import GraphSync from "./GraphSync";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
-import layoutState from "./stores/layoutState";
 import uiState from "./stores/uiState";
 import { get } from "svelte/store";
 import type ComfyGraphNode from "./nodes/ComfyGraphNode";
@@ -10,6 +9,9 @@ import type IComfyInputSlot from "./IComfyInputSlot";
 import type { ComfyBackendNode } from "./nodes/ComfyBackendNode";
 import type { ComfyComboNode, ComfyWidgetNode } from "./nodes/widgets";
 import selectionState from "./stores/selectionState";
+import type { WritableLayoutStateStore } from "./stores/layoutStates";
+import type { WorkflowInstID } from "./components/ComfyApp";
+import layoutStates from "./stores/layoutStates";
 
 type ComfyGraphEvents = {
     configured: (graph: LGraph) => void
@@ -24,6 +26,13 @@ type ComfyGraphEvents = {
 
 export default class ComfyGraph extends LGraph {
     eventBus: TypedEmitter<ComfyGraphEvents> = new EventEmitter() as TypedEmitter<ComfyGraphEvents>;
+
+    workflowID: WorkflowInstID | null = null;
+
+    constructor(workflowID?: WorkflowInstID) {
+        super();
+        this.workflowID = workflowID;
+    }
 
     override onConfigure() {
         console.debug("Configured");
@@ -50,19 +59,24 @@ export default class ComfyGraph extends LGraph {
     override onNodeAdded(node: LGraphNode, options: LGraphAddNodeOptions) {
         // Don't add nodes in subgraphs until this callback reaches the root
         // graph
-        if (node.getRootGraph() == null || this._is_subgraph)
-            return;
+        // Only root graphs will have a workflow ID, so we don't mind subgraphs
+        // missing it
+        if (node.getRootGraph() != null && !this._is_subgraph && this.workflowID != null) {
+            const layoutState = get(layoutStates).all[this.workflowID]
+            if (layoutState === null) {
+                throw new Error(`LGraph with workflow missing layout! ${this.workflowID}`)
+            }
 
-        this.doAddNode(node, options);
+            this.doAddNode(node, layoutState, options);
+        }
 
-        // console.debug("Added", node);
         this.eventBus.emit("nodeAdded", node);
     }
 
     /*
      * Add widget UI/groups for newly added nodes.
      */
-    private doAddNode(node: LGraphNode, options: LGraphAddNodeOptions) {
+    private doAddNode(node: LGraphNode, layoutState: WritableLayoutStateStore, options: LGraphAddNodeOptions) {
         layoutState.nodeAdded(node, options)
 
         // All nodes whether they come from base litegraph or ComfyBox should
@@ -144,7 +158,7 @@ export default class ComfyGraph extends LGraph {
         // ************** RECURSION ALERT ! **************
         if (node.is(Subgraph)) {
             for (const child of node.subgraph.iterateNodesInOrder()) {
-                this.doAddNode(child, options)
+                this.doAddNode(child, layoutState, options)
             }
         }
         // ************** RECURSION ALERT ! **************
@@ -152,16 +166,23 @@ export default class ComfyGraph extends LGraph {
 
     override onNodeRemoved(node: LGraphNode, options: LGraphRemoveNodeOptions) {
         selectionState.clear(); // safest option
-        layoutState.nodeRemoved(node, options);
 
-        // Handle subgraphs being removed
-        if (node.is(Subgraph)) {
-            for (const child of node.subgraph.iterateNodesInOrder()) {
-                this.onNodeRemoved(child, options)
+        if (node.getRootGraph() != null && !this._is_subgraph && this.workflowID != null) {
+            const layoutState = get(layoutStates).all[this.workflowID]
+            if (layoutState === null) {
+                throw new Error(`LGraph with workflow missing layout! ${this.workflowID}`)
+            }
+
+            layoutState.nodeRemoved(node, options);
+
+            // Handle subgraphs being removed
+            if (node.is(Subgraph)) {
+                for (const child of node.subgraph.iterateNodesInOrder()) {
+                    this.onNodeRemoved(child, options)
+                }
             }
         }
 
-        // console.debug("Removed", node);
         this.eventBus.emit("nodeRemoved", node);
     }
 

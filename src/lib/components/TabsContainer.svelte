@@ -11,11 +11,12 @@
  // notice - fade in works fine but don't add svelte's fade-out (known issue)
  import {cubicIn} from 'svelte/easing';
  import { flip } from 'svelte/animate';
- import layoutState, { type ContainerLayout, type WidgetLayout, type IDragItem } from "$lib/stores/layoutState";
+ import { type ContainerLayout, type WidgetLayout, type IDragItem, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
  import { startDrag, stopDrag } from "$lib/utils"
  import type { Writable } from "svelte/store";
  import { isHidden } from "$lib/widgets/utils";
 
+ export let layoutState: WritableLayoutStateStore;
  export let container: ContainerLayout | null = null;
  export let zIndex: number = 0;
  export let classes: string[] = [];
@@ -24,19 +25,17 @@
  export let dragDisabled: boolean = false;
  export let isMobile: boolean = false;
 
- let attrsChanged: Writable<boolean> | null = null;
+ // let attrsChanged: Writable<number> = writable(0);
  let children: IDragItem[] = [];
  const flipDurationMs = 100;
 
- let selectedIndex: number = 0;
-
  $: if (container) {
      children = $layoutState.allItems[container.id].children;
-     attrsChanged = container.attrsChanged
+     // attrsChanged = container.attrsChanged
  }
  else {
      children = [];
-     attrsChanged = null
+     // attrsChanged = writable(0)
  }
 
  function handleConsider(evt: any) {
@@ -65,6 +64,14 @@
 
  function handleSelect() {
      navigator.vibrate(20)
+ }
+
+ function _startDrag(e: MouseEvent | TouchEvent) {
+     startDrag(e, layoutState)
+ }
+
+ function _stopDrag(e: MouseEvent | TouchEvent) {
+     stopDrag(e, layoutState)
  }
 </script>
 
@@ -103,7 +110,7 @@
                                 <label for={String(item.id)}>
                                     <BlockTitle><strong>Tab {i+1}:</strong> {tabName}</BlockTitle>
                                 </label>
-                                <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
+                                <WidgetContainer {layoutState} dragItem={item} zIndex={zIndex+1} {isMobile} />
                                 {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
                                     <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
                                 {/if}
@@ -112,18 +119,26 @@
                     {/each}
                 </div>
                 {#if isHidden(container) && edit}
-                    <div class="handle handle-hidden" style="z-index: {zIndex+100}" class:hidden={!edit} />
+                    <div class="handle handle-hidden"
+                         style:z-index={zIndex+100}
+                         class:hidden={!edit} />
                 {/if}
                 {#if showHandles}
-                    <div class="handle handle-container" style="z-index: {zIndex+100}" data-drag-item-id={container.id} on:mousedown={startDrag} on:touchstart={startDrag} on:mouseup={stopDrag} on:touchend={stopDrag}/>
+                    <div class="handle handle-container"
+                         style:z-index={zIndex+100}
+                         data-drag-item-id={container.id}
+                         on:mousedown={_startDrag}
+                         on:touchstart={_startDrag}
+                         on:mouseup={_stopDrag}
+                         on:touchend={_stopDrag}/>
                 {/if}
             </Block>
         {:else}
             <Tabs elem_classes={["gradio-tabs"]} on:select={handleSelect}>
                 {#each children.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item, i(item.id)}
                     {@const tabName = getTabName(container, i)}
-                    <TabItem name={tabName}>
-                        <WidgetContainer dragItem={item} zIndex={zIndex+1} {isMobile} />
+                    <TabItem id={tabName} name={tabName}>
+                        <WidgetContainer {layoutState} dragItem={item} zIndex={zIndex+1} {isMobile} />
                     </TabItem>
                 {/each}
             </Tabs>

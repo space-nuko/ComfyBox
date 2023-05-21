@@ -3,11 +3,11 @@ import type ComfyApp from "./components/ComfyApp";
 import queueState from "./stores/queueState";
 import { get, type Unsubscriber } from "svelte/store";
 import uiState from "./stores/uiState";
-import layoutState from "./stores/layoutState";
 import { Watch } from "@litegraph-ts/nodes-basic";
 import { ComfyReroute } from "./nodes";
 import type { Progress } from "./components/ComfyApp";
 import selectionState from "./stores/selectionState";
+import type ComfyGraph from "./ComfyGraph";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
@@ -18,10 +18,14 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     app: ComfyApp | null;
     private _unsubscribe: Unsubscriber;
 
+    get comfyGraph(): ComfyGraph | null {
+        return this.graph as ComfyGraph;
+    }
+
     constructor(
         app: ComfyApp,
-        graph: LGraph,
         canvas: HTMLCanvasElement | string,
+        graph?: ComfyGraph,
         options: {
             skip_render?: boolean;
             skip_events?: boolean;
@@ -282,7 +286,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         selectionState.update(ss => {
             ss.currentSelectionNodes = Object.values(nodes)
             ss.currentSelection = []
-            const ls = get(layoutState)
+            const ls = get(this.comfyGraph.layoutState)
             for (const node of ss.currentSelectionNodes) {
                 const widget = ls.allItemsByNode[node.id]
                 if (widget)
@@ -299,7 +303,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
                 ss.currentHoveredNodes.add(node.id)
             }
             ss.currentHovered.clear()
-            const ls = get(layoutState)
+            const ls = get(this.comfyGraph.layoutState)
             for (const nodeID of ss.currentHoveredNodes) {
                 const widget = ls.allItemsByNode[nodeID]
                 if (widget)
