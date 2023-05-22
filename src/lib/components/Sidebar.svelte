@@ -115,7 +115,7 @@
      > button {
          width: 4rem;
          height: 4rem;
-         padding: 0.5rem;
+         padding: 0.75rem;
          color: var(--neutral-600);
          border-right: 3px solid transparent;
 

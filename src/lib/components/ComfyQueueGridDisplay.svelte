@@ -8,10 +8,10 @@
  export let showPrompt: (entry: QueueUIEntry) => void;
  export let clearQueue: () => Promise<void>;
  export let mode: QueueItemType = "queue";
+ export let gridColumns: number = 3;
 
  let allEntries: [QueueUIEntry, string][] = []
  let allImages: string[] = []
- let gridColumns: number = 3;
 
  $: buildImageList(entries);
 
@@ -36,7 +36,7 @@
 </script>
 
 <div class="grid-wrapper {mode}-mode">
-    <div class="grid-columns">
+    <div class="grid-controls">
         <div>
             <input type="range" bind:value={gridColumns} min={1} max={8} step={1} />
             <div class="button-wrapper">
@@ -64,18 +64,19 @@
 </div>
 
 <style lang="scss">
- $grid-columns-control-height: 3rem;
+ $grid-controls-height: 3rem;
+ $grid-controls-margin: 0.25rem;
 
  .grid-wrapper {
      height: 100%;
  }
 
- .grid-columns {
-     height: $grid-columns-control-height;
+ .grid-controls {
+     height: $grid-controls-height;
      position: relative;
      display: flex;
      flex-direction: column;
-     margin: 0.25rem 1rem;
+     margin: $grid-controls-margin 1rem;
 
      > div {
          width: 100%;
@@ -89,7 +90,7 @@
          }
 
          .button-wrapper {
-             padding: 0.25rem;
+             padding: $grid-controls-margin;
              .clear-queue-button {
                  @include square-button;
 
@@ -102,7 +103,7 @@
  }
 
  .grid-entries {
-     height: calc(100% - #{$grid-columns-control-height});
+     height: calc(100% - #{$grid-controls-height} - #{$grid-controls-margin} * 2);
      padding: 0 var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
      overflow-y: auto;
  }

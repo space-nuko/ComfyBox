@@ -2,64 +2,122 @@
  import type { QueueItemType } from "$lib/api";
  import { showLightbox, truncateString } from "$lib/utils";
  import type { QueueUIEntry } from "./ComfyQueue.svelte";
+ import queueState from "$lib/stores/queueState";
 
  export let entries: QueueUIEntry[] = [];
  export let showPrompt: (entry: QueueUIEntry) => void;
  export let clearQueue: () => void;
  export let mode: QueueItemType = "queue";
+ export let imageSize: number = 40;
 </script>
 
-<div class="queue-wrapper {mode}-mode">
-    {#each entries as entry}
-        <div class="queue-entry {entry.status}" on:click={(e) => showPrompt(entry, e)}>
-            {#if entry.images.length > 0}
-                <div class="queue-entry-images"
-                     style="--cols: {Math.ceil(Math.sqrt(Math.min(entry.images.length, 4)))}" >
-                    {#each entry.images.slice(0, 4) as image, i}
-                        <div>
-                            <!-- svelte-ignore a11y-click-events-have-key-events -->
-                            <img class="queue-entry-image"
-                                 on:click={(e) => showLightbox(entry.images, i, e)}
-                            src={image}
-                            alt="thumbnail" />
-                        </div>
-                    {/each}
-                </div>
-            {/if}
-            <div class="queue-entry-details">
-                <div class="queue-entry-message">
-                    {truncateString(entry.message, 20)}
-                </div>
-                <div class="queue-entry-submessage">
-                    {entry.submessage}
+<div class="list-wrapper {mode}-mode">
+    {#if mode === "history"}
+        <div class="list-controls">
+            <div>
+                <input type="range" bind:value={imageSize} min={10} max={100} step={0.1} />
+                <div class="button-wrapper">
+                    <button class="clear-queue-button secondary"
+                            on:click={clearQueue}
+                            disabled={$queueState.isInterrupting}>
+                        🗑️
+                    </button>
                 </div>
             </div>
         </div>
-        <div class="queue-entry-rest {entry.status}">
-            {#if entry.date != null}
-                <span class="queue-entry-queued-at">
-                    {entry.date}
-                </span>
-            {/if}
-        </div>
-    {/each}
+    {/if}
+    <div class="list-entries {mode}-mode" style:--imageSize={imageSize}>
+        {#each entries as entry}
+            <div class="list-entry {entry.status}" on:click={(e) => showPrompt(entry, e)}>
+                {#if entry.images.length > 0}
+                    <div class="list-entry-images"
+                         style="--cols: {Math.ceil(Math.sqrt(Math.min(entry.images.length, 4)))}" >
+                        {#each entry.images.slice(0, 4) as image, i}
+                            <div>
+                                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                <img class="list-entry-image"
+                                     on:click={(e) => showLightbox(entry.images, i, e)}
+                                src={image}
+                                alt="thumbnail" />
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
+                <div class="list-entry-details">
+                    <div class="list-entry-message">
+                        {truncateString(entry.message, 20)}
+                    </div>
+                    <div class="list-entry-submessage">
+                        {entry.submessage}
+                    </div>
+                </div>
+            </div>
+            <div class="list-entry-rest {entry.status}">
+                {#if entry.date != null}
+                    <span class="list-entry-queued-at">
+                        {entry.date}
+                    </span>
+                {/if}
+            </div>
+        {/each}
+    </div>
 </div>
 
 <style lang="scss">
- .queue-wrapper {
-     height: 100%;
-     display: flex;
-     overflow-y: auto;
-     flex-flow: column nowrap;
+ $list-controls-height: 3rem;
+ $list-controls-margin: 0.25rem;
 
-     &.queue-mode > :global(:first-child) {
+ .list-wrapper {
+     height: 100%;
+
+     &.queue-mode .list-entries > :global(:first-child) {
          // elements stick to bottom in queue mode only
          // next element in queue is on the bottom
          margin-top: auto !important;
      }
  }
 
- .queue-entry {
+ .list-entries {
+     --imageSize: 40;
+     height: calc(100% - #{$list-controls-height} - #{$list-controls-margin});
+     overflow-y: auto;
+     display: flex;
+     flex-flow: column nowrap;
+ }
+
+ .list-controls {
+     height: $list-controls-height;
+     position: relative;
+     display: flex;
+     flex-direction: column;
+     margin: $list-controls-margin 1rem;
+
+     > div {
+         width: 100%;
+         height: 100%;
+         display: flex;
+         flex-direction: row;
+         justify-content: center;
+
+         input {
+             width: 100%;
+             margin: auto;
+         }
+
+         .button-wrapper {
+             padding: 0.25rem;
+             .clear-queue-button {
+                 @include square-button;
+
+                 aspect-ratio: 1/1;
+                 height: 100%;
+                 padding: 0.25rem;
+             }
+         }
+     }
+ }
+
+ .list-entry {
      padding: 1.0rem;
      display: flex;
      flex-direction: row;
@@ -96,7 +154,7 @@
      }
  }
 
- .queue-entry-rest {
+ .list-entry-rest {
      width: 100%;
      position: relative;
 
@@ -108,7 +166,7 @@
 
  $thumbnails-size: 12rem;
 
- .queue-entry-images {
+ .list-entry-images {
      --cols: 1;
      margin: auto;
      width: calc($thumbnails-size * 2);
@@ -119,7 +177,9 @@
      column-gap: 1px;
      row-gap: 1px;
      vertical-align: top;
-     flex: 1 1 40%;
+     flex-grow: 1;
+     flex-shrink: 1;
+     flex-basis: calc(var(--imageSize) * 1%);
 
      img {
          aspect-ratio: 1 / 1;
@@ -132,7 +192,7 @@
      }
  }
 
- .queue-entry-details {
+ .list-entry-details {
      position: relative;
      padding: 1rem;
      width: 100%;
@@ -142,15 +202,15 @@
      white-space: nowrap;
  }
 
- .queue-entry-message {
+ .list-entry-message {
      font-size: 15px;
  }
 
- .queue-entry-submessage {
+ .list-entry-submessage {
      font-size: 12px;
  }
 
- .queue-entry-queued-at {
+ .list-entry-queued-at {
      width: auto;
      font-size: 12px;
      position:absolute;
