@@ -1,11 +1,11 @@
 <script lang="ts">
  import type { QueueItemType } from "$lib/api";
- import { truncateString } from "$lib/utils";
+ import { showLightbox, truncateString } from "$lib/utils";
  import type { QueueUIEntry } from "./ComfyQueue.svelte";
 
  export let entries: QueueUIEntry[] = [];
  export let showPrompt: (entry: QueueUIEntry) => void;
- export let showLightbox: (images: string[], index: number, e: Event) => void;
+ export let clearQueue: () => void;
  export let mode: QueueItemType = "queue";
 </script>
 

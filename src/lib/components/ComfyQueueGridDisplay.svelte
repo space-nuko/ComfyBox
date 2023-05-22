@@ -1,11 +1,12 @@
 <script lang="ts">
-	import type { QueueItemType } from "$lib/api";
- import { truncateString } from "$lib/utils";
+ import type { QueueItemType } from "$lib/api";
+ import { showLightbox } from "$lib/utils";
  import type { QueueUIEntry } from "./ComfyQueue.svelte";
+ import queueState from "$lib/stores/queueState";
 
  export let entries: QueueUIEntry[] = [];
  export let showPrompt: (entry: QueueUIEntry) => void;
- export let showLightbox: (images: string[], index: number, e: Event) => void;
+ export let clearQueue: () => Promise<void>;
  export let mode: QueueItemType = "queue";
 
  let allEntries: [QueueUIEntry, string][] = []
@@ -34,10 +35,17 @@
  }
 </script>
 
-<div class="grid-wrapper">
+<div class="grid-wrapper {mode}-mode">
     <div class="grid-columns">
         <div>
             <input type="range" bind:value={gridColumns} min={1} max={8} step={1} />
+            <div class="button-wrapper">
+                <button class="clear-queue-button secondary"
+                        on:click={clearQueue}
+                        disabled={$queueState.isInterrupting}>
+                    🗑️
+                </button>
+            </div>
         </div>
     </div>
     <div class="grid-entries">
@@ -63,20 +71,32 @@
  }
 
  .grid-columns {
-     width: 100%;
      height: $grid-columns-control-height;
      position: relative;
      display: flex;
      flex-direction: column;
-     padding: var(--spacing-lg) 0;
+     margin: 0.25rem 1rem;
 
      > div {
          width: 100%;
-         margin: auto;
-         padding: 0 1rem;
+         height: 100%;
+         display: flex;
+         flex-direction: row;
+
          input {
              width: 100%;
              margin: auto;
+         }
+
+         .button-wrapper {
+             padding: 0.25rem;
+             .clear-queue-button {
+                 @include square-button;
+
+                 aspect-ratio: 1/1;
+                 height: 100%;
+                 padding: 0.25rem;
+             }
          }
      }
  }

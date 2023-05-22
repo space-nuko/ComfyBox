@@ -1,4 +1,4 @@
-import type { ComfyAPIHistoryEntry, ComfyAPIHistoryItem, ComfyAPIHistoryResponse, ComfyAPIQueueResponse, ComfyAPIStatusResponse, ComfyBoxPromptExtraData, ComfyNodeID, PromptID } from "$lib/api";
+import type { ComfyAPIHistoryEntry, ComfyAPIHistoryItem, ComfyAPIHistoryResponse, ComfyAPIQueueResponse, ComfyAPIStatusResponse, ComfyBoxPromptExtraData, ComfyNodeID, PromptID, QueueItemType } from "$lib/api";
 import type { Progress, SerializedPromptInputsAll, SerializedPromptOutputs, WorkflowInstID } from "$lib/components/ComfyApp";
 import type { ComfyExecutionResult } from "$lib/nodes/ComfyWidgetNodes";
 import notify from "$lib/notify";
@@ -17,6 +17,7 @@ type QueueStateOps = {
     progressUpdated: (progress: Progress) => void
     getQueueEntry: (promptID: PromptID) => QueueEntry | null;
     afterQueued: (workflowID: WorkflowInstID, promptID: PromptID, number: number, prompt: SerializedPromptInputsAll, extraData: any) => void
+    queueCleared: (type: QueueItemType) => void;
     onExecuted: (promptID: PromptID, nodeID: ComfyNodeID, output: ComfyExecutionResult) => QueueEntry | null
 }
 
@@ -363,6 +364,25 @@ function onExecuted(promptID: PromptID, nodeID: ComfyNodeID, outputs: ComfyExecu
     return entry_;
 }
 
+function queueCleared(type: QueueItemType) {
+    console.debug("[queueState] queueCleared", type)
+
+    store.update(s => {
+        if (type === "queue") {
+            s.queuePending.set([]);
+            s.queueRunning.set([]);
+            s.queueRemaining = 0;
+            s.runningNodeID = null;
+            s.progress = null;
+        }
+        else {
+            s.queueCompleted.set([])
+        }
+        s.isInterrupting = false;
+        return s;
+    })
+}
+
 const queueStateStore: WritableQueueStateStore =
 {
     ...store,
@@ -375,6 +395,7 @@ const queueStateStore: WritableQueueStateStore =
     executionCached,
     executionError,
     afterQueued,
+    queueCleared,
     getQueueEntry,
     onExecuted
 }

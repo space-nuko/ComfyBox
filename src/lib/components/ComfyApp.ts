@@ -1,6 +1,6 @@
 import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot, type NodeID, type NodeTypeSpec, type NodeTypeOpts, type SlotIndex, type UUID } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
-import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyPromptRequest, type ComfyNodeID, type PromptID } from "$lib/api"
+import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyPromptRequest, type ComfyNodeID, type PromptID, type QueueItemType } from "$lib/api"
 import { importA1111, parsePNGMetadata } from "$lib/pnginfo";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
@@ -33,7 +33,7 @@ import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import { get, writable, type Writable } from "svelte/store";
 import { tick } from "svelte";
 import uiState from "$lib/stores/uiState";
-import { basename, download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
+import { basename, capitalize, download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
 import notify from "$lib/notify";
 import configState from "$lib/stores/configState";
 import { blankGraph } from "$lib/defaultGraph";
@@ -312,7 +312,7 @@ export default class ComfyApp {
 
         const workflows = state.workflows as SerializedAppState[];
         await Promise.all(workflows.map(w => {
-            return this.openWorkflow(w, defs).catch(error => {
+            return this.openWorkflow(w, defs, false).catch(error => {
                 console.error("Failed restoring previous workflow", error)
                 notify(`Failed restoring previous workflow: ${error}`, { type: "error" })
             })
@@ -509,6 +509,18 @@ export default class ComfyApp {
         this.api.init();
     }
 
+    async clearQueue(type: QueueItemType) {
+        queueState.update(s => { s.isInterrupting = true; return s; })
+        await this.api.clearItems(type)
+            .then(() => {
+                queueState.queueCleared(type);
+                notify(`${capitalize(type)} cleared.`);
+            })
+            .finally(() => {
+                queueState.update(s => { s.isInterrupting = false; return s; })
+            });
+    }
+
     private addKeyboardHandler() {
         window.addEventListener("keydown", (e) => {
             this.shiftDown = e.shiftKey;
@@ -557,9 +569,12 @@ export default class ComfyApp {
         setColor(BuiltInSlotType.ACTION, "lightseagreen")
     }
 
-    async openWorkflow(data: SerializedAppState, refreshCombos: boolean | Record<string, ComfyNodeDef> = true): Promise<ComfyWorkflow> {
+    async openWorkflow(data: SerializedAppState,
+        refreshCombos: boolean | Record<string, ComfyNodeDef> = true,
+        warnMissingNodeTypes: boolean = true
+    ): Promise<ComfyWorkflow> {
         if (data.version !== COMFYBOX_SERIAL_VERSION) {
-            const mes = `Invalid ComfyBox saved data format: ${data.version}`
+            const mes = `Invalid ComfyBox saved data format: ${data.version} `
             notify(mes, { type: "error" })
             return Promise.reject(mes);
         }
@@ -580,7 +595,7 @@ export default class ComfyApp {
             return Promise.reject(error)
         }
 
-        if (workflow.missingNodeTypes.size > 0) {
+        if (workflow.missingNodeTypes.size > 0 && warnMissingNodeTypes) {
             modalState.pushModal({
                 svelteComponent: MissingNodeTypesModal,
                 svelteProps: {
@@ -681,7 +696,7 @@ export default class ComfyApp {
         }
         catch (error) {
             console.error("Failed to load default graph", error)
-            notify(`Failed to load default graph: ${error}`, { type: "error" })
+            notify(`Failed to load default graph: ${error} `, { type: "error" })
             state = structuredClone(blankGraph)
         }
         await this.openWorkflow(state, defs)
@@ -737,7 +752,7 @@ export default class ComfyApp {
         else {
             const date = new Date();
             const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
-            filename = `workflow-${formattedDate}.json`
+            filename = `workflow - ${formattedDate}.json`
         }
 
         const indent = 2
@@ -782,7 +797,7 @@ export default class ComfyApp {
         try {
             while (this.queueItems.length) {
                 ({ num, batchCount, workflow } = this.queueItems.pop());
-                console.debug(`Queue get! ${num} ${batchCount} ${tag}`);
+                console.debug(`Queue get! ${num} ${batchCount} ${tag} `);
 
                 const thumbnails = []
                 for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
@@ -850,7 +865,7 @@ export default class ComfyApp {
 
                     if (error != null) {
                         const mes: string = error;
-                        notify(`Error queuing prompt:\n${mes}`, { type: "error" })
+                        notify(`Error queuing prompt: \n${mes} `, { type: "error" })
                         console.error(graphToGraphVis(workflow.graph))
                         console.error(promptToGraphVis(p))
                         console.error("Error queuing prompt", error, num, p)

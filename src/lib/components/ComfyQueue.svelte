@@ -83,6 +83,18 @@
      changed = false;
  }
 
+ async function clearQueue() {
+     await app.clearQueue(mode);
+
+     if (mode === "queue") {
+         _queuedEntries = []
+         _runningEntries = []
+     }
+
+     _entries = [];
+     changed = true;
+ }
+
  function formatDate(date: Date): string {
      const time = date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
      const day = date.toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(',', '');
@@ -173,16 +185,6 @@
      console.warn("[ComfyQueue] BUILDHISTORY", _entries, $queueCompleted)
  }
 
- function showLightbox(images: string[], index: number, e: Event) {
-     e.preventDefault()
-     if (!images)
-         return
-
-     ImageViewer.instance.showModal(images, index);
-
-     e.stopPropagation()
- }
-
  async function interrupt() {
      if ($queueState.isInterrupting)
          return
@@ -254,9 +256,9 @@
     <div class="queue-entries" bind:this={queueList}>
         {#if _entries.length > 0}
             {#if mode === "history" && displayMode === "grid"}
-                <ComfyQueueGridDisplay entries={_entries} {showLightbox} {showPrompt} {mode} />
+                <ComfyQueueGridDisplay entries={_entries} {showPrompt} {clearQueue} {mode} />
             {:else}
-                <ComfyQueueListDisplay entries={_entries} {showLightbox} {showPrompt} {mode} />
+                <ComfyQueueListDisplay entries={_entries} {showPrompt} {clearQueue} {mode} />
             {/if}
         {:else}
             <div class="queue-empty">
@@ -405,41 +407,8 @@
  .mode-button {
      height: calc($mode-buttons-height);
      padding: 0.2rem;
-     border: 1px solid var(--panel-border-color);
-     font-weight: bold;
-     text-align: center;
-     margin: auto;
 
-     &.primary {
-         background: var(--button-primary-background-fill);
-         &:hover {
-             background: var(--button-primary-background-fill-hover);
-         }
-     }
-
-     &.secondary {
-         background: var(--button-secondary-background-fill);
-         &:hover {
-             background: var(--button-secondary-background-fill-hover);
-         }
-     }
-
-     &.ternary {
-         background: var(--panel-background-fill);
-         &:hover {
-             background: var(--block-background-fill );
-         }
-     }
-
-     &:hover {
-         filter: brightness(85%);
-     }
-     &:active {
-         filter: brightness(50%)
-     }
-     &.selected {
-         filter: brightness(80%)
-     }
+     @include square-button;
  }
 
  :global(.dark) .mode-button {
