@@ -8,6 +8,9 @@ export type ConfigState = {
 
     /** When saving, always prompt for a name to save the workflow as */
     promptForWorkflowName: boolean,
+
+    /** When closing the tab, open the confirmation window if there's unsaved changes */
+    confirmWhenUnloadingUnsavedChanges: boolean,
 }
 
 type ConfigStateOps = {
@@ -17,7 +20,8 @@ export type WritableConfigStateStore = Writable<ConfigState> & ConfigStateOps;
 const store: Writable<ConfigState> = writable(
     {
         alwaysStripUserState: false,
-        promptForWorkflowName: false
+        promptForWorkflowName: false,
+        confirmWhenUnloadingUnsavedChanges: true
     })
 
 const configStateStore: WritableConfigStateStore =

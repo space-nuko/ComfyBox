@@ -6,6 +6,7 @@ import { get } from "svelte/store";
 import type { ComfyNodeID } from "./api";
 import { type SerializedPrompt } from "./components/ComfyApp";
 import workflowState from "./stores/workflowState";
+import { ImageViewer } from "./ImageViewer";
 
 export function clamp(n: number, min: number, max: number): number {
     return Math.min(Math.max(n, min), max)
@@ -21,6 +22,10 @@ export function range(size: number, startAt: number = 0): ReadonlyArray<number> 
 
 export function countNewLines(str: string): number {
     return str.split(/\r\n|\r|\n/).length
+}
+
+export function capitalize(str: string) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 export function basename(filepath: string): string {
@@ -500,4 +505,14 @@ export function comfyBoxImageToComfyFile(image: ComfyBoxImageMetadata): ComfyIma
 
 export function comfyBoxImageToComfyURL(image: ComfyBoxImageMetadata): string {
     return convertComfyOutputToComfyURL(image.comfyUIFile)
+}
+
+export function showLightbox(images: string[], index: number, e: Event) {
+    e.preventDefault()
+    if (!images)
+        return
+
+    ImageViewer.instance.showModal(images, index);
+
+    e.stopPropagation()
 }

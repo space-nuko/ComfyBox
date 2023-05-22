@@ -1,7 +1,9 @@
 <script lang="ts">
- import { ListIcon as List, ImageIcon as Image, SettingsIcon as Settings } from "svelte-feather-icons";
- import ComfyApp, { type A1111PromptAndInfo, type SerializedAppState } from "./ComfyApp";
+ import { Image, Gear } from "svelte-bootstrap-icons";
+ import ComfyApp from "./ComfyApp";
  import uiState from "$lib/stores/uiState";
+ import configState from "$lib/stores/configState";
+ import workflowState from "$lib/stores/workflowState";
  import { SvelteToast, toast } from '@zerodevx/svelte-toast'
 
  import LightboxModal from "./LightboxModal.svelte";
@@ -34,6 +36,16 @@
      document.getElementById("app-root").classList.remove("dark")
  }
 
+ function handleBeforeUnload(event: BeforeUnloadEvent) {
+     if (!$configState.confirmWhenUnloadingUnsavedChanges)
+         return;
+
+     const unsavedChanges = $workflowState.openedWorkflows.some(w => w.isModified);
+     if (unsavedChanges) {
+         event.preventDefault();
+         event.returnValue = '';
+     }
+ }
 </script>
 
 <svelte:head>
@@ -42,13 +54,15 @@
     {/if}
 </svelte:head>
 
+<svelte:window on:beforeunload={handleBeforeUnload} />
+
 <div id="main" class:dark={uiTheme === "gradio-dark"}>
     <div id="container">
         <Sidebar selected="generate">
             <SidebarItem id="generate" name="Generate" icon={Image}>
                 <ComfyWorkflowsView {app} {uiTheme} />
             </SidebarItem>
-            <SidebarItem id="settings" name="Settings" icon={Settings}>
+            <SidebarItem id="settings" name="Settings" icon={Gear}>
             </SidebarItem>
         </Sidebar>
     </div>

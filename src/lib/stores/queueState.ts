@@ -1,4 +1,4 @@
-import type { ComfyAPIHistoryEntry, ComfyAPIHistoryItem, ComfyAPIHistoryResponse, ComfyAPIQueueResponse, ComfyAPIStatusResponse, ComfyBoxPromptExtraData, ComfyNodeID, PromptID } from "$lib/api";
+import type { ComfyAPIHistoryEntry, ComfyAPIHistoryItem, ComfyAPIHistoryResponse, ComfyAPIQueueResponse, ComfyAPIStatusResponse, ComfyBoxPromptExtraData, ComfyNodeID, PromptID, QueueItemType } from "$lib/api";
 import type { Progress, SerializedPromptInputsAll, SerializedPromptOutputs, WorkflowInstID } from "$lib/components/ComfyApp";
 import type { ComfyExecutionResult } from "$lib/nodes/ComfyWidgetNodes";
 import notify from "$lib/notify";
@@ -17,6 +17,8 @@ type QueueStateOps = {
     progressUpdated: (progress: Progress) => void
     getQueueEntry: (promptID: PromptID) => QueueEntry | null;
     afterQueued: (workflowID: WorkflowInstID, promptID: PromptID, number: number, prompt: SerializedPromptInputsAll, extraData: any) => void
+    queueItemDeleted: (type: QueueItemType, id: PromptID) => void;
+    queueCleared: (type: QueueItemType) => void;
     onExecuted: (promptID: PromptID, nodeID: ComfyNodeID, output: ComfyExecutionResult) => QueueEntry | null
 }
 
@@ -181,6 +183,39 @@ function findEntryInPending(promptID: PromptID): [number, QueueEntry | null, Wri
     return [-1, null, null]
 }
 
+function deleteEntry(promptID: PromptID): boolean {
+    const state = get(store);
+    let index = get(state.queuePending).findIndex(e => e.promptID === promptID)
+    let found = false;
+    if (index !== -1) {
+        state.queuePending.update(qp => {
+            qp.splice(index, 1)
+            return qp;
+        })
+        found = true;
+    }
+
+    index = get(state.queueRunning).findIndex(e => e.promptID === promptID)
+    if (index !== -1) {
+        state.queueRunning.update(qr => {
+            qr.splice(index, 1)
+            return qr;
+        })
+        found = true;
+    }
+
+    index = get(state.queueCompleted).findIndex(e => e.entry.promptID === promptID)
+    if (index !== -1) {
+        state.queueCompleted.update(qc => {
+            qc.splice(index, 1)
+            return qc;
+        })
+        found = true;
+    }
+
+    return found;
+}
+
 function moveToRunning(index: number, queue: Writable<QueueEntry[]>) {
     const state = get(store)
 
@@ -294,7 +329,7 @@ function createNewQueueEntry(promptID: PromptID, number: number = -1, prompt: Se
     return {
         number,
         queuedAt: new Date(), // Now
-        finishedAt: null,
+        finishedAt: undefined,
         promptID,
         prompt,
         extraData,
@@ -363,6 +398,37 @@ function onExecuted(promptID: PromptID, nodeID: ComfyNodeID, outputs: ComfyExecu
     return entry_;
 }
 
+function queueItemDeleted(type: QueueItemType, id: PromptID) {
+    console.debug("[queueState] queueItemDeleted", type, id)
+
+    store.update(s => {
+        if (!deleteEntry(id)) {
+            console.error("[queueState] Queue item to delete not found!", type, id);
+        }
+        s.isInterrupting = false;
+        return s;
+    })
+}
+
+function queueCleared(type: QueueItemType) {
+    console.debug("[queueState] queueCleared", type)
+
+    store.update(s => {
+        if (type === "queue") {
+            s.queuePending.set([]);
+            s.queueRunning.set([]);
+            s.queueRemaining = 0;
+            s.runningNodeID = null;
+            s.progress = null;
+        }
+        else {
+            s.queueCompleted.set([])
+        }
+        s.isInterrupting = false;
+        return s;
+    })
+}
+
 const queueStateStore: WritableQueueStateStore =
 {
     ...store,
@@ -375,6 +441,8 @@ const queueStateStore: WritableQueueStateStore =
     executionCached,
     executionError,
     afterQueued,
+    queueItemDeleted,
+    queueCleared,
     getQueueEntry,
     onExecuted
 }
