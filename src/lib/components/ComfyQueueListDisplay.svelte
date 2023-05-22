@@ -7,6 +7,7 @@
  export let entries: QueueUIEntry[] = [];
  export let showPrompt: (entry: QueueUIEntry) => void;
  export let clearQueue: () => void;
+ export let deleteEntry: (entry: QueueUIEntry, event: MouseEvent) => void;
  export let mode: QueueItemType = "queue";
  export let imageSize: number = 40;
 </script>
@@ -29,6 +30,11 @@
     <div class="list-entries {mode}-mode" style:--imageSize={imageSize}>
         {#each entries as entry}
             <div class="list-entry {entry.status}" on:click={(e) => showPrompt(entry, e)}>
+            <button class="list-entry-delete-button secondary"
+                    on:click={(e) => deleteEntry(entry, e)}
+                    disabled={$queueState.isInterrupting}>
+                <span>✕</span>
+            </button>
                 {#if entry.images.length > 0}
                     <div class="list-entry-images"
                          style="--cols: {Math.ceil(Math.sqrt(Math.min(entry.images.length, 4)))}" >
@@ -128,8 +134,9 @@
      border-top: 1px solid var(--table-border-color);
      background: var(--panel-background-fill);
      max-height: 14rem;
+     position: relative;
 
-     &:hover:not(:has(img:hover)) {
+     &:hover:not(:has(img:hover)):not(:has(button:hover)) {
          cursor: pointer;
          background: var(--block-background-fill);
 
@@ -155,6 +162,34 @@
      }
      &.pending, &.unknown {
      }
+ }
+
+ .list-entry-delete-button {
+     @include square-button;
+
+     display: flex;
+     position: absolute;
+     width: 1.4rem;
+     height: 1.4rem;
+     text-align: center;
+     align-items: center;
+     font-size: 10pt;
+     justify-content: center;
+     text-align: center;
+     top:0;
+     right:0.5rem;
+     margin: 0.5rem;
+     z-index: 1000000000;
+
+     opacity: 70%;
+     background: var(--neutral-700);
+     color: var(--neutral-300);
+
+     &:hover {
+         opacity: 100%;
+         color: var(--neutral-100);
+     }
+
  }
 
  .list-entry-rest {
