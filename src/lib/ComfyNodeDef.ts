@@ -53,7 +53,7 @@ export function isBackendNodeDefInputType(inputName: string, type: ComfyNodeDefI
 }
 
 export function iterateNodeDefInputs(def: ComfyNodeDef): Iterable<[string, ComfyNodeDefInput]> {
-    var inputs = def.input.required
+    var inputs = def.input.required || {}
     if (def.input.optional != null) {
         inputs = Object.assign({}, def.input.required, def.input.optional)
     }
@@ -61,7 +61,8 @@ export function iterateNodeDefInputs(def: ComfyNodeDef): Iterable<[string, Comfy
 }
 
 export function iterateNodeDefOutputs(def: ComfyNodeDef): Iterable<ComfyNodeDefOutput> {
-    return range(def.output.length).map(i => {
+    const outputCount = def.output ? def.output.length : 0;
+    return range(outputCount).map(i => {
         return {
             type: def.output[i],
             name: def.output_name[i] || def.output[i],
