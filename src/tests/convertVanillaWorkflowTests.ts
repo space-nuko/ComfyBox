@@ -8,6 +8,7 @@ import layoutStates, { defaultWorkflowAttributes, type IDragItem, type WidgetLay
 import ComfyApp from '$lib/components/ComfyApp';
 import { LiteGraph } from '@litegraph-ts/core';
 import type { ComfyNodeDef } from '$lib/ComfyNodeDef';
+import type IComfyInputSlot from '$lib/IComfyInputSlot';
 
 const objectInfo: Record<string, ComfyNodeDef> = await import("./data/objectInfo.json")
 const json1: ComfyVanillaWorkflow = await import("./data/convertedWidget.json")
@@ -103,6 +104,7 @@ export default class convertVanillaWorkflowTests extends UnitTest {
 
         const targetNode = widget.node.getOutputNodes(0)[0]
         expect(targetNode.inputs[links[0].target_slot].type).toEqual("number")
+        expect((targetNode.inputs[links[0].target_slot] as IComfyInputSlot).serialize).toEqual(true)
         expect(links[0].type).toEqual("number");
     }
 

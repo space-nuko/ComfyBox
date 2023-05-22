@@ -296,6 +296,7 @@ function convertPrimitiveNode(vanillaWorkflow: ComfyVanillaWorkflow, node: Seria
                 link[5] = widgetInputType // link data type
                 if (foundInput != null) {
                     foundInput.type = widgetInputType;
+                    (foundInput as IComfyInputSlot).serialize = true; // IMPORTANT!!!
                 }
 
                 // Change the title of the widget to the name of the first input connected to
@@ -305,7 +306,10 @@ function convertPrimitiveNode(vanillaWorkflow: ComfyVanillaWorkflow, node: Seria
                 }
             }
         }
-        // Remove links on the old node so they won't be double-removed when it's pruned
+
+        // Remove links on the old node so they won't be double-removed when
+        // it's pruned (removeSerializedNode will remove any links still
+        // connected to other inputs, but we want to keep the ones we rewrote)
         mainOutput.links = []
     }
     else {
@@ -423,7 +427,7 @@ export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWork
                     config: inputOpts,
                     defaultWidgetNode: null,
                     widgetNodeType,
-                    serialize: true,
+                    serialize: true, // IMPORTANT!
                     properties: {}
                 }
 
