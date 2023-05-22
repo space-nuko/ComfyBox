@@ -1,5 +1,5 @@
 import { parseWhateverIntoImageMetadata, type ComfyBoxImageMetadata, type ComfyUploadImageType } from "$lib/utils";
-import { BuiltInSlotType, LiteGraph, type IComboWidget, type ITextWidget, type PropertyLayout, type SlotLayout } from "@litegraph-ts/core";
+import { BuiltInSlotType, LiteGraph, type IComboWidget, type ITextWidget, type PropertyLayout, type SlotLayout, type INumberWidget } from "@litegraph-ts/core";
 import { get, writable, type Writable } from "svelte/store";
 
 import GalleryWidget from "$lib/widgets/GalleryWidget.svelte";
@@ -42,15 +42,17 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
 
     selectedFilename: string | null = null;
 
-    selectedIndexWidget: ITextWidget;
+    selectedIndexWidget: INumberWidget;
     modeWidget: IComboWidget;
 
     imageWidth: Writable<number> = writable(0);
     imageHeight: Writable<number> = writable(0);
 
+    selectedImage: Writable<number | null> = writable(null);
+
     constructor(name?: string) {
         super(name, [])
-        this.selectedIndexWidget = this.addWidget("text", "Selected", String(this.properties.index), "index")
+        this.selectedIndexWidget = this.addWidget("number", "Selected", get(this.selectedImage))
         this.selectedIndexWidget.disabled = true;
         this.modeWidget = this.addWidget("combo", "Mode", this.properties.updateMode, null, { property: "updateMode", values: ["replace", "append"] })
     }
@@ -63,11 +65,14 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
 
     override onExecute() {
         const value = get(this.value)
+        const index = get(this.selectedImage)
         this.setOutputData(0, value)
-        this.setOutputData(1, this.properties.index)
+        this.setOutputData(1, index)
 
-        if (this.properties.index != null && value && value[this.properties.index] != null) {
-            const image = value[this.properties.index];
+        this.selectedIndexWidget.value = index;
+
+        if (index != null && value && value[index] != null) {
+            const image = value[index];
             image.width = get(this.imageWidth)
             image.height = get(this.imageHeight)
         }
@@ -101,7 +106,6 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
 
     override setValue(value: any, noChangedEvent: boolean = false) {
         super.setValue(value, noChangedEvent)
-        this.setProperty("index", null)
     }
 }
 

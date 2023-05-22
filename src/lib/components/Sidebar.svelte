@@ -62,7 +62,7 @@
             {#if t.id === $selected_tab}
                 <button class="selected">
                     {#if t.icon !== null}
-                        <svelte:component this={t.icon} size="100%" strokeWidth={1.5} />
+                        <svelte:component this={t.icon} width="100%" height="100%" strokeWidth={1.5} />
                     {:else}
                         {t.name}
                     {/if}
@@ -75,7 +75,7 @@
                              }}
                     >
                     {#if t.icon !== null}
-                        <svelte:component this={t.icon} size="100%" strokeWidth={1.5} />
+                        <svelte:component this={t.icon} width="100%" height="100%" strokeWidth={1.5} />
                     {:else}
                         {t.name}
                     {/if}

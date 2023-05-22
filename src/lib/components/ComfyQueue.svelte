@@ -1,9 +1,23 @@
+<script lang="ts" context="module">
+ export type QueueUIEntryStatus = QueueEntryStatus | "pending" | "running";
+
+ export type QueueUIEntry = {
+     entry: QueueEntry,
+     message: string,
+     submessage: string,
+     date?: string,
+     status: QueueUIEntryStatus,
+     images?: string[], // URLs
+     details?: string // shown in a tooltip on hover
+ }
+</script>
+
 <script lang="ts">
  import queueState, { type CompletedQueueEntry, type QueueEntry, type QueueEntryStatus } from "$lib/stores/queueState";
  import ProgressBar from "./ProgressBar.svelte";
  import Spinner from "./Spinner.svelte";
  import PromptDisplay from "./PromptDisplay.svelte";
- import { ListIcon as List } from "svelte-feather-icons";
+ import { List, ListUl, Grid } from "svelte-bootstrap-icons";
  import { convertComfyOutputToComfyURL, convertFilenameToComfyURL, getNodeInfo, truncateString } from "$lib/utils"
  import type { Writable } from "svelte/store";
  import type { QueueItemType } from "$lib/api";
@@ -14,6 +28,8 @@
  import Modal from "./Modal.svelte";
  import DropZone from "./DropZone.svelte";
 	import workflowState from "$lib/stores/workflowState";
+ import ComfyQueueListDisplay from "./ComfyQueueListDisplay.svelte";
+ import ComfyQueueGridDisplay from "./ComfyQueueGridDisplay.svelte";
 
  export let app: ComfyApp;
 
@@ -22,25 +38,16 @@
  let queueCompleted: Writable<CompletedQueueEntry[]> | null = null;
  let queueList: HTMLDivElement | null = null;
 
- type QueueUIEntryStatus = QueueEntryStatus | "pending" | "running";
-
- type QueueUIEntry = {
-     entry: QueueEntry,
-     message: string,
-     submessage: string,
-     date?: string,
-     status: QueueUIEntryStatus,
-     images?: string[], // URLs
-     details?: string // shown in a tooltip on hover
- }
-
  $: if ($queueState) {
      queuePending = $queueState.queuePending
      queueRunning = $queueState.queueRunning
      queueCompleted = $queueState.queueCompleted
  }
 
+ type DisplayModeType = "list" | "grid";
+
  let mode: QueueItemType = "queue";
+ let displayMode: DisplayModeType = "list";
  let changed = true;
 
  function switchMode(newMode: QueueItemType) {
@@ -51,6 +58,16 @@
          _runningEntries = []
          _entries = []
      }
+ }
+
+ function switchDisplayMode(newDisplayMode: DisplayModeType) {
+     // changed = displayMode !== newDisplayMode
+     displayMode = newDisplayMode
+     // if (changed) {
+     //     _queuedEntries = []
+     //     _runningEntries = []
+     //     _entries = []
+     // }
  }
 
  let _queuedEntries: QueueUIEntry[] = []
@@ -156,12 +173,12 @@
      console.warn("[ComfyQueue] BUILDHISTORY", _entries, $queueCompleted)
  }
 
- function showLightbox(entry: QueueUIEntry, index: number, e: Event) {
+ function showLightbox(images: string[], index: number, e: Event) {
      e.preventDefault()
-     if (!entry.images)
+     if (!images)
          return
 
-     ImageViewer.instance.showModal(entry.images, index);
+     ImageViewer.instance.showModal(images, index);
 
      e.stopPropagation()
  }
@@ -184,7 +201,7 @@
  let expandAll = false;
  let selectedPrompt = null;
  let selectedImages = [];
- function showPrompt(entry: QueueUIEntry, e: MouseEvent) {
+ function showPrompt(entry: QueueUIEntry) {
      selectedPrompt = entry.entry.prompt;
      selectedImages = entry.images;
      showModal = true;
@@ -219,48 +236,33 @@
     </div>
 </Modal>
 
-<div class="queue">
-    <div class="queue-entries {mode}-mode" bind:this={queueList}>
+<div class="queue {mode}-mode">
+    {#if mode === "history"}
+        <div class="display-mode-buttons">
+            <div class="mode-button image-display-button ternary"
+                 on:click={() => switchDisplayMode("list")}
+                class:selected={displayMode === "list"}>
+                <List width="100%" height="100%" />
+            </div>
+            <div class="mode-button image-display-button ternary"
+                 on:click={() => switchDisplayMode("grid")}
+                class:selected={displayMode === "grid"}>
+                <Grid width="100%" height="100%" />
+            </div>
+        </div>
+    {/if}
+    <div class="queue-entries" bind:this={queueList}>
         {#if _entries.length > 0}
-            {#each _entries as entry}
-                <div class="queue-entry {entry.status}" on:click={(e) => showPrompt(entry, e)}>
-                    {#if entry.images.length > 0}
-                         <div class="queue-entry-images"
-                              style="--cols: {Math.ceil(Math.sqrt(Math.min(entry.images.length, 4)))}" >
-                            {#each entry.images.slice(0, 4) as image, i}
-                                <div>
-                                    <img class="queue-entry-image"
-                                         on:click={(e) => showLightbox(entry, i, e)}
-                                         src={image}
-                                         alt="thumbnail" />
-                                </div>
-                            {/each}
-                        </div>
-                    {:else}
-                        <!-- <div class="queue-entry-image-placeholder" /> -->
-                    {/if}
-                    <div class="queue-entry-details">
-                        <div class="queue-entry-message">
-                            {truncateString(entry.message, 20)}
-                        </div>
-                        <div class="queue-entry-submessage">
-                            {entry.submessage}
-                        </div>
-                    </div>
-                </div>
-                <div class="queue-entry-rest {entry.status}">
-                    {#if entry.date != null}
-                        <span class="queue-entry-queued-at">
-                            {entry.date}
-                        </span>
-                    {/if}
-                </div>
-            {/each}
+            {#if mode === "history" && displayMode === "grid"}
+                <ComfyQueueGridDisplay entries={_entries} {showLightbox} {showPrompt} {mode} />
+            {:else}
+                <ComfyQueueListDisplay entries={_entries} {showLightbox} {showPrompt} {mode} />
+            {/if}
         {:else}
             <div class="queue-empty">
                 <div class="queue-empty-container">
                     <div class="queue-empty-icon">
-                        <List size="120rem" />
+                        <ListUl width="100%" height="10rem" />
                     </div>
                     <div class="queue-empty-message">
                         (No entries)
@@ -272,12 +274,12 @@
     <div class="mode-buttons">
         <div class="mode-button secondary"
              on:click={() => switchMode("queue")}
-            class:mode-selected={mode === "queue"}>
+            class:selected={mode === "queue"}>
             Queue
         </div>
         <div class="mode-button secondary"
              on:click={() => switchMode("history")}
-            class:mode-selected={mode === "history"}>
+            class:selected={mode === "history"}>
             History
         </div>
     </div>
@@ -315,10 +317,12 @@
 
 <style lang="scss">
  $pending-height: 200px;
+ $display-mode-buttons-height: 2rem;
  $bottom-bar-height: 70px;
  $workflow-tabs-height: 2.5rem;
  $mode-buttons-height: 30px;
  $queue-height: calc(100vh - #{$pending-height} - #{$mode-buttons-height} - #{$bottom-bar-height} - #{$workflow-tabs-height} - 0.9rem);
+ $queue-height-history: calc(#{$queue-height} - #{$display-mode-buttons-height});
 
  .prompt-modal-header {
      padding-left: 0.2rem;
@@ -329,20 +333,22 @@
 }
  .queue {
      color: var(--body-text-color);
+
+     &.queue-mode > .queue-entries {
+         height: $queue-height;
+         max-height: $queue-height;
+     }
+
+     &.history-mode > .queue-entries {
+         height: $queue-height-history;
+         max-height: $queue-height-history;
+     }
  }
 
  .queue-entries {
-     height: $queue-height;
-     max-height: $queue-height;
      display: flex;
-     overflow-y: auto;
      flex-flow: column nowrap;
-
-     &.queue-mode > :first-child {
-         // elements stick to bottom in queue mode only
-         // next element in queue is on the bottom
-         margin-top: auto !important;
-     }
+     height: $queue-height;
 
      > .queue-empty {
          display: flex;
@@ -368,105 +374,21 @@
      }
  }
 
- .queue-entry {
-     padding: 1.0rem;
+ .display-mode-buttons {
      display: flex;
      flex-direction: row;
-     border-bottom: 1px solid var(--block-border-color);
-     border-top: 1px solid var(--table-border-color);
-     background: var(--panel-background-fill);
-     max-height: 14rem;
+     top: 0px;
+     height: $display-mode-buttons-height;
+     margin-bottom: auto;
 
-     &:hover:not(:has(img:hover)) {
-         cursor: pointer;
-         background: var(--block-background-fill);
+     > .mode-button {
+         width: 100%;
+         color: var(--neutral-500);
 
-         &.running {
-             background: var(--comfy-accent-soft);
+         &.selected {
+             color: var(--body-text-color);
          }
      }
-
-     &.success {
-         /* background: green; */
-     }
-     &.error {
-         background: red;
-     }
-     &.all_cached, &.interrupted {
-         filter: brightness(80%);
-         background: var(--comfy-disabled-textbox-background-fill);
-         color: var(--comfy-disable-textbox-text-color);
-     }
-     &.running {
-         background: var(--block-background-fill);
-         border: 3px dashed var(--neutral-500);
-     }
-     &.pending, &.unknown {
-     }
- }
-
- .queue-entry-rest {
-     width: 100%;
-     position: relative;
-
-     &.all_cached, &.interrupted {
-         filter: brightness(80%);
-         color: var(--comfy-accent-soft);
-     }
- }
-
- $thumbnails-size: 12rem;
-
- .queue-entry-images {
-     --cols: 1;
-     margin: auto;
-     width: calc($thumbnails-size * 2);
-     display: grid;
-     display: inline-grid;
-     grid-template-columns: repeat(var(--cols), 1fr);
-     grid-template-rows: repeat(var(--cols), 1fr);
-     column-gap: 1px;
-     row-gap: 1px;
-     vertical-align: top;
-     flex: 1 1 40%;
-
-     img {
-         aspect-ratio: 1 / 1;
-         object-fit: cover;
-
-         &:hover {
-             cursor: pointer;
-             filter: brightness(120%) contrast(120%);
-         }
-     }
- }
-
- .queue-entry-details {
-     position: relative;
-     padding: 1rem;
-     width: 100%;
-     display: flex;
-     flex-direction: column;
-     justify-content: center;
-     white-space: nowrap;
- }
-
- .queue-entry-message {
-     font-size: 15px;
- }
-
- .queue-entry-submessage {
-     font-size: 12px;
- }
-
- .queue-entry-queued-at {
-     width: auto;
-     font-size: 12px;
-     position:absolute;
-     right: 0px;
-     bottom: 0px;
-     padding: 0.4rem 0.6rem;
-     color: var(--body-text-color);
  }
 
  .mode-buttons {
@@ -502,13 +424,20 @@
          }
      }
 
+     &.ternary {
+         background: var(--panel-background-fill);
+         &:hover {
+             background: var(--block-background-fill );
+         }
+     }
+
      &:hover {
          filter: brightness(85%);
      }
      &:active {
          filter: brightness(50%)
      }
-     &.mode-selected {
+     &.selected {
          filter: brightness(80%)
      }
  }
@@ -521,7 +450,7 @@
      &:active {
          filter: brightness(50%)
      }
-     &.mode-selected {
+     &.selected {
          filter: brightness(150%)
      }
  }

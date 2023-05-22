@@ -1,6 +1,6 @@
 <script lang="ts">
- import { ListIcon as List, ImageIcon as Image, SettingsIcon as Settings } from "svelte-feather-icons";
- import ComfyApp, { type A1111PromptAndInfo, type SerializedAppState } from "./ComfyApp";
+ import { Image, Gear } from "svelte-bootstrap-icons";
+ import ComfyApp from "./ComfyApp";
  import uiState from "$lib/stores/uiState";
  import configState from "$lib/stores/configState";
  import workflowState from "$lib/stores/workflowState";
@@ -62,7 +62,7 @@
             <SidebarItem id="generate" name="Generate" icon={Image}>
                 <ComfyWorkflowsView {app} {uiTheme} />
             </SidebarItem>
-            <SidebarItem id="settings" name="Settings" icon={Settings}>
+            <SidebarItem id="settings" name="Settings" icon={Gear}>
             </SidebarItem>
         </Sidebar>
     </div>

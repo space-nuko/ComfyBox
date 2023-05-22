@@ -108,6 +108,12 @@ hr {
     color: var(--panel-border-color);
 }
 
+input {
+    color: var(--body-text-color);
+    background: var(--input-background-fill);
+    border: var(--input-border-width) solid var(--input-border-color)
+}
+
 input:not(input[type=radio]), textarea {
     border-radius: 0 !important;
 }
