@@ -53,7 +53,7 @@ export function isBackendNodeDefInputType(inputName: string, type: ComfyNodeDefI
 }
 
 export function iterateNodeDefInputs(def: ComfyNodeDef): Iterable<[string, ComfyNodeDefInput]> {
-    var inputs = def.input.required
+    var inputs = def.input.required || {}
     if (def.input.optional != null) {
         inputs = Object.assign({}, def.input.required, def.input.optional)
     }
