@@ -87,7 +87,7 @@
                  class:is-executing={$queueState.runningNodeID && $queueState.runningNodeID == widget.node.id}
                  class:hidden={hidden}
             >
-                <svelte:component this={widget.node.svelteComponentType} {layoutState} {widget} {isMobile} />
+                <svelte:component this={widget.node.svelteComponentType} {widget} {isMobile} />
             </div>
             {#if hidden && edit}
                 <div class="handle handle-hidden" class:hidden={!edit} />

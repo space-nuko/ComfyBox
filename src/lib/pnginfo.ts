@@ -1,65 +1,158 @@
 import { LiteGraph, LGraph, LGraphNode } from "@litegraph-ts/core"
 import type ComfyAPI from "$lib/api"
 
-class PNGMetadataPromise extends Promise<Record<string, string>> {
-    public cancelMethod: () => void;
-    constructor(executor: (resolve: (value?: Record<string, string>) => void, reject: (reason?: any) => void) => void) {
-        super(executor);
+class Lazy<T> {
+    thunk: () => T;
+    cache: T | null;
 
+    constructor(thunk: () => T) {
+        this.thunk = thunk;
+        this.cache = null;
     }
 
-    //cancel the operation
-    public cancel() {
-        if (this.cancelMethod) {
-            this.cancelMethod();
+    get(): T {
+        if (this.cache === null) {
+            this.cache = this.thunk();
         }
+
+        return this.cache;
     }
 }
 
-export function getPngMetadata(file: File): PNGMetadataPromise {
-    return new PNGMetadataPromise((r, _) => {
-        const reader = new FileReader();
-        reader.onload = (event: Event) => {
-            // Get the PNG data as a Uint8Array
-            const pngData = new Uint8Array((event.target as any).result);
-            const dataView = new DataView(pngData.buffer);
+interface PNGChunk {
+    type: string,
+    data: Uint8Array,
+}
 
-            // Check that the PNG signature is present
-            if (dataView.getUint32(0) !== 0x89504e47) {
-                console.error("Not a valid PNG file");
-                r();
-                return;
-            }
+enum ParseErrorKind {
+    PNGMalformedHeader,
+    PNGMalformedTextChunk,
+    JPEGNoEXIF,
+    JPEGNoUserComment,
+    JPEGMalformedUserComment,
+    UnexpectedEOF,
+    UnsupportedFileType,
+    Other,
+}
 
-            // Start searching for chunks after the PNG signature
-            let offset = 8;
-            let txt_chunks = {};
-            // Loop through the chunks in the PNG file
-            while (offset < pngData.length) {
-                // Get the length of the chunk
-                const length = dataView.getUint32(offset);
-                // Get the chunk type
-                const type = String.fromCharCode(...pngData.slice(offset + 4, offset + 8));
-                if (type === "tEXt") {
-                    // Get the keyword
-                    let keyword_end = offset + 8;
-                    while (pngData[keyword_end] !== 0) {
-                        keyword_end++;
-                    }
-                    const keyword = String.fromCharCode(...pngData.slice(offset + 8, keyword_end));
-                    // Get the text
-                    const text = String.fromCharCode(...pngData.slice(keyword_end + 1, offset + 8 + length));
-                    txt_chunks[keyword] = text;
+interface ParseError {
+    kind: ParseErrorKind,
+    error: any,
+}
+
+/*
+ * This function was taken from the hdg userscript
+ */
+function* pngChunks(bytes: Uint8Array): Generator<PNGChunk, ParseError | null> {
+    const HEADER: number[] = [137, 80, 78, 71, 13, 10, 26, 10];
+    const LENGTH_LEN = 4;
+    const TYPE_LEN = 4;
+    const CRC_LEN = 4;
+
+    let view = new DataView(bytes.buffer);
+    let decoder = new TextDecoder("utf-8", { fatal: true });
+    let pos = 0;
+
+    for (let i = 0; i < HEADER.length; i++) {
+        if (bytes[i] != HEADER[i]) {
+            return {
+                kind: ParseErrorKind.PNGMalformedHeader,
+                error: `wrong PNG header: ${bytes.slice(0, HEADER.length)}`,
+            };
+        }
+    }
+    pos += HEADER.length;
+
+    while (pos < bytes.byteLength) {
+        try {
+            let len = view.getUint32(pos, false);
+            let type = decoder.decode(bytes.subarray(pos + LENGTH_LEN, pos + LENGTH_LEN + TYPE_LEN));
+            if (type.length < 4) {
+                return {
+                    kind: ParseErrorKind.UnexpectedEOF,
+                    error: "PNG parse error: unexpected EOF when parsing chunk type",
                 }
+            }
+            let start = pos + LENGTH_LEN + TYPE_LEN;
 
-                offset += 12 + length;
+            yield {
+                type,
+                data: bytes.subarray(start, start + len),
             }
 
-            r(txt_chunks);
-        };
+            pos = start + len + CRC_LEN;
+        } catch (err) {
+            return {
+                kind: ParseErrorKind.Other,
+                error: err,
+            };
+        }
+    }
 
-        reader.readAsArrayBuffer(file);
-    });
+    return null;
+}
+
+type PNGTextChunk = {
+    keyword: string,
+    text: string
+}
+
+function parsePNGTextChunk(data: Uint8Array): PNGTextChunk | ParseError {
+    let decoder = new TextDecoder("utf-8", { fatal: true });
+
+    let sep = data.findIndex(v => v === 0);
+    if (sep < 0) {
+        return {
+            kind: ParseErrorKind.PNGMalformedTextChunk,
+            error: "PNG parse error: no null separator in tEXt chunk",
+        }
+    }
+
+    try {
+        let keyword = decoder.decode(data.subarray(0, sep));
+        let text = decoder.decode(data.subarray(sep + 1, data.byteLength));
+        return { keyword, text }
+    } catch (err) {
+        return {
+            kind: ParseErrorKind.Other,
+            error: err,
+        };
+    }
+}
+
+export async function parsePNGMetadata(buf: ArrayBuffer): Promise<Record<string, string>> {
+    let bytes = new Uint8Array(buf);
+    const metadata = {}
+    let next: IteratorResult<PNGChunk, ParseError>;
+
+    let chunks = pngChunks(bytes);
+    do {
+        next = chunks.next();
+        if (!next.done) {
+            let chunk = next.value;
+            if ("kind" in chunk) {
+                console.warn("ignored a malformed PNG text chunk");
+                console.error(chunk.error);
+                continue;
+            }
+
+            if (chunk.type !== "tEXt") {
+                continue;
+            }
+
+            let result = parsePNGTextChunk(chunk.data);
+            if ("kind" in result) {
+                console.warn("ignored a malformed PNG text chunk");
+                console.error(result.error);
+                continue;
+            }
+
+            let textChunk = result;
+            metadata[textChunk.keyword] = textChunk.text
+        }
+    } while (next.value != null && !next.done)
+
+    return metadata;
 }
 
 type NodeIndex = { node: LGraphNode, index: number }

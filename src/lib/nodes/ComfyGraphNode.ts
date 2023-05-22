@@ -312,11 +312,16 @@ export default class ComfyGraphNode extends LGraphNode {
         (o as any).saveUserState = this.saveUserState
         if (!this.saveUserState && (!get(uiState).isSavingToLocalStorage || get(configState).alwaysStripUserState)) {
             this.stripUserState(o)
-            console.warn("[ComfyGraphNode] stripUserState", this, o)
+            console.debug("[ComfyGraphNode] stripUserState", this, o)
         }
     }
 
     override onConfigure(o: SerializedLGraphNode) {
+        if (this.inputs.length != (o.inputs || []).length || this.outputs.length != (o.outputs || []).length) {
+            console.error("Expected node slot size mismatch when deserializing!", o.type, "ours", this.inputs, this.outputs, "theirs", o.inputs, o.outputs)
+            return;
+        }
+
         // Save the litegraph type of the default ComfyWidgetNode for each input.
         for (let index = 0; index < this.inputs.length; index++) {
             const input = this.inputs[index]

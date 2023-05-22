@@ -1,9 +1,14 @@
 import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot, type NodeID, type NodeTypeSpec, type NodeTypeOpts, type SlotIndex, type UUID } from "@litegraph-ts/core";
 import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
 import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyPromptRequest, type ComfyNodeID, type PromptID } from "$lib/api"
-import { getPngMetadata, importA1111 } from "$lib/pnginfo";
+import { importA1111, parsePNGMetadata } from "$lib/pnginfo";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
+import A1111PromptModal from "./modal/A1111PromptModal.svelte";
+import MissingNodeTypesModal from "./modal/MissingNodeTypesModal.svelte";
+import WorkflowLoadErrorModal from "./modal/WorkflowLoadErrorModal.svelte";
+import ConfirmConvertWithMissingNodeTypesModal from "./modal/ConfirmConvertWithMissingNodeTypesModal.svelte";
+
 
 // Import nodes
 import "@litegraph-ts/nodes-basic"
@@ -21,14 +26,14 @@ import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import queueState from "$lib/stores/queueState";
 import { type SvelteComponentDev } from "svelte/internal";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
-import type { LayoutState, SerializedLayoutState, WritableLayoutStateStore } from "$lib/stores/layoutStates";
+import { defaultWorkflowAttributes, type LayoutState, type SerializedLayoutState, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
 import { toast } from '@zerodevx/svelte-toast'
 import ComfyGraph from "$lib/ComfyGraph";
 import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
 import { get, writable, type Writable } from "svelte/store";
 import { tick } from "svelte";
 import uiState from "$lib/stores/uiState";
-import { download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
+import { basename, download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
 import notify from "$lib/notify";
 import configState from "$lib/stores/configState";
 import { blankGraph } from "$lib/defaultGraph";
@@ -44,6 +49,8 @@ import selectionState from "$lib/stores/selectionState";
 import layoutStates from "$lib/stores/layoutStates";
 import { ComfyWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
 import workflowState from "$lib/stores/workflowState";
+import convertVanillaWorkflow, { type ComfyVanillaWorkflow } from "$lib/convertVanillaWorkflow";
+import modalState from "$lib/stores/modalState";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -72,8 +79,10 @@ export type A1111PromptAndInfo = {
  * Represents a single workflow that can be loaded into the program from JSON.
  */
 export type SerializedAppState = {
-    /** Program identifier, should always be "ComfyBox" */
-    createdBy: "ComfyBox",
+    /** For easy structural typing use */
+    comfyBoxWorkflow: true,
+    /** Program identifier, should be something like "ComfyBox" or "ComfyUI" */
+    createdBy: string,
     /** Serial version, should be incremented on breaking changes */
     version: number,
     /** Commit hash if found */
@@ -138,6 +147,28 @@ type CanvasState = {
     canvas: ComfyGraphCanvas,
 }
 
+export type WorkflowLoadError = {
+    message: string,
+    error: Error
+}
+
+export type VanillaWorkflowConvertResult = {
+    comfyBoxWorkflow: SerializedAppState,
+    missingNodeTypes: Set<string>
+}
+
+function isComfyBoxWorkflow(data: any): data is SerializedAppState {
+    return data != null && (typeof data === "object") && data.comfyBoxWorkflow;
+}
+
+function isVanillaWorkflow(data: any): data is SerializedLGraph {
+    return data != null && (typeof data === "object") && data.last_node_id != null;
+}
+
+type BackendNodeDef = {
+    nodeDef: ComfyNodeDef
+}
+
 export default class ComfyApp {
     api: ComfyAPI;
 
@@ -150,7 +181,6 @@ export default class ComfyApp {
     ctrlDown: boolean = false;
     selectedGroupMoving: boolean = false;
     alreadySetup: Writable<boolean> = writable(false);
-    a1111Prompt: Writable<A1111PromptAndInfo | null> = writable(null);
 
     private queueItems: PromptQueueItem[] = [];
     private processingQueue: boolean = false;
@@ -228,15 +258,16 @@ export default class ComfyApp {
         this.lCanvas.draw(true, true);
     }
 
-    serialize(workflow: ComfyWorkflow): SerializedAppState {
+    serialize(workflow: ComfyWorkflow, canvas?: SerializedGraphCanvasState): SerializedAppState {
         const layoutState = layoutStates.getLayout(workflow.id);
         if (layoutState == null)
             throw new Error("Workflow has no layout!")
 
         const { graph, layout, attrs } = workflow.serialize(layoutState);
-        const canvas = this.lCanvas.serialize();
+        canvas ||= this.lCanvas.serialize();
 
         return {
+            comfyBoxWorkflow: true,
             createdBy: "ComfyBox",
             version: COMFYBOX_SERIAL_VERSION,
             commitHash: __GIT_COMMIT_HASH__,
@@ -280,9 +311,12 @@ export default class ComfyApp {
             return false;
 
         const workflows = state.workflows as SerializedAppState[];
-        for (const workflow of workflows) {
-            await this.openWorkflow(workflow, defs)
-        }
+        await Promise.all(workflows.map(w => {
+            return this.openWorkflow(w, defs).catch(error => {
+                console.error("Failed restoring previous workflow", error)
+                notify(`Failed restoring previous workflow: ${error}`, { type: "error" })
+            })
+        }));
 
         if (typeof state.activeWorkflowIndex === "number") {
             workflowState.setActiveWorkflow(this.lCanvas, state.activeWorkflowIndex);
@@ -295,7 +329,11 @@ export default class ComfyApp {
     static node_type_overrides: Record<string, typeof ComfyBackendNode> = {}
     static widget_type_overrides: Record<string, typeof SvelteComponentDev> = {}
 
+    static knownBackendNodes: Record<string, BackendNodeDef> = {}
+
     private async registerNodes(defs: Record<ComfyNodeID, ComfyNodeDef>) {
+        ComfyApp.knownBackendNodes = {}
+
         // Register a node for each definition
         for (const [nodeId, nodeDef] of Object.entries(defs)) {
             const typeOverride = ComfyApp.node_type_overrides[nodeId]
@@ -318,6 +356,9 @@ export default class ComfyApp {
 
             LiteGraph.registerNodeType(node);
             node.category = nodeDef.category;
+            ComfyApp.knownBackendNodes[nodeId] = {
+                nodeDef
+            }
 
             ComfyApp.registerDefaultSlotHandlers(nodeId, nodeDef)
         }
@@ -399,7 +440,7 @@ export default class ComfyApp {
                 } catch (error) { }
             }
 
-            if (workflow && workflow.createdBy === "ComfyBox") {
+            if (workflow && typeof workflow.createdBy === "string") {
                 this.openWorkflow(workflow);
             }
             else {
@@ -518,11 +559,35 @@ export default class ComfyApp {
 
     async openWorkflow(data: SerializedAppState, refreshCombos: boolean | Record<string, ComfyNodeDef> = true): Promise<ComfyWorkflow> {
         if (data.version !== COMFYBOX_SERIAL_VERSION) {
-            throw `Invalid ComfyBox saved data format: ${data.version}`
+            const mes = `Invalid ComfyBox saved data format: ${data.version}`
+            notify(mes, { type: "error" })
+            return Promise.reject(mes);
         }
+
         this.clean();
 
-        const workflow = workflowState.openWorkflow(this.lCanvas, data);
+        let workflow: ComfyWorkflow;
+        try {
+            workflow = workflowState.openWorkflow(this.lCanvas, data);
+        }
+        catch (error) {
+            modalState.pushModal({
+                svelteComponent: WorkflowLoadErrorModal,
+                svelteProps: {
+                    error
+                }
+            })
+            return Promise.reject(error)
+        }
+
+        if (workflow.missingNodeTypes.size > 0) {
+            modalState.pushModal({
+                svelteComponent: MissingNodeTypesModal,
+                svelteProps: {
+                    missingNodeTypes: workflow.missingNodeTypes
+                }
+            })
+        }
 
         // Restore canvas offset/zoom
         this.lCanvas.deserialize(data.canvas)
@@ -535,6 +600,56 @@ export default class ComfyApp {
         }
 
         return workflow;
+    }
+
+    async openVanillaWorkflow(data: SerializedLGraph, filename: string) {
+        const title = basename(filename)
+
+        const attrs: WorkflowAttributes = {
+            ...defaultWorkflowAttributes,
+            title
+        }
+
+        const canvas: SerializedGraphCanvasState = {
+            offset: [0, 0],
+            scale: 1
+        }
+
+        const [comfyBoxWorkflow, layoutState] = convertVanillaWorkflow(data, attrs);
+
+        const addWorkflow = () => {
+            notify("Converted ComfyUI workflow to ComfyBox format.", { type: "info" })
+            workflowState.addWorkflow(this.lCanvas, comfyBoxWorkflow)
+            this.lCanvas.deserialize(canvas);
+        }
+
+        if (comfyBoxWorkflow.missingNodeTypes.size > 0) {
+            modalState.pushModal({
+                svelteComponent: ConfirmConvertWithMissingNodeTypesModal,
+                svelteProps: {
+                    missingNodeTypes: comfyBoxWorkflow.missingNodeTypes
+                },
+                closeOnClick: false,
+                showCloseButton: false,
+                buttons: [
+                    {
+                        name: "Cancel",
+                        variant: "secondary",
+                        onClick: () => {
+                            layoutStates.remove(comfyBoxWorkflow.id)
+                        }
+                    },
+                    {
+                        name: "Convert",
+                        variant: "primary",
+                        onClick: addWorkflow
+                    },
+                ]
+            })
+        }
+        else {
+            addWorkflow()
+        }
     }
 
     setActiveWorkflow(id: WorkflowInstID) {
@@ -695,7 +810,7 @@ export default class ComfyApp {
                     }
 
                     const p = this.graphToPrompt(workflow, tag);
-                    const l = workflow.layout.serialize();
+                    const wf = this.serialize(workflow)
                     console.debug(graphToGraphVis(workflow.graph))
                     console.debug(promptToGraphVis(p))
 
@@ -704,9 +819,10 @@ export default class ComfyApp {
 
                     const extraData: ComfyBoxPromptExtraData = {
                         extra_pnginfo: {
-                            workflow: p.workflow,
-                            comfyBoxLayout: l,
-                            comfyBoxSubgraphs: [tag],
+                            comfyBoxWorkflow: wf,
+                            comfyBoxPrompt: {
+                                subgraphs: [tag]
+                            }
                         },
                         thumbnails
                     }
@@ -761,10 +877,14 @@ export default class ComfyApp {
      */
     async handleFile(file: File) {
         if (file.type === "image/png") {
-            const pngInfo = await getPngMetadata(file);
+            const buffer = await file.arrayBuffer();
+            const pngInfo = await parsePNGMetadata(buffer);
             if (pngInfo) {
-                if (pngInfo.comfyBoxConfig) {
-                    await this.openWorkflow(JSON.parse(pngInfo.comfyBoxConfig));
+                if (pngInfo.comfyBoxWorkflow) {
+                    await this.openWorkflow(JSON.parse(pngInfo.comfyBoxWorkflow));
+                } else if (pngInfo.workflow) {
+                    const workflow = JSON.parse(pngInfo.workflow);
+                    await this.openVanillaWorkflow(workflow, file.name);
                 } else if (pngInfo.parameters) {
                     const parsed = parseA1111(pngInfo.parameters)
                     if ("error" in parsed) {
@@ -772,11 +892,18 @@ export default class ComfyApp {
                         return;
                     }
                     const converted = convertA1111ToStdPrompt(parsed)
-                    this.a1111Prompt.set({
+                    const a1111Info: A1111PromptAndInfo = {
                         infotext: pngInfo.parameters,
                         parsedInfotext: parsed,
                         stdPrompt: converted,
                         imageFile: file
+                    }
+                    modalState.pushModal({
+                        title: "A1111 Prompt Details",
+                        svelteComponent: A1111PromptModal,
+                        svelteProps: {
+                            prompt: a1111Info
+                        },
                     })
                 }
                 else {
@@ -787,7 +914,13 @@ export default class ComfyApp {
         } else if (file.type === "application/json" || file.name.endsWith(".json")) {
             const reader = new FileReader();
             reader.onload = async () => {
-                await this.openWorkflow(JSON.parse(reader.result as string));
+                const result = JSON.parse(reader.result as string)
+                if (isComfyBoxWorkflow(result)) {
+                    await this.openWorkflow(result);
+                }
+                else if (isVanillaWorkflow(result)) {
+                    await this.openVanillaWorkflow(result, file.name);
+                }
             };
             reader.readAsText(file);
         }
@@ -930,6 +1063,5 @@ export default class ComfyApp {
      * Clean current state
      */
     clean() {
-        this.a1111Prompt.set(null);
     }
 }

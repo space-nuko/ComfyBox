@@ -5,13 +5,17 @@ import ComfyWidgetNode, { type ComfyWidgetProperties } from "./ComfyWidgetNode";
 
 export interface ComfyTextProperties extends ComfyWidgetProperties {
     multiline: boolean;
+    lines: number;
+    maxLines: number;
 }
 
 export default class ComfyTextNode extends ComfyWidgetNode<string> {
     override properties: ComfyTextProperties = {
         tags: [],
         defaultValue: "",
-        multiline: false
+        multiline: false,
+        lines: 5,
+        maxLines: 5,
     }
 
     static slotLayout: SlotLayout = {

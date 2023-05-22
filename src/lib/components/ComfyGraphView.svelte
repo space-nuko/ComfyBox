@@ -1,6 +1,7 @@
 <script lang="ts">
  import { Button } from "@gradio/button";
  import type ComfyApp from "./ComfyApp";
+	import DropZone from "./DropZone.svelte";
 
  export let app: ComfyApp;
  export let transitioning: boolean = false;
@@ -13,6 +14,7 @@
 <div class="wrapper litegraph">
     <div class="canvas-wrapper pane-wrapper">
         <canvas id="graph-canvas" />
+        <DropZone {app} />
     </div>
     <div class="bar">
         {#if !transitioning}

@@ -1,11 +1,10 @@
 <script lang="ts">
- import ComfyBoxStdPrompt from "$lib/ComfyBoxStdPrompt";
-	import type { A1111ParsedInfotext } from "$lib/parseA1111";
+ import type { A1111ParsedInfotext } from "$lib/parseA1111";
  import { Block, BlockTitle } from "@gradio/atoms";
  import { TextBox } from "@gradio/form";
  import { JsonView } from '@zerodevx/svelte-json-view'
- import type { A1111PromptAndInfo } from "./ComfyApp";
-	import { StaticImage } from "./gradio/image";
+ import type { A1111PromptAndInfo } from "$lib/components/ComfyApp";
+ import { StaticImage } from "$lib/components/gradio/image";
 
  export let prompt: A1111PromptAndInfo | null = null;
 
