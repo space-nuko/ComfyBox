@@ -272,7 +272,7 @@ function convertPrimitiveNode(vanillaWorkflow: ComfyVanillaWorkflow, node: Seria
     const widgetLayout = layoutState.addWidget(group, comfyWidgetNode)
     widgetLayout.attrs.title = mainOutput.name;
 
-    // Rewrite links to point to the new widget node
+    // Follow the existing links on the original node and do some cleanup
     const newLinkOutputSlot = serWidgetNode.outputs.findIndex(o => o.name === comfyWidgetNode.outputSlotName)
     if (newLinkOutputSlot !== -1) {
         const newLinkOutput = serWidgetNode.outputs[newLinkOutputSlot];
@@ -280,21 +280,28 @@ function convertPrimitiveNode(vanillaWorkflow: ComfyVanillaWorkflow, node: Seria
         for (const linkID of mainOutput.links) {
             const link = vanillaWorkflow.links.find(l => l[0] === linkID)
             if (link) {
+                // Rewrite links to point to the new widget node
                 link[1] = serWidgetNode.id; // origin node ID
                 link[2] = newLinkOutputSlot; // origin node slot
                 newLinkOutput.links ||= []
                 newLinkOutput.links.push(linkID)
 
+                // Look up the node the link was connected to.
+                const targetNode = vanillaWorkflow.nodes.find(n => n.id === link[3]) // target node ID
+                const foundInput = targetNode != null ? targetNode.inputs[link[4]] : null // target node slot
+
+                // Make sure that the input type for the connected inputs is correct.
+                // ComfyUI seems to set them to the input def type instead of the litegraph type.
+                // For example a "number" input gets changed to type "INT" or "FLOAT"
+                link[5] = widgetInputType // link data type
+                if (foundInput != null) {
+                    foundInput.type = widgetInputType;
+                }
+
                 // Change the title of the widget to the name of the first input connected to
-                if (foundTitle == null) {
-                    const targetNode = vanillaWorkflow.nodes.find(n => n.id === link[3]) // target node ID
-                    if (targetNode != null) {
-                        const foundInput = targetNode.inputs[link[4]] // target node slot
-                        if (foundInput != null && foundInput.name) {
-                            foundTitle = foundInput.name;
-                            widgetLayout.attrs.title = foundTitle;
-                        }
-                    }
+                if (foundTitle == null && foundInput != null && foundInput.name) {
+                    foundTitle = foundInput.name;
+                    widgetLayout.attrs.title = foundTitle;
                 }
             }
         }
