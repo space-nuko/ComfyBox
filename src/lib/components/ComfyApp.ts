@@ -18,6 +18,7 @@ import "@litegraph-ts/nodes-math"
 import "@litegraph-ts/nodes-strings"
 import "$lib/nodes/index"
 import "$lib/nodes/widgets/index"
+import "$lib/nodes/actions/index"
 import * as nodes from "$lib/nodes/index"
 import * as widgets from "$lib/nodes/widgets/index"
 
