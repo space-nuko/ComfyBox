@@ -2,9 +2,9 @@
  import { Page, Navbar, Link, BlockTitle, Block, List, ListItem, Toolbar } from "framework7-svelte"
  import WidgetContainer from "$lib/components/WidgetContainer.svelte";
  import type ComfyApp from "$lib/components/ComfyApp";
- import type { ComfyWorkflow } from "$lib/components/ComfyApp";
  import { writable, type Writable } from "svelte/store";
  import type { WritableLayoutStateStore } from "$lib/stores/layoutStates";
+ import workflowState, { type ComfyWorkflow } from "$lib/stores/workflowState";
 
  export let subworkflowID: number = -1;
  export let app: ComfyApp
@@ -13,6 +13,7 @@
  let workflow: ComfyWorkflow | null = null
  let layoutState: WritableLayoutStateStore | null = null;
 
+ $: workflow = $workflowState.activeWorkflow;
  $: layoutState = workflow ? workflow.layout : null;
 </script>
 

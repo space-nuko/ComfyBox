@@ -159,7 +159,6 @@ function rewriteIDsInGraph(vanillaWorkflow: ComfyVanillaWorkflow) {
         link[3] = getNodeID(link[3])
     }
 
-
     // Recurse!
     for (const node of vanillaWorkflow.nodes) {
         if (node.type === "graph/subgraph") {
@@ -170,7 +169,8 @@ function rewriteIDsInGraph(vanillaWorkflow: ComfyVanillaWorkflow) {
 
 /*
  * Returns [nodeType, inputType, addedWidgetCount] for a config type, like "FLOAT" -> ["ui/number", "number", 1]
- * For "INT:seed" it's ["ui/number", "number", 2] since that type adds a randomizer combo widget
+ * For "INT:seed" it's ["ui/number", "number", 2] since that type adds a randomizer combo widget,
+ * so there will be 2 total widgets
  */
 function getWidgetTypesFromConfig(inputName: string, inputType: ComfyNodeDefInputType): [string, SlotType, number] | null {
     let widgetNodeType = null;
@@ -266,6 +266,7 @@ function convertPrimitiveNode(vanillaWorkflow: ComfyVanillaWorkflow, node: Seria
         widgetNodeType,
         value);
 
+    // Set the UI node's min/max/step from the node def
     configureWidgetNodeProperties(serWidgetNode, widgetOpts)
 
     let foundTitle = null;
@@ -276,7 +277,6 @@ function convertPrimitiveNode(vanillaWorkflow: ComfyVanillaWorkflow, node: Seria
     const newLinkOutputSlot = serWidgetNode.outputs.findIndex(o => o.name === comfyWidgetNode.outputSlotName)
     if (newLinkOutputSlot !== -1) {
         const newLinkOutput = serWidgetNode.outputs[newLinkOutputSlot];
-        // TODO other links need pruning?
         for (const linkID of mainOutput.links) {
             const link = vanillaWorkflow.links.find(l => l[0] === linkID)
             if (link) {
@@ -293,6 +293,8 @@ function convertPrimitiveNode(vanillaWorkflow: ComfyVanillaWorkflow, node: Seria
                 // Make sure that the input type for the connected inputs is correct.
                 // ComfyUI seems to set them to the input def type instead of the litegraph type.
                 // For example a "number" input gets changed to type "INT" or "FLOAT"
+                // Also ensure the input is marked for serialization, else there
+                // will be random prompt validation errors on the backend
                 link[5] = widgetInputType // link data type
                 if (foundInput != null) {
                     foundInput.type = widgetInputType;
@@ -343,8 +345,6 @@ function removeSerializedNode(vanillaWorkflow: SerializedLGraph, node: Serialize
 /*
  * Converts a workflow saved with vanilla ComfyUI into a ComfyBox workflow,
  * adding UI nodes for each widget.
- *
- * TODO: test this!
  */
 export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWorkflow, attrs: WorkflowAttributes): [ComfyWorkflow, WritableLayoutStateStore] {
     const [comfyBoxWorkflow, layoutState] = ComfyWorkflow.create();
