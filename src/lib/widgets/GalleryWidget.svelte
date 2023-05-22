@@ -7,7 +7,6 @@
  import type { Styles } from "@gradio/utils";
  import type { WidgetLayout } from "$lib/stores/layoutStates";
  import { writable, type Writable } from "svelte/store";
- import type { FileData as GradioFileData } from "@gradio/upload";
  import type { SelectData as GradioSelectData } from "@gradio/utils";
  import { clamp, comfyBoxImageToComfyURL, type ComfyBoxImageMetadata } from "$lib/utils";
  import { f7 } from "framework7-svelte";
@@ -18,10 +17,9 @@
  let node: ComfyGalleryNode | null = null;
  let nodeValue: Writable<ComfyBoxImageMetadata[]> | null = null;
  let propsChanged: Writable<number> | null = null;
- let option: number | null = null;
  let imageWidth: Writable<number> = writable(0);
  let imageHeight: Writable<number> = writable(0);
- let selected_image: number | null = null;
+ let selected_image: Writable<number | null> = writable(null);
 
  $: widget && setNodeValue(widget);
 
@@ -32,6 +30,7 @@
          propsChanged = node.propsChanged;
          imageWidth = node.imageWidth
          imageHeight = node.imageHeight
+         selected_image = node.selectedImage;
 
          if ($nodeValue != null) {
              if (node.properties.index < 0 || node.properties.index >= $nodeValue.length) {
@@ -81,7 +80,7 @@
          thumbs: images.map(i => i.url),
          type: 'popup',
      });
-     mobileLightbox.open(selected_image)
+     mobileLightbox.open($selected_image)
  }
 
  function onClicked(e: CustomEvent<HTMLImageElement>) {
@@ -97,20 +96,6 @@
      // Update index
      node.setProperty("index", e.detail.index as number)
  }
-
- $: if ($propsChanged > -1 && widget && $nodeValue) {
-     if (widget.attrs.variant === "image") {
-         node.setProperty("index", selected_image)
-     }
-     else {
-         node.setProperty("index", $nodeValue.length > 0 ? 0 : null)
-     }
- }
- else {
-     node.setProperty("index", null)
- }
-
- $: node.setProperty("index", selected_image)
 </script>
 
 {#if widget && node && nodeValue && $nodeValue}
@@ -148,7 +133,7 @@
                         on:clicked={onClicked}
                         bind:imageWidth={$imageWidth}
                         bind:imageHeight={$imageHeight}
-                        bind:selected_image
+                        bind:selected_image={$selected_image}
                     />
                 </div>
             </Block>

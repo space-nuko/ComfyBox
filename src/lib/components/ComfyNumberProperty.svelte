@@ -29,7 +29,7 @@
 <label class="number-wrapper">
     <BlockTitle>{name}</BlockTitle>
     <div class="number">
-        <input type="number" bind:value {min} {max} {step} {disabled}>
+        <input type="number" bind:value {min} {max} {step} {disabled} />
     </div>
 </label>
 
