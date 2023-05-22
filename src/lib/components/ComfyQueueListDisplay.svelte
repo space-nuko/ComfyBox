@@ -179,7 +179,7 @@
      top:0;
      right:0.5rem;
      margin: 0.5rem;
-     z-index: 1000000000;
+     z-index: var(--layer-1);
 
      opacity: 70%;
      background: var(--neutral-700);

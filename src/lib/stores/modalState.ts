@@ -1,24 +1,28 @@
 import type { SvelteComponentDev } from "svelte/internal";
-import { writable, type Writable } from "svelte/store";
+import { get, writable, type Writable } from "svelte/store";
 import { v4 as uuidv4 } from "uuid";
+
+export type ModalState = Record<string, any>;
 
 export type ModalButton = {
     name: string,
     variant: "primary" | "secondary",
-    onClick: () => void,
+    onClick: (state: ModalData) => void,
     closeOnClick?: boolean
 }
 export interface ModalData {
     id: string,
     title?: string,
-    onClose?: () => void,
+    onClose?: (modal: ModalState) => void,
     svelteComponent?: typeof SvelteComponentDev,
     svelteProps: Record<string, any>,
     buttons: ModalButton[],
     showCloseButton: boolean,
-    closeOnClick: boolean
+    closeOnClick: boolean,
+    state: Writable<ModalState>,
+    close: () => void,
 }
-export interface ModalState {
+export interface ModalStates {
     activeModals: ModalData[]
 }
 
@@ -28,20 +32,23 @@ export interface ModalStateOps {
     closeAllModals: () => void,
 }
 
-export type WritableModalStateStore = Writable<ModalState> & ModalStateOps;
-const store: Writable<ModalState> = writable(
+export type WritableModalStateStore = Writable<ModalStates> & ModalStateOps;
+const store: Writable<ModalStates> = writable(
     {
         activeModals: []
     })
 
 function pushModal(data: Partial<ModalData>) {
+    const id = uuidv4()
     const modal: ModalData = {
         showCloseButton: true,
         closeOnClick: true,
         buttons: [],
         svelteProps: {},
+        state: writable({}),
         ...data,
-        id: uuidv4(),
+        id,
+        close: () => closeModal(id)
     }
 
     store.update(s => {
@@ -51,7 +58,13 @@ function pushModal(data: Partial<ModalData>) {
 }
 
 function closeModal(id: string) {
+    const modal = get(store).activeModals.find(m => m.id === id);
+    if (modal == null)
+        return;
+
     store.update(s => {
+        if (modal.onClose)
+            modal.onClose(modal)
         s.activeModals = s.activeModals.filter(m => m.id !== id)
         return s;
     })

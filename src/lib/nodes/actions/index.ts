@@ -8,3 +8,5 @@ export { default as ComfySetNodeModeAdvancedAction } from "./ComfySetNodeModeAdv
 export { default as ComfySetPromptThumbnailsAction } from "./ComfySetPromptThumbnailsAction"
 export { default as ComfyStoreImagesAction } from "./ComfyStoreImagesAction"
 export { default as ComfySwapAction } from "./ComfySwapAction"
+export { default as ComfySendOutputAction } from "./ComfySendOutputAction"
+export { default as ComfyReceiveOutputNode } from "./ComfyReceiveOutputNode"

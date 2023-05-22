@@ -14,6 +14,7 @@
  import notify from "$lib/notify";
  import NumberInput from "$lib/components/NumberInput.svelte";
 	import type { ComfyImageEditorNode } from "$lib/nodes/widgets";
+	import { ImageViewer } from "$lib/ImageViewer";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -176,6 +177,17 @@
      }, 1000);
  }
 
+ function openLightbox() {
+     if (!$nodeValue || $nodeValue.length === 0)
+         return;
+
+     const comfyImage = $nodeValue[0];
+     const comfyURL = comfyBoxImageToComfyURL(comfyImage);
+     const images = [comfyURL]
+
+     ImageViewer.instance.showModal(images, 0);
+ }
+
  let status = "empty";
  let uploadError = null;
 
@@ -233,7 +245,7 @@
                      on:upload_error={onUploadError}
                      on:clear={onClear}
                      on:change={onChange}
-                     on:image_clicked={openImageEditor}
+                     on:image_clicked={openLightbox}
         />
     {:else}
         <div class="comfy-image-editor-panel">
@@ -249,7 +261,7 @@
                          on:upload_error={onUploadError}
                          on:clear={onClear}
                          on:change={onChange}
-                         on:image_clicked={openImageEditor}
+                         on:image_clicked={openLightbox}
             />
             <Modal bind:showModal closeOnClick={false} on:close={disposeEditor} bind:closeDialog>
                 <div>

@@ -1,3 +1,5 @@
+import "$lib/nodes/ComfyGraphNode";
+
 export { default as ComfyReroute } from "./ComfyReroute"
 export { default as ComfyPickFirstNode } from "./ComfyPickFirstNode"
 export { default as ComfyValueControl } from "./ComfyValueControl"
