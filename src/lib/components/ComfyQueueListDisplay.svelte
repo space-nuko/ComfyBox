@@ -79,7 +79,10 @@
 
  .list-entries {
      --imageSize: 40;
-     height: calc(100% - #{$list-controls-height} - #{$list-controls-margin});
+     height: 100%;
+     &.history-mode {
+         height: calc(100% - #{$list-controls-height} - #{$list-controls-margin} * 2);
+     }
      overflow-y: auto;
      display: flex;
      flex-flow: column nowrap;
@@ -105,7 +108,7 @@
          }
 
          .button-wrapper {
-             padding: 0.25rem;
+             padding: $list-controls-margin;
              .clear-queue-button {
                  @include square-button;
 
