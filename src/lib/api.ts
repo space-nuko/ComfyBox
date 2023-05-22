@@ -331,7 +331,7 @@ export default class ComfyAPI {
      * @param {string} type The type of item to delete, queue or history
      * @param {number} id The id of the item to delete
      */
-    async deleteItem(type: QueueItemType, id: number): Promise<Response> {
+    async deleteItem(type: QueueItemType, id: PromptID): Promise<Response> {
         return this.postItem(type, { delete: [id] });
     }
 

@@ -1,6 +1,6 @@
 <script lang="ts">
  import { Pane, Splitpanes } from 'svelte-splitpanes';
- import { PlusSquareIcon as PlusSquare } from 'svelte-feather-icons';
+ import { PlusSquareDotted } from 'svelte-bootstrap-icons';
  import { Button } from "@gradio/button";
  import { BlockTitle } from "@gradio/atoms";
  import ComfyWorkflowView from "./ComfyWorkflowView.svelte";
@@ -253,7 +253,7 @@
         </div>
         <button class="workflow-add-new-button"
                 on:click={createNewWorkflow}>
-            <PlusSquare size="100%" strokeWidth={1.5} />
+            <PlusSquareDotted width="100%" height="100%" />
         </button>
     </div>
     <div id="bottombar">

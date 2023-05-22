@@ -22,14 +22,14 @@ export type ComfyNodeDefInput = [ComfyNodeDefInputType, ComfyNodeDefInputOptions
 /**
  * - Array: Combo widget. Usually the values are strings but they can also be other stuff like booleans.
  * - "INT"/"FLOAT"/etc.: Non-combo type widgets. See ComfyWidgets type.
- * - other string: Must be an input type, usually something lke "IMAGE" or "LATENT".
+ * - other string: Must be a backend input type, usually something lke "IMAGE" or "LATENT".
  */
 export type ComfyNodeDefInputType = any[] | keyof typeof ComfyWidgets | string
 
 export type ComfyNodeDefInputOptions = {
     forceInput?: boolean;
 
-    // NOTE: For COMBO type inputs, the default value is always the first entry the list.
+    // NOTE: For COMBO type inputs, the default value is always the first entry in the list.
     default?: any,
 
     // INT/FLOAT options
