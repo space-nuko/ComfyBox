@@ -96,6 +96,8 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
 
         if (this.properties.updateMode === "append") {
             const currentValue = get(this.value)
+            if (meta.length > 0)
+                this.selectedImage.set(currentValue.length);
             return currentValue.concat(meta)
         }
         else {
