@@ -81,6 +81,44 @@ body {
     --comfy-progress-bar-foreground: #B3D8A9
 }
 
+@mixin square-button {
+     border: 1px solid var(--panel-border-color);
+     font-weight: bold;
+     text-align: center;
+     margin: auto;
+
+     &.primary {
+         background: var(--button-primary-background-fill);
+         &:hover {
+             background: var(--button-primary-background-fill-hover);
+         }
+     }
+
+     &.secondary {
+         background: var(--button-secondary-background-fill);
+         &:hover {
+             background: var(--button-secondary-background-fill-hover);
+         }
+     }
+
+     &.ternary {
+         background: var(--panel-background-fill);
+         &:hover {
+             background: var(--block-background-fill);
+         }
+     }
+
+     &:hover {
+         filter: brightness(85%);
+     }
+     &:active {
+         filter: brightness(50%)
+     }
+     &.selected {
+         filter: brightness(80%)
+     }
+}
+
 @mixin disable-input {
     -webkit-text-fill-color: var(--comfy-disabled-textbox-text-color);
     background-color: var(--comfy-disabled-textbox-background-fill);
