@@ -509,7 +509,35 @@ export default class ComfyApp {
         this.api.init();
     }
 
+    async interrupt() {
+        if (get(queueState).isInterrupting)
+            return
+
+        queueState.update(s => { s.isInterrupting = true; return s; })
+        await this.api.interrupt()
+            .finally(() => {
+                queueState.update(s => { s.isInterrupting = true; return s })
+            });
+    }
+
+    async deleteQueueItem(type: QueueItemType, promptID: PromptID) {
+        if (get(queueState).isInterrupting)
+            return
+
+        queueState.update(s => { s.isInterrupting = true; return s; })
+        await this.api.deleteItem(type, promptID)
+            .then(() => {
+                queueState.queueItemDeleted(type, promptID);
+            })
+            .finally(() => {
+                queueState.update(s => { s.isInterrupting = false; return s; })
+            });
+    }
+
     async clearQueue(type: QueueItemType) {
+        if (get(queueState).isInterrupting)
+            return
+
         queueState.update(s => { s.isInterrupting = true; return s; })
         await this.api.clearItems(type)
             .then(() => {

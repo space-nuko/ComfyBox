@@ -85,6 +85,27 @@
      changed = false;
  }
 
+ async function deleteEntry(entry: QueueUIEntry, event: MouseEvent) {
+     event.preventDefault();
+     event.stopImmediatePropagation()
+
+     // TODO support interrupting from multiple running items!
+     if (entry.status === "running") {
+         await app.interrupt();
+     }
+     else {
+         await app.deleteQueueItem(mode, entry.entry.promptID);
+     }
+
+     if (mode === "queue") {
+         _queuedEntries = []
+         _runningEntries = []
+     }
+
+     _entries = [];
+     changed = true;
+ }
+
  async function clearQueue() {
      await app.clearQueue(mode);
 
@@ -188,17 +209,7 @@
  }
 
  async function interrupt() {
-     if ($queueState.isInterrupting)
-         return
-
-     const app = (window as any).app as ComfyApp;
-     if (!app || !app.api)
-         return;
-
-     await app.api.interrupt()
-              .then(() => {
-                  queueState.update(s => { s.isInterrupting = true; return s })
-              });
+     await app.interrupt();
  }
 
  let showModal = false;
@@ -260,7 +271,7 @@
             {#if mode === "history" && displayMode === "grid"}
                 <ComfyQueueGridDisplay entries={_entries} {showPrompt} {clearQueue} {mode} bind:gridColumns />
             {:else}
-                <ComfyQueueListDisplay entries={_entries} {showPrompt} {clearQueue} {mode} bind:imageSize />
+                <ComfyQueueListDisplay entries={_entries} {showPrompt} {clearQueue} {mode} {deleteEntry} bind:imageSize />
             {/if}
         {:else}
             <div class="queue-empty">
