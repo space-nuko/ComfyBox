@@ -1,7 +1,7 @@
 import { type WidgetLayout, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
 import selectionState from "$lib/stores/selectionState";
 import type { FileData as GradioFileData } from "@gradio/upload";
-import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, type NodeID } from "@litegraph-ts/core";
+import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, type NodeID, type SlotType } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import type { ComfyNodeID } from "./api";
 import { type SerializedPrompt } from "./components/ComfyApp";
@@ -507,6 +507,21 @@ export function comfyBoxImageToComfyURL(image: ComfyBoxImageMetadata): string {
     return convertComfyOutputToComfyURL(image.comfyUIFile)
 }
 
+export function comfyURLToComfyFile(urlString: string): ComfyImageLocation | null {
+    const url = new URL(urlString);
+    const params = new URLSearchParams(url.search);
+    const filename = params.get("filename")
+    const type = params.get("type") as ComfyUploadImageType;
+    const subfolder = params.get("subfolder") || ""
+
+    // If at least filename and type exist then we're good
+    if (filename != null && type != null) {
+        return { filename, type, subfolder }
+    }
+
+    return null;
+}
+
 export function showLightbox(images: string[], index: number, e: Event) {
     e.preventDefault()
     if (!images)
@@ -515,4 +530,32 @@ export function showLightbox(images: string[], index: number, e: Event) {
     ImageViewer.instance.showModal(images, index);
 
     e.stopPropagation()
+}
+
+export function getLitegraphType(param: any): SlotType | null {
+    if (param == null)
+        return null;
+
+    switch (typeof param) {
+        case "string":
+            return "string"
+        case "number":
+        case "bigint":
+            return "number"
+        case "boolean":
+            return "boolean"
+        case "object":
+            if (isComfyBoxImageMetadata(param)) {
+                return "COMFYBOX_IMAGE"
+            }
+            else if (isComfyBoxImageMetadataArray(param)) {
+                return "COMFYBOX_IMAGES"
+            }
+            return null;
+        case "symbol":
+        case "undefined":
+        case "function":
+        default:
+            return null;
+    }
 }

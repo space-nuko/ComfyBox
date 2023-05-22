@@ -223,8 +223,13 @@
      expandAll = false
  }
 
- $: if(!showModal)
-     selectedPrompt = null;
+ function closeModal() {
+     selectedPrompt = null
+     selectedImages = []
+     showModal = false;
+     expandAll = false;
+     console.warn("CLOSEMODAL")
+ }
 
  let queued = false
  $: queued = Boolean($queueState.runningNodeID || $queueState.progress);
@@ -238,9 +243,11 @@
     <div slot="header" class="prompt-modal-header">
         <h1 style="padding-bottom: 1rem;">Prompt Details</h1>
     </div>
-    {#if selectedPrompt}
-        <PromptDisplay prompt={selectedPrompt} images={selectedImages} {expandAll} />
-    {/if}
+    <svelte:fragment let:closeDialog>
+        {#if selectedPrompt}
+            <PromptDisplay closeModal={() => { closeModal(); closeDialog(); }} {app} prompt={selectedPrompt} images={selectedImages} {expandAll} />
+        {/if}
+    </svelte:fragment>
     <div slot="buttons" let:closeDialog>
         <Button variant="secondary" on:click={closeDialog}>
             Close

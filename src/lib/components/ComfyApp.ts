@@ -1,57 +1,39 @@
-import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot, type NodeID, type NodeTypeSpec, type NodeTypeOpts, type SlotIndex, type UUID } from "@litegraph-ts/core";
-import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
-import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyPromptRequest, type ComfyNodeID, type PromptID, type QueueItemType } from "$lib/api"
-import { importA1111, parsePNGMetadata } from "$lib/pnginfo";
-import EventEmitter from "events";
-import type TypedEmitter from "typed-emitter";
+import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyNodeID, type ComfyPromptRequest, type PromptID, type QueueItemType } from "$lib/api";
+import { parsePNGMetadata } from "$lib/pnginfo";
+import { BuiltInSlotType, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type INodeInputSlot, type LGraphNodeConstructor, type NodeID, type NodeTypeOpts, type SerializedLGraph, type SlotIndex } from "@litegraph-ts/core";
 import A1111PromptModal from "./modal/A1111PromptModal.svelte";
+import ConfirmConvertWithMissingNodeTypesModal from "./modal/ConfirmConvertWithMissingNodeTypesModal.svelte";
 import MissingNodeTypesModal from "./modal/MissingNodeTypesModal.svelte";
 import WorkflowLoadErrorModal from "./modal/WorkflowLoadErrorModal.svelte";
-import ConfirmConvertWithMissingNodeTypesModal from "./modal/ConfirmConvertWithMissingNodeTypesModal.svelte";
 
+import * as nodes from "$lib/nodes/index";
 
-// Import nodes
-import "@litegraph-ts/nodes-basic"
-import "@litegraph-ts/nodes-events"
-import "@litegraph-ts/nodes-logic"
-import "@litegraph-ts/nodes-math"
-import "@litegraph-ts/nodes-strings"
-import "$lib/nodes/index"
-import "$lib/nodes/widgets/index"
-import "$lib/nodes/actions/index"
-import * as nodes from "$lib/nodes/index"
-import * as widgets from "$lib/nodes/widgets/index"
-
-import ComfyGraphCanvas, { type SerializedGraphCanvasState } from "$lib/ComfyGraphCanvas";
-import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
-import queueState from "$lib/stores/queueState";
-import { type SvelteComponentDev } from "svelte/internal";
-import type IComfyInputSlot from "$lib/IComfyInputSlot";
-import { defaultWorkflowAttributes, type LayoutState, type SerializedLayoutState, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
-import { toast } from '@zerodevx/svelte-toast'
-import ComfyGraph from "$lib/ComfyGraph";
-import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
-import { get, writable, type Writable } from "svelte/store";
-import { tick } from "svelte";
-import uiState from "$lib/stores/uiState";
-import { basename, capitalize, download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
-import notify from "$lib/notify";
-import configState from "$lib/stores/configState";
-import { blankGraph } from "$lib/defaultGraph";
-import type { SerializedPromptOutput } from "$lib/utils";
-import ComfyPromptSerializer, { UpstreamNodeLocator, isActiveBackendNode } from "./ComfyPromptSerializer";
-import { iterateNodeDefInputs, type ComfyNodeDef, isBackendNodeDefInputType, iterateNodeDefOutputs } from "$lib/ComfyNodeDef";
-import { ComfyComboNode } from "$lib/nodes/widgets";
-import parseA1111, { type A1111ParsedInfotext } from "$lib/parseA1111";
-import convertA1111ToStdPrompt from "$lib/convertA1111ToStdPrompt";
 import type { ComfyBoxStdPrompt } from "$lib/ComfyBoxStdPrompt";
 import ComfyBoxStdPromptSerializer from "$lib/ComfyBoxStdPromptSerializer";
-import selectionState from "$lib/stores/selectionState";
-import layoutStates from "$lib/stores/layoutStates";
-import { ComfyWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
-import workflowState from "$lib/stores/workflowState";
-import convertVanillaWorkflow, { type ComfyVanillaWorkflow } from "$lib/convertVanillaWorkflow";
+import ComfyGraphCanvas, { type SerializedGraphCanvasState } from "$lib/ComfyGraphCanvas";
+import { isBackendNodeDefInputType, iterateNodeDefInputs, iterateNodeDefOutputs, type ComfyNodeDef } from "$lib/ComfyNodeDef";
+import convertA1111ToStdPrompt from "$lib/convertA1111ToStdPrompt";
+import convertVanillaWorkflow from "$lib/convertVanillaWorkflow";
+import { blankGraph } from "$lib/defaultGraph";
+import type IComfyInputSlot from "$lib/IComfyInputSlot";
+import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
+import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
+import { ComfyComboNode } from "$lib/nodes/widgets";
+import notify from "$lib/notify";
+import parseA1111, { type A1111ParsedInfotext } from "$lib/parseA1111";
+import configState from "$lib/stores/configState";
+import layoutStates, { defaultWorkflowAttributes, type SerializedLayoutState } from "$lib/stores/layoutStates";
 import modalState from "$lib/stores/modalState";
+import queueState from "$lib/stores/queueState";
+import selectionState from "$lib/stores/selectionState";
+import uiState from "$lib/stores/uiState";
+import workflowState, { ComfyWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
+import type { SerializedPromptOutput } from "$lib/utils";
+import { basename, capitalize, download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range } from "$lib/utils";
+import { tick } from "svelte";
+import { type SvelteComponentDev } from "svelte/internal";
+import { get, writable, type Writable } from "svelte/store";
+import ComfyPromptSerializer, { isActiveBackendNode, UpstreamNodeLocator } from "./ComfyPromptSerializer";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -556,8 +538,13 @@ export default class ComfyApp {
             this.ctrlDown = e.ctrlKey;
 
             // Queue prompt using ctrl or command + enter
-            if ((e.ctrlKey || e.metaKey) && (e.key === "Enter" || e.keyCode === 13 || e.keyCode === 10)) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === "Enter" || e.code === "Enter" || e.keyCode === 10)) {
+                e.preventDefault();
                 this.runDefaultQueueAction();
+            }
+            else if ((e.ctrlKey) && (e.key === "s" || e.code === "KeyS")) {
+                e.preventDefault();
+                this.saveStateToLocalStorage();
             }
         });
         window.addEventListener("keyup", (e) => {

@@ -104,7 +104,6 @@
      .accordion {
          background: var(--panel-background-fill);
 
-
          :global(> .block .block) {
              background: var(--panel-background-fill);
          }

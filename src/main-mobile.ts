@@ -1,3 +1,6 @@
+// Run node registration before anthing else, in the proper order
+import "$lib/nodeImports";
+
 import AppMobile from './AppMobile.svelte';
 import Framework7 from 'framework7/lite-bundle';
 import Framework7Svelte from 'framework7-svelte';

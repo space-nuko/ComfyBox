@@ -2,19 +2,18 @@
  import modalState, { type ModalButton, type ModalData } from "$lib/stores/modalState";
  import { Button } from "@gradio/button";
  import Modal from "./Modal.svelte";
+	import { SvelteComponentDev } from "svelte/internal";
+	import { get } from "svelte/store";
 
  function onClose(modal: ModalData | null) {
      if (modal == null)
          return;
 
-     if (modal.onClose)
-         modal.onClose()
-
      modalState.closeModal(modal.id)
  }
 
- function onButtonClicked(button: ModalButton, closeDialog: Function) {
-     button.onClick();
+ function onButtonClicked(modal: ModalData, button: ModalButton, closeDialog: Function) {
+     button.onClick(modal);
 
      if (button.closeOnClick !== false) {
          closeDialog()
@@ -31,13 +30,13 @@
         </div>
         <svelte:fragment>
             {#if modal != null && modal.svelteComponent != null}
-                <svelte:component this={modal.svelteComponent} {...modal.svelteProps}/>
+                <svelte:component this={modal.svelteComponent} {...modal.svelteProps} _modal={modal}/>
             {/if}
         </svelte:fragment>
         <div slot="buttons" class="buttons" let:closeDialog>
             {#if modal != null && modal.buttons?.length > 0}
                 {#each modal.buttons as button}
-                    <Button variant={button.variant} on:click={() => onButtonClicked(button, closeDialog)}>
+                    <Button variant={button.variant} on:click={() => onButtonClicked(modal, button, closeDialog)}>
                         {button.name}
                     </Button>
                 {/each}
