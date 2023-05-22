@@ -48,6 +48,8 @@
 
  let mode: QueueItemType = "queue";
  let displayMode: DisplayModeType = "list";
+ let imageSize: number = 40;
+ let gridColumns: number = 3;
  let changed = true;
 
  function switchMode(newMode: QueueItemType) {
@@ -256,9 +258,9 @@
     <div class="queue-entries" bind:this={queueList}>
         {#if _entries.length > 0}
             {#if mode === "history" && displayMode === "grid"}
-                <ComfyQueueGridDisplay entries={_entries} {showPrompt} {clearQueue} {mode} />
+                <ComfyQueueGridDisplay entries={_entries} {showPrompt} {clearQueue} {mode} bind:gridColumns />
             {:else}
-                <ComfyQueueListDisplay entries={_entries} {showPrompt} {clearQueue} {mode} />
+                <ComfyQueueListDisplay entries={_entries} {showPrompt} {clearQueue} {mode} bind:imageSize />
             {/if}
         {:else}
             <div class="queue-empty">
