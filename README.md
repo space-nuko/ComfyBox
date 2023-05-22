@@ -14,7 +14,9 @@ ComfyBox is a frontend to Stable Diffusion that lets you create custom image gen
 
 ## Usage
 
-You can import your existing workflows from ComfyUI into ComfyBox by simply clicking `Load` and choosing the `.json` or `.png` with embedded metadata, or dropping either file onto the graph viewer.
+A preconfigured workflow is included for the most common txt2img and img2img use cases, so all it takes to start generating is clicking `Load Default` to load the default workflow and then `Queue Prompt`.
+
+You can import your existing workflows from ComfyUI into ComfyBox by clicking `Load` and choosing the `.json` or `.png` with embedded metadata, or dropping either file onto the graph viewer.
 
 ## NOTE
 

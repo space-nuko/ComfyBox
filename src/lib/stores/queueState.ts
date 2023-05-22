@@ -181,6 +181,19 @@ function findEntryInPending(promptID: PromptID): [number, QueueEntry | null, Wri
     return [-1, null, null]
 }
 
+function moveToRunning(index: number, queue: Writable<QueueEntry[]>) {
+    const state = get(store)
+
+    const entry = get(queue)[index];
+    console.debug("[queueState] Move to running", entry.promptID, index)
+    // entry.startedAt = new Date() // Now
+    queue.update(qp => { qp.splice(index, 1); return qp });
+    state.queueRunning.update(qr => { qr.push(entry); return qr })
+
+    state.isInterrupting = false;
+    store.set(state)
+}
+
 function moveToCompleted(index: number, queue: Writable<QueueEntry[]>, status: QueueEntryStatus, message?: string, error?: string) {
     const state = get(store)
 
@@ -298,8 +311,11 @@ function executionStart(promptID: PromptID) {
         const [index, entry, queue] = findEntryInPending(promptID);
         if (entry == null) {
             const entry = createNewQueueEntry(promptID);
-            s.queuePending.update(qp => { qp.push(entry); return qp })
+            s.queueRunning.update(qr => { qr.push(entry); return qr })
             console.debug("[queueState] ADD PROMPT", promptID)
+        }
+        else {
+            moveToRunning(index, queue)
         }
         s.isInterrupting = false;
         return s
