@@ -7,11 +7,9 @@
  import LightboxModal from "./LightboxModal.svelte";
  import Sidebar from "./Sidebar.svelte";
  import SidebarItem from "./SidebarItem.svelte";
- // import Modal from "./Modal.svelte";
- // import A1111PromptDisplay from "./A1111PromptDisplay.svelte";
-	import notify from "$lib/notify";
-	import ComfyWorkflowsView from "./ComfyWorkflowsView.svelte";
-
+ import notify from "$lib/notify";
+ import ComfyWorkflowsView from "./ComfyWorkflowsView.svelte";
+ import GlobalModal from "./GlobalModal.svelte";
 
  export let app: ComfyApp = undefined;
  let hasShownUIHelpToast: boolean = false;
@@ -36,11 +34,6 @@
      document.getElementById("app-root").classList.remove("dark")
  }
 
- // let showModal: boolean = false;
- //
- // $: showModal = $a1111Prompt != null
- //
- // let selectedTab
 </script>
 
 <svelte:head>
@@ -48,20 +41,6 @@
         <link rel="stylesheet" href="/src/scss/ux.scss">
     {/if}
 </svelte:head>
-
-<!--
-     <Modal bind:showModal on:close={() => ($a1111Prompt = null)}>
-     <div slot="header" class="prompt-modal-header">
-     <h1 style="padding-bottom: 1rem;">A1111 Prompt Details</h1>
-     </div>
-     <A1111PromptDisplay prompt={$a1111Prompt} />
-     <div slot="buttons" let:closeDialog>
-     <Button variant="secondary" on:click={closeDialog}>
-     Close
-     </Button>
-     </div>
-     </Modal>
--->
 
 <div id="main" class:dark={uiTheme === "gradio-dark"}>
     <div id="container">
@@ -74,6 +53,7 @@
         </Sidebar>
     </div>
     <LightboxModal />
+    <GlobalModal/>
 </div>
 <SvelteToast options={toastOptions} />
 

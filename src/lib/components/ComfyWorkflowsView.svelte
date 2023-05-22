@@ -18,6 +18,7 @@
  import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
  import { fade } from 'svelte/transition';
  import { cubicIn } from 'svelte/easing';
+	import { truncateString } from '$lib/utils';
 
  export let app: ComfyApp;
  export let uiTheme: string = "gradio-dark" // TODO config
@@ -50,7 +51,7 @@
  }
 
  async function doRefreshCombos() {
-     await app.refreshComboInNodes(undefined, true)
+     await app.refreshComboInNodes(undefined, undefined, true)
  }
 
  function refreshView(event?: Event) {
@@ -136,12 +137,12 @@
      if (!fileInput)
          return;
 
+     fileInput.value = null;
      fileInput.click();
  }
 
  function loadWorkflow(): void {
      app.handleFile(fileInput.files[0]);
-     fileInput.files = null;
  }
 
  function doSaveLocal(): void {
@@ -203,7 +204,7 @@
                     {#if $workflowState.activeWorkflow != null}
                         <ComfyWorkflowView {app} workflow={$workflowState.activeWorkflow} />
                     {:else}
-                        <span>No workflow loaded</span>
+                        <span style:color="var(--body-text-color)">No workflow loaded</span>
                     {/if}
                 </Pane>
                 <Pane bind:size={graphSize}>
@@ -235,7 +236,7 @@
                         class:selected={item.id === $workflowState.activeWorkflowID}
                         on:click={() => app.setActiveWorkflow(item.id)}>
                     <span class="workflow-tab-title">
-                        {workflow.attrs.title}
+                        {truncateString(workflow.attrs.title, 32)}
                         {#if workflow.isModified}
                             *
                         {/if}
@@ -313,7 +314,7 @@
         </div>
     </div>
 </div>
-<input bind:this={fileInput} id="comfy-file-input" type="file" accept=".json" on:change={loadWorkflow} />
+<input bind:this={fileInput} id="comfy-file-input" type="file" accept="application/json,image/png" on:change={loadWorkflow} />
 
 {#if appSetupPromise}
     {#await appSetupPromise}
@@ -326,7 +327,7 @@
                 Error loading app
             </div>
             <div>{error}</div>
-            {#if error.stack}
+            {#if error != null && error.stack}
                 {@const lines = error.stack.split("\n")}
                 {#each lines as line}
                     <div style:font-size="16px">{line}</div>

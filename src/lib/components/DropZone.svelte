@@ -1,15 +1,12 @@
 <script lang="ts">
-	import { writable, type Writable } from "svelte/store";
+ import modalState from "$lib/stores/modalState";
  import type ComfyApp from "./ComfyApp";
 
  export let app: ComfyApp;
- let a1111Prompt: Writable<any | null> = writable(null);
  let dropZone: HTMLDivElement | null = null;
  let disabled = false;
 
- $: a1111Prompt = app.a1111Prompt;
-
- $: disabled = a1111Prompt && $a1111Prompt;
+ $: disabled = $modalState.activeModals.length > 0;
 
  $: if (disabled) {
      hideDropZone();

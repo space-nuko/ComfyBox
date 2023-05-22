@@ -4,7 +4,7 @@
  import Spinner from "./Spinner.svelte";
  import PromptDisplay from "./PromptDisplay.svelte";
  import { ListIcon as List } from "svelte-feather-icons";
- import { convertComfyOutputToComfyURL, convertFilenameToComfyURL, getNodeInfo } from "$lib/utils"
+ import { convertComfyOutputToComfyURL, convertFilenameToComfyURL, getNodeInfo, truncateString } from "$lib/utils"
  import type { Writable } from "svelte/store";
  import type { QueueItemType } from "$lib/api";
  import { ImageViewer } from "$lib/ImageViewer";
@@ -22,12 +22,14 @@
  let queueCompleted: Writable<CompletedQueueEntry[]> | null = null;
  let queueList: HTMLDivElement | null = null;
 
+ type QueueUIEntryStatus = QueueEntryStatus | "pending" | "running";
+
  type QueueUIEntry = {
      entry: QueueEntry,
      message: string,
      submessage: string,
      date?: string,
-     status: QueueEntryStatus | "pending" | "running",
+     status: QueueUIEntryStatus,
      images?: string[], // URLs
      details?: string // shown in a tooltip on hover
  }
@@ -39,21 +41,29 @@
  }
 
  let mode: QueueItemType = "queue";
+ let changed = true;
 
  function switchMode(newMode: QueueItemType) {
-     const changed = mode !== newMode
+     changed = mode !== newMode
      mode = newMode
-     if (changed)
+     if (changed) {
+         _queuedEntries = []
+         _runningEntries = []
          _entries = []
+     }
  }
 
+ let _queuedEntries: QueueUIEntry[] = []
+ let _runningEntries: QueueUIEntry[] = []
  let _entries: QueueUIEntry[] = []
 
- $: if (mode === "queue" && $queuePending && $queuePending.length != _entries.length) {
+ $: if (mode === "queue" && (changed || ($queuePending && $queuePending.length != _queuedEntries.length))) {
      updateFromQueue();
+     changed = false;
  }
- else if (mode === "history" && $queueCompleted && $queueCompleted.length != _entries.length) {
+ else if (mode === "history" && (changed  || ($queueCompleted && $queueCompleted.length != _entries.length))) {
      updateFromHistory();
+     changed = false;
  }
 
  function formatDate(date: Date): string {
@@ -62,20 +72,20 @@
      return [time, day].join(", ")
  }
 
- function convertEntry(entry: QueueEntry): QueueUIEntry {
+ function convertEntry(entry: QueueEntry, status: QueueUIEntryStatus): QueueUIEntry {
      let date = entry.finishedAt || entry.queuedAt;
      let dateStr = null;
      if (date) {
          dateStr = formatDate(date);
      }
 
-     const subgraphs: string[] | null = entry.extraData?.extra_pnginfo?.comfyBoxSubgraphs;
+     const subgraphs: string[] | null = entry.extraData?.extra_pnginfo?.comfyBoxPrompt?.subgraphs;
 
      let message = "Prompt";
      if (entry.workflowID != null) {
          const workflow = workflowState.getWorkflow(entry.workflowID);
          if (workflow != null && workflow.attrs.title) {
-             message = `Workflow: ${workflow.attrs.title}`
+             message = `${workflow.attrs.title}`
          }
          if (subgraphs?.length > 0)
              message += ` (${subgraphs.join(', ')})`
@@ -93,13 +103,13 @@
          message,
          submessage,
          date: dateStr,
-         status: "pending",
+         status,
          images: []
      }
  }
 
- function convertPendingEntry(entry: QueueEntry): QueueUIEntry {
-     const result = convertEntry(entry);
+ function convertPendingEntry(entry: QueueEntry, status: QueueUIEntryStatus): QueueUIEntry {
+     const result = convertEntry(entry, status);
 
      const thumbnails = entry.extraData?.thumbnails
      if (thumbnails) {
@@ -110,8 +120,7 @@
  }
 
  function convertCompletedEntry(entry: CompletedQueueEntry): QueueUIEntry {
-     const result = convertEntry(entry.entry);
-     result.status = entry.status;
+     const result = convertEntry(entry.entry, entry.status);
 
      const images = Object.values(entry.entry.outputs).flatMap(o => o.images)
          .map(convertComfyOutputToComfyURL);
@@ -128,12 +137,15 @@
  }
 
  async function updateFromQueue() {
-     _entries = $queuePending.map(convertPendingEntry).reverse(); // newest entries appear at the top
+     // newest entries appear at the top
+     _queuedEntries = $queuePending.map((e) => convertPendingEntry(e, "pending")).reverse();
+     _runningEntries = $queueRunning.map((e) => convertPendingEntry(e, "running")).reverse();
+     _entries = [..._queuedEntries, ..._runningEntries]
      if (queueList) {
          await tick(); // Wait for list size to be recalculated
          queueList.scroll({ top: queueList.scrollHeight })
      }
-     console.warn("[ComfyQueue] BUILDQUEUE", _entries, $queuePending)
+     console.warn("[ComfyQueue] BUILDQUEUE", _entries, $queuePending, $queueRunning)
  }
 
  async function updateFromHistory() {
@@ -208,7 +220,6 @@
 </Modal>
 
 <div class="queue">
-    <DropZone {app} />
     <div class="queue-entries {mode}-mode" bind:this={queueList}>
         {#if _entries.length > 0}
             {#each _entries as entry}
@@ -230,7 +241,7 @@
                     {/if}
                     <div class="queue-entry-details">
                         <div class="queue-entry-message">
-                            {entry.message}
+                            {truncateString(entry.message, 20)}
                         </div>
                         <div class="queue-entry-submessage">
                             {entry.submessage}
@@ -305,8 +316,9 @@
 <style lang="scss">
  $pending-height: 200px;
  $bottom-bar-height: 70px;
+ $workflow-tabs-height: 2.5rem;
  $mode-buttons-height: 30px;
- $queue-height: calc(100vh - #{$pending-height} - #{$mode-buttons-height} - #{$bottom-bar-height});
+ $queue-height: calc(100vh - #{$pending-height} - #{$mode-buttons-height} - #{$bottom-bar-height} - #{$workflow-tabs-height} - 0.9rem);
 
  .prompt-modal-header {
      padding-left: 0.2rem;
@@ -368,6 +380,10 @@
      &:hover:not(:has(img:hover)) {
          cursor: pointer;
          background: var(--block-background-fill);
+
+         &.running {
+             background: var(--comfy-accent-soft);
+         }
      }
 
      &.success {
@@ -382,10 +398,10 @@
          color: var(--comfy-disable-textbox-text-color);
      }
      &.running {
-         /* background: lightblue; */
+         background: var(--block-background-fill);
+         border: 3px dashed var(--neutral-500);
      }
      &.pending, &.unknown {
-         /* background: orange; */
      }
  }
 

@@ -41,12 +41,12 @@
          return;
 
      navigator.vibrate(20)
+     fileInput.value = null;
      fileInput.click();
  }
 
  function loadWorkflow(): void {
      app.handleFile(fileInput.files[0]);
-     fileInput.files = null;
 }
 
  function doSaveLocal(): void {

@@ -428,6 +428,38 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: "gallery",
                 refreshPanelOnChange: true
             },
+
+            // Text
+            {
+                name: "multiline",
+                type: "boolean",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/text"],
+                defaultValue: false
+            },
+            {
+                name: "lines",
+                type: "number",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/text"],
+                defaultValue: 5,
+                min: 1,
+                max: 100,
+                step: 1
+            },
+            {
+                name: "maxLines",
+                type: "number",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/text"],
+                defaultValue: 5,
+                min: 1,
+                max: 100,
+                step: 1
+            },
         ]
     },
     {
@@ -657,13 +689,19 @@ export interface WidgetLayout extends IDragItem {
     node: ComfyWidgetNode
 }
 
+export type DefaultLayout = {
+    root: ContainerLayout,
+    left: ContainerLayout,
+    right: ContainerLayout,
+}
+
 export type DragItemID = UUID;
 
 type LayoutStateOps = {
-    workflow: ComfyWorkflow,
+    workflow: ComfyWorkflow | null,
 
-    addContainer: (parent: ContainerLayout | null, attrs: Partial<Attributes>, index?: number) => ContainerLayout,
-    addWidget: (parent: ContainerLayout, node: ComfyWidgetNode, attrs: Partial<Attributes>, index?: number) => WidgetLayout,
+    addContainer: (parent: ContainerLayout | null, attrs?: Partial<Attributes>, index?: number) => ContainerLayout,
+    addWidget: (parent: ContainerLayout, node: ComfyWidgetNode, attrs?: Partial<Attributes>, index?: number) => WidgetLayout,
     findDefaultContainerForInsertion: () => ContainerLayout | null,
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode, options: LGraphAddNodeOptions) => void,
@@ -675,7 +713,7 @@ type LayoutStateOps = {
     findLayoutForNode: (nodeId: ComfyNodeID) => IDragItem | null,
     serialize: () => SerializedLayoutState,
     deserialize: (data: SerializedLayoutState, graph: LGraph) => void,
-    initDefaultLayout: () => void,
+    initDefaultLayout: () => DefaultLayout,
     onStartConfigure: () => void
     notifyWorkflowModified: () => void
 }
@@ -700,11 +738,7 @@ export type SerializedDragItem = {
 
 export type WritableLayoutStateStore = Writable<LayoutState> & LayoutStateOps;
 
-function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
-    if (get(layoutStates).all[workflow.id] != null) {
-        throw new Error(`Layout state already created! ${id}`)
-    }
-
+function createRaw(workflow: ComfyWorkflow | null = null): WritableLayoutStateStore {
     const store: Writable<LayoutState> = writable({
         root: null,
         allItems: {},
@@ -1040,7 +1074,7 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
         return found.dragItem as WidgetLayout
     }
 
-    function initDefaultLayout() {
+    function initDefaultLayout(): DefaultLayout {
         store.set({
             root: null,
             allItems: {},
@@ -1060,6 +1094,8 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
         })
 
         console.debug("[layoutState] initDefault")
+
+        return { root, left, right }
     }
 
     function serialize(): SerializedLayoutState {
@@ -1160,7 +1196,7 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
 
     function notifyWorkflowModified() {
         if (!get(store).isConfiguring)
-            workflow.notifyModified();
+            workflow?.notifyModified();
     }
 
     const layoutStateStore: WritableLayoutStateStore =
@@ -1184,6 +1220,16 @@ function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
         deserialize,
         notifyWorkflowModified
     }
+
+    return layoutStateStore
+}
+
+function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
+    if (get(layoutStates).all[workflow.id] != null) {
+        throw new Error(`Layout state already created! ${id}`)
+    }
+
+    const layoutStateStore = createRaw(workflow);
 
     layoutStates.update(s => {
         s.all[workflow.id] = layoutStateStore;
@@ -1233,6 +1279,7 @@ export type LayoutStateStores = {
 
 export type LayoutStateStoresOps = {
     create: (workflow: ComfyWorkflow) => WritableLayoutStateStore,
+    createRaw: (workflow?: ComfyWorkflow | null) => WritableLayoutStateStore,
     remove: (workflowID: WorkflowInstID) => void,
     getLayout: (workflowID: WorkflowInstID) => WritableLayoutStateStore | null,
     getLayoutByGraph: (graph: LGraph) => WritableLayoutStateStore | null,
@@ -1249,6 +1296,7 @@ const store = writable({
 const layoutStates: WritableLayoutStateStores = {
     ...store,
     create,
+    createRaw,
     remove,
     getLayout,
     getLayoutByGraph,

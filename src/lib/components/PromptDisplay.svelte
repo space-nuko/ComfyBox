@@ -8,6 +8,7 @@
  import Gallery from "$lib/components/gradio/gallery/Gallery.svelte";
  import { ImageViewer } from "$lib/ImageViewer";
  import type { Styles } from "@gradio/utils";
+	import { countNewLines } from "$lib/utils";
 
  const splitLength = 50;
 
@@ -18,7 +19,7 @@
 
  let galleryStyle: Styles = {
      grid_cols: [2],
-     object_fit: "cover",
+     object_fit: "contain",
      height: "var(--size-96)"
  }
 
@@ -27,10 +28,6 @@
          && input.length === 2
          && typeof input[0] === "string"
          && typeof input[1] === "number"
- }
-
- function countNewLines(str: string): number {
-     return str.split(/\r\n|\r|\n/).length
  }
 
  function isMultiline(input: any): boolean {
@@ -165,6 +162,11 @@
 
          > :global(.block) {
              height: 100%;
+
+             :global(> .preview) {
+                 height: 100%;
+                 max-height: none !important;
+             }
          }
      }
 

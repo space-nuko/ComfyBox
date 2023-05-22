@@ -31,6 +31,7 @@ body {
     --comfy-splitpanes-background-fill: var(--secondary-100);
     --comfy-splitpanes-background-fill-hover: var(--secondary-300);
     --comfy-splitpanes-background-fill-active: var(--secondary-400);
+    --comfy-dropdown-list-background: white;
     --comfy-dropdown-item-color-hover: white;
     --comfy-dropdown-item-background-hover: var(--neutral-400);
     --comfy-dropdown-item-color-active: var(--neutral-100);
@@ -107,7 +108,7 @@ hr {
     color: var(--panel-border-color);
 }
 
-input, textarea {
+input:not(input[type=radio]), textarea {
     border-radius: 0 !important;
 }
 
