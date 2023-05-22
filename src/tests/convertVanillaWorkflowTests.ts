@@ -98,7 +98,11 @@ export default class convertVanillaWorkflowTests extends UnitTest {
         const kSampler = convWorkflow.graph.findNodesByType("KSampler")[0];
         expect(links[0].origin_id).toEqual(widget.node.id);
         expect(links[0].target_id).toEqual(kSampler.id);
+
         expect(widget.node.outputs[0].type).toEqual("number");
+
+        const targetNode = widget.node.getOutputNodes(0)[0]
+        expect(targetNode.inputs[links[0].target_slot].type).toEqual("number")
         expect(links[0].type).toEqual("number");
     }
 
