@@ -151,5 +151,7 @@
 
  .edit {
      border: 2px dashed var(--color-blue-400);
+     pointer-events: none;
+     user-select: none;
  }
 </style>

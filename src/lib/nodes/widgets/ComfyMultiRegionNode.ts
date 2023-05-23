@@ -43,10 +43,7 @@ export default class ComfyMultiRegionNode extends ComfyWidgetNode<BoundingBox[]>
             { name: "changed", type: BuiltInSlotType.EVENT },
 
             // dynamic outputs, may be removed later
-            { name: "x1", type: "number" },
-            { name: "y1", type: "number" },
-            { name: "w1", type: "number" },
-            { name: "h1", type: "number" },
+            { name: "region1", type: "COMFYBOX_REGION" },
         ]
     }
 
@@ -77,24 +74,24 @@ export default class ComfyMultiRegionNode extends ComfyWidgetNode<BoundingBox[]>
         let height = this.getInputData(2) || 0
 
         if (width != this.properties.canvasWidth || height != this.properties.canvasHeight) {
-            console.warn("SIZCHANGE", width, height, this.properties.canvasWidth, this.properties.canvasHeight)
             this.properties.canvasWidth = width;
             this.properties.canvasHeight = height;
-            this.sizeChanged.set(true);
             this.updateSize();
         }
 
         const value = this.getValue();
 
-        for (let index = 0; index < this.properties.regionCount * 2; index += 2) {
+        for (let index = 0; index < this.properties.regionCount; index++) {
             const bbox = value[index]
             if (bbox != null) {
-                const xOutput = this.outputs[index + 1]
-                if (xOutput != null) {
-                    this.setOutputData(index + 1, bbox[0] * this.properties.canvasWidth)
-                    this.setOutputData(index + 2, bbox[1] * this.properties.canvasHeight)
-                    this.setOutputData(index + 3, bbox[2] * this.properties.canvasWidth)
-                    this.setOutputData(index + 4, bbox[3] * this.properties.canvasHeight)
+                const output = this.outputs[index + 1] // + changed slot
+                if (output != null) {
+                    let data = this.getOutputData(index) || [0, 0, 0, 0]
+                    data[0] = bbox[0] * this.properties.canvasWidth
+                    data[1] = bbox[1] * this.properties.canvasHeight
+                    data[2] = bbox[2] * this.properties.canvasWidth
+                    data[3] = bbox[3] * this.properties.canvasHeight
+                    this.setOutputData(index, data)
                 }
             }
         }
@@ -110,10 +107,7 @@ export default class ComfyMultiRegionNode extends ComfyWidgetNode<BoundingBox[]>
         }
 
         for (let index = 0; index < this.properties.regionCount; index++) {
-            this.addOutput(`x${index + 1}`, "number")
-            this.addOutput(`y${index + 1}`, "number")
-            this.addOutput(`w${index + 1}`, "number")
-            this.addOutput(`h${index + 1}`, "number")
+            this.addOutput(`region${index + 1}`, "COMFYBOX_REGION")
         }
 
         this.regionsChanged.set(true);

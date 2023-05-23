@@ -592,6 +592,7 @@ export default class ComfyApp {
 
         setColor("COMFYBOX_IMAGES", "rebeccapurple")
         setColor("COMFYBOX_IMAGE", "fuchsia")
+        setColor("COMFYBOX_REGION", "salmon")
         setColor(BuiltInSlotType.EVENT, "lightseagreen")
         setColor(BuiltInSlotType.ACTION, "lightseagreen")
     }
