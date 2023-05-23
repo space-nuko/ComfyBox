@@ -41,7 +41,7 @@ export default class ComfyMultiRegionNode extends ComfyWidgetNode<BoundingBox[]>
             { name: "changed", type: BuiltInSlotType.EVENT },
 
             // dynamic outputs, may be removed later
-            { name: "region1", type: "COMFYBOX_REGION" },
+            { name: "region_1", type: "COMFYBOX_REGION" },
         ]
     }
 
@@ -145,7 +145,7 @@ export default class ComfyMultiRegionNode extends ComfyWidgetNode<BoundingBox[]>
         }
 
         for (let index = this.outputs.length - 1; index < this.properties.regionCount; index++) {
-            this.addOutput(`region${index + 1}`, "COMFYBOX_REGION")
+            this.addOutput(`region_${index + 1}`, "COMFYBOX_REGION")
         }
 
         this.regionsChanged.set(true);
@@ -165,10 +165,10 @@ export default class ComfyMultiRegionNode extends ComfyWidgetNode<BoundingBox[]>
         value ||= this.getValue();
 
         for (const bbox of value) {
-            bbox[0] = clamp(bbox[0], 0, 1 - bbox[2]);
-            bbox[1] = clamp(bbox[1], 0, 1 - bbox[3]);
-            bbox[2] = clamp(bbox[2], 0, 1 - bbox[1])
-            bbox[3] = clamp(bbox[3], 0, 1 - bbox[2])
+            bbox[0] = clamp(bbox[0], 0, 1);
+            bbox[1] = clamp(bbox[1], 0, 1);
+            bbox[2] = clamp(bbox[2], 0, 1)
+            bbox[3] = clamp(bbox[3], 0, 1)
         }
 
         const sizeChanged = this.properties.canvasWidth != this._prevWidth
