@@ -208,7 +208,8 @@ export default class ComfyApp {
 
         // We failed to restore a workflow so load the default
         if (!restored) {
-            await this.initDefaultWorkflow(defs);
+            await this.initDefaultWorkflow("defaultWorkflow", defs);
+            await this.initDefaultWorkflow("upscale", defs);
         }
 
         // Save current workflow automatically
@@ -704,15 +705,15 @@ export default class ComfyApp {
         selectionState.clear();
     }
 
-    async initDefaultWorkflow(defs?: Record<string, ComfyNodeDef>) {
+    async initDefaultWorkflow(name: string = "defaultWorkflow", defs?: Record<string, ComfyNodeDef>) {
         let state = null;
         try {
-            const graphResponse = await fetch("/workflows/defaultWorkflow.json");
+            const graphResponse = await fetch(`/workflows/${name}.json`);
             state = await graphResponse.json() as SerializedAppState;
         }
         catch (error) {
-            console.error("Failed to load default graph", error)
-            notify(`Failed to load default graph: ${error} `, { type: "error" })
+            console.error(`Failed to load default graph ${name}`, error)
+            notify(`Failed to load default graph ${name}: ${error} `, { type: "error" })
             state = structuredClone(blankGraph)
         }
         await this.openWorkflow(state, defs)
