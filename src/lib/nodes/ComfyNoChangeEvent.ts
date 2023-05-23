@@ -17,7 +17,7 @@ export default class ComfyNoChangeEvent extends ComfyGraphNode {
         }
         else {
             param = {
-                value: param,
+                __widgetValue__: param,
                 noChangedEvent: true
             }
         }

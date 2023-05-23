@@ -20,6 +20,7 @@
  let imageWidth: Writable<number> = writable(0);
  let imageHeight: Writable<number> = writable(0);
  let selected_image: Writable<number | null> = writable(null);
+ let forceSelectImage: Writable<boolean | null> = writable(null);
 
  $: widget && setNodeValue(widget);
 
@@ -31,6 +32,7 @@
          imageWidth = node.imageWidth
          imageHeight = node.imageHeight
          selected_image = node.selectedImage;
+         forceSelectImage = node.forceSelectImage;
 
          if ($nodeValue != null) {
              if (node.properties.index < 0 || node.properties.index >= $nodeValue.length) {
@@ -43,6 +45,7 @@
  let style: Styles = {
      grid_cols: [isMobile ? 2 : 3],
      object_fit: "cover",
+     // preview: true
  }
  let element: HTMLDivElement;
 
@@ -134,6 +137,7 @@
                         bind:imageWidth={$imageWidth}
                         bind:imageHeight={$imageHeight}
                         bind:selected_image={$selected_image}
+                        bind:forceSelectImage={$forceSelectImage}
                     />
                 </div>
             </Block>

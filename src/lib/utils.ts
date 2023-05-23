@@ -9,6 +9,8 @@ import workflowState from "./stores/workflowState";
 import { ImageViewer } from "./ImageViewer";
 
 export function clamp(n: number, min: number, max: number): number {
+    if (max <= min)
+        return min;
     return Math.min(Math.max(n, min), max)
 }
 

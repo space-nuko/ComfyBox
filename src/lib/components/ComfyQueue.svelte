@@ -80,9 +80,16 @@
      updateFromQueue();
      changed = false;
  }
- else if (mode === "history" && (changed  || ($queueCompleted && $queueCompleted.length != _entries.length))) {
+ else if (mode === "history" && (changed || ($queueCompleted && $queueCompleted.length != _entries.length))) {
      updateFromHistory();
      changed = false;
+ }
+
+ $: if (mode === "queue" && !$queuePending && !$queueRunning) {
+     _queuedEntries = []
+     _runningEntries = []
+     _entries = [];
+     changed = true
  }
 
  async function deleteEntry(entry: QueueUIEntry, event: MouseEvent) {

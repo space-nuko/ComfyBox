@@ -27,7 +27,7 @@ export default class ComfyReceiveOutputNode extends ComfyGraphNode {
 
     static slotLayout: SlotLayout = {
         outputs: [
-            { name: "received", type: BuiltInSlotType.EVENT }
+            { name: "received", type: BuiltInSlotType.EVENT, options: { color_off: "fuchsia", color_on: "fuchsia" } }
         ]
     }
 

@@ -31,6 +31,13 @@ export default class ComfyExecuteSubgraphAction extends ComfyGraphNode {
             this.setProperty("tag", tag)
     }
 
+    override getTitle(): string {
+        if (this.flags.collapsed) {
+            return "Execute: " + String(this.properties.targetTag);
+        }
+        return this.title;
+    }
+
     override onAction(action: any, param: any) {
         const tag = this.getInputData(1) || this.properties.targetTag;
 
