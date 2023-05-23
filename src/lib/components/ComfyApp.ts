@@ -42,6 +42,12 @@ if (typeof window !== "undefined") {
     nodes.ComfyReroute.setDefaultTextVisibility(!!localStorage["Comfy.ComfyReroute.DefaultVisibility"]);
 }
 
+export type OpenWorkflowOptions = {
+    setActive?: boolean,
+    refreshCombos?: boolean | Record<string, ComfyNodeDef>,
+    warnMissingNodeTypes?: boolean,
+}
+
 /*
  * Queued prompt that hasn't been sent to the backend yet.
  */
@@ -208,8 +214,12 @@ export default class ComfyApp {
 
         // We failed to restore a workflow so load the default
         if (!restored) {
-            await this.initDefaultWorkflow("defaultWorkflow", defs);
-            await this.initDefaultWorkflow("upscale", defs);
+            const options: OpenWorkflowOptions = {
+                refreshCombos: defs,
+                setActive: false
+            }
+            await this.initDefaultWorkflow("defaultWorkflow", options);
+            await this.initDefaultWorkflow("upscale", options);
         }
 
         // Save current workflow automatically
@@ -296,7 +306,7 @@ export default class ComfyApp {
 
         const workflows = state.workflows as SerializedAppState[];
         await Promise.all(workflows.map(w => {
-            return this.openWorkflow(w, defs, false).catch(error => {
+            return this.openWorkflow(w, { refreshCombos: defs, warnMissingNodeTypes: false, setActive: false }).catch(error => {
                 console.error("Failed restoring previous workflow", error)
                 notify(`Failed restoring previous workflow: ${error}`, { type: "error" })
             })
@@ -586,9 +596,11 @@ export default class ComfyApp {
         setColor(BuiltInSlotType.ACTION, "lightseagreen")
     }
 
-    async openWorkflow(data: SerializedAppState,
-        refreshCombos: boolean | Record<string, ComfyNodeDef> = true,
-        warnMissingNodeTypes: boolean = true
+    async openWorkflow(data: SerializedAppState, options: OpenWorkflowOptions = {
+        setActive: true,
+        refreshCombos: true,
+        warnMissingNodeTypes: true
+    }
     ): Promise<ComfyWorkflow> {
         if (data.version !== COMFYBOX_SERIAL_VERSION) {
             const mes = `Invalid ComfyBox saved data format: ${data.version} `
@@ -600,7 +612,7 @@ export default class ComfyApp {
 
         let workflow: ComfyWorkflow;
         try {
-            workflow = workflowState.openWorkflow(this.lCanvas, data);
+            workflow = workflowState.openWorkflow(this.lCanvas, data, options.setActive);
         }
         catch (error) {
             modalState.pushModal({
@@ -612,7 +624,7 @@ export default class ComfyApp {
             return Promise.reject(error)
         }
 
-        if (workflow.missingNodeTypes.size > 0 && warnMissingNodeTypes) {
+        if (workflow.missingNodeTypes.size > 0 && options.warnMissingNodeTypes) {
             modalState.pushModal({
                 svelteComponent: MissingNodeTypesModal,
                 svelteProps: {
@@ -624,10 +636,10 @@ export default class ComfyApp {
         // Restore canvas offset/zoom
         this.lCanvas.deserialize(data.canvas)
 
-        if (refreshCombos) {
+        if (options.refreshCombos) {
             let defs = null;
-            if (typeof refreshCombos === "object")
-                defs = refreshCombos;
+            if (typeof options.refreshCombos === "object")
+                defs = options.refreshCombos;
             await this.refreshComboInNodes(workflow, defs);
         }
 
@@ -705,7 +717,7 @@ export default class ComfyApp {
         selectionState.clear();
     }
 
-    async initDefaultWorkflow(name: string = "defaultWorkflow", defs?: Record<string, ComfyNodeDef>) {
+    async initDefaultWorkflow(name: string = "defaultWorkflow", options?: OpenWorkflowOptions) {
         let state = null;
         try {
             const graphResponse = await fetch(`/workflows/${name}.json`);
@@ -716,7 +728,7 @@ export default class ComfyApp {
             notify(`Failed to load default graph ${name}: ${error} `, { type: "error" })
             state = structuredClone(blankGraph)
         }
-        await this.openWorkflow(state, defs)
+        await this.openWorkflow(state, options)
     }
 
     clear() {

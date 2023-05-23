@@ -76,11 +76,11 @@
  let _runningEntries: QueueUIEntry[] = []
  let _entries: QueueUIEntry[] = []
 
- $: if (mode === "queue" && (changed || ($queuePending && $queuePending.length != _queuedEntries.length))) {
+ $: if (mode === "queue" && (changed || $queuePending.length != _queuedEntries.length || $queueRunning.length != _runningEntries.length)) {
      updateFromQueue();
      changed = false;
  }
- else if (mode === "history" && (changed || ($queueCompleted && $queueCompleted.length != _entries.length))) {
+ else if (mode === "history" && (changed || $queueCompleted.length != _entries.length)) {
      updateFromHistory();
      changed = false;
  }

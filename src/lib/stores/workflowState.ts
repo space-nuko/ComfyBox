@@ -245,8 +245,8 @@ type WorkflowStateOps = {
     getWorkflowByNodeID: (id: NodeID) => ComfyWorkflow | null
     getActiveWorkflow: () => ComfyWorkflow | null
     createNewWorkflow: (canvas: ComfyGraphCanvas, title?: string, setActive?: boolean) => ComfyWorkflow,
-    openWorkflow: (canvas: ComfyGraphCanvas, data: SerializedAppState) => ComfyWorkflow,
-    addWorkflow: (canvas: ComfyGraphCanvas, data: ComfyWorkflow) => void,
+    openWorkflow: (canvas: ComfyGraphCanvas, data: SerializedAppState, setActive?: boolean) => ComfyWorkflow,
+    addWorkflow: (canvas: ComfyGraphCanvas, data: ComfyWorkflow, setActive?: boolean) => void,
     closeWorkflow: (canvas: ComfyGraphCanvas, index: number) => void,
     closeAllWorkflows: (canvas: ComfyGraphCanvas) => void,
     setActiveWorkflow: (canvas: ComfyGraphCanvas, index: number | WorkflowInstID) => ComfyWorkflow | null,
@@ -299,7 +299,7 @@ function createNewWorkflow(canvas: ComfyGraphCanvas, title: string = "New Workfl
     state.openedWorkflows.push(workflow);
     state.openedWorkflowsByID[workflow.id] = workflow;
 
-    if (setActive)
+    if (setActive || state.activeWorkflowID == null)
         setActiveWorkflow(canvas, state.openedWorkflows.length - 1)
 
     store.set(state)
@@ -307,20 +307,22 @@ function createNewWorkflow(canvas: ComfyGraphCanvas, title: string = "New Workfl
     return workflow;
 }
 
-function openWorkflow(canvas: ComfyGraphCanvas, data: SerializedAppState): ComfyWorkflow {
+function openWorkflow(canvas: ComfyGraphCanvas, data: SerializedAppState, setActive: boolean = true): ComfyWorkflow {
     const [workflow, layoutState] = ComfyWorkflow.create("Workflow")
     workflow.deserialize(layoutState, { graph: data.workflow, layout: data.layout, attrs: data.attrs })
 
-    addWorkflow(canvas, workflow);
+    addWorkflow(canvas, workflow, setActive);
 
     return workflow;
 }
 
-function addWorkflow(canvas: ComfyGraphCanvas, workflow: ComfyWorkflow) {
+function addWorkflow(canvas: ComfyGraphCanvas, workflow: ComfyWorkflow, setActive: boolean = true) {
     const state = get(store);
     state.openedWorkflows.push(workflow);
     state.openedWorkflowsByID[workflow.id] = workflow;
-    setActiveWorkflow(canvas, state.openedWorkflows.length - 1)
+
+    if (setActive || state.activeWorkflowID == null)
+        setActiveWorkflow(canvas, state.openedWorkflows.length - 1)
 
     store.set(state)
 
