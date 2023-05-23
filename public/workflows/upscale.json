@@ -1,16 +1,135 @@
 {
+  "comfyBoxWorkflow": true,
   "createdBy": "ComfyBox",
   "version": 1,
+  "commitHash": "test",
   "workflow": {
-    "last_node_id": 13,
-    "last_link_id": 11,
+    "last_node_id": 0,
+    "last_link_id": 0,
     "nodes": [
       {
-        "id": "47706464-4d82-4329-91a9-c9b2bec4cf60",
+        "id": "36cac98f-995d-4723-9d6f-70e3273fab95",
+        "type": "image/pick_image",
+        "pos": [
+          764,
+          209
+        ],
+        "size": [
+          210,
+          190
+        ],
+        "flags": {},
+        "order": 5,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "images",
+            "type": "COMFYBOX_IMAGES,COMFYBOX_IMAGE",
+            "link": "55273c8c-f32f-4718-b87a-ce7178af48f2",
+            "properties": {}
+          },
+          {
+            "name": "index",
+            "type": "number",
+            "link": null,
+            "properties": {}
+          }
+        ],
+        "outputs": [
+          {
+            "name": "image",
+            "type": "COMFYBOX_IMAGE",
+            "links": [],
+            "properties": {},
+            "slot_index": 0
+          },
+          {
+            "name": "filename",
+            "type": "string",
+            "links": [
+              "d3e6117a-9ac6-4ea9-aef7-9deab54d83bf"
+            ],
+            "properties": {},
+            "slot_index": 1
+          },
+          {
+            "name": "width",
+            "type": "number",
+            "links": [],
+            "properties": {}
+          },
+          {
+            "name": "height",
+            "type": "number",
+            "links": [],
+            "properties": {}
+          }
+        ],
+        "title": "Comfy.PickImage",
+        "properties": {
+          "tags": []
+        },
+        "saveUserState": true
+      },
+      {
+        "id": "1e69d880-041e-48dd-8030-f0eb83add915",
+        "type": "LoadImage",
+        "pos": [
+          991,
+          236
+        ],
+        "size": [
+          140,
+          46
+        ],
+        "flags": {},
+        "order": 6,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "image",
+            "type": "string",
+            "link": "d3e6117a-9ac6-4ea9-aef7-9deab54d83bf",
+            "properties": {},
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/combo",
+            "serialize": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "IMAGE",
+            "type": "IMAGE",
+            "links": [
+              "4e26eb6e-0230-4980-bc9d-bfd0c1142079"
+            ],
+            "properties": {},
+            "shape": 3,
+            "slot_index": 0
+          },
+          {
+            "name": "MASK",
+            "type": "MASK",
+            "links": [],
+            "properties": {},
+            "shape": 3
+          }
+        ],
+        "title": "Load Image",
+        "properties": {
+          "tags": []
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": "578edfae-2767-4b23-9a3b-6edd8ccad1dd",
         "type": "ui/combo",
         "pos": [
-          1957.9086484470572,
-          1203.438046544425
+          827,
+          157
         ],
         "size": [
           210,
@@ -23,14 +142,10 @@
         "mode": 0,
         "inputs": [
           {
-            "name": "value",
-            "type": "string",
-            "link": null
-          },
-          {
             "name": "store",
             "type": -1,
             "link": null,
+            "properties": {},
             "shape": 1
           }
         ],
@@ -39,13 +154,15 @@
             "name": "value",
             "type": "string",
             "links": [
-              "ca92647a-2a42-45c1-9e75-96aadd954d2f"
-            ]
+              "ee03fe14-9fb7-4bd2-abb4-f8920841b93f"
+            ],
+            "properties": {}
           },
           {
             "name": "changed",
             "type": -2,
-            "links": null,
+            "links": [],
+            "properties": {},
             "shape": 1
           }
         ],
@@ -64,416 +181,25 @@
         "saveUserState": false
       },
       {
-        "id": "8ad09059-f3fc-453f-8633-bd7281bc2802",
-        "type": "ui/image_upload",
-        "pos": [
-          1925.8925619834713,
-          1247.7851239669424
-        ],
-        "size": [
-          210,
-          138
-        ],
-        "flags": {},
-        "order": 1,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "store",
-            "type": -1,
-            "link": null,
-            "shape": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "filename",
-            "type": "string",
-            "links": [
-              "6c59e5a0-008d-4f8f-a2a3-e18ce2536194"
-            ]
-          },
-          {
-            "name": "width",
-            "type": "number",
-            "links": null
-          },
-          {
-            "name": "height",
-            "type": "number",
-            "links": null
-          },
-          {
-            "name": "image_count",
-            "type": "number",
-            "links": null
-          },
-          {
-            "name": "changed",
-            "type": -2,
-            "links": null,
-            "shape": 1
-          }
-        ],
-        "title": "UI.ImageUpload",
-        "properties": {
-          "defaultValue": null,
-          "tags": [],
-          "fileCount": "single"
-        },
-        "widgets_values": [],
-        "color": "#223",
-        "bgColor": "#335",
-        "comfyValue": [],
-        "shownOutputProperties": {},
-        "saveUserState": false
-      },
-      {
-        "id": "c3c2fedf-e8ea-4d42-a866-5e8118cba44f",
-        "type": "ImageUpscaleWithModel",
-        "pos": [
-          2322,
-          1204
-        ],
-        "size": [
-          176.4,
-          46
-        ],
-        "flags": {},
-        "order": 6,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "upscale_model",
-            "type": "UPSCALE_MODEL",
-            "link": "e76b88da-2474-4416-947a-3df7744b9f0e",
-            "config": {}
-          },
-          {
-            "name": "image",
-            "type": "IMAGE",
-            "link": "978dec85-18c9-42f5-af2a-d560ea9f6a3b",
-            "config": {}
-          }
-        ],
-        "outputs": [
-          {
-            "name": "IMAGE",
-            "type": "IMAGE",
-            "links": [
-              "a2678fb8-093c-4769-92e8-20ae02961047"
-            ],
-            "slot_index": 0
-          }
-        ],
-        "title": "ImageUpscaleWithModel",
-        "properties": {
-          "tags": []
-        },
-        "color": "#432",
-        "bgColor": "#653",
-        "saveUserState": true
-      },
-      {
-        "id": "257170fc-2503-4304-9d8c-fdc50f1fd0da",
-        "type": "ui/button",
-        "pos": [
-          2657,
-          1335
-        ],
-        "size": [
-          210,
-          78
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 2,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "clicked",
-            "type": -2,
-            "links": [
-              "76b86223-43cc-4eee-b678-6481aa77066d"
-            ],
-            "shape": 1,
-            "slot_index": 0
-          },
-          {
-            "name": "isClicked",
-            "type": "boolean",
-            "links": null
-          }
-        ],
-        "title": "UI.Button",
-        "properties": {
-          "tags": [],
-          "defaultValue": false,
-          "param": "bang"
-        },
-        "widgets_values": [
-          "false"
-        ],
-        "color": "#223",
-        "bgColor": "#335",
-        "comfyValue": false,
-        "shownOutputProperties": {},
-        "saveUserState": true
-      },
-      {
-        "id": "f842f292-01b3-45e3-8972-ef5d036dd7d3",
-        "type": "SaveImage",
-        "pos": [
-          2542,
-          1254
-        ],
-        "size": [
-          220,
-          46
-        ],
-        "flags": {},
-        "order": 7,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "images",
-            "type": "IMAGE",
-            "link": "a2678fb8-093c-4769-92e8-20ae02961047",
-            "config": {}
-          },
-          {
-            "name": "filename_prefix",
-            "type": "string",
-            "link": "79173f8b-dace-41e6-9897-3ba6d7e8ef3e",
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/text",
-            "serialize": true
-          }
-        ],
-        "outputs": [
-          {
-            "name": "onExecuted",
-            "type": -2,
-            "links": [
-              "fc2282f2-64c9-44b8-ae2f-0476777d088f"
-            ],
-            "color_off": "rebeccapurple",
-            "color_on": "rebeccapurple",
-            "shape": 1,
-            "slot_index": 0
-          }
-        ],
-        "title": "SaveImage",
-        "properties": {
-          "tags": []
-        },
-        "color": "#432",
-        "bgColor": "#653",
-        "saveUserState": true
-      },
-      {
-        "id": "1dcc0510-9e06-4ca4-b607-26c361abce6c",
-        "type": "LoadImage",
-        "pos": [
-          2160,
-          1264
-        ],
-        "size": [
-          140,
-          46
-        ],
-        "flags": {},
-        "order": 5,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "image",
-            "type": "string",
-            "link": "6c59e5a0-008d-4f8f-a2a3-e18ce2536194",
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/combo",
-            "serialize": true,
-            "slot_index": 0
-          }
-        ],
-        "outputs": [
-          {
-            "name": "IMAGE",
-            "type": "IMAGE",
-            "links": [
-              "978dec85-18c9-42f5-af2a-d560ea9f6a3b"
-            ],
-            "slot_index": 0
-          },
-          {
-            "name": "MASK",
-            "type": "MASK",
-            "links": null
-          }
-        ],
-        "title": "LoadImage",
-        "properties": {
-          "tags": []
-        },
-        "color": "#432",
-        "bgColor": "#653",
-        "saveUserState": true
-      },
-      {
-        "id": "5c25a00f-c779-44b0-a09f-6915e7170536",
-        "type": "ui/text",
-        "pos": [
-          2445,
-          1300
-        ],
-        "size": [
-          210,
-          78
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 3,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "value",
-            "type": "string",
-            "link": null
-          },
-          {
-            "name": "store",
-            "type": -1,
-            "link": null,
-            "shape": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "value",
-            "type": "string",
-            "links": [
-              "79173f8b-dace-41e6-9897-3ba6d7e8ef3e"
-            ],
-            "slot_index": 0
-          },
-          {
-            "name": "changed",
-            "type": -2,
-            "links": null,
-            "shape": 1
-          }
-        ],
-        "title": "UI.Text",
-        "properties": {
-          "tags": [],
-          "defaultValue": "ComfyUI",
-          "multiline": false
-        },
-        "widgets_values": [
-          "ComfyUI"
-        ],
-        "color": "#223",
-        "bgColor": "#335",
-        "comfyValue": "ComfyUI",
-        "shownOutputProperties": {},
-        "saveUserState": true
-      },
-      {
-        "id": "31918f22-9e41-446d-a024-a24c90bc5a45",
-        "type": "ui/gallery",
-        "pos": [
-          2819,
-          1259
-        ],
-        "size": [
-          210,
-          166
-        ],
-        "flags": {},
-        "order": 8,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "images",
-            "type": "OUTPUT",
-            "link": null,
-            "slot_index": 0
-          },
-          {
-            "name": "store",
-            "type": -1,
-            "link": "fc2282f2-64c9-44b8-ae2f-0476777d088f",
-            "color_off": "rebeccapurple",
-            "color_on": "rebeccapurple",
-            "shape": 1
-          },
-          {
-            "name": "clear",
-            "type": -1,
-            "link": "76b86223-43cc-4eee-b678-6481aa77066d",
-            "shape": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "selected_index",
-            "type": "number",
-            "links": null
-          },
-          {
-            "name": "width",
-            "type": "number",
-            "links": null
-          },
-          {
-            "name": "height",
-            "type": "number",
-            "links": null
-          },
-          {
-            "name": "filename",
-            "type": "string",
-            "links": null
-          }
-        ],
-        "title": "UI.Gallery",
-        "properties": {
-          "tags": [],
-          "defaultValue": null,
-          "index": 0,
-          "updateMode": "replace"
-        },
-        "widgets_values": [],
-        "color": "#223",
-        "bgColor": "#335",
-        "comfyValue": [],
-        "shownOutputProperties": {},
-        "saveUserState": false
-      },
-      {
-        "id": "76728844-31dc-4a76-bd2f-f32f1d7bbb64",
+        "id": "832c965f-03bf-4c21-a05d-2c4f0acf1078",
         "type": "UpscaleModelLoader",
         "pos": [
-          2088,
-          1179
+          955,
+          138
         ],
         "size": [
           203.2,
           26
         ],
         "flags": {},
-        "order": 4,
+        "order": 3,
         "mode": 0,
         "inputs": [
           {
             "name": "model_name",
             "type": "string",
-            "link": "ca92647a-2a42-45c1-9e75-96aadd954d2f",
+            "link": "ee03fe14-9fb7-4bd2-abb4-f8920841b93f",
+            "properties": {},
             "config": {},
             "defaultWidgetNode": null,
             "widgetNodeType": "ui/combo",
@@ -485,84 +211,417 @@
             "name": "UPSCALE_MODEL",
             "type": "UPSCALE_MODEL",
             "links": [
-              "e76b88da-2474-4416-947a-3df7744b9f0e"
+              "609844e8-11fb-4766-8335-ba108bb4246c"
             ],
-            "slot_index": 0
+            "properties": {},
+            "shape": 3
           }
         ],
-        "title": "UpscaleModelLoader",
+        "title": "Load Upscale Model",
         "properties": {
           "tags": []
         },
         "color": "#432",
         "bgColor": "#653",
         "saveUserState": true
+      },
+      {
+        "id": "6f79aef0-534a-46e6-99fe-ecd391ea271e",
+        "type": "ImageUpscaleWithModel",
+        "pos": [
+          1189,
+          181
+        ],
+        "size": [
+          226.79999999999998,
+          46
+        ],
+        "flags": {},
+        "order": 7,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "upscale_model",
+            "type": "UPSCALE_MODEL",
+            "link": "609844e8-11fb-4766-8335-ba108bb4246c",
+            "properties": {},
+            "slot_index": 0,
+            "config": {}
+          },
+          {
+            "name": "image",
+            "type": "IMAGE",
+            "link": "4e26eb6e-0230-4980-bc9d-bfd0c1142079",
+            "properties": {},
+            "slot_index": 1,
+            "config": {}
+          }
+        ],
+        "outputs": [
+          {
+            "name": "IMAGE",
+            "type": "IMAGE",
+            "links": [
+              "7c5f8d16-23a4-4998-912e-75cdadf616a9"
+            ],
+            "properties": {},
+            "shape": 3,
+            "slot_index": 0
+          }
+        ],
+        "title": "Upscale Image (using Model)",
+        "properties": {
+          "tags": []
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": "59feacdf-de02-4b1e-b8ba-e219ba5126b7",
+        "type": "ui/text",
+        "pos": [
+          1408,
+          235
+        ],
+        "size": [
+          210,
+          78
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 1,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "string",
+            "link": null,
+            "properties": {}
+          },
+          {
+            "name": "store",
+            "type": -1,
+            "link": null,
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "value",
+            "type": "string",
+            "links": [
+              "07a53e72-7ca6-4dc6-b9dd-d9d20c0a546c"
+            ],
+            "properties": {}
+          },
+          {
+            "name": "changed",
+            "type": -2,
+            "links": [],
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "title": "UI.Text",
+        "properties": {
+          "tags": [],
+          "defaultValue": "ComfyUI",
+          "multiline": false,
+          "lines": 5,
+          "maxLines": 5
+        },
+        "widgets_values": [
+          "ComfyUI"
+        ],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": "ComfyUI",
+        "shownOutputProperties": {},
+        "saveUserState": true
+      },
+      {
+        "id": "15bf90cc-971a-498c-b555-e037354119cd",
+        "type": "ui/gallery",
+        "pos": [
+          1858,
+          206
+        ],
+        "size": [
+          210,
+          126
+        ],
+        "flags": {},
+        "order": 9,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "images",
+            "type": "OUTPUT",
+            "link": null,
+            "properties": {}
+          },
+          {
+            "name": "store",
+            "type": -1,
+            "link": "3fa443e7-f9f4-4415-b82e-d804bf7079b0",
+            "properties": {},
+            "color_off": "rebeccapurple",
+            "color_on": "rebeccapurple",
+            "shape": 1,
+            "slot_index": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "images",
+            "type": "COMFYBOX_IMAGES",
+            "links": [],
+            "properties": {}
+          },
+          {
+            "name": "selected_index",
+            "type": "number",
+            "links": [],
+            "properties": {}
+          }
+        ],
+        "title": "UI.Gallery",
+        "properties": {
+          "tags": [],
+          "defaultValue": null,
+          "index": 0,
+          "updateMode": "replace",
+          "autoSelectOnUpdate": true
+        },
+        "widgets_values": [],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": [],
+        "shownOutputProperties": {},
+        "saveUserState": false
+      },
+      {
+        "id": "9a5eefed-5e6b-450c-898c-8a170572e67e",
+        "type": "SaveImage",
+        "pos": [
+          1538,
+          191
+        ],
+        "size": [
+          186.4,
+          46
+        ],
+        "flags": {},
+        "order": 8,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "images",
+            "type": "IMAGE",
+            "link": "7c5f8d16-23a4-4998-912e-75cdadf616a9",
+            "properties": {},
+            "config": {}
+          },
+          {
+            "name": "filename_prefix",
+            "type": "string",
+            "link": "07a53e72-7ca6-4dc6-b9dd-d9d20c0a546c",
+            "properties": {},
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/text",
+            "serialize": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "OUTPUT",
+            "type": -2,
+            "links": [
+              "3fa443e7-f9f4-4415-b82e-d804bf7079b0"
+            ],
+            "properties": {},
+            "color_off": "rebeccapurple",
+            "color_on": "rebeccapurple",
+            "shape": 1,
+            "slot_index": 0
+          }
+        ],
+        "title": "Save Image",
+        "properties": {
+          "tags": []
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": "abf0b8e9-e0e4-4c57-b6b2-c4aa26536c71",
+        "type": "ui/image_upload",
+        "pos": [
+          469,
+          205
+        ],
+        "size": [
+          210,
+          78
+        ],
+        "flags": {},
+        "order": 4,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "store",
+            "type": -1,
+            "link": "8f85fe39-4121-4fb8-b9d8-2b989fc544e8",
+            "properties": {},
+            "shape": 1,
+            "slot_index": 0
+          }
+        ],
+        "outputs": [
+          {
+            "name": "images",
+            "type": "COMFYBOX_IMAGES",
+            "links": [
+              "55273c8c-f32f-4718-b87a-ce7178af48f2"
+            ],
+            "properties": {},
+            "slot_index": 0
+          },
+          {
+            "name": "changed",
+            "type": -2,
+            "links": [],
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "title": "UI.ImageUpload",
+        "properties": {
+          "defaultValue": null,
+          "tags": []
+        },
+        "widgets_values": [],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": [],
+        "shownOutputProperties": {},
+        "saveUserState": false
+      },
+      {
+        "id": "edba3201-d2b5-4624-bdfa-6e3ccce1b21c",
+        "type": "events/receive_output",
+        "pos": [
+          130,
+          203
+        ],
+        "size": [
+          247,
+          106
+        ],
+        "flags": {},
+        "order": 2,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "received",
+            "type": -2,
+            "links": [
+              "8f85fe39-4121-4fb8-b9d8-2b989fc544e8"
+            ],
+            "properties": {},
+            "shape": 1,
+            "color_on": "fuchsia",
+            "color_off": "fuchsia"
+          }
+        ],
+        "title": "Comfy.ReceiveOutput",
+        "properties": {
+          "tags": [],
+          "name": "Image",
+          "description": "Image to upscale.",
+          "type": "COMFYBOX_IMAGE"
+        },
+        "saveUserState": true
       }
     ],
     "links": [
       [
-        "ca92647a-2a42-45c1-9e75-96aadd954d2f",
-        "47706464-4d82-4329-91a9-c9b2bec4cf60",
+        "55273c8c-f32f-4718-b87a-ce7178af48f2",
+        "abf0b8e9-e0e4-4c57-b6b2-c4aa26536c71",
         0,
-        "76728844-31dc-4a76-bd2f-f32f1d7bbb64",
+        "36cac98f-995d-4723-9d6f-70e3273fab95",
+        0,
+        "COMFYBOX_IMAGES,COMFYBOX_IMAGE"
+      ],
+      [
+        "d3e6117a-9ac6-4ea9-aef7-9deab54d83bf",
+        "36cac98f-995d-4723-9d6f-70e3273fab95",
+        1,
+        "1e69d880-041e-48dd-8030-f0eb83add915",
         0,
         "string"
       ],
       [
-        "e76b88da-2474-4416-947a-3df7744b9f0e",
-        "76728844-31dc-4a76-bd2f-f32f1d7bbb64",
+        "4e26eb6e-0230-4980-bc9d-bfd0c1142079",
+        "1e69d880-041e-48dd-8030-f0eb83add915",
         0,
-        "c3c2fedf-e8ea-4d42-a866-5e8118cba44f",
+        "6f79aef0-534a-46e6-99fe-ecd391ea271e",
+        1,
+        "IMAGE"
+      ],
+      [
+        "ee03fe14-9fb7-4bd2-abb4-f8920841b93f",
+        "578edfae-2767-4b23-9a3b-6edd8ccad1dd",
+        0,
+        "832c965f-03bf-4c21-a05d-2c4f0acf1078",
+        0,
+        "string"
+      ],
+      [
+        "609844e8-11fb-4766-8335-ba108bb4246c",
+        "832c965f-03bf-4c21-a05d-2c4f0acf1078",
+        0,
+        "6f79aef0-534a-46e6-99fe-ecd391ea271e",
         0,
         "UPSCALE_MODEL"
       ],
       [
-        "6c59e5a0-008d-4f8f-a2a3-e18ce2536194",
-        "8ad09059-f3fc-453f-8633-bd7281bc2802",
+        "07a53e72-7ca6-4dc6-b9dd-d9d20c0a546c",
+        "59feacdf-de02-4b1e-b8ba-e219ba5126b7",
         0,
-        "1dcc0510-9e06-4ca4-b607-26c361abce6c",
-        0,
+        "9a5eefed-5e6b-450c-898c-8a170572e67e",
+        1,
         "string"
       ],
       [
-        "978dec85-18c9-42f5-af2a-d560ea9f6a3b",
-        "1dcc0510-9e06-4ca4-b607-26c361abce6c",
+        "7c5f8d16-23a4-4998-912e-75cdadf616a9",
+        "6f79aef0-534a-46e6-99fe-ecd391ea271e",
         0,
-        "c3c2fedf-e8ea-4d42-a866-5e8118cba44f",
-        1,
-        "IMAGE"
-      ],
-      [
-        "a2678fb8-093c-4769-92e8-20ae02961047",
-        "c3c2fedf-e8ea-4d42-a866-5e8118cba44f",
-        0,
-        "f842f292-01b3-45e3-8972-ef5d036dd7d3",
+        "9a5eefed-5e6b-450c-898c-8a170572e67e",
         0,
         "IMAGE"
       ],
       [
-        "fc2282f2-64c9-44b8-ae2f-0476777d088f",
-        "f842f292-01b3-45e3-8972-ef5d036dd7d3",
+        "3fa443e7-f9f4-4415-b82e-d804bf7079b0",
+        "9a5eefed-5e6b-450c-898c-8a170572e67e",
         0,
-        "31918f22-9e41-446d-a024-a24c90bc5a45",
+        "15bf90cc-971a-498c-b555-e037354119cd",
         1,
         -1
       ],
       [
-        "76b86223-43cc-4eee-b678-6481aa77066d",
-        "257170fc-2503-4304-9d8c-fdc50f1fd0da",
+        "8f85fe39-4121-4fb8-b9d8-2b989fc544e8",
+        "edba3201-d2b5-4624-bdfa-6e3ccce1b21c",
         0,
-        "31918f22-9e41-446d-a024-a24c90bc5a45",
-        2,
+        "abf0b8e9-e0e4-4c57-b6b2-c4aa26536c71",
+        0,
         -1
-      ],
-      [
-        "79173f8b-dace-41e6-9897-3ba6d7e8ef3e",
-        "5c25a00f-c779-44b0-a09f-6915e7170536",
-        0,
-        "f842f292-01b3-45e3-8972-ef5d036dd7d3",
-        1,
-        "string"
       ]
     ],
     "groups": [],
@@ -570,13 +629,18 @@
     "extra": {},
     "version": 10
   },
+  "attrs": {
+    "title": "Upscale by Model",
+    "queuePromptButtonName": "Queue Prompt",
+    "queuePromptButtonRunWorkflow": true
+  },
   "layout": {
-    "root": "4d6c8745-5133-4d31-a33c-bc93f507ac45",
+    "root": "46a08906-61a9-4a23-881b-9615cf165e33",
     "allItems": {
-      "0": {
+      "46a08906-61a9-4a23-881b-9615cf165e33": {
         "dragItem": {
           "type": "container",
-          "id": "4d6c8745-5133-4d31-a33c-bc93f507ac45",
+          "id": "46a08906-61a9-4a23-881b-9615cf165e33",
           "attrs": {
             "title": "",
             "hidden": false,
@@ -584,9 +648,9 @@
             "direction": "horizontal",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
-            "containerVariant": "block",
+            "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
@@ -594,14 +658,14 @@
           }
         },
         "children": [
-          "c3414cbc-42d4-4c63-bdda-f960bac31fdd",
-          "bcacc84b-4d08-4ebb-977f-7b0be56543c1"
+          "c7b8c9d6-5dac-4cab-876f-d251fca35d17",
+          "6582cde5-d5f4-4a5f-b429-49ad8d495081"
         ]
       },
-      "1": {
+      "c7b8c9d6-5dac-4cab-876f-d251fca35d17": {
         "dragItem": {
           "type": "container",
-          "id": "c3414cbc-42d4-4c63-bdda-f960bac31fdd",
+          "id": "c7b8c9d6-5dac-4cab-876f-d251fca35d17",
           "attrs": {
             "title": "",
             "hidden": false,
@@ -609,9 +673,9 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
-            "containerVariant": "block",
+            "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
@@ -619,15 +683,15 @@
           }
         },
         "children": [
-          "74447132-c425-4db0-be80-57fdec6d4fc9",
-          "052ece2d-e32a-486c-9856-d07fd26e7ab2"
+          "f4070548-a2d1-4330-a9e0-86a9a00bfc89",
+          "025dbbeb-b959-4b59-8b55-01bf4b6a1cdc"
         ],
-        "parent": "4d6c8745-5133-4d31-a33c-bc93f507ac45"
+        "parent": "46a08906-61a9-4a23-881b-9615cf165e33"
       },
-      "2": {
+      "6582cde5-d5f4-4a5f-b429-49ad8d495081": {
         "dragItem": {
           "type": "container",
-          "id": "bcacc84b-4d08-4ebb-977f-7b0be56543c1",
+          "id": "6582cde5-d5f4-4a5f-b429-49ad8d495081",
           "attrs": {
             "title": "",
             "hidden": false,
@@ -635,9 +699,9 @@
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
-            "containerVariant": "block",
+            "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
@@ -645,26 +709,26 @@
           }
         },
         "children": [
-          "6e754e38-5790-4e46-a4b7-dbe5fb9ee30d",
-          "6c0af451-b908-4850-a5cf-a458fc3147ed"
+          "8293884a-9e35-4c06-9d34-414d812c0f6d",
+          "531673e4-c61d-4c48-8da4-03bbd02e36a3"
         ],
-        "parent": "4d6c8745-5133-4d31-a33c-bc93f507ac45"
+        "parent": "46a08906-61a9-4a23-881b-9615cf165e33"
       },
-      "3": {
+      "f4070548-a2d1-4330-a9e0-86a9a00bfc89": {
         "dragItem": {
           "type": "widget",
-          "id": "ee2182f5-88e5-4f68-a6d4-1f39cd7c47e6",
-          "nodeId": "47706464-4d82-4329-91a9-c9b2bec4cf60",
+          "id": "f4070548-a2d1-4330-a9e0-86a9a00bfc89",
+          "nodeId": "abf0b8e9-e0e4-4c57-b6b2-c4aa26536c71",
           "attrs": {
-            "title": "Model Name",
+            "title": "Input",
             "hidden": false,
             "disabled": false,
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
-            "containerVariant": "block",
+            "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
@@ -672,20 +736,44 @@
           }
         },
         "children": [],
-        "parent": "052ece2d-e32a-486c-9856-d07fd26e7ab2"
+        "parent": "c7b8c9d6-5dac-4cab-876f-d251fca35d17"
       },
-      "4": {
+      "2f0371e8-559e-4a58-a5d1-0a50117675fc": {
+        "dragItem": {
+          "type": "widget",
+          "id": "2f0371e8-559e-4a58-a5d1-0a50117675fc",
+          "nodeId": "578edfae-2767-4b23-9a3b-6edd8ccad1dd",
+          "attrs": {
+            "title": "model_name",
+            "hidden": false,
+            "disabled": false,
+            "direction": "vertical",
+            "classes": "",
+            "style": "",
+            "nodeDisabledState": "hidden",
+            "variant": "gallery",
+            "containerVariant": "hidden",
+            "openOnStartup": false,
+            "buttonVariant": "primary",
+            "buttonSize": "large",
+            "tags": []
+          }
+        },
+        "children": [],
+        "parent": "025dbbeb-b959-4b59-8b55-01bf4b6a1cdc"
+      },
+      "025dbbeb-b959-4b59-8b55-01bf4b6a1cdc": {
         "dragItem": {
           "type": "container",
-          "id": "052ece2d-e32a-486c-9856-d07fd26e7ab2",
+          "id": "025dbbeb-b959-4b59-8b55-01bf4b6a1cdc",
           "attrs": {
-            "title": "UpscaleModelLoader",
+            "title": "Load Upscale Model",
             "hidden": false,
             "disabled": false,
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -695,25 +783,25 @@
           }
         },
         "children": [
-          "ee2182f5-88e5-4f68-a6d4-1f39cd7c47e6"
+          "2f0371e8-559e-4a58-a5d1-0a50117675fc"
         ],
-        "parent": "c3414cbc-42d4-4c63-bdda-f960bac31fdd"
+        "parent": "c7b8c9d6-5dac-4cab-876f-d251fca35d17"
       },
-      "5": {
+      "db12215f-fd9c-463f-9fbd-26b79e994e0e": {
         "dragItem": {
           "type": "widget",
-          "id": "74447132-c425-4db0-be80-57fdec6d4fc9",
-          "nodeId": "8ad09059-f3fc-453f-8633-bd7281bc2802",
+          "id": "db12215f-fd9c-463f-9fbd-26b79e994e0e",
+          "nodeId": "59feacdf-de02-4b1e-b8ba-e219ba5126b7",
           "attrs": {
-            "title": "Image",
+            "title": "filename_prefix",
             "hidden": false,
             "disabled": false,
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
-            "containerVariant": "block",
+            "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
@@ -721,143 +809,20 @@
           }
         },
         "children": [],
-        "parent": "c3414cbc-42d4-4c63-bdda-f960bac31fdd"
+        "parent": "531673e4-c61d-4c48-8da4-03bbd02e36a3"
       },
-      "6": {
-        "dragItem": {
-          "type": "widget",
-          "id": "6e754e38-5790-4e46-a4b7-dbe5fb9ee30d",
-          "nodeId": "31918f22-9e41-446d-a024-a24c90bc5a45",
-          "attrs": {
-            "title": "Result",
-            "hidden": false,
-            "disabled": false,
-            "direction": "vertical",
-            "classes": "",
-            "style": "",
-            "nodeDisabledState": "disabled",
-            "variant": "gallery",
-            "containerVariant": "block",
-            "openOnStartup": false,
-            "buttonVariant": "primary",
-            "buttonSize": "large",
-            "tags": []
-          }
-        },
-        "children": [],
-        "parent": "bcacc84b-4d08-4ebb-977f-7b0be56543c1"
-      },
-      "9": {
-        "dragItem": {
-          "type": "widget",
-          "id": "d4c3177b-5d39-4293-9d6e-6abf941a94d4",
-          "nodeId": "5c25a00f-c779-44b0-a09f-6915e7170536",
-          "attrs": {
-            "title": "Filename Prefix",
-            "hidden": false,
-            "disabled": false,
-            "direction": "vertical",
-            "classes": "",
-            "style": "",
-            "nodeDisabledState": "disabled",
-            "variant": "gallery",
-            "containerVariant": "block",
-            "openOnStartup": false,
-            "buttonVariant": "primary",
-            "buttonSize": "large",
-            "tags": []
-          }
-        },
-        "children": [],
-        "parent": "6c0af451-b908-4850-a5cf-a458fc3147ed"
-      },
-      "11": {
-        "dragItem": {
-          "type": "widget",
-          "id": "e9e0d601-1cce-4de3-9885-1834df406efd",
-          "nodeId": "257170fc-2503-4304-9d8c-fdc50f1fd0da",
-          "attrs": {
-            "title": "Clear Outputs",
-            "hidden": false,
-            "disabled": false,
-            "direction": "vertical",
-            "classes": "",
-            "style": "",
-            "nodeDisabledState": "disabled",
-            "variant": "gallery",
-            "containerVariant": "block",
-            "openOnStartup": false,
-            "buttonVariant": "secondary",
-            "buttonSize": "large",
-            "tags": []
-          }
-        },
-        "children": [],
-        "parent": "6c0af451-b908-4850-a5cf-a458fc3147ed"
-      },
-      "12": {
+      "531673e4-c61d-4c48-8da4-03bbd02e36a3": {
         "dragItem": {
           "type": "container",
-          "id": "6c0af451-b908-4850-a5cf-a458fc3147ed",
+          "id": "531673e4-c61d-4c48-8da4-03bbd02e36a3",
           "attrs": {
-            "title": "",
-            "hidden": false,
-            "disabled": false,
-            "direction": "horizontal",
-            "classes": "",
-            "style": "",
-            "nodeDisabledState": "disabled",
-            "variant": "gallery",
-            "containerVariant": "block",
-            "openOnStartup": false,
-            "buttonVariant": "primary",
-            "buttonSize": "large",
-            "tags": []
-          }
-        },
-        "children": [
-          "d4c3177b-5d39-4293-9d6e-6abf941a94d4",
-          "e9e0d601-1cce-4de3-9885-1834df406efd"
-        ],
-        "parent": "bcacc84b-4d08-4ebb-977f-7b0be56543c1"
-      },
-      "4d6c8745-5133-4d31-a33c-bc93f507ac45": {
-        "dragItem": {
-          "type": "container",
-          "id": "4d6c8745-5133-4d31-a33c-bc93f507ac45",
-          "attrs": {
-            "title": "",
-            "hidden": false,
-            "disabled": false,
-            "direction": "horizontal",
-            "classes": "",
-            "style": "",
-            "nodeDisabledState": "disabled",
-            "variant": "gallery",
-            "containerVariant": "block",
-            "openOnStartup": false,
-            "buttonVariant": "primary",
-            "buttonSize": "large",
-            "tags": []
-          }
-        },
-        "children": [
-          "c3414cbc-42d4-4c63-bdda-f960bac31fdd",
-          "bcacc84b-4d08-4ebb-977f-7b0be56543c1"
-        ]
-      },
-      "c3414cbc-42d4-4c63-bdda-f960bac31fdd": {
-        "dragItem": {
-          "type": "container",
-          "id": "c3414cbc-42d4-4c63-bdda-f960bac31fdd",
-          "attrs": {
-            "title": "",
+            "title": "Save Image",
             "hidden": false,
             "disabled": false,
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "block",
             "openOnStartup": false,
@@ -867,52 +832,25 @@
           }
         },
         "children": [
-          "74447132-c425-4db0-be80-57fdec6d4fc9",
-          "052ece2d-e32a-486c-9856-d07fd26e7ab2"
+          "db12215f-fd9c-463f-9fbd-26b79e994e0e"
         ],
-        "parent": "4d6c8745-5133-4d31-a33c-bc93f507ac45"
+        "parent": "6582cde5-d5f4-4a5f-b429-49ad8d495081"
       },
-      "bcacc84b-4d08-4ebb-977f-7b0be56543c1": {
-        "dragItem": {
-          "type": "container",
-          "id": "bcacc84b-4d08-4ebb-977f-7b0be56543c1",
-          "attrs": {
-            "title": "",
-            "hidden": false,
-            "disabled": false,
-            "direction": "vertical",
-            "classes": "",
-            "style": "",
-            "nodeDisabledState": "disabled",
-            "variant": "gallery",
-            "containerVariant": "block",
-            "openOnStartup": false,
-            "buttonVariant": "primary",
-            "buttonSize": "large",
-            "tags": []
-          }
-        },
-        "children": [
-          "6e754e38-5790-4e46-a4b7-dbe5fb9ee30d",
-          "6c0af451-b908-4850-a5cf-a458fc3147ed"
-        ],
-        "parent": "4d6c8745-5133-4d31-a33c-bc93f507ac45"
-      },
-      "ee2182f5-88e5-4f68-a6d4-1f39cd7c47e6": {
+      "8293884a-9e35-4c06-9d34-414d812c0f6d": {
         "dragItem": {
           "type": "widget",
-          "id": "ee2182f5-88e5-4f68-a6d4-1f39cd7c47e6",
-          "nodeId": "47706464-4d82-4329-91a9-c9b2bec4cf60",
+          "id": "8293884a-9e35-4c06-9d34-414d812c0f6d",
+          "nodeId": "15bf90cc-971a-498c-b555-e037354119cd",
           "attrs": {
-            "title": "Model Name",
+            "title": "Output",
             "hidden": false,
             "disabled": false,
             "direction": "vertical",
             "classes": "",
             "style": "",
-            "nodeDisabledState": "disabled",
+            "nodeDisabledState": "hidden",
             "variant": "gallery",
-            "containerVariant": "block",
+            "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
@@ -920,166 +858,14 @@
           }
         },
         "children": [],
-        "parent": "052ece2d-e32a-486c-9856-d07fd26e7ab2"
-      },
-      "052ece2d-e32a-486c-9856-d07fd26e7ab2": {
-        "dragItem": {
-          "type": "container",
-          "id": "052ece2d-e32a-486c-9856-d07fd26e7ab2",
-          "attrs": {
-            "title": "UpscaleModelLoader",
-            "hidden": false,
-            "disabled": false,
-            "direction": "vertical",
-            "classes": "",
-            "style": "",
-            "nodeDisabledState": "disabled",
-            "variant": "gallery",
-            "containerVariant": "block",
-            "openOnStartup": false,
-            "buttonVariant": "primary",
-            "buttonSize": "large",
-            "tags": []
-          }
-        },
-        "children": [
-          "ee2182f5-88e5-4f68-a6d4-1f39cd7c47e6"
-        ],
-        "parent": "c3414cbc-42d4-4c63-bdda-f960bac31fdd"
-      },
-      "74447132-c425-4db0-be80-57fdec6d4fc9": {
-        "dragItem": {
-          "type": "widget",
-          "id": "74447132-c425-4db0-be80-57fdec6d4fc9",
-          "nodeId": "8ad09059-f3fc-453f-8633-bd7281bc2802",
-          "attrs": {
-            "title": "Image",
-            "hidden": false,
-            "disabled": false,
-            "direction": "vertical",
-            "classes": "",
-            "style": "",
-            "nodeDisabledState": "disabled",
-            "variant": "gallery",
-            "containerVariant": "block",
-            "openOnStartup": false,
-            "buttonVariant": "primary",
-            "buttonSize": "large",
-            "tags": []
-          }
-        },
-        "children": [],
-        "parent": "c3414cbc-42d4-4c63-bdda-f960bac31fdd"
-      },
-      "6e754e38-5790-4e46-a4b7-dbe5fb9ee30d": {
-        "dragItem": {
-          "type": "widget",
-          "id": "6e754e38-5790-4e46-a4b7-dbe5fb9ee30d",
-          "nodeId": "31918f22-9e41-446d-a024-a24c90bc5a45",
-          "attrs": {
-            "title": "Result",
-            "hidden": false,
-            "disabled": false,
-            "direction": "vertical",
-            "classes": "",
-            "style": "",
-            "nodeDisabledState": "disabled",
-            "variant": "gallery",
-            "containerVariant": "block",
-            "openOnStartup": false,
-            "buttonVariant": "primary",
-            "buttonSize": "large",
-            "tags": []
-          }
-        },
-        "children": [],
-        "parent": "bcacc84b-4d08-4ebb-977f-7b0be56543c1"
-      },
-      "d4c3177b-5d39-4293-9d6e-6abf941a94d4": {
-        "dragItem": {
-          "type": "widget",
-          "id": "d4c3177b-5d39-4293-9d6e-6abf941a94d4",
-          "nodeId": "5c25a00f-c779-44b0-a09f-6915e7170536",
-          "attrs": {
-            "title": "Filename Prefix",
-            "hidden": false,
-            "disabled": false,
-            "direction": "vertical",
-            "classes": "",
-            "style": "",
-            "nodeDisabledState": "disabled",
-            "variant": "gallery",
-            "containerVariant": "block",
-            "openOnStartup": false,
-            "buttonVariant": "primary",
-            "buttonSize": "large",
-            "tags": []
-          }
-        },
-        "children": [],
-        "parent": "6c0af451-b908-4850-a5cf-a458fc3147ed"
-      },
-      "e9e0d601-1cce-4de3-9885-1834df406efd": {
-        "dragItem": {
-          "type": "widget",
-          "id": "e9e0d601-1cce-4de3-9885-1834df406efd",
-          "nodeId": "257170fc-2503-4304-9d8c-fdc50f1fd0da",
-          "attrs": {
-            "title": "Clear Outputs",
-            "hidden": false,
-            "disabled": false,
-            "direction": "vertical",
-            "classes": "",
-            "style": "",
-            "nodeDisabledState": "disabled",
-            "variant": "gallery",
-            "containerVariant": "block",
-            "openOnStartup": false,
-            "buttonVariant": "secondary",
-            "buttonSize": "large",
-            "tags": []
-          }
-        },
-        "children": [],
-        "parent": "6c0af451-b908-4850-a5cf-a458fc3147ed"
-      },
-      "6c0af451-b908-4850-a5cf-a458fc3147ed": {
-        "dragItem": {
-          "type": "container",
-          "id": "6c0af451-b908-4850-a5cf-a458fc3147ed",
-          "attrs": {
-            "title": "",
-            "hidden": false,
-            "disabled": false,
-            "direction": "horizontal",
-            "classes": "",
-            "style": "",
-            "nodeDisabledState": "disabled",
-            "variant": "gallery",
-            "containerVariant": "block",
-            "openOnStartup": false,
-            "buttonVariant": "primary",
-            "buttonSize": "large",
-            "tags": []
-          }
-        },
-        "children": [
-          "d4c3177b-5d39-4293-9d6e-6abf941a94d4",
-          "e9e0d601-1cce-4de3-9885-1834df406efd"
-        ],
-        "parent": "bcacc84b-4d08-4ebb-977f-7b0be56543c1"
+        "parent": "6582cde5-d5f4-4a5f-b429-49ad8d495081"
       }
-    },
-    "currentId": 15,
-    "attrs": {
-      "queuePromptButtonName": "Queue Prompt",
-      "queuePromptButtonRunWorkflow": true
     }
   },
   "canvas": {
     "offset": [
-      -1717.3714583644114,
-      -1017.6529225774816
+      0,
+      0
     ],
     "scale": 1
   }

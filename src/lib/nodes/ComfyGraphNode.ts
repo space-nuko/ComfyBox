@@ -150,9 +150,7 @@ export default class ComfyGraphNode extends LGraphNode {
             const link = currentNode.getUpstreamLink();
             if (link !== null) {
                 const node = this.graph.getNodeById(link.origin_id) as ComfyGraphNode;
-                console.warn(node.type)
                 if (node.canInheritSlotTypes) {
-                    console.log("REROUTE2", node)
                     if (node === this) {
                         // We've found a circle
                         currentNode.disconnectInput(link.target_slot);
@@ -193,7 +191,6 @@ export default class ComfyGraphNode extends LGraphNode {
                             const node = this.graph.getNodeById(link.target_id) as ComfyGraphNode;
 
                             if (node.canInheritSlotTypes) {
-                                console.log("REROUTE", node)
                                 // Follow reroute nodes
                                 nodes.push(node);
                                 updateNodes.push(node);

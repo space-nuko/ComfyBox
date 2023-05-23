@@ -566,6 +566,14 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 values: ["replace", "append"],
                 defaultValue: "replace"
             },
+            {
+                name: "autoSelectOnUpdate",
+                type: "boolean",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/gallery"],
+                defaultValue: true
+            },
 
             // Radio
             {

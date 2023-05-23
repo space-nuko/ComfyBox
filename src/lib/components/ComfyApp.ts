@@ -1,62 +1,51 @@
-import { LiteGraph, LGraph, LGraphCanvas, LGraphNode, type LGraphNodeConstructor, type LGraphNodeExecutable, type SerializedLGraph, type SerializedLGraphGroup, type SerializedLGraphNode, type SerializedLLink, NodeMode, type Vector2, BuiltInSlotType, type INodeInputSlot, type NodeID, type NodeTypeSpec, type NodeTypeOpts, type SlotIndex, type UUID } from "@litegraph-ts/core";
-import type { LConnectionKind, INodeSlot } from "@litegraph-ts/core";
-import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyPromptRequest, type ComfyNodeID, type PromptID, type QueueItemType } from "$lib/api"
-import { importA1111, parsePNGMetadata } from "$lib/pnginfo";
-import EventEmitter from "events";
-import type TypedEmitter from "typed-emitter";
+import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyNodeID, type ComfyPromptRequest, type PromptID, type QueueItemType } from "$lib/api";
+import { parsePNGMetadata } from "$lib/pnginfo";
+import { BuiltInSlotType, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type INodeInputSlot, type LGraphNodeConstructor, type NodeID, type NodeTypeOpts, type SerializedLGraph, type SlotIndex } from "@litegraph-ts/core";
 import A1111PromptModal from "./modal/A1111PromptModal.svelte";
+import ConfirmConvertWithMissingNodeTypesModal from "./modal/ConfirmConvertWithMissingNodeTypesModal.svelte";
 import MissingNodeTypesModal from "./modal/MissingNodeTypesModal.svelte";
 import WorkflowLoadErrorModal from "./modal/WorkflowLoadErrorModal.svelte";
-import ConfirmConvertWithMissingNodeTypesModal from "./modal/ConfirmConvertWithMissingNodeTypesModal.svelte";
 
+import * as nodes from "$lib/nodes/index";
 
-// Import nodes
-import "@litegraph-ts/nodes-basic"
-import "@litegraph-ts/nodes-events"
-import "@litegraph-ts/nodes-logic"
-import "@litegraph-ts/nodes-math"
-import "@litegraph-ts/nodes-strings"
-import "$lib/nodes/index"
-import "$lib/nodes/widgets/index"
-import * as nodes from "$lib/nodes/index"
-import * as widgets from "$lib/nodes/widgets/index"
-
-import ComfyGraphCanvas, { type SerializedGraphCanvasState } from "$lib/ComfyGraphCanvas";
-import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
-import queueState from "$lib/stores/queueState";
-import { type SvelteComponentDev } from "svelte/internal";
-import type IComfyInputSlot from "$lib/IComfyInputSlot";
-import { defaultWorkflowAttributes, type LayoutState, type SerializedLayoutState, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
-import { toast } from '@zerodevx/svelte-toast'
-import ComfyGraph from "$lib/ComfyGraph";
-import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
-import { get, writable, type Writable } from "svelte/store";
-import { tick } from "svelte";
-import uiState from "$lib/stores/uiState";
-import { basename, capitalize, download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range, workflowToGraphVis } from "$lib/utils";
-import notify from "$lib/notify";
-import configState from "$lib/stores/configState";
-import { blankGraph } from "$lib/defaultGraph";
-import type { SerializedPromptOutput } from "$lib/utils";
-import ComfyPromptSerializer, { UpstreamNodeLocator, isActiveBackendNode } from "./ComfyPromptSerializer";
-import { iterateNodeDefInputs, type ComfyNodeDef, isBackendNodeDefInputType, iterateNodeDefOutputs } from "$lib/ComfyNodeDef";
-import { ComfyComboNode } from "$lib/nodes/widgets";
-import parseA1111, { type A1111ParsedInfotext } from "$lib/parseA1111";
-import convertA1111ToStdPrompt from "$lib/convertA1111ToStdPrompt";
 import type { ComfyBoxStdPrompt } from "$lib/ComfyBoxStdPrompt";
 import ComfyBoxStdPromptSerializer from "$lib/ComfyBoxStdPromptSerializer";
-import selectionState from "$lib/stores/selectionState";
-import layoutStates from "$lib/stores/layoutStates";
-import { ComfyWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
-import workflowState from "$lib/stores/workflowState";
-import convertVanillaWorkflow, { type ComfyVanillaWorkflow } from "$lib/convertVanillaWorkflow";
+import ComfyGraphCanvas, { type SerializedGraphCanvasState } from "$lib/ComfyGraphCanvas";
+import { isBackendNodeDefInputType, iterateNodeDefInputs, iterateNodeDefOutputs, type ComfyNodeDef } from "$lib/ComfyNodeDef";
+import convertA1111ToStdPrompt from "$lib/convertA1111ToStdPrompt";
+import convertVanillaWorkflow from "$lib/convertVanillaWorkflow";
+import { blankGraph } from "$lib/defaultGraph";
+import type IComfyInputSlot from "$lib/IComfyInputSlot";
+import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
+import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
+import { ComfyComboNode } from "$lib/nodes/widgets";
+import notify from "$lib/notify";
+import parseA1111, { type A1111ParsedInfotext } from "$lib/parseA1111";
+import configState from "$lib/stores/configState";
+import layoutStates, { defaultWorkflowAttributes, type SerializedLayoutState } from "$lib/stores/layoutStates";
 import modalState from "$lib/stores/modalState";
+import queueState from "$lib/stores/queueState";
+import selectionState from "$lib/stores/selectionState";
+import uiState from "$lib/stores/uiState";
+import workflowState, { ComfyWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
+import type { SerializedPromptOutput } from "$lib/utils";
+import { basename, capitalize, download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range } from "$lib/utils";
+import { tick } from "svelte";
+import { type SvelteComponentDev } from "svelte/internal";
+import { get, writable, type Writable } from "svelte/store";
+import ComfyPromptSerializer, { isActiveBackendNode, UpstreamNodeLocator } from "./ComfyPromptSerializer";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
 if (typeof window !== "undefined") {
     // Load default visibility
     nodes.ComfyReroute.setDefaultTextVisibility(!!localStorage["Comfy.ComfyReroute.DefaultVisibility"]);
+}
+
+export type OpenWorkflowOptions = {
+    setActive?: boolean,
+    refreshCombos?: boolean | Record<string, ComfyNodeDef>,
+    warnMissingNodeTypes?: boolean,
 }
 
 /*
@@ -225,7 +214,12 @@ export default class ComfyApp {
 
         // We failed to restore a workflow so load the default
         if (!restored) {
-            await this.initDefaultWorkflow(defs);
+            const options: OpenWorkflowOptions = {
+                refreshCombos: defs,
+                setActive: false
+            }
+            await this.initDefaultWorkflow("defaultWorkflow", options);
+            await this.initDefaultWorkflow("upscale", options);
         }
 
         // Save current workflow automatically
@@ -312,7 +306,7 @@ export default class ComfyApp {
 
         const workflows = state.workflows as SerializedAppState[];
         await Promise.all(workflows.map(w => {
-            return this.openWorkflow(w, defs, false).catch(error => {
+            return this.openWorkflow(w, { refreshCombos: defs, warnMissingNodeTypes: false, setActive: false }).catch(error => {
                 console.error("Failed restoring previous workflow", error)
                 notify(`Failed restoring previous workflow: ${error}`, { type: "error" })
             })
@@ -473,8 +467,8 @@ export default class ComfyApp {
 
         this.api.addEventListener("executing", (promptID: PromptID | null, nodeID: ComfyNodeID | null) => {
             const queueEntry = queueState.executingUpdated(promptID, nodeID);
-            if (queueEntry != null) {
-                const workflow = workflowState.getWorkflow(queueEntry.workflowID);
+            if (queueEntry != null && queueEntry.extraData?.workflowID != null) {
+                const workflow = workflowState.getWorkflow(queueEntry.extraData.workflowID);
                 workflow?.graph?.setDirtyCanvas(true, false);
             }
         });
@@ -482,7 +476,7 @@ export default class ComfyApp {
         this.api.addEventListener("executed", (promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutput) => {
             const queueEntry = queueState.onExecuted(promptID, nodeID, output)
             if (queueEntry != null) {
-                const workflow = workflowState.getWorkflow(queueEntry.workflowID);
+                const workflow = workflowState.getWorkflow(queueEntry.extraData.workflowID);
                 if (workflow != null) {
                     workflow.graph.setDirtyCanvas(true, false);
                     const node = workflow.graph.getNodeByIdRecursive(nodeID) as ComfyGraphNode;
@@ -555,8 +549,13 @@ export default class ComfyApp {
             this.ctrlDown = e.ctrlKey;
 
             // Queue prompt using ctrl or command + enter
-            if ((e.ctrlKey || e.metaKey) && (e.key === "Enter" || e.keyCode === 13 || e.keyCode === 10)) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === "Enter" || e.code === "Enter" || e.keyCode === 10)) {
+                e.preventDefault();
                 this.runDefaultQueueAction();
+            }
+            else if ((e.ctrlKey) && (e.key === "s" || e.code === "KeyS")) {
+                e.preventDefault();
+                this.saveStateToLocalStorage();
             }
         });
         window.addEventListener("keyup", (e) => {
@@ -597,9 +596,11 @@ export default class ComfyApp {
         setColor(BuiltInSlotType.ACTION, "lightseagreen")
     }
 
-    async openWorkflow(data: SerializedAppState,
-        refreshCombos: boolean | Record<string, ComfyNodeDef> = true,
-        warnMissingNodeTypes: boolean = true
+    async openWorkflow(data: SerializedAppState, options: OpenWorkflowOptions = {
+        setActive: true,
+        refreshCombos: true,
+        warnMissingNodeTypes: true
+    }
     ): Promise<ComfyWorkflow> {
         if (data.version !== COMFYBOX_SERIAL_VERSION) {
             const mes = `Invalid ComfyBox saved data format: ${data.version} `
@@ -611,7 +612,7 @@ export default class ComfyApp {
 
         let workflow: ComfyWorkflow;
         try {
-            workflow = workflowState.openWorkflow(this.lCanvas, data);
+            workflow = workflowState.openWorkflow(this.lCanvas, data, options.setActive);
         }
         catch (error) {
             modalState.pushModal({
@@ -623,7 +624,7 @@ export default class ComfyApp {
             return Promise.reject(error)
         }
 
-        if (workflow.missingNodeTypes.size > 0 && warnMissingNodeTypes) {
+        if (workflow.missingNodeTypes.size > 0 && options.warnMissingNodeTypes) {
             modalState.pushModal({
                 svelteComponent: MissingNodeTypesModal,
                 svelteProps: {
@@ -635,10 +636,10 @@ export default class ComfyApp {
         // Restore canvas offset/zoom
         this.lCanvas.deserialize(data.canvas)
 
-        if (refreshCombos) {
+        if (options.refreshCombos) {
             let defs = null;
-            if (typeof refreshCombos === "object")
-                defs = refreshCombos;
+            if (typeof options.refreshCombos === "object")
+                defs = options.refreshCombos;
             await this.refreshComboInNodes(workflow, defs);
         }
 
@@ -716,18 +717,18 @@ export default class ComfyApp {
         selectionState.clear();
     }
 
-    async initDefaultWorkflow(defs?: Record<string, ComfyNodeDef>) {
+    async initDefaultWorkflow(name: string = "defaultWorkflow", options?: OpenWorkflowOptions) {
         let state = null;
         try {
-            const graphResponse = await fetch("/workflows/defaultWorkflow.json");
+            const graphResponse = await fetch(`/workflows/${name}.json`);
             state = await graphResponse.json() as SerializedAppState;
         }
         catch (error) {
-            console.error("Failed to load default graph", error)
-            notify(`Failed to load default graph: ${error} `, { type: "error" })
+            console.error(`Failed to load default graph ${name}`, error)
+            notify(`Failed to load default graph ${name}: ${error} `, { type: "error" })
             state = structuredClone(blankGraph)
         }
-        await this.openWorkflow(state, defs)
+        await this.openWorkflow(state, options)
     }
 
     clear() {
@@ -820,7 +821,7 @@ export default class ComfyApp {
             tag = null;
 
         this.processingQueue = true;
-        let workflow;
+        let workflow: ComfyWorkflow;
 
         try {
             while (this.queueItems.length) {
@@ -867,6 +868,8 @@ export default class ComfyApp {
                                 subgraphs: [tag]
                             }
                         },
+                        workflowID: workflow.id,
+                        workflowTitle: workflow.attrs.title,
                         thumbnails
                     }
 

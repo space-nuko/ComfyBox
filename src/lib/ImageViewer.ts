@@ -6,7 +6,7 @@ export class ImageViewer {
     currentImages: string[] = []
     selectedIndex: number = -1;
     currentGallery: HTMLDivElement | null = null;
-    private static _instance: ImageViewer;
+    static _instance: ImageViewer;
 
     static get instance(): ImageViewer {
         if (!ImageViewer._instance)
@@ -62,6 +62,18 @@ export class ImageViewer {
         this.currentGallery = galleryElem;
         this.setModalImageSrc(imageUrls[index])
         this.lightboxModal.style.display = "flex";
+
+        const left = this.lightboxModal.querySelector<HTMLElement>(".modalPrev")
+        const right = this.lightboxModal.querySelector<HTMLElement>(".modalNext")
+        if (imageUrls.length <= 1) {
+            left.style.display = "none"
+            right.style.display = "none"
+        }
+        else {
+            left.style.display = "block"
+            right.style.display = "block"
+        }
+
         setTimeout(() => {
             this.modalImage.focus()
         }, 200)
@@ -138,6 +150,9 @@ export class ImageViewer {
     }
 
     showLightbox(source: HTMLImageElement) {
+        if (this.lightboxModal.style.display != "none")
+            this.closeModal();
+
         const initiallyZoomed = true
         this.modalZoomSet(this.modalImage, initiallyZoomed)
 

@@ -53,6 +53,7 @@
     <div id="dropzone"
          class="dropzone"
          bind:this={dropZone}
+         on:pointerdown={hideDropZone}
          on:dragover={allowDrag}
          on:dragleave={hideDropZone}
          on:drop={handleDrop}

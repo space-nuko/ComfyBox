@@ -1,5 +1,5 @@
 import type { SerializedGraphCanvasState } from '$lib/ComfyGraphCanvas';
-import { clamp, LGraphNode, type LGraphCanvas, type NodeID, type SerializedLGraph, type UUID, LGraph, LiteGraph } from '@litegraph-ts/core';
+import { clamp, LGraphNode, type LGraphCanvas, type NodeID, type SerializedLGraph, type UUID, LGraph, LiteGraph, type SlotType, NodeMode } from '@litegraph-ts/core';
 import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
 import { defaultWorkflowAttributes, type SerializedLayoutState, type WritableLayoutStateStore } from './layoutStates';
@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import type ComfyGraphCanvas from '$lib/ComfyGraphCanvas';
 import { blankGraph } from '$lib/defaultGraph';
 import type { SerializedAppState } from '$lib/components/ComfyApp';
+import type ComfyReceiveOutputNode from '$lib/nodes/actions/ComfyReceiveOutputNode';
 
 type ActiveCanvas = {
     canvas: LGraphCanvas | null;
@@ -232,6 +233,11 @@ export type WorkflowState = {
     activeWorkflow: ComfyWorkflow | null,
 }
 
+export type WorkflowReceiveOutputTargets = {
+    workflow: ComfyWorkflow,
+    targetNodes: ComfyReceiveOutputNode[]
+}
+
 type WorkflowStateOps = {
     getWorkflow: (id: WorkflowInstID) => ComfyWorkflow | null
     getWorkflowByGraph: (graph: LGraph) => ComfyWorkflow | null
@@ -239,11 +245,12 @@ type WorkflowStateOps = {
     getWorkflowByNodeID: (id: NodeID) => ComfyWorkflow | null
     getActiveWorkflow: () => ComfyWorkflow | null
     createNewWorkflow: (canvas: ComfyGraphCanvas, title?: string, setActive?: boolean) => ComfyWorkflow,
-    openWorkflow: (canvas: ComfyGraphCanvas, data: SerializedAppState) => ComfyWorkflow,
-    addWorkflow: (canvas: ComfyGraphCanvas, data: ComfyWorkflow) => void,
+    openWorkflow: (canvas: ComfyGraphCanvas, data: SerializedAppState, setActive?: boolean) => ComfyWorkflow,
+    addWorkflow: (canvas: ComfyGraphCanvas, data: ComfyWorkflow, setActive?: boolean) => void,
     closeWorkflow: (canvas: ComfyGraphCanvas, index: number) => void,
     closeAllWorkflows: (canvas: ComfyGraphCanvas) => void,
-    setActiveWorkflow: (canvas: ComfyGraphCanvas, index: number) => ComfyWorkflow | null
+    setActiveWorkflow: (canvas: ComfyGraphCanvas, index: number | WorkflowInstID) => ComfyWorkflow | null,
+    findReceiveOutputTargets: (type: SlotType | SlotType[]) => WorkflowReceiveOutputTargets[]
 }
 
 export type WritableWorkflowStateStore = Writable<WorkflowState> & WorkflowStateOps;
@@ -292,7 +299,7 @@ function createNewWorkflow(canvas: ComfyGraphCanvas, title: string = "New Workfl
     state.openedWorkflows.push(workflow);
     state.openedWorkflowsByID[workflow.id] = workflow;
 
-    if (setActive)
+    if (setActive || state.activeWorkflowID == null)
         setActiveWorkflow(canvas, state.openedWorkflows.length - 1)
 
     store.set(state)
@@ -300,20 +307,22 @@ function createNewWorkflow(canvas: ComfyGraphCanvas, title: string = "New Workfl
     return workflow;
 }
 
-function openWorkflow(canvas: ComfyGraphCanvas, data: SerializedAppState): ComfyWorkflow {
+function openWorkflow(canvas: ComfyGraphCanvas, data: SerializedAppState, setActive: boolean = true): ComfyWorkflow {
     const [workflow, layoutState] = ComfyWorkflow.create("Workflow")
     workflow.deserialize(layoutState, { graph: data.workflow, layout: data.layout, attrs: data.attrs })
 
-    addWorkflow(canvas, workflow);
+    addWorkflow(canvas, workflow, setActive);
 
     return workflow;
 }
 
-function addWorkflow(canvas: ComfyGraphCanvas, workflow: ComfyWorkflow) {
+function addWorkflow(canvas: ComfyGraphCanvas, workflow: ComfyWorkflow, setActive: boolean = true) {
     const state = get(store);
     state.openedWorkflows.push(workflow);
     state.openedWorkflowsByID[workflow.id] = workflow;
-    setActiveWorkflow(canvas, state.openedWorkflows.length - 1)
+
+    if (setActive || state.activeWorkflowID == null)
+        setActiveWorkflow(canvas, state.openedWorkflows.length - 1)
 
     store.set(state)
 
@@ -345,13 +354,17 @@ function closeAllWorkflows(canvas: ComfyGraphCanvas) {
         closeWorkflow(canvas, 0)
 }
 
-function setActiveWorkflow(canvas: ComfyGraphCanvas, index: number): ComfyWorkflow | null {
+function setActiveWorkflow(canvas: ComfyGraphCanvas, index: number | WorkflowInstID): ComfyWorkflow | null {
     const state = get(store);
 
     if (state.openedWorkflows.length === 0) {
         state.activeWorkflowID = null;
         state.activeWorkflow = null
         return null;
+    }
+
+    if (typeof index === "string") {
+        index = state.openedWorkflows.findIndex(w => w.id === index)
     }
 
     if (index < 0 || index >= state.openedWorkflows.length)
@@ -375,6 +388,31 @@ function setActiveWorkflow(canvas: ComfyGraphCanvas, index: number): ComfyWorkfl
     return workflow;
 }
 
+function findReceiveOutputTargets(type: SlotType | SlotType[]): WorkflowReceiveOutputTargets[] {
+    let result = []
+
+    const state = get(store);
+
+    if (!Array.isArray(type))
+        type = [type]
+
+    const types = new Set(type);
+
+    for (const workflow of state.openedWorkflows) {
+        const targetNodes = workflow.graph
+            // can't use class here because of circular import
+            .findNodesByTypeRecursive("events/receive_output")
+            .filter(n => {
+                return types.has(n.properties.type) && n.mode === NodeMode.ALWAYS
+            })
+
+        if (targetNodes.length > 0)
+            result.push({ workflow, targetNodes });
+    }
+
+    return result;
+}
+
 const workflowStateStore: WritableWorkflowStateStore =
 {
     ...store,
@@ -389,5 +427,6 @@ const workflowStateStore: WritableWorkflowStateStore =
     closeWorkflow,
     closeAllWorkflows,
     setActiveWorkflow,
+    findReceiveOutputTargets
 }
 export default workflowStateStore;

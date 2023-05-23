@@ -76,13 +76,20 @@
  let _runningEntries: QueueUIEntry[] = []
  let _entries: QueueUIEntry[] = []
 
- $: if (mode === "queue" && (changed || ($queuePending && $queuePending.length != _queuedEntries.length))) {
+ $: if (mode === "queue" && (changed || $queuePending.length != _queuedEntries.length || $queueRunning.length != _runningEntries.length)) {
      updateFromQueue();
      changed = false;
  }
- else if (mode === "history" && (changed  || ($queueCompleted && $queueCompleted.length != _entries.length))) {
+ else if (mode === "history" && (changed || $queueCompleted.length != _entries.length)) {
      updateFromHistory();
      changed = false;
+ }
+
+ $: if (mode === "queue" && !$queuePending && !$queueRunning) {
+     _queuedEntries = []
+     _runningEntries = []
+     _entries = [];
+     changed = true
  }
 
  async function deleteEntry(entry: QueueUIEntry, event: MouseEvent) {
@@ -134,14 +141,11 @@
      const subgraphs: string[] | null = entry.extraData?.extra_pnginfo?.comfyBoxPrompt?.subgraphs;
 
      let message = "Prompt";
-     if (entry.workflowID != null) {
-         const workflow = workflowState.getWorkflow(entry.workflowID);
-         if (workflow != null && workflow.attrs.title) {
-             message = `${workflow.attrs.title}`
-         }
-         if (subgraphs?.length > 0)
-             message += ` (${subgraphs.join(', ')})`
+     if (entry.extraData?.workflowTitle != null) {
+         message = `${entry.extraData.workflowTitle}`
      }
+     if (subgraphs?.length > 0)
+         message += ` (${subgraphs.join(', ')})`
 
      let submessage = `Nodes: ${Object.keys(entry.prompt).length}`
 
@@ -223,8 +227,13 @@
      expandAll = false
  }
 
- $: if(!showModal)
-     selectedPrompt = null;
+ function closeModal() {
+     selectedPrompt = null
+     selectedImages = []
+     showModal = false;
+     expandAll = false;
+     console.warn("CLOSEMODAL")
+ }
 
  let queued = false
  $: queued = Boolean($queueState.runningNodeID || $queueState.progress);
@@ -238,9 +247,11 @@
     <div slot="header" class="prompt-modal-header">
         <h1 style="padding-bottom: 1rem;">Prompt Details</h1>
     </div>
-    {#if selectedPrompt}
-        <PromptDisplay prompt={selectedPrompt} images={selectedImages} {expandAll} />
-    {/if}
+    <svelte:fragment let:closeDialog>
+        {#if selectedPrompt}
+            <PromptDisplay closeModal={() => { closeModal(); closeDialog(); }} {app} prompt={selectedPrompt} images={selectedImages} {expandAll} />
+        {/if}
+    </svelte:fragment>
     <div slot="buttons" let:closeDialog>
         <Button variant="secondary" on:click={closeDialog}>
             Close
