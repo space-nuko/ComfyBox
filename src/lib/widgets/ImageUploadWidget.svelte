@@ -15,6 +15,7 @@
  import NumberInput from "$lib/components/NumberInput.svelte";
 	import type { ComfyImageEditorNode } from "$lib/nodes/widgets";
 	import { ImageViewer } from "$lib/ImageViewer";
+	import { generateBlankCanvas, generateImageCanvas } from "./utils";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -53,42 +54,6 @@
 
      kl = null;
      showModal = false;
- }
-
- function generateBlankCanvas(width: number, height: number, fill: string = "#fff"): HTMLCanvasElement {
-     const canvas = document.createElement('canvas');
-     canvas.width = width;
-     canvas.height = height;
-     const ctx = canvas.getContext('2d');
-     ctx.save();
-     ctx.fillStyle = fill,
-           ctx.fillRect(0, 0, canvas.width, canvas.height);
-     ctx.restore();
-     return canvas;
- }
-
- async function loadImage(imageURL: string): Promise<HTMLImageElement> {
-     return new Promise((resolve) => {
-         const e = new Image();
-         e.setAttribute('crossorigin', 'anonymous'); // Don't taint the canvas from loading files on-disk
-         e.addEventListener("load", () => { resolve(e); });
-         e.src = imageURL;
-         return e;
-     });
- }
-
- async function generateImageCanvas(imageURL: string): Promise<[HTMLCanvasElement, number, number]> {
-     const image = await loadImage(imageURL);
-     const canvas = document.createElement('canvas');
-     canvas.width = image.width;
-     canvas.height = image.height;
-     const ctx = canvas.getContext('2d');
-     ctx.save();
-     ctx.fillStyle = "rgba(255, 255, 255, 0.0)";
-     ctx.fillRect(0, 0, canvas.width, canvas.height);
-     ctx.drawImage(image, 0, 0);
-     ctx.restore();
-     return [canvas, image.width, image.height];
  }
 
  const FILENAME: string = "ComfyUITemp.png";
