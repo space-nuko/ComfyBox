@@ -4,7 +4,7 @@
 
 	export let showModal; // boolean
 	export let closeOnClick = true; // boolean
-    export const closeDialog = _ => doClose();
+    export const closeDialog = () => doClose();
 
 	let dialog; // HTMLDialogElement
 
@@ -40,7 +40,7 @@
 >
     <div on:click|stopPropagation>
         <slot name="header" />
-        <slot />
+        <slot {closeDialog} />
         <div class="button-row">
             <slot name="buttons" {closeDialog}>
                 <!-- svelte-ignore a11y-autofocus -->

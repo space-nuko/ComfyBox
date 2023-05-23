@@ -39,8 +39,6 @@ export type QueueEntry = {
 
     /*** Data not sent by ComfyUI's API, lost on page refresh ***/
 
-    /* Workflow tab that sent the prompt.  */
-    workflowID?: WorkflowInstID,
     /* Prompt outputs, collected while the prompt is still executing */
     outputs: SerializedPromptOutputs,
     /* Nodes of the workflow that have finished running so far. */
@@ -363,12 +361,10 @@ function afterQueued(workflowID: WorkflowInstID, promptID: PromptID, number: num
         const [index, entry, queue] = findEntryInPending(promptID);
         if (entry == null) {
             const entry = createNewQueueEntry(promptID, number, prompt, extraData);
-            entry.workflowID = workflowID;
             s.queuePending.update(qp => { qp.push(entry); return qp })
             console.debug("[queueState] ADD PROMPT", promptID)
         }
         else {
-            entry.workflowID = workflowID;
             entry.number = number;
             entry.prompt = prompt
             entry.extraData = extraData

@@ -5,6 +5,7 @@ import type { ComfyImageLocation } from "$lib/utils";
 import type { SerializedLGraph, UUID } from "@litegraph-ts/core";
 import type { SerializedLayoutState } from "./stores/layoutStates";
 import type { ComfyNodeDef } from "./ComfyNodeDef";
+import type { WorkflowInstID } from "./stores/workflowState";
 
 export type ComfyPromptRequest = {
     client_id?: string,
@@ -68,6 +69,12 @@ export type ComfyPromptPNGInfo = {
 }
 
 export type ComfyBoxPromptExtraData = ComfyUIPromptExtraData & {
+    /* Workflow tab that sent the prompt.  */
+    workflowID?: WorkflowInstID,
+
+    workflowTitle?: string,
+
+    /* Thumbnails to show in the queue */
     thumbnails?: ComfyImageLocation[],
 }
 

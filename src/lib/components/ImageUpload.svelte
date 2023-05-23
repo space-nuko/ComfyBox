@@ -200,12 +200,14 @@
             elem_id="comfy-image-upload-block"
             {elem_classes}
         >
-            <BlockLabel
-                label={label}
-                show_label={label != ""}
-                Icon={FileIcon}
-                float={label != ""}
-            />
+            {#if label != ""}
+                <BlockLabel
+                    label={label}
+                    show_label={label != ""}
+                    Icon={FileIcon}
+                    float={label != ""}
+                />
+            {/if}
             {#if value && value.length > 0 && !pending_upload}
                 {@const firstImage = value[0]}
                 <ModifyUpload on:clear={handle_clear} absolute />

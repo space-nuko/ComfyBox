@@ -8,19 +8,53 @@
  import Gallery from "$lib/components/gradio/gallery/Gallery.svelte";
  import { ImageViewer } from "$lib/ImageViewer";
  import type { Styles } from "@gradio/utils";
-	import { countNewLines } from "$lib/utils";
+ import { comfyFileToComfyBoxMetadata, comfyURLToComfyFile, countNewLines } from "$lib/utils";
+ import ReceiveOutputTargets from "./modal/ReceiveOutputTargets.svelte";
+ import workflowState, { type ComfyWorkflow, type WorkflowReceiveOutputTargets } from "$lib/stores/workflowState";
+ import type { ComfyReceiveOutputNode } from "$lib/nodes/actions";
+ import type ComfyApp from "./ComfyApp";
 
  const splitLength = 50;
 
  export let prompt: SerializedPromptInputsAll;
- export let images: string[] = [];
+ export let images: string[] = []; // list of image URLs to ComfyUI's /view? endpoint
  export let isMobile: boolean = false;
  export let expandAll: boolean = false;
+ export let closeModal: () => void;
+ export let app: ComfyApp;
+
+ let selected_image: number | null = null;
 
  let galleryStyle: Styles = {
      grid_cols: [2],
      object_fit: "contain",
      height: "var(--size-96)"
+ }
+
+ let receiveTargets: WorkflowReceiveOutputTargets[] = [];
+ let comfyBoxImages = []
+ let litegraphType = "(none)"
+
+ $: if (images.length > 0) {
+     // since the image links come from gradio, have to parse the URL for the
+     // ComfyImageLocation params
+     comfyBoxImages = images.map(comfyURLToComfyFile)
+                            .map(comfyFileToComfyBoxMetadata);
+ }
+ else {
+     comfyBoxImages = []
+ }
+
+ $: if (comfyBoxImages.length > 0) {
+     if (selected_image != null)
+         litegraphType = "COMFYBOX_IMAGE"
+     else
+         litegraphType = "COMFYBOX_IMAGES"
+     receiveTargets = workflowState.findReceiveOutputTargets(litegraphType)
+ }
+ else {
+     litegraphType = "(none)"
+     receiveTargets = []
  }
 
  function isInputLink(input: SerializedPromptInput): boolean {
@@ -65,56 +99,98 @@
      // TODO dialog renders over it
      // ImageViewer.instance.showLightbox(e.detail)
  }
+
+ function sendOutput(workflow: ComfyWorkflow, targetNode: ComfyReceiveOutputNode) {
+     if (workflow == null || targetNode == null)
+         return
+
+     let value = null;
+     if (targetNode.properties.type === "COMFYBOX_IMAGE") {
+         if (selected_image != null)
+             value = comfyBoxImages[selected_image]
+         else
+             value = comfyBoxImages[0]
+     }
+     else if (targetNode.properties.type === "COMFYBOX_IMAGES") {
+         value = comfyBoxImages
+     }
+
+     if (value == null)
+         return;
+
+     targetNode.receiveOutput(value);
+     workflowState.setActiveWorkflow(app.lCanvas, workflow.id)
+
+     closeModal();
+ }
 </script>
 
 <div class="prompt-display">
-    <div class="scroll-container">
+    <div class="prompt-and-sends">
         <Block>
-            {#each Object.entries(prompt) as [nodeID, inputs], i}
-                {@const classType = inputs.class_type}
-                {@const filtered = Object.entries(inputs.inputs).filter((i) => !isInputLink(i[1]))}
-                {#if filtered.length > 0}
-                    <div class="accordion">
-                        <Block padding={true}>
-                            <Accordion label="Node {i+1}: {classType}" open={expandAll}>
-                                {#each filtered as [inputName, input]}
-                                    <Block>
-                                        <button class="copy-button" on:click={() => handleCopy(nodeID, inputName, input)}>
-                                            {#if copiedNodeID === nodeID && copiedInputName === inputName}
-                                                <span class="copied-icon">
-                                                    <Check />
-                                                </span>
-                                            {:else}
-                                                <span class="copy-text"><Copy /></span>
-                                            {/if}
-                                        </button>
-                                        <div>
-                                            {#if isInputLink(input)}
-                                                Link {input[0]} -> {input[1]}
-                                            {:else if typeof input === "object"}
+            <Accordion label="Prompt" open={expandAll}>
+                <div class="scroll-container">
+                    <Block>
+                        {#each Object.entries(prompt) as [nodeID, inputs], i}
+                            {@const classType = inputs.class_type}
+                            {@const filtered = Object.entries(inputs.inputs).filter((i) => !isInputLink(i[1]))}
+                            {#if filtered.length > 0}
+                                <div class="accordion">
+                                    <Block padding={true}>
+                                        <Accordion label="Node {i+1}: {classType}" open={expandAll}>
+                                            {#each filtered as [inputName, input]}
                                                 <Block>
-                                                    <BlockLabel
-                                                        Icon={JSONIcon}
-                                                        show_label={true}
-                                                        label={inputName}
-                                                        float={true}
-                                                    />
-                                                    <JSONComponent value={input} />
+                                                    <button class="copy-button" on:click={() => handleCopy(nodeID, inputName, input)}>
+                                                        {#if copiedNodeID === nodeID && copiedInputName === inputName}
+                                                            <span class="copied-icon">
+                                                                <Check />
+                                                            </span>
+                                                        {:else}
+                                                            <span class="copy-text"><Copy /></span>
+                                                        {/if}
+                                                    </button>
+                                                    <div>
+                                                        {#if isInputLink(input)}
+                                                            Link {input[0]} -> {input[1]}
+                                                        {:else if typeof input === "object"}
+                                                            <Block>
+                                                                <BlockLabel
+                                                                    Icon={JSONIcon}
+                                                                    show_label={true}
+                                                                    label={inputName}
+                                                                    float={true}
+                                                                />
+                                                                <JSONComponent value={input} />
+                                                            </Block>
+                                                        {:else if isMultiline(input)}
+                                                            {@const lines = Math.max(countNewLines(input), input.length / splitLength)}
+                                                            <TextBox label={inputName} value={formatInput(input)} {lines} max_lines={lines} />
+                                                        {:else}
+                                                            <TextBox label={inputName} value={formatInput(input)} lines={1} max_lines={1} />
+                                                        {/if}
+                                                    </div>
                                                 </Block>
-                                            {:else if isMultiline(input)}
-                                                {@const lines = Math.max(countNewLines(input), input.length / splitLength)}
-                                                <TextBox label={inputName} value={formatInput(input)} {lines} max_lines={lines} />
-                                            {:else}
-                                                <TextBox label={inputName} value={formatInput(input)} lines={1} max_lines={1} />
-                                            {/if}
-                                        </div>
+                                            {/each}
+                                        </Accordion>
                                     </Block>
-                                {/each}
-                            </Accordion>
-                        </Block>
-                    </div>
-                {/if}
-            {/each}
+                                </div>
+                            {/if}
+                        {/each}
+                    </Block>
+                </div>
+            </Accordion>
+        </Block>
+        <Block>
+            <Accordion label="Send Outputs To..." open={true}>
+                <Block>
+                    <BlockTitle>Output type: {litegraphType}</BlockTitle>
+                    {#if receiveTargets.length > 0}
+                        <ReceiveOutputTargets {receiveTargets} on:select={(e) => sendOutput(e.detail.workflow, e.detail.targetNode)} />
+                    {:else}
+                        <div class="outputs-message">No receive output targets found across all workflows.</div>
+                    {/if}
+                </Block>
+            </Accordion>
         </Block>
     </div>
     {#if images.length > 0}
@@ -128,6 +204,7 @@
                     root={""}
                     root_url={""}
                     on:clicked={onGalleryImageClicked}
+                    bind:selected_image
                 />
             </Block>
         </div>
@@ -148,26 +225,15 @@
      @media (min-width: 1600px) {
          flex-direction: row;
      }
+ }
+
+ .prompt-and-sends {
+     width: 50%;
 
      .scroll-container {
          position: relative;
          /* overflow-y: auto; */
          flex: 1 1 0%;
-     }
-
-     .image-container {
-         position: relative;
-         flex: 1 1 0%;
-         max-width: 30vw;
-
-         > :global(.block) {
-             height: 100%;
-
-             :global(> .preview) {
-                 height: 100%;
-                 max-height: none !important;
-             }
-         }
      }
 
      .copy-button {
@@ -217,6 +283,25 @@
 
          :global(> .block .block) {
              background: var(--panel-background-fill);
+         }
+     }
+ }
+
+ .outputs-message {
+     padding: 0.5rem;
+ }
+
+ .image-container {
+     position: relative;
+     flex: 1 1 0%;
+     width: 50%;
+
+     > :global(.block) {
+         height: 100%;
+
+         :global(> .preview) {
+             height: 100%;
+             max-height: none !important;
          }
      }
  }

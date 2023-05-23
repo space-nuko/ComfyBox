@@ -1,4 +1,5 @@
 export { default as ComfyWidgetNode } from "./ComfyWidgetNode"
+
 export { default as ComfyButtonNode } from "./ComfyButtonNode"
 export { default as ComfyCheckboxNode } from "./ComfyCheckboxNode"
 export { default as ComfyComboNode } from "./ComfyComboNode"
