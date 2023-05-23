@@ -456,8 +456,8 @@ export default class ComfyApp {
 
         this.api.addEventListener("executing", (promptID: PromptID | null, nodeID: ComfyNodeID | null) => {
             const queueEntry = queueState.executingUpdated(promptID, nodeID);
-            if (queueEntry != null) {
-                const workflow = workflowState.getWorkflow(queueEntry.workflowID);
+            if (queueEntry != null && queueEntry.extraData?.workflowID != null) {
+                const workflow = workflowState.getWorkflow(queueEntry.extraData.workflowID);
                 workflow?.graph?.setDirtyCanvas(true, false);
             }
         });
@@ -465,7 +465,7 @@ export default class ComfyApp {
         this.api.addEventListener("executed", (promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutput) => {
             const queueEntry = queueState.onExecuted(promptID, nodeID, output)
             if (queueEntry != null) {
-                const workflow = workflowState.getWorkflow(queueEntry.workflowID);
+                const workflow = workflowState.getWorkflow(queueEntry.extraData.workflowID);
                 if (workflow != null) {
                     workflow.graph.setDirtyCanvas(true, false);
                     const node = workflow.graph.getNodeByIdRecursive(nodeID) as ComfyGraphNode;
@@ -808,7 +808,7 @@ export default class ComfyApp {
             tag = null;
 
         this.processingQueue = true;
-        let workflow;
+        let workflow: ComfyWorkflow;
 
         try {
             while (this.queueItems.length) {
@@ -855,6 +855,8 @@ export default class ComfyApp {
                                 subgraphs: [tag]
                             }
                         },
+                        workflowID: workflow.id,
+                        workflowTitle: workflow.attrs.title,
                         thumbnails
                     }
 
