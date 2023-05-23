@@ -141,14 +141,11 @@
      const subgraphs: string[] | null = entry.extraData?.extra_pnginfo?.comfyBoxPrompt?.subgraphs;
 
      let message = "Prompt";
-     if (entry.workflowID != null) {
-         const workflow = workflowState.getWorkflow(entry.workflowID);
-         if (workflow != null && workflow.attrs.title) {
-             message = `${workflow.attrs.title}`
-         }
-         if (subgraphs?.length > 0)
-             message += ` (${subgraphs.join(', ')})`
+     if (entry.extraData?.workflowTitle != null) {
+         message = `${entry.extraData.workflowTitle}`
      }
+     if (subgraphs?.length > 0)
+         message += ` (${subgraphs.join(', ')})`
 
      let submessage = `Nodes: ${Object.keys(entry.prompt).length}`
 
