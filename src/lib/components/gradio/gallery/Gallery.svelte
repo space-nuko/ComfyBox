@@ -51,12 +51,20 @@
 	let prevValue: string[] | FileData[] | null = value;
 	export let selected_image: number | null = null;
 	let old_selected_image: number | null = null;
+	export let forceSelectImage: boolean | null = null;
 
 	$: if (prevValue !== value) {
 		// When value is falsy (clear button or first load),
 		// style.preview determines the selected image
 		if (was_reset) {
-			selected_image = style.preview && value?.length ? 0 : null;
+            let selectImage: boolean = Boolean(style.preview && value?.length)
+            let selectedIndex = 0;
+            if (forceSelectImage != null) {
+                selectImage = forceSelectImage
+                selectedIndex = selected_image;
+                forceSelectImage = null;
+            }
+			selected_image = selectImage ? selectedIndex : null;
 			was_reset = false;
 			// Otherwise we keep the selected_image the same if the
 			// gallery has at least as many elements as it did before

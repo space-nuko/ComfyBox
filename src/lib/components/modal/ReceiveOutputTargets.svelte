@@ -23,7 +23,7 @@
     {#if receiveTargets.length > 0}
         {#each receiveTargets as { workflow, targetNodes }}
             <Block>
-                <BlockTitle>{workflow.attrs.title}</BlockTitle>
+                <BlockTitle>Workflow: <b>{workflow.attrs.title}</b></BlockTitle>
                 {#each targetNodes as targetNode}
                     <Block>
                         <div class="target">

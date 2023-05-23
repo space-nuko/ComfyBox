@@ -239,8 +239,8 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         if (action === this.storeActionName) {
             let noChangedEvent = false;
             let value = param;
-            if (param != null && typeof param === "object" && "value" in param) {
-                value = param.value
+            if (param != null && typeof param === "object" && "__widgetValue__" in param) {
+                value = param.__widgetValue__
                 if ("noChangedEvent" in param)
                     noChangedEvent = Boolean(param.noChangedEvent)
             }
