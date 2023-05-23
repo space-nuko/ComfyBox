@@ -22,7 +22,6 @@
  export let expandAll: boolean = false;
  export let closeModal: () => void;
  export let app: ComfyApp;
- let isPromptOpen = expandAll;
 
  let selected_image: number | null = null;
 
@@ -129,7 +128,7 @@
 <div class="prompt-display">
     <div class="prompt-and-sends">
         <Block>
-            <Accordion label="Prompt" open={isPromptOpen}>
+            <Accordion label="Prompt" open={expandAll}>
                 <div class="scroll-container">
                     <Block>
                         {#each Object.entries(prompt) as [nodeID, inputs], i}
