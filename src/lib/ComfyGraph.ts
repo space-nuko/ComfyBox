@@ -11,7 +11,7 @@ import type { ComfyComboNode, ComfyWidgetNode } from "./nodes/widgets";
 import selectionState from "./stores/selectionState";
 import type { WritableLayoutStateStore } from "./stores/layoutStates";
 import layoutStates from "./stores/layoutStates";
-import type { ComfyWorkflow } from "./stores/workflowState";
+import type { ComfyWorkflow, WorkflowInstID } from "./stores/workflowState";
 import workflowState from "./stores/workflowState";
 
 type ComfyGraphEvents = {
@@ -163,7 +163,7 @@ export default class ComfyGraph extends LGraph {
                 // case node was cloned
                 const reg = LiteGraph.registered_node_types[node.type]
 
-                layoutState.groupItems(dragItemIDs, { title: reg.title })
+                layoutState.groupItems(dragItemIDs, { title: reg.title, variant: "accordion", openOnStartup: true })
             }
         }
 

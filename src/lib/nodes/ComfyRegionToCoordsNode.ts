@@ -7,10 +7,11 @@ export default class ComfyRegionToCoordsNode extends ComfyGraphNode {
             { name: "in", type: "COMFYBOX_REGION" },
         ],
         outputs: [
-            { name: "x", type: "number" },
-            { name: "y", type: "number" },
+            // same order as conditioning nodes
             { name: "width", type: "number" },
             { name: "height", type: "number" },
+            { name: "x", type: "number" },
+            { name: "y", type: "number" },
         ],
     }
 
@@ -19,16 +20,16 @@ export default class ComfyRegionToCoordsNode extends ComfyGraphNode {
         if (!Array.isArray(value))
             return;
 
-        this.setOutputData(0, value[0])
-        this.setOutputData(1, value[1])
-        this.setOutputData(2, value[2])
-        this.setOutputData(3, value[3])
+        this.setOutputData(0, value[2])
+        this.setOutputData(1, value[3])
+        this.setOutputData(2, value[0])
+        this.setOutputData(3, value[1])
     }
 }
 
 LiteGraph.registerNodeType({
     class: ComfyRegionToCoordsNode,
     title: "Comfy.RegionToCoords",
-    desc: "Converts a COMFYBOX_REGION to four outputs of [x, y, width, height]",
+    desc: "Converts a COMFYBOX_REGION to four outputs of [width, height, x, y]",
     type: "utils/region_to_coords"
 })

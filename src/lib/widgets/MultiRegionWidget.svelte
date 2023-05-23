@@ -15,7 +15,6 @@
  import { generateBlankCanvas, generateImageCanvas, loadImage } from "./utils";
  import { clamp } from "$lib/utils";
  import Row from "$lib/components/gradio/app/Row.svelte";
- import Column from "$lib/components/gradio/app/Column.svelte";
 
 // ref: https://html-color.codes/
 const COLOR_MAP: [string, string][] = [
@@ -400,6 +399,10 @@ const COLOR_MAP: [string, string][] = [
      displayBoxes = await recreateDisplayBoxes();
  }
 
+ function updateSelectedIndex(newIndexPlusOne: number) {
+     selectedIndex = clamp(newIndexPlusOne - 1, 0, $nodeValue.length - 1);
+ }
+
  function updateX(newX: number) {
      const bbox = $nodeValue[selectedIndex]
      const dbox = displayBoxes[selectedIndex]
@@ -440,7 +443,7 @@ const COLOR_MAP: [string, string][] = [
      displayBoxes[selectedIndex] = displayBoundingBox(bbox, selectedIndex, imageElem, dbox);
  }
 
- function updateValue() {
+ async function updateValue() {
      // Clamp regions
      const bbox = $nodeValue[selectedIndex]
      const dbox = displayBoxes[selectedIndex]
@@ -451,6 +454,8 @@ const COLOR_MAP: [string, string][] = [
          bbox[1] = clamp(bbox[1], 0, 1 - bbox[3])
          displayBoxes[selectedIndex] = displayBoundingBox(bbox, selectedIndex, imageElem, dbox);
      }
+
+     await updateImageAndDBoxes();
 
      // Force reactivity after changing a bbox's internal values
      $nodeValue = $nodeValue
@@ -504,6 +509,13 @@ const COLOR_MAP: [string, string][] = [
             </div>
             {#if selectedBBox}
                 <Block>
+                    <Row>
+                        <Range label="Region #" value={selectedIndex+1}
+                                show_label={true} minimum={1} maximum={$nodeValue.length} step={1}
+                                on:change={(e) => updateSelectedIndex(e.detail)}
+                            on:release={updateValue}
+                            />
+                    </Row>
                     <Row>
                         <Range label="X" value={selectedBBox[0]}
                                show_label={true} minimum={0.0} maximum={1.0} step={0.01}
