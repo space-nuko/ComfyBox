@@ -220,6 +220,7 @@ export default class ComfyApp {
             }
             await this.initDefaultWorkflow("defaultWorkflow", options);
             await this.initDefaultWorkflow("upscale", options);
+            await this.initDefaultWorkflow("conditioningRegions", options);
         }
 
         // Save current workflow automatically
@@ -356,6 +357,24 @@ export default class ComfyApp {
 
             ComfyApp.registerDefaultSlotHandlers(nodeId, nodeDef)
         }
+
+        ComfyApp.registerComfyBoxSlotTypes()
+    }
+
+    static registerComfyBoxSlotTypes() {
+        const reg = (type: string) => {
+            const lowerType = type.toLowerCase();
+            if (!LiteGraph.slot_types_in.includes(lowerType)) {
+                LiteGraph.slot_types_in.push(lowerType);
+            }
+            if (!LiteGraph.slot_types_out.includes(type)) {
+                LiteGraph.slot_types_out.push(type);
+            }
+        }
+
+        reg("COMFYBOX_IMAGE")
+        reg("COMFYBOX_IMAGES")
+        reg("COMFYBOX_REGION")
     }
 
     static registerDefaultSlotHandlers(nodeId: string, nodeDef: ComfyNodeDef) {
@@ -592,6 +611,7 @@ export default class ComfyApp {
 
         setColor("COMFYBOX_IMAGES", "rebeccapurple")
         setColor("COMFYBOX_IMAGE", "fuchsia")
+        setColor("COMFYBOX_REGION", "salmon")
         setColor(BuiltInSlotType.EVENT, "lightseagreen")
         setColor(BuiltInSlotType.ACTION, "lightseagreen")
     }
@@ -770,7 +790,9 @@ export default class ComfyApp {
 
         const promptFilename = get(configState).promptForWorkflowName;
 
-        let filename = "workflow.json";
+        const title = workflow.attrs.title.trim() || "workflow"
+
+        let filename = `${title}.json`;
         if (promptFilename) {
             filename = prompt("Save workflow as:", filename);
             if (!filename) return;
@@ -781,7 +803,7 @@ export default class ComfyApp {
         else {
             const date = new Date();
             const formattedDate = date.toISOString().replace(/:/g, '-').replace(/\.\d{3}/g, '').replace('T', '_').replace("Z", "");
-            filename = `workflow - ${formattedDate}.json`
+            filename = `${title} - ${formattedDate}.json`
         }
 
         const indent = 2

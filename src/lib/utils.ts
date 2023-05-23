@@ -476,7 +476,7 @@ export function parseWhateverIntoImageMetadata(param: any): ComfyBoxImageMetadat
 
     if (isComfyBoxImageMetadata(param)) {
         meta = [param];
-    }
+    }
     else if (Array.isArray(param) && param.every(isComfyBoxImageMetadata)) {
         meta = param
     }
