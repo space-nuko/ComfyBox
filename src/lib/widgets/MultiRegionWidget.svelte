@@ -9,10 +9,13 @@
  import type { BoundingBox } from "$lib/nodes/widgets/ComfyMultiRegionNode";
  import type { WidgetLayout } from "$lib/stores/layoutStates";
  import { Block, BlockLabel } from "@gradio/atoms";
- import { Chart as SquareIcon } from "@gradio/icons";
+ import { Chart as ChartIcon } from "@gradio/icons";
+ import { Range } from "@gradio/form";
  import { writable, type Writable } from "svelte/store";
  import { generateBlankCanvas, loadImage } from "./utils";
  import { clamp } from "$lib/utils";
+ import Row from "$lib/components/gradio/app/Row.svelte";
+ import Column from "$lib/components/gradio/app/Column.svelte";
 
 // ref: https://html-color.codes/
 const COLOR_MAP: [string, string][] = [
@@ -50,7 +53,6 @@ const COLOR_MAP: [string, string][] = [
  $: widget && setNodeValue(widget);
 
  function setNodeValue(widget: WidgetLayout) {
-     console.error("SETNODEVALUE")
      if (widget) {
          node = widget.node as ComfyMultiRegionNode
          nodeValue = node.value;
@@ -95,7 +97,6 @@ const COLOR_MAP: [string, string][] = [
  }
 
  $: if (node != null && $sizeChanged) {
-     console.warn("SIZCHANGEd")
      updateImage(node.properties.canvasWidth, node.properties.canvasHeight)
          .then(() => {
              return recreateDisplayBoxes()
@@ -106,7 +107,15 @@ const COLOR_MAP: [string, string][] = [
  }
 
  onMount(async () => {
-     displayBoxes = await recreateDisplayBoxes(node, $nodeValue);
+     if (node) {
+         updateImage(node.properties.canvasWidth, node.properties.canvasHeight)
+             .then(() => {
+                 return recreateDisplayBoxes()
+             })
+             .then(dbs => {
+                 displayBoxes = dbs;
+             })
+     }
  })
 
  $: if ($regionsChanged) {
@@ -116,7 +125,6 @@ const COLOR_MAP: [string, string][] = [
 
  async function updateImage(width: number, height: number) {
      showWidget = width > 0 && height > 0;
-     console.error("SHOW", showWidget, width, height)
      const blank = generateBlankCanvas(width, height, "transparent");
      const url = blank.toDataURL();
      const newImg = await loadImage(url);
@@ -246,7 +254,6 @@ const COLOR_MAP: [string, string][] = [
      // Calculate viewport scale based on the current canvas size and the natural image size
      let vpScale = Math.min(imageElem.clientWidth / imageElem.naturalWidth, imageElem.clientHeight / imageElem.naturalHeight);
      let vpOffset = imageElem.getBoundingClientRect();
-     console.warn(vpScale, vpOffset)
 
      // Calculate scaled dimensions of the canvas
      let scaledX = imageElem.naturalWidth * vpScale;
@@ -382,6 +389,62 @@ const COLOR_MAP: [string, string][] = [
  async function onResize() {
      displayBoxes = await recreateDisplayBoxes();
  }
+
+ function updateX(newX: number) {
+     const bbox = $nodeValue[selectedIndex]
+     const dbox = displayBoxes[selectedIndex]
+     if (!bbox || !dbox)
+         return
+
+     bbox[0] = newX
+     displayBoxes[selectedIndex] = displayBoundingBox(bbox, selectedIndex, imageElem, dbox);
+ }
+
+ function updateY(newY: number) {
+     const bbox = $nodeValue[selectedIndex]
+     const dbox = displayBoxes[selectedIndex]
+     if (!bbox || !dbox)
+         return
+
+     bbox[1] = newY
+     displayBoxes[selectedIndex] = displayBoundingBox(bbox, selectedIndex, imageElem, dbox);
+ }
+
+ function updateWidth(newWidth: number) {
+     const bbox = $nodeValue[selectedIndex]
+     const dbox = displayBoxes[selectedIndex]
+     if (!bbox || !dbox)
+         return
+
+     bbox[2] = newWidth
+     displayBoxes[selectedIndex] = displayBoundingBox(bbox, selectedIndex, imageElem, dbox);
+ }
+
+ function updateHeight(newHeight: number) {
+     const bbox = $nodeValue[selectedIndex]
+     const dbox = displayBoxes[selectedIndex]
+     if (!bbox || !dbox)
+         return
+
+     bbox[3] = newHeight
+     displayBoxes[selectedIndex] = displayBoundingBox(bbox, selectedIndex, imageElem, dbox);
+ }
+
+ function updateValue() {
+     // Clamp regions
+     const bbox = $nodeValue[selectedIndex]
+     const dbox = displayBoxes[selectedIndex]
+     if (bbox && dbox) {
+         bbox[2] = clamp(bbox[2], 0, 1)
+         bbox[3] = clamp(bbox[3], 0, 1)
+         bbox[0] = clamp(bbox[0], 0, 1 - bbox[2])
+         bbox[1] = clamp(bbox[1], 0, 1 - bbox[3])
+         displayBoxes[selectedIndex] = displayBoundingBox(bbox, selectedIndex, imageElem, dbox);
+     }
+
+     // Force reactivity after changing a bbox's internal values
+     $nodeValue = $nodeValue
+ }
 </script>
 
 <svelte:window on:resize={onResize}/>
@@ -393,11 +456,13 @@ const COLOR_MAP: [string, string][] = [
             <BlockLabel
                 label={label}
                 show_label={label != ""}
-                Icon={SquareIcon}
+                Icon={ChartIcon}
                 float={label != ""}
             />
         {/if}
         {#if showWidget}
+            {@const selectedBBox = $nodeValue[selectedIndex]}
+            {@const selectedDBox = displayBoxes[selectedIndex]}
             <div class="regions-container">
                 <div bind:this={imageContainer} class="regions-image-container">
                     <img bind:this={imageElem} class="regions-image"/>
@@ -427,9 +492,37 @@ const COLOR_MAP: [string, string][] = [
                     {/each}
                 </div>
             </div>
-    {:else}
+            {#if selectedBBox}
+                <Block>
+                    <Row>
+                        <Range label="X" value={selectedBBox[0]}
+                               show_label={true} minimum={0.0} maximum={1.0} step={0.01}
+                               on:change={(e) => updateX(e.detail)}
+                            on:release={updateValue}
+                            />
+                            <Range label="Width" value={selectedBBox[2]}
+                                   show_label={true} minimum={0.0} maximum={1.0} step={0.01}
+                                   on:change={(e) => updateWidth(e.detail)}
+                                on:release={updateValue}
+                                />
+                    </Row>
+                    <Row>
+                        <Range label="Y" value={selectedBBox[1]}
+                               show_label={true} minimum={0.0} maximum={1.0} step={0.01}
+                               on:change={(e) => updateY(e.detail)}
+                            on:release={updateValue}
+                            />
+                            <Range label="Height" value={selectedBBox[3]}
+                                   show_label={true} minimum={0.0} maximum={1.0} step={0.01}
+                                   on:change={(e) => updateHeight(e.detail)}
+                                on:release={updateValue}
+                                />
+                    </Row>
+                </Block>
+            {/if}
+        {:else}
             <div class="regions-empty">
-                <span>(Empty canvas)</span>
+                <span>(No regions)</span>
             </div>
         {/if}
     </Block>
@@ -441,7 +534,10 @@ const COLOR_MAP: [string, string][] = [
      padding: 0;
 
      .regions-image-container {
+         display: flex;
+
          img {
+             height: 100%;
              border: 3px solid var(--input-border-color);
          }
      }
