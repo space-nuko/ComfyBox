@@ -220,6 +220,7 @@ export default class ComfyApp {
             }
             await this.initDefaultWorkflow("defaultWorkflow", options);
             await this.initDefaultWorkflow("upscale", options);
+            await this.initDefaultWorkflow("conditioningRegions", options);
         }
 
         // Save current workflow automatically
