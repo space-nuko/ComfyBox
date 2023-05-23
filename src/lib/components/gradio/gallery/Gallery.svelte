@@ -15,6 +15,7 @@
 	export let label: string;
 	export let root: string = "";
 	export let root_url: null | string = null;
+    export let scrollOnUpdate = false;
 	export let value: Array<string> | Array<FileData> | null = null;
 	export let style: Styles = {
 		grid_cols: [2],
@@ -120,6 +121,7 @@
 	let container: HTMLDivElement;
 
 	async function scroll_to_img(index: number | null) {
+        if (!scrollOnUpdate) return;
 		if (typeof index !== "number") return;
 		await tick();
 

@@ -150,7 +150,7 @@
      let submessage = `Nodes: ${Object.keys(entry.prompt).length}`
 
      if (Object.keys(entry.outputs).length > 0) {
-         const imageCount = Object.values(entry.outputs).flatMap(o => o.images).length
+         const imageCount = Object.values(entry.outputs).filter(o => o.images).flatMap(o => o.images).length
          submessage = `Images: ${imageCount}`
      }
 
@@ -172,14 +172,24 @@
          result.images = thumbnails.map(convertComfyOutputToComfyURL);
      }
 
+     const outputs = Object.values(entry.outputs)
+                           .filter(o => o.images)
+                           .flatMap(o => o.images)
+                           .map(convertComfyOutputToComfyURL);
+     if (outputs) {
+         result.images = result.images.concat(outputs)
+     }
+
      return result;
  }
 
  function convertCompletedEntry(entry: CompletedQueueEntry): QueueUIEntry {
      const result = convertEntry(entry.entry, entry.status);
 
-     const images = Object.values(entry.entry.outputs).flatMap(o => o.images)
-         .map(convertComfyOutputToComfyURL);
+     const images = Object.values(entry.entry.outputs)
+                          .filter(o => o.images)
+                          .flatMap(o => o.images)
+                          .map(convertComfyOutputToComfyURL);
      result.images = images
 
      if (entry.message)
