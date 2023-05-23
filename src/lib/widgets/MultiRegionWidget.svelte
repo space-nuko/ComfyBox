@@ -8,28 +8,30 @@
  import type { ComfyMultiRegionNode } from "$lib/nodes/widgets";
  import type { BoundingBox } from "$lib/nodes/widgets/ComfyMultiRegionNode";
  import type { WidgetLayout } from "$lib/stores/layoutStates";
- import { Block } from "@gradio/atoms";
+ import { Block, BlockLabel } from "@gradio/atoms";
+ import { Chart as SquareIcon } from "@gradio/icons";
  import { writable, type Writable } from "svelte/store";
  import { generateBlankCanvas, loadImage } from "./utils";
+ import { clamp } from "$lib/utils";
 
 // ref: https://html-color.codes/
 const COLOR_MAP: [string, string][] = [
-    ['#ff0000', '2px solid rgba(255, 0, 0, 0.3)'],          // red
-    ['#ff9900', '2px solid rgba(255, 153, 0, 0.3)'],        // orange
-    ['#ffff00', '2px solid rgba(255, 255, 0, 0.3)'],        // yellow
-    ['#33cc33', '2px solid rgba(51, 204, 51, 0.3)'],        // green
-    ['#33cccc', '2px solid rgba(51, 204, 204, 0.3)'],       // indigo
-    ['#0066ff', '2px solid rgba(0, 102, 255, 0.3)'],        // blue
-    ['#6600ff', '2px solid rgba(102, 0, 255, 0.3)'],        // purple
-    ['#cc00cc', '2px solid rgba(204, 0, 204, 0.3)'],        // dark pink
-    ['#ff6666', '2px solid rgba(255, 102, 102, 0.3)'],      // light red
-    ['#ffcc66', '2px solid rgba(255, 204, 102, 0.3)'],      // light orange
-    ['#99cc00', '2px solid rgba(153, 204, 0, 0.3)'],        // lime green
-    ['#00cc99', '2px solid rgba(0, 204, 153, 0.3)'],        // teal
-    ['#0099cc', '2px solid rgba(0, 153, 204, 0.3)'],        // steel blue
-    ['#9933cc', '2px solid rgba(153, 51, 204, 0.3)'],       // lavender
-    ['#ff3399', '2px solid rgba(255, 51, 153, 0.3)'],       // hot pink
-    ['#996633', '2px solid rgba(153, 102, 51, 0.3)'],       // brown
+    ['#ff0000', 'rgba(255, 0, 0, 0.3)'],          // red
+    ['#ff9900', 'rgba(255, 153, 0, 0.3)'],        // orange
+    ['#ffff00', 'rgba(255, 255, 0, 0.3)'],        // yellow
+    ['#33cc33', 'rgba(51, 204, 51, 0.3)'],        // green
+    ['#33cccc', 'rgba(51, 204, 204, 0.3)'],       // indigo
+    ['#0066ff', 'rgba(0, 102, 255, 0.3)'],        // blue
+    ['#6600ff', 'rgba(102, 0, 255, 0.3)'],        // purple
+    ['#cc00cc', 'rgba(204, 0, 204, 0.3)'],        // dark pink
+    ['#ff6666', 'rgba(255, 102, 102, 0.3)'],      // light red
+    ['#ffcc66', 'rgba(255, 204, 102, 0.3)'],      // light orange
+    ['#99cc00', 'rgba(153, 204, 0, 0.3)'],        // lime green
+    ['#00cc99', 'rgba(0, 204, 153, 0.3)'],        // teal
+    ['#0099cc', 'rgba(0, 153, 204, 0.3)'],        // steel blue
+    ['#9933cc', 'rgba(153, 51, 204, 0.3)'],       // lavender
+    ['#ff3399', 'rgba(255, 51, 153, 0.3)'],       // hot pink
+    ['#996633', 'rgba(153, 102, 51, 0.3)'],       // brown
 ];
 
  export let widget: WidgetLayout | null = null;
@@ -41,16 +43,28 @@ const COLOR_MAP: [string, string][] = [
  let node: ComfyMultiRegionNode | null = null;
  let nodeValue: Writable<BoundingBox[]> = writable([]);
  let sizeChanged: Writable<boolean> = writable(false);
+ let regionsChanged: Writable<boolean> = writable(false);
+ let propsChanged: Writable<number> = writable(0);
+ let selectedIndex: number = 0;
 
  $: widget && setNodeValue(widget);
 
  function setNodeValue(widget: WidgetLayout) {
+     console.error("SETNODEVALUE")
      if (widget) {
          node = widget.node as ComfyMultiRegionNode
          nodeValue = node.value;
+         propsChanged = node.propsChanged;
          sizeChanged = node.sizeChanged;
+         regionsChanged = node.regionsChanged;
      }
  };
+
+ let showWidget: boolean = false;
+
+ if (sizeChanged && $sizeChanged) {
+     console.error("Z@");
+ }
 
  type DisplayBoundingBox = {
      xPx: number,
@@ -62,8 +76,7 @@ const COLOR_MAP: [string, string][] = [
      borderColor: string
  }
 
- let displayBoxes = []
- let changed = true;
+ let displayBoxes = [];
 
  async function recreateDisplayBoxes(_node?: ComfyMultiRegionNode, bboxes?: BoundingBox[]): Promise<DisplayBoundingBox[]> {
      _node ||= node;
@@ -72,7 +85,8 @@ const COLOR_MAP: [string, string][] = [
      console.debug("[MultiRegionWidget] Recreate!", bboxes, imageElem, _node)
 
      if (_node != null && imageElem != null && imageContainer != null) {
-         await updateImage(_node.properties.totalWidth, _node.properties.totalHeight);
+         selectedIndex = clamp(selectedIndex, 0, bboxes.length - 1);
+         await updateImage(_node.properties.canvasWidth, _node.properties.canvasHeight);
          return bboxes.map((b, i) => displayBoundingBox(b, i, imageElem))
      }
      else {
@@ -81,21 +95,29 @@ const COLOR_MAP: [string, string][] = [
  }
 
  $: if (node != null && $sizeChanged) {
-     updateImage(node.properties.totalWidth, node.properties.totalHeight)
-         .then(() => $sizeChanged = false)
+     console.warn("SIZCHANGEd")
+     updateImage(node.properties.canvasWidth, node.properties.canvasHeight)
+         .then(() => {
+             return recreateDisplayBoxes()
+         })
+         .then(dbs => {
+             displayBoxes = dbs;
+         })
  }
 
  onMount(async () => {
      displayBoxes = await recreateDisplayBoxes(node, $nodeValue);
  })
 
- $: if (changed) {
-     changed = false;
+ $: if ($regionsChanged) {
+     $regionsChanged = false;
      recreateDisplayBoxes(node, $nodeValue).then(dbs => displayBoxes = dbs);
  }
 
  async function updateImage(width: number, height: number) {
-     const blank = generateBlankCanvas(width, height);
+     showWidget = width > 0 && height > 0;
+     console.error("SHOW", showWidget, width, height)
+     const blank = generateBlankCanvas(width, height, "transparent");
      const url = blank.toDataURL();
      const newImg = await loadImage(url);
      newImg.classList.add("regions-image");
@@ -103,6 +125,7 @@ const COLOR_MAP: [string, string][] = [
          imageContainer.replaceChildren(newImg)
      }
      imageElem = newImg;
+     imageElem.style.border = `${BORDER_SIZE_PX}px solid var(--border-color-primary)`;
      $sizeChanged = false;
  }
 
@@ -119,14 +142,14 @@ const COLOR_MAP: [string, string][] = [
      // client: image widget display size
      // natural: content image real size
      const vpScale = Math.min(imageElem.clientWidth / imageElem.naturalWidth, imageElem.clientHeight / imageElem.naturalHeight);
-     const imageElemCenterX = imageElem.clientWidth  / 2;
-     const imageElemCenterY = imageElem.clientHeight / 2;
+     const imageElemCenterX = (imageElem.clientWidth)  / 2;
+     const imageElemCenterY = (imageElem.clientHeight) / 2;
      const scaledX = imageElem.naturalWidth  * vpScale;
      const scaledY = imageElem.naturalHeight * vpScale;
-     const viewRectLeft  = imageElemCenterX - scaledX / 2;
-     const viewRectRight = imageElemCenterX + scaledX / 2;
-     const viewRectTop   = imageElemCenterY - scaledY / 2;
-     const viewRectDown  = imageElemCenterY + scaledY / 2;
+     const viewRectLeft  = imageElemCenterX - scaledX / 2 + BORDER_SIZE_PX;
+     const viewRectRight = imageElemCenterX + scaledX / 2 + BORDER_SIZE_PX;
+     const viewRectTop   = imageElemCenterY - scaledY / 2 + BORDER_SIZE_PX;
+     const viewRectDown  = imageElemCenterY + scaledY / 2 + BORDER_SIZE_PX;
 
      const xDiv = viewRectLeft + scaledX * x;
      const yDiv = viewRectTop  + scaledY * y;
@@ -143,7 +166,7 @@ const COLOR_MAP: [string, string][] = [
      const maxH = maxSize / scaledY;
      const warnLargeSize = w > maxW || h > maxH
 
-     const [bgColor, borderColor] = COLOR_MAP[index % COLOR_MAP.length]
+     const [borderColor, bgColor] = COLOR_MAP[index % COLOR_MAP.length]
 
      out ||= {} as DisplayBoundingBox
      out.xPx= xDiv;
@@ -159,6 +182,7 @@ const COLOR_MAP: [string, string][] = [
 
  const RESIZE_BORDER = 5;
  const MOVE_BORDER = 5;
+ const BORDER_SIZE_PX = 3;
 
  function updateCursorStyle(e: MouseEvent) {
      // This function changes the cursor style when hovering over the bounding box
@@ -193,6 +217,8 @@ const COLOR_MAP: [string, string][] = [
      let bbox = $nodeValue[index];
      if (!imageElem || !bbox)
          return;
+
+     selectedIndex = index;
 
      // Check if the click is inside the bounding box
      const div = e.target as HTMLDivElement;
@@ -344,7 +370,7 @@ const COLOR_MAP: [string, string][] = [
      const onMouseUp = () => {
          document.removeEventListener('mousemove', onMouseMove);
          document.removeEventListener('mouseup', onMouseUp);
-         changed = true;
+         $regionsChanged = true;
          $nodeValue = $nodeValue;
      }
 
@@ -360,38 +386,65 @@ const COLOR_MAP: [string, string][] = [
 
 <svelte:window on:resize={onResize}/>
 
-<Block>
-    <div class="regions-container">
-        <div bind:this={imageContainer} class="regions-image-container">
-            <img bind:this={imageElem} class="regions-image"/>
-        </div>
-        <div class="regions">
-            {#each displayBoxes as dBox, i}
-                <div class="region"
-                     style:left="{dBox.xPx}px"
-                     style:top="{dBox.yPx}px"
-                     style:width="{dBox.widthPx}px"
-                     style:height="{dBox.heightPx}px"
-                     style:background={dBox.bgColor}
-                     style:border={dBox.borderColor}
-                     style:display="block"
-                     on:mousemove={updateCursorStyle}
-                     on:mousedown={(e) => onBoxMouseDown(e, i)}
-                    >
-                    <span class="tip"
-                          style:display={dBox.warnLargeSize ? "block" : "none"}>
-                        Warning: Region very large!
-                    </span>
+{#key $propsChanged}
+    <Block>
+        {#if widget?.attrs.title}
+            {@const label = widget.attrs.title}
+            <BlockLabel
+                label={label}
+                show_label={label != ""}
+                Icon={SquareIcon}
+                float={label != ""}
+            />
+        {/if}
+        {#if showWidget}
+            <div class="regions-container">
+                <div bind:this={imageContainer} class="regions-image-container">
+                    <img bind:this={imageElem} class="regions-image"/>
                 </div>
-            {/each}
-        </div>
-    </div>
-</Block>
+                <div class="regions">
+                    {#each displayBoxes as dBox, i}
+                        {@const selected = selectedIndex === i}
+                        <div class="region"
+                             style:left="{dBox.xPx}px"
+                             style:top="{dBox.yPx}px"
+                             style:width="{dBox.widthPx}px"
+                             style:height="{dBox.heightPx}px"
+                             style:background={dBox.bgColor}
+                             style:border-style={selected ? "solid" : "dotted"}
+                             style:border-color={dBox.borderColor}
+                             style:display="block"
+                             style:opacity={selected ? "100%" : "40%"}
+                             style:z-index={selected ? "var(--layer-3)" : "var(--layer-2)"}
+                             on:mousemove={updateCursorStyle}
+                             on:mousedown={(e) => onBoxMouseDown(e, i)}
+                            >
+                            <span class="tip"
+                                  style:display={dBox.warnLargeSize ? "block" : "none"}>
+                                Warning: Region very large!
+                            </span>
+                        </div>
+                    {/each}
+                </div>
+            </div>
+    {:else}
+            <div class="regions-empty">
+                <span>(Empty canvas)</span>
+            </div>
+        {/if}
+    </Block>
+{/key}
 
 <style lang="scss">
  .regions-container {
      position: relative;
      padding: 0;
+
+     .regions-image-container {
+         img {
+             border: 3px solid var(--input-border-color);
+         }
+     }
  }
 
  .regions {
@@ -403,10 +456,10 @@ const COLOR_MAP: [string, string][] = [
 
      .region {
          position: absolute;
-         border: 2px solid blue;
-         background: teal;
          z-index: var(--layer-3);
          cursor: move;
+         border-style: dotted;
+         border-width: 2px;
 
          .tip {
              position: absolute;
@@ -419,6 +472,21 @@ const COLOR_MAP: [string, string][] = [
              color: red;
              z-index: var(--layer-2);
          }
+     }
+ }
+
+ .regions-empty {
+     display: flex;
+     position: relative;
+     height: 10rem;
+     justify-content: center;
+     text-align: center;
+     font-size: 32px;
+     font-weight: bolder;
+     color: var(--comfy-accent-soft);
+
+     span {
+         margin: auto;
      }
  }
 </style>
