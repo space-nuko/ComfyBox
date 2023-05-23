@@ -26,7 +26,7 @@ Also note that the saved workflow format is subject to change until it's been fi
 
 ## Features
 - **No-Code UI Builder** - A novel system for creating your own Stable Diffusion user interfaces from the basic components.
-- **Manage Multiple Workflows** - You can open as many workflows as you like and switch between them using tabs within the app.
+- **Manage Multiple Workflows** - You can open as many workflows as you like and switch between them using tabs within the app. You can also write custom "Send To" actions to copy your image outputs into other workflows for further processing.
 - **Use Your Existing Workflows** - Import workflows you've created in ComfyUI into ComfyBox and a new UI will be created for you.
 - **Extension Support** - All custom ComfyUI nodes are supported out of the box.
 - **Prompt Queue** - Queue up multiple prompts without waiting for them to finish first. Inspect currently queued and executed prompts.
