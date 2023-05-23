@@ -12,7 +12,7 @@
  import { Chart as ChartIcon } from "@gradio/icons";
  import { Range } from "@gradio/form";
  import { writable, type Writable } from "svelte/store";
- import { generateBlankCanvas, loadImage } from "./utils";
+ import { generateBlankCanvas, generateImageCanvas, loadImage } from "./utils";
  import { clamp } from "$lib/utils";
  import Row from "$lib/components/gradio/app/Row.svelte";
  import Column from "$lib/components/gradio/app/Column.svelte";
@@ -49,6 +49,7 @@ const COLOR_MAP: [string, string][] = [
  let regionsChanged: Writable<boolean> = writable(false);
  let propsChanged: Writable<number> = writable(0);
  let selectedIndex: number = 0;
+ let imageOpacity: number = 1;
 
  $: widget && setNodeValue(widget);
 
@@ -59,6 +60,8 @@ const COLOR_MAP: [string, string][] = [
          propsChanged = node.propsChanged;
          sizeChanged = node.sizeChanged;
          regionsChanged = node.regionsChanged;
+
+         updateImageAndDBoxes();
      }
  };
 
@@ -88,7 +91,7 @@ const COLOR_MAP: [string, string][] = [
 
      if (_node != null && imageElem != null && imageContainer != null) {
          selectedIndex = clamp(selectedIndex, 0, bboxes.length - 1);
-         await updateImage(_node.properties.canvasWidth, _node.properties.canvasHeight);
+         await updateImage(_node.properties.canvasWidth, _node.properties.canvasHeight, _node.properties.canvasImageURL);
          return bboxes.map((b, i) => displayBoundingBox(b, i, imageElem))
      }
      else {
@@ -96,8 +99,11 @@ const COLOR_MAP: [string, string][] = [
      }
  }
 
- $: if (node != null && $sizeChanged) {
-     updateImage(node.properties.canvasWidth, node.properties.canvasHeight)
+ async function updateImageAndDBoxes() {
+     if (node == null)
+         return;
+
+     return updateImage(node.properties.canvasWidth, node.properties.canvasHeight, node.properties.canvasImageURL)
          .then(() => {
              return recreateDisplayBoxes()
          })
@@ -106,16 +112,12 @@ const COLOR_MAP: [string, string][] = [
          })
  }
 
+ $: if (node != null && $sizeChanged) {
+     updateImageAndDBoxes();
+ }
+
  onMount(async () => {
-     if (node) {
-         updateImage(node.properties.canvasWidth, node.properties.canvasHeight)
-             .then(() => {
-                 return recreateDisplayBoxes()
-             })
-             .then(dbs => {
-                 displayBoxes = dbs;
-             })
-     }
+     await updateImageAndDBoxes();
  })
 
  $: if ($regionsChanged) {
@@ -123,17 +125,25 @@ const COLOR_MAP: [string, string][] = [
      recreateDisplayBoxes(node, $nodeValue).then(dbs => displayBoxes = dbs);
  }
 
- async function updateImage(width: number, height: number) {
+ let hasImage = false;
+
+ async function updateImage(width: number, height: number, imageURL: string | null) {
      showWidget = width > 0 && height > 0;
-     const blank = generateBlankCanvas(width, height, "transparent");
-     const url = blank.toDataURL();
-     const newImg = await loadImage(url);
+     hasImage = imageURL != null
+
+     if (imageURL == null) {
+         const blank = generateBlankCanvas(width, height, "transparent");
+         imageURL = blank.toDataURL();
+     }
+
+     const newImg = await loadImage(imageURL);
      newImg.classList.add("regions-image");
      if (imageContainer != null) {
          imageContainer.replaceChildren(newImg)
      }
      imageElem = newImg;
      imageElem.style.border = `${BORDER_SIZE_PX}px solid var(--border-color-primary)`;
+
      $sizeChanged = false;
  }
 
@@ -177,10 +187,10 @@ const COLOR_MAP: [string, string][] = [
      const [borderColor, bgColor] = COLOR_MAP[index % COLOR_MAP.length]
 
      out ||= {} as DisplayBoundingBox
-     out.xPx= xDiv;
-     out.yPx= yDiv;
-     out.widthPx= wDiv;
-     out.heightPx= hDiv;
+     out.xPx = xDiv;
+     out.yPx = yDiv;
+     out.widthPx = wDiv;
+     out.heightPx = hDiv;
      out.warnLargeSize = warnLargeSize;
      out.bgColor = bgColor
      out.borderColor = borderColor
@@ -449,7 +459,7 @@ const COLOR_MAP: [string, string][] = [
 
 <svelte:window on:resize={onResize}/>
 
-{#key $propsChanged}
+{#key node?.properties.canvasWidth}
     <Block>
         {#if widget?.attrs.title}
             {@const label = widget.attrs.title}
@@ -462,10 +472,10 @@ const COLOR_MAP: [string, string][] = [
         {/if}
         {#if showWidget}
             {@const selectedBBox = $nodeValue[selectedIndex]}
-            {@const selectedDBox = displayBoxes[selectedIndex]}
             <div class="regions-container">
-                <div bind:this={imageContainer} class="regions-image-container">
-                    <img bind:this={imageElem} class="regions-image"/>
+                <div bind:this={imageContainer} class="regions-image-container"
+                     style:opacity="{hasImage ? imageOpacity * 100 : 100}%">
+                    <img bind:this={imageElem} class="regions-image" />
                 </div>
                 <div class="regions">
                     {#each displayBoxes as dBox, i}
@@ -518,6 +528,12 @@ const COLOR_MAP: [string, string][] = [
                                 on:release={updateValue}
                                 />
                     </Row>
+                    {#if hasImage}
+                        <Row>
+                            <Range label="Image Opacity" bind:value={imageOpacity}
+                                   show_label={true} minimum={0.0} maximum={1.0} step={0.01}/>
+                        </Row>
+                    {/if}
                 </Block>
             {/if}
         {:else}
