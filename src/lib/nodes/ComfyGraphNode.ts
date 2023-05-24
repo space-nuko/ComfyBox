@@ -8,7 +8,7 @@ import type IComfyInputSlot from "$lib/IComfyInputSlot";
 import uiState from "$lib/stores/uiState";
 import { get } from "svelte/store";
 import configState from "$lib/stores/configState";
-import type { WritableLayoutStateStore } from "$lib/stores/layoutStates";
+import type { WidgetLayout, WritableLayoutStateStore } from "$lib/stores/layoutStates";
 import layoutStates from "$lib/stores/layoutStates";
 import workflowStateStore, { ComfyWorkflow } from "$lib/stores/workflowState";
 
@@ -105,6 +105,10 @@ export default class ComfyGraphNode extends LGraphNode {
 
     get layoutState(): WritableLayoutStateStore | null {
         return layoutStates.getLayoutByNode(this);
+    }
+
+    get dragItem(): WidgetLayout | null {
+        return layoutStates.getDragItemByNode(this);
     }
 
     get workflow(): ComfyWorkflow | null {

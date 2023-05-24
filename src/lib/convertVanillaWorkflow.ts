@@ -391,8 +391,7 @@ export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWork
         // Lazily create group in case there are no inputs
         let group: ContainerLayout | null = null;
 
-        // TODO needs to be generalized!
-        let isOutputNode = ["PreviewImage", "SaveImage"].indexOf(node.type) !== -1
+        let isOutputNode = def.nodeDef.output_node
 
         for (const [inputName, [inputType, inputOpts]] of iterateNodeDefInputs(def.nodeDef)) {
             // Detect if this input was a widget converted to an input
@@ -475,7 +474,7 @@ export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWork
         }
 
         // Add OUTPUT event slot to output nodes
-        // TODO needs to be generalized!
+        // For now assume that all output nodes will send back images
         if (isOutputNode) {
             const newOutput: INodeOutputSlot = {
                 name: "OUTPUT",

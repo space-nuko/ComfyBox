@@ -76,6 +76,9 @@ importers:
       '@zerodevx/svelte-json-view':
         specifier: ^1.0.5
         version: 1.0.5(svelte@3.58.0)
+      canvas-to-svg:
+        specifier: ^1.0.3
+        version: 1.0.3
       events:
         specifier: ^3.3.0
         version: 3.3.0
@@ -3778,6 +3781,10 @@ packages:
 
   /caniuse-lite@1.0.30001488:
     resolution: {integrity: sha512-NORIQuuL4xGpIy6iCCQGN4iFjlBXtfKWIenlUuyZJumLRIindLb7wXM+GO8erEhb7vXfcnf4BAg2PrSDN5TNLQ==}
+
+  /canvas-to-svg@1.0.3:
+    resolution: {integrity: sha512-qWQKPW0lRkOCClRmKtTzC5dNLtdOCzEOPYWASvW9ggkq4cRYL0o8RnC4fPc4tNE5WGm5YzJTGFztFG0JuCGXcQ==}
+    dev: false
 
   /case@1.6.3:
     resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}

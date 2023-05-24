@@ -10,11 +10,11 @@ import type ComfyGraph from '$lib/ComfyGraph';
 import type { ComfyWorkflow, WorkflowAttributes, WorkflowInstID } from './workflowState';
 import workflowState from './workflowState';
 
-function isComfyWidgetNode(node: LGraphNode): node is ComfyWidgetNode {
+export function isComfyWidgetNode(node: LGraphNode): node is ComfyWidgetNode {
     return "svelteComponentType" in node
 }
 
-type DragItemEntry = {
+export type DragItemEntry = {
     /*
      * Drag item.
      */
@@ -719,7 +719,9 @@ type LayoutStateOps = {
     ungroup: (container: ContainerLayout) => void,
     findLayoutEntryForNode: (nodeId: ComfyNodeID) => DragItemEntry | null,
     findLayoutForNode: (nodeId: ComfyNodeID) => IDragItem | null,
+    iterateBreadthFirst: (id?: DragItemID | null) => Iterable<DragItemEntry>,
     serialize: () => SerializedLayoutState,
+    serializeAtRoot: (rootID: DragItemID) => SerializedLayoutState,
     deserialize: (data: SerializedLayoutState, graph: LGraph) => void,
     initDefaultLayout: () => DefaultLayout,
     onStartConfigure: () => void
@@ -1082,6 +1084,25 @@ function createRaw(workflow: ComfyWorkflow | null = null): WritableLayoutStateSt
         return found.dragItem as WidgetLayout
     }
 
+    function* iterateBreadthFirst(id?: DragItemID | null): Iterable<DragItemEntry> {
+        const state = get(store);
+
+        id ||= state.root?.id;
+        if (id == null)
+            return;
+
+        const queue = [state.allItems[id]];
+        while (queue.length > 0) {
+            const node = queue.shift();
+            yield node;
+            if (node.children) {
+                for (const child of node.children) {
+                    queue.push(state.allItems[child.id]);
+                }
+            }
+        }
+    }
+
     function initDefaultLayout(): DefaultLayout {
         store.set({
             root: null,
@@ -1104,6 +1125,40 @@ function createRaw(workflow: ComfyWorkflow | null = null): WritableLayoutStateSt
         console.debug("[layoutState] initDefault")
 
         return { root, left, right }
+    }
+
+    function serializeAtRoot(rootID: DragItemID): SerializedLayoutState {
+        const state = get(store);
+
+        if (!state.allItems[rootID])
+            throw "Root not contained in layout!"
+
+        const allItems: Record<DragItemID, SerializedDragEntry> = {}
+
+        const queue = [state.allItems[rootID]]
+        while (queue.length > 0) {
+            const entry = queue.shift();
+            allItems[entry.dragItem.id] = {
+                dragItem: {
+                    type: entry.dragItem.type,
+                    id: entry.dragItem.id,
+                    nodeId: (entry.dragItem as any).node?.id,
+                    attrs: entry.dragItem.attrs
+                },
+                children: entry.children.map((di) => di.id),
+                parent: entry.parent?.id
+            }
+            if (entry.children) {
+                for (const child of entry.children) {
+                    queue.push(state.allItems[child.id]);
+                }
+            }
+        }
+
+        return {
+            root: rootID,
+            allItems
+        }
     }
 
     function serialize(): SerializedLayoutState {
@@ -1221,10 +1276,12 @@ function createRaw(workflow: ComfyWorkflow | null = null): WritableLayoutStateSt
         groupItems,
         findLayoutEntryForNode,
         findLayoutForNode,
+        iterateBreadthFirst,
         ungroup,
         initDefaultLayout,
         onStartConfigure,
         serialize,
+        serializeAtRoot,
         deserialize,
         notifyWorkflowModified
     }
@@ -1273,6 +1330,22 @@ function getLayoutByNode(node: LGraphNode): WritableLayoutStateStore | null {
     return getLayoutByGraph(rootGraph);
 }
 
+function getLayoutByDragItemID(dragItemID: DragItemID): WritableLayoutStateStore | null {
+    return Object.values(get(layoutStates).all).find(l => get(l).allItems[dragItemID] != null)
+}
+
+function getDragItemByNode(node: LGraphNode): WidgetLayout | null {
+    const layout = getLayoutByNode(node);
+    if (layout == null)
+        return null;
+
+    const entry = get(layout).allItemsByNode[node.id]
+    if (entry && entry.dragItem.type === "widget")
+        return entry.dragItem as WidgetLayout;
+
+    return null;
+}
+
 export type LayoutStateStores = {
     /*
      * Layouts associated with opened workflows
@@ -1292,6 +1365,8 @@ export type LayoutStateStoresOps = {
     getLayout: (workflowID: WorkflowInstID) => WritableLayoutStateStore | null,
     getLayoutByGraph: (graph: LGraph) => WritableLayoutStateStore | null,
     getLayoutByNode: (node: LGraphNode) => WritableLayoutStateStore | null,
+    getLayoutByDragItemID: (dragItemID: DragItemID) => WritableLayoutStateStore | null,
+    getDragItemByNode: (node: LGraphNode) => WidgetLayout | null,
 }
 
 export type WritableLayoutStateStores = Writable<LayoutStateStores> & LayoutStateStoresOps;
@@ -1308,7 +1383,9 @@ const layoutStates: WritableLayoutStateStores = {
     remove,
     getLayout,
     getLayoutByGraph,
-    getLayoutByNode
+    getLayoutByNode,
+    getLayoutByDragItemID,
+    getDragItemByNode
 }
 
 export default layoutStates;
