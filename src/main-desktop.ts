@@ -5,7 +5,7 @@ import ComfyApp from '$lib/components/ComfyApp';
 import init from '$lib/init';
 import App from './App.svelte';
 
-await init();
+init();
 
 const comfyApp = new ComfyApp();
 (window as any).app = comfyApp;

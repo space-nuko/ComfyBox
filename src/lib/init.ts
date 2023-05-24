@@ -38,7 +38,7 @@ function configureGlobals() {
     win.svelteGet = get;
 }
 
-export default async function init(isMobile: boolean = false) {
+export default function init(isMobile: boolean = false) {
     configureLitegraph(isMobile);
     configureGlobals();
 }
