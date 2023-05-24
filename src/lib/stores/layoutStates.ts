@@ -405,7 +405,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: ""
             },
 
-            // Editor
+            // Image Editor
             {
                 name: "variant",
                 type: "enum",
@@ -430,6 +430,16 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
             },
 
             // Text
+            {
+                name: "variant",
+                type: "enum",
+                location: "widget",
+                editable: true,
+                validNodeTypes: ["ui/text"],
+                values: ["text", "code"],
+                defaultValue: "text",
+                refreshPanelOnChange: true
+            },
             {
                 name: "multiline",
                 type: "boolean",

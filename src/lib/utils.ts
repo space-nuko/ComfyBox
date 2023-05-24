@@ -52,6 +52,14 @@ export function* enumerate<T>(iterable: Iterable<T>): Iterable<[number, T]> {
     }
 }
 
+export async function timeExecutionMs(fn: (...any) => Promise<any>, ...args: any[]): Promise<number> {
+    const start = new Date().getTime();
+
+    await fn.apply(null, args)
+
+    return new Date().getTime() - start;
+}
+
 export function download(filename: string, text: string, type: string = "text/plain") {
     const blob = new Blob([text], { type: type });
     const url = URL.createObjectURL(blob);
