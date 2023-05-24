@@ -10,6 +10,7 @@
     "checkJs": true,
     "strict": false,
     "baseUrl": "./src",
+    "typeRoots": ["./node_modules/@types/", "./src"],
     "paths": {
       "$lib": ["lib"],
       "$lib/*": ["lib/*"]

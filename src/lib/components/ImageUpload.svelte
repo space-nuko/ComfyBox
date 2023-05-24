@@ -174,8 +174,6 @@
      uploaded = true;
  }
 
- $: console.warn(imgWidth, imgHeight, "IMGSIZE!!")
-
  function handle_clear(_e: CustomEvent<null>) {
      _value = null;
      value = [];

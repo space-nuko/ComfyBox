@@ -1,10 +1,10 @@
 <script lang="ts">
  import { Button } from "@gradio/button";
  import type ComfyApp from "./ComfyApp";
-	import DropZone from "./DropZone.svelte";
+ import DropZone from "./DropZone.svelte";
+ import interfaceState from "$lib/stores/interfaceState";
 
  export let app: ComfyApp;
- export let transitioning: boolean = false;
 
  function doRecenter(): void {
      app?.lCanvas?.recenter();
@@ -17,7 +17,7 @@
         <DropZone {app} />
     </div>
     <div class="bar">
-        {#if !transitioning}
+        {#if !$interfaceState.graphTransitioning}
             <span class="left">
                 <button on:click={doRecenter}>Recenter</button>
             </span>

@@ -94,6 +94,9 @@ importers:
       '@tsconfig/svelte':
         specifier: ^4.0.1
         version: 4.0.1
+      '@types/dompurify':
+        specifier: ^3.0.2
+        version: 3.0.2
       '@zerodevx/svelte-json-view':
         specifier: ^1.0.5
         version: 1.0.5(svelte@3.58.0)
@@ -115,6 +118,9 @@ importers:
       csv-parse:
         specifier: ^5.3.10
         version: 5.3.10
+      dompurify:
+        specifier: ^3.0.3
+        version: 3.0.3
       events:
         specifier: ^3.3.0
         version: 3.3.0
@@ -142,9 +148,6 @@ importers:
       svelte-bootstrap-icons:
         specifier: ^2.3.1
         version: 2.3.1
-      svelte-codemirror-editor:
-        specifier: ^1.1.0
-        version: 1.1.0(codemirror@6.0.1)
       svelte-feather-icons:
         specifier: ^4.0.0
         version: 4.0.0
@@ -3235,6 +3238,12 @@ packages:
     resolution: {integrity: sha512-sZLCdHvBUcNby1cB6Fd3ZBrABbjz3v1Vm90nysCQ6Vt7vd6e/h9Lt7SiJUoEX0l4Dzc7P5llKyhqSi1ycSf1Hg==}
     dev: true
 
+  /@types/dompurify@3.0.2:
+    resolution: {integrity: sha512-YBL4ziFebbbfQfH5mlC+QTJsvh0oJUrWbmxKMyEdL7emlHJqGR2Qb34TEFKj+VCayBvjKy3xczMFNhugThUsfQ==}
+    dependencies:
+      '@types/trusted-types': 2.0.3
+    dev: false
+
   /@types/estree@1.0.1:
     resolution: {integrity: sha512-LG4opVs2ANWZ1TJoKc937iMmNstM/d0ae1vNbnBvBhqCSezgVUOzcLCqbI5elV8Vy6WKwKjaqR+zO9VKirBBCA==}
 
@@ -3317,6 +3326,10 @@ packages:
   /@types/stack-utils@2.0.1:
     resolution: {integrity: sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==}
     dev: true
+
+  /@types/trusted-types@2.0.3:
+    resolution: {integrity: sha512-NfQ4gyz38SL8sDNrSixxU2Os1a5xcdFxipAFxYEuLUlvU2uDwS4NUpsImcf1//SlWItCVMMLiylsxbmNMToV/g==}
+    dev: false
 
   /@types/uuid@9.0.1:
     resolution: {integrity: sha512-rFT3ak0/2trgvp4yYZo5iKFEPsET7vKydKF+VRCxlQ9bpheehyAJH89dAkaLEq/j/RZXJIqcgsmPJKUP1Z28HA==}
@@ -4560,6 +4573,10 @@ packages:
     engines: {node: '>= 4'}
     dependencies:
       domelementtype: 2.3.0
+    dev: false
+
+  /dompurify@3.0.3:
+    resolution: {integrity: sha512-axQ9zieHLnAnHh0sfAamKYiqXMJAVwu+LM/alQ7WDagoWessyWvMSFyW65CqF3owufNu8HBcE4cM2Vflu7YWcQ==}
     dev: false
 
   /domutils@2.8.0:
@@ -8096,14 +8113,6 @@ packages:
       - stylus
       - sugarss
     dev: true
-
-  /svelte-codemirror-editor@1.1.0(codemirror@6.0.1):
-    resolution: {integrity: sha512-wFdMIsZds5qzn3x2NbFUxDVU6Cn3rwFdq0035ypaFVgzTjJ90bnPm6IbrFA4OJz1ngIyfbIuPAPDjm7rJIr0gg==}
-    peerDependencies:
-      codemirror: ^6.0.0
-    dependencies:
-      codemirror: 6.0.1
-    dev: false
 
   /svelte-dnd-action@0.9.22(svelte@3.58.0):
     resolution: {integrity: sha512-lOQJsNLM1QWv5mdxIkCVtk6k4lHCtLgfE59y8rs7iOM6erchbLC9hMEFYSveZz7biJV0mpg7yDSs4bj/RT/YkA==}

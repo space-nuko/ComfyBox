@@ -261,7 +261,9 @@
 
  .animation-wrapper {
      position: relative;
+     flex-basis: 0%;
      flex-grow: 100;
+     flex-shrink: 100;
  }
 
  .handle-hidden {

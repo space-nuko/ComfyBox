@@ -5,6 +5,7 @@ import A1111PromptModal from "./modal/A1111PromptModal.svelte";
 import ConfirmConvertWithMissingNodeTypesModal from "./modal/ConfirmConvertWithMissingNodeTypesModal.svelte";
 import MissingNodeTypesModal from "./modal/MissingNodeTypesModal.svelte";
 import WorkflowLoadErrorModal from "./modal/WorkflowLoadErrorModal.svelte";
+import EditTemplateModal from "./modal/EditTemplateModal.svelte";
 
 import * as nodes from "$lib/nodes/index";
 
@@ -35,6 +36,7 @@ import { type SvelteComponentDev } from "svelte/internal";
 import { get, writable, type Writable } from "svelte/store";
 import ComfyPromptSerializer, { isActiveBackendNode, UpstreamNodeLocator } from "./ComfyPromptSerializer";
 import DanbooruTags from "$lib/DanbooruTags";
+import { deserializeTemplate } from "$lib/ComfyBoxTemplate";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -1001,6 +1003,24 @@ export default class ComfyApp {
                 }
             };
             reader.readAsText(file);
+        } else if (file.type === "image/svg+xml" || file.name.endsWith(".svg")) {
+            const templateAndSvg = await deserializeTemplate(file);
+            modalState.pushModal({
+                title: "ComfyBox Template Preview",
+                svelteComponent: EditTemplateModal,
+                closeOnClick: false,
+                showCloseButton: false,
+                svelteProps: {
+                    templateAndSvg
+                },
+                buttons: [
+                    {
+                        name: "Close",
+                        variant: "secondary",
+                        onClick: () => { }
+                    },
+                ]
+            })
         }
     }
 

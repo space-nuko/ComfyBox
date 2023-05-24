@@ -3,14 +3,12 @@
  import { PlusSquareDotted } from 'svelte-bootstrap-icons';
  import { Button } from "@gradio/button";
  import { BlockTitle } from "@gradio/atoms";
- import ComfyBoxWorkflowView from "./ComfyBoxWorkflowView.svelte";
  import { Checkbox, TextBox } from "@gradio/form"
  import ComfyQueue from "./ComfyQueue.svelte";
  import ComfyUnlockUIButton from "./ComfyUnlockUIButton.svelte";
- import ComfyGraphView from "./ComfyGraphView.svelte";
  import { get, writable, type Writable } from "svelte/store";
- import ComfyProperties from "./ComfyProperties.svelte";
  import uiState from "$lib/stores/uiState";
+ import interfaceState from "$lib/stores/interfaceState";
  import workflowState, { ComfyBoxWorkflow } from "$lib/stores/workflowState";
  import selectionState from "$lib/stores/selectionState";
  import type ComfyApp from './ComfyApp';
@@ -18,7 +16,8 @@
  import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
  import { fade } from 'svelte/transition';
  import { cubicIn } from 'svelte/easing';
-	import { truncateString } from '$lib/utils';
+ import { truncateString } from '$lib/utils';
+ import ComfyPaneView from './ComfyPaneView.svelte';
 
  export let app: ComfyApp;
  export let uiTheme: string = "gradio-dark" // TODO config
@@ -28,7 +27,6 @@
 
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
- let alreadySetup: Writable<boolean> = writable(false);
  let fileInput: HTMLInputElement = undefined;
  let loading = true;
 
@@ -45,10 +43,6 @@
      );
      refreshView();
  })
-
- $: if (app) {
-     alreadySetup = app.alreadySetup;
- }
 
  async function doRefreshCombos() {
      await app.refreshComboInNodes(undefined, undefined, true)
@@ -73,7 +67,6 @@
      $selectionState.currentSelection = []
 
  let graphSize = 0;
- let graphTransitioning = false;
 
  $: if (containerElem) {
      const canvas = containerElem.querySelector<HTMLDivElement>("#graph-canvas")
@@ -81,10 +74,10 @@
          const paneNode = canvas.closest(".splitpanes__pane")
          if (paneNode) {
              (paneNode as HTMLElement).ontransitionstart = () => {
-                 graphTransitioning = true
+                 $interfaceState.graphTransitioning = true
              }
              (paneNode as HTMLElement).ontransitionend = () => {
-                 graphTransitioning = false
+                 $interfaceState.graphTransitioning = false
                  app.resizeCanvas()
              }
          }
@@ -194,28 +187,20 @@
 <div id="comfy-content" bind:this={containerElem} class:loading>
     <Splitpanes theme="comfy" on:resize={refreshView}>
         <Pane bind:size={propsSidebarSize}>
-            <div class="sidebar-wrapper pane-wrapper">
-                <ComfyProperties workflow={$workflowState.activeWorkflow} />
-            </div>
+            <ComfyPaneView {app} mode="properties"/>
         </Pane>
         <Pane>
             <Splitpanes theme="comfy" on:resize={refreshView} horizontal="{true}">
                 <Pane>
-                    {#if $workflowState.activeWorkflow != null}
-                        <ComfyBoxWorkflowView {app} workflow={$workflowState.activeWorkflow} />
-                    {:else}
-                        <span style:color="var(--body-text-color)">No workflow loaded</span>
-                    {/if}
+                    <ComfyPaneView {app} mode="activeWorkflow"/>
                 </Pane>
                 <Pane bind:size={graphSize}>
-                    <ComfyGraphView {app} transitioning={graphTransitioning} />
+                    <ComfyPaneView {app} mode="graph"/>
                 </Pane>
             </Splitpanes>
         </Pane>
         <Pane bind:size={queueSidebarSize}>
-            <div class="sidebar-wrapper pane-wrapper">
-                <ComfyQueue {app} />
-            </div>
+            <ComfyPaneView {app} mode="queue"/>
         </Pane>
     </Splitpanes>
     <div id="workflow-tabs">
@@ -260,32 +245,32 @@
         <div class="bottombar-content">
             <div class="left">
                 {#if workflow != null && workflow.attrs.queuePromptButtonName != ""}
-                    <Button variant="primary" disabled={!$alreadySetup} on:click={queuePrompt}>
+                    <Button variant="primary" disabled={loading} on:click={queuePrompt}>
                         {workflow.attrs.queuePromptButtonName}
                     </Button>
                 {/if}
-                <Button variant="secondary" disabled={!$alreadySetup} on:click={toggleGraph}>
+                <Button variant="secondary" disabled={loading} on:click={toggleGraph}>
                     Toggle Graph
                 </Button>
-                <Button variant="secondary" disabled={!$alreadySetup} on:click={toggleProps}>
+                <Button variant="secondary" disabled={loading} on:click={toggleProps}>
                     Toggle Props
                 </Button>
-                <Button variant="secondary" disabled={!$alreadySetup} on:click={toggleQueue}>
+                <Button variant="secondary" disabled={loading} on:click={toggleQueue}>
                     Toggle Queue
                 </Button>
-                <Button variant="secondary" disabled={!$alreadySetup} on:click={doSave}>
+                <Button variant="secondary" disabled={loading} on:click={doSave}>
                     Save
                 </Button>
-                <Button variant="secondary" disabled={!$alreadySetup} on:click={doSaveLocal}>
+                <Button variant="secondary" disabled={loading} on:click={doSaveLocal}>
                     Save Local
                 </Button>
-                <Button variant="secondary" disabled={!$alreadySetup} on:click={doLoad}>
+                <Button variant="secondary" disabled={loading} on:click={doLoad}>
                     Load
                 </Button>
-                <Button variant="secondary" disabled={!$alreadySetup} on:click={doLoadDefault}>
+                <Button variant="secondary" disabled={loading} on:click={doLoadDefault}>
                     Load Default
                 </Button>
-                <Button variant="secondary" disabled={!$alreadySetup} on:click={doRefreshCombos}>
+                <Button variant="secondary" disabled={loading} on:click={doRefreshCombos}>
                     🔄
                 </Button>
                 <!-- <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
@@ -486,18 +471,6 @@
      }
  }
 
- .sidebar-wrapper {
-     width: 100%;
-     height: 100%;
- }
-
- :global(html, body) {
-     width: 100%;
-     height: 100%;
-     margin: 0px;
-     font-family: Arial;
- }
-
  :global(.splitpanes.comfy>.splitpanes__splitter) {
      background: var(--comfy-splitpanes-background-fill);
 
@@ -507,7 +480,7 @@
      &:active:not([disabled]) {
          background: var(--comfy-splitpanes-background-fill-active);
      }
- }
+ }
 
  $splitter-size: 1rem;
 

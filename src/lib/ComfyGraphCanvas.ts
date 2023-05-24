@@ -1,4 +1,4 @@
-import { BuiltInSlotShape, LGraphCanvas, LGraphNode, LLink, LiteGraph, NodeMode, Subgraph, TitleMode, type ContextMenuItem, type IContextMenuItem, type NodeID, type Vector2, type Vector4, type MouseEventExt, ContextMenu } from "@litegraph-ts/core";
+import { BuiltInSlotShape, LGraphCanvas, LGraphNode, LLink, LiteGraph, NodeMode, Subgraph, TitleMode, type ContextMenuItem, type IContextMenuItem, type NodeID, type Vector2, type Vector4, type MouseEventExt, ContextMenu, type SerializedLGraphNode } from "@litegraph-ts/core";
 import { get, type Unsubscriber } from "svelte/store";
 import type ComfyGraph from "./ComfyGraph";
 import type ComfyApp from "./components/ComfyApp";
@@ -6,12 +6,38 @@ import { ComfyReroute } from "./nodes";
 import layoutStates from "./stores/layoutStates";
 import queueState from "./stores/queueState";
 import selectionState from "./stores/selectionState";
-import { createTemplate, type ComfyBoxTemplate, serializeTemplate } from "./ComfyBoxTemplate";
+import { createTemplate, type ComfyBoxTemplate, serializeTemplate, type SerializedComfyBoxTemplate } from "./ComfyBoxTemplate";
 import notify from "./notify";
+import { v4 as uuidv4 } from "uuid"
+import { download } from "./utils";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
     scale: number
+}
+
+function getMinPos(nodes: SerializedLGraphNode[]): Vector2 {
+    var posMin: Vector2 = [0, 0]
+    var posMinIndexes: [number, number] | null = null;
+
+    for (var i = 0; i < nodes.length; ++i) {
+        if (posMin) {
+            if (posMin[0] > nodes[i].pos[0]) {
+                posMin[0] = nodes[i].pos[0];
+                posMinIndexes[0] = i;
+            }
+            if (posMin[1] > nodes[i].pos[1]) {
+                posMin[1] = nodes[i].pos[1];
+                posMinIndexes[1] = i;
+            }
+        }
+        else {
+            posMin = [nodes[i].pos[0], nodes[i].pos[1]];
+            posMinIndexes = [i, i];
+        }
+    }
+
+    return posMin;
 }
 
 export default class ComfyGraphCanvas extends LGraphCanvas {
@@ -439,19 +465,49 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         this.graph.add(subgraph)
     }
 
-    override getCanvasMenuOptions(): ContextMenuItem[] {
-        const options = super.getCanvasMenuOptions();
+    /*
+     * Inserts a ComfyBox template. Logic is similar to pasting from the
+     * clipboard in vanilla litegraph.
+     */
+    insertTemplate(template: SerializedComfyBoxTemplate, pos: Vector2) {
+        const minPos = getMinPos(template.nodes);
 
-        options.push(
-            {
-                content: "Convert to Subgraph",
-                has_submenu: false,
-                disabled: Object.keys(this.selected_nodes).length === 0,
-                callback: this.convertToSubgraph.bind(this)
-            },
-        )
+        const templateNodeIDToNewNode: Record<NodeID, LGraphNode> = {}
 
-        return options
+        var nodes = [];
+        for (var i = 0; i < template.nodes.length; ++i) {
+            var node_data = template.nodes[i];
+            var node = LiteGraph.createNode(node_data.type);
+            if (node) {
+                const prevNodeId = node_data.id;
+                node_data.id = uuidv4();
+                templateNodeIDToNewNode[prevNodeId] = node
+
+                node.configure(node_data);
+
+                node.pos[0] += pos[0] - minPos[0]; //+= 5;
+                node.pos[1] += pos[1] - minPos[1]; //+= 5;
+
+                this.graph.add(node, { doProcessChange: false, addedBy: "template" as any });
+
+                nodes.push(node);
+            }
+        }
+
+        //create links
+        for (var i = 0; i < template.links.length; ++i) {
+            var link_info = template.links[i];
+            var origin_node = templateNodeIDToNewNode[link_info[0]];
+            var target_node = templateNodeIDToNewNode[link_info[2]];
+            if (origin_node && target_node)
+                origin_node.connect(link_info[1], target_node, link_info[3]);
+            else
+                console.error("[ComfyGraphCanvas] nodes missing on template insertion!", link_info);
+        }
+
+        this.selectNodes(nodes);
+
+        this.graph.afterChange();
     }
 
     saveAsTemplate(_value: IContextMenuItem, _options, mouseEvent, prevMenu, node?: LGraphNode) {
@@ -470,6 +526,23 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         console.warn("TEMPLATEFOUND", template)
 
         const serialized = serializeTemplate(this, template);
+
+        download("template.svg", serialized.svg, "image/svg+xml");
+    }
+
+    override getCanvasMenuOptions(): ContextMenuItem[] {
+        const options = super.getCanvasMenuOptions();
+
+        options.push(
+            {
+                content: "Convert to Subgraph",
+                has_submenu: false,
+                disabled: Object.keys(this.selected_nodes).length === 0,
+                callback: this.convertToSubgraph.bind(this)
+            },
+        )
+
+        return options
     }
 
     override getNodeMenuOptions(node: LGraphNode): ContextMenuItem[] {
