@@ -6,6 +6,7 @@
  import type { ComfyTextNode } from "$lib/nodes/widgets";
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
+ import TextWidgetCodeVariant from "./TextWidgetCodeVariant.svelte"
 
  let node: ComfyTextNode | null = null;
  let nodeValue: Writable<string> | null = null;
@@ -31,18 +32,22 @@
 
 <div class="wrapper gradio-textbox">
     {#if node !== null && nodeValue !== null}
-        <TextBox
-            bind:value={$nodeValue}
-            label={widget.attrs.title}
-            disabled={isDisabled(widget)}
-            lines={node.properties.multiline ? node.properties.lines : 1}
-            max_lines={node.properties.multiline ? node.properties.maxLines : 1}
-            show_label={widget.attrs.title !== ""}
-            on:change
-            on:submit
-            on:blur
-            on:select
-        />
+        {#if widget.attrs.variant === "code"}
+            <TextWidgetCodeVariant {widget} {node} {nodeValue} />
+        {:else}
+            <TextBox
+                bind:value={$nodeValue}
+                label={widget.attrs.title}
+                disabled={isDisabled(widget)}
+                lines={node.properties.multiline ? node.properties.lines : 1}
+                max_lines={node.properties.multiline ? node.properties.maxLines : 1}
+                show_label={widget.attrs.title !== ""}
+                on:change
+                on:submit
+                on:blur
+                on:select
+            />
+        {/if}
     {/if}
 </div>
 

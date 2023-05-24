@@ -10,6 +10,7 @@ import { download } from "./utils";
  * components they represent in the UI.
  */
 export type ComfyBoxTemplate = {
+    version: 1,
     nodes: LGraphNode[],
     links: LLink[],
     container?: DragItemEntry
@@ -20,6 +21,8 @@ export type ComfyBoxTemplate = {
  * components they represent in the UI.
  */
 export type SerializedComfyBoxTemplate = {
+    version: 1,
+
     /*
      * Serialized nodes
      */
@@ -270,6 +273,7 @@ export function serializeTemplate(canvas: ComfyGraphCanvas, template: ComfyBoxTe
     [nodes, links] = pruneDetachedLinks(nodes, links);
 
     let comfyBoxTemplate: SerializedComfyBoxTemplate = {
+        version: 1,
         nodes: nodes,
         links: links,
         layout: layout
@@ -320,6 +324,7 @@ export function createTemplate(nodes: LGraphNode[]): ComfyBoxTemplateResult {
         }
 
         return {
+            version: 1,
             nodes: nodes,
             links: links,
             container: container
@@ -328,6 +333,7 @@ export function createTemplate(nodes: LGraphNode[]): ComfyBoxTemplateResult {
     else {
         // No UI to serialize.
         return {
+            version: 1,
             nodes: nodes,
             links: links,
         }

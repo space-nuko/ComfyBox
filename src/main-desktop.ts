@@ -2,10 +2,10 @@
 import "$lib/nodeImports";
 
 import ComfyApp from '$lib/components/ComfyApp';
-import { configureLitegraph } from '$lib/init';
+import init from '$lib/init';
 import App from './App.svelte';
 
-configureLitegraph()
+await init();
 
 const comfyApp = new ComfyApp();
 (window as any).app = comfyApp;

@@ -34,6 +34,7 @@ import { tick } from "svelte";
 import { type SvelteComponentDev } from "svelte/internal";
 import { get, writable, type Writable } from "svelte/store";
 import ComfyPromptSerializer, { isActiveBackendNode, UpstreamNodeLocator } from "./ComfyPromptSerializer";
+import DanbooruTags from "$lib/DanbooruTags";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -231,6 +232,8 @@ export default class ComfyApp {
         this.addKeyboardHandler();
 
         await this.updateHistoryAndQueue();
+
+        await this.initFrontendFeatures();
 
         // await this.#invokeExtensionsAsync("setup");
 
@@ -584,6 +587,10 @@ export default class ComfyApp {
             this.shiftDown = e.shiftKey;
             this.ctrlDown = e.ctrlKey;
         });
+    }
+
+    private async initFrontendFeatures() {
+        await DanbooruTags.instance.load();
     }
 
     private async updateHistoryAndQueue() {

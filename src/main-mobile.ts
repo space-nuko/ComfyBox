@@ -9,11 +9,11 @@ import ComfyApp from '$lib/components/ComfyApp';
 import uiState from '$lib/stores/uiState';
 import { LiteGraph } from '@litegraph-ts/core';
 import ComfyGraph from '$lib/ComfyGraph';
-import { configureLitegraph } from '$lib/init';
+import init from '$lib/init';
 
 Framework7.use(Framework7Svelte);
 
-configureLitegraph(true);
+await init(true);
 
 const comfyApp = new ComfyApp();
 (window as any).app = comfyApp;

@@ -3,8 +3,9 @@ import { LGraphCanvas, LiteGraph, Subgraph } from '@litegraph-ts/core';
 import layoutStates from './stores/layoutStates';
 import { get } from 'svelte/store';
 import workflowState from './stores/workflowState';
+import DanbooruTags from './DanbooruTags';
 
-export function configureLitegraph(isMobile: boolean = false) {
+function configureLitegraph(isMobile: boolean = false) {
     LiteGraph.catch_exceptions = false;
 
     // Must be enabled, otherwise subgraphs won't work (because of non-unique node/link IDs)
@@ -26,10 +27,18 @@ export function configureLitegraph(isMobile: boolean = false) {
     }
 
     Subgraph.default_lgraph_factory = () => new ComfyGraph;
+}
 
-    (window as any).LiteGraph = LiteGraph;
-    (window as any).LGraphCanvas = LGraphCanvas;
-    (window as any).layoutStates = layoutStates;
-    (window as any).workflowState = workflowState;
-    (window as any).svelteGet = get;
+function configureGlobals() {
+    const win = window as any
+    win.LiteGraph = LiteGraph;
+    win.LGraphCanvas = LGraphCanvas;
+    win.layoutStates = layoutStates;
+    win.workflowState = workflowState;
+    win.svelteGet = get;
+}
+
+export default async function init(isMobile: boolean = false) {
+    configureLitegraph(isMobile);
+    configureGlobals();
 }
