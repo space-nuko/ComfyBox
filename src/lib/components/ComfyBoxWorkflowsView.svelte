@@ -9,7 +9,7 @@
  import { get, writable, type Writable } from "svelte/store";
  import uiState from "$lib/stores/uiState";
  import interfaceState from "$lib/stores/interfaceState";
- import workflowState, { ComfyBoxWorkflow } from "$lib/stores/workflowState";
+ import workflowState, { ComfyBoxWorkflow, type WorkflowInstID } from "$lib/stores/workflowState";
  import selectionState from "$lib/stores/selectionState";
  import type ComfyApp from './ComfyApp';
  import { onMount } from "svelte";
@@ -22,8 +22,10 @@
  export let app: ComfyApp;
  export let uiTheme: string = "gradio-dark" // TODO config
 
+ type OpenedWorkflow = { id: WorkflowInstID };
+
  let workflow: ComfyBoxWorkflow | null = null;
- let openedWorkflows = []
+ let openedWorkflows: OpenedWorkflow[] = []
 
  let containerElem: HTMLDivElement;
  let resizeTimeout: NodeJS.Timeout | null;
@@ -165,7 +167,7 @@
      app.closeWorkflow(workflow.id);
  }
 
- function handleConsider(evt: any) {
+ function handleConsider(evt: CustomEvent<DndEvent<OpenedWorkflow>>) {
      console.warn(openedWorkflows.length, openedWorkflows, evt.detail.items.length, evt.detail.items)
      openedWorkflows = evt.detail.items;
      // openedWorkflows = evt.detail.items.filter(item => item.id !== SHADOW_PLACEHOLDER_ITEM_ID);
@@ -175,7 +177,7 @@
      // })
  };
 
- function handleFinalize(evt: any) {
+ function handleFinalize(evt: CustomEvent<DndEvent<OpenedWorkflow>>) {
      openedWorkflows = evt.detail.items;
      workflowState.update(s => {
          s.openedWorkflows = openedWorkflows.filter(w => w.id !== SHADOW_PLACEHOLDER_ITEM_ID).map(w => workflowState.getWorkflow(w.id));
@@ -206,6 +208,7 @@
     <div id="workflow-tabs">
         <div class="workflow-tab-items"
              use:dndzone="{{
+                  type: "workflowTab",
                   items: openedWorkflows,
                   flipDurationMs: 200,
                   type: "workflow-tab",

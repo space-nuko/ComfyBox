@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
- export type ComfyPaneMode = "none" | "activeWorkflow" | "graph" | "properties" | "queue"
+ export type ComfyPaneMode = "none" | "activeWorkflow" | "graph" | "properties" | "templates" | "queue"
 </script>
 
 <script lang="ts">
@@ -8,12 +8,13 @@
   */
  import workflowState from "$lib/stores/workflowState";
  import type ComfyApp from "./ComfyApp";
- import { Sliders2, LayoutTextSidebarReverse } from "svelte-bootstrap-icons";
+ import { Sliders2, BoxSeam, LayoutTextSidebarReverse } from "svelte-bootstrap-icons";
 
  import ComfyBoxWorkflowView from "./ComfyBoxWorkflowView.svelte";
  import ComfyGraphView from "./ComfyGraphView.svelte";
  import ComfyProperties from "./ComfyProperties.svelte";
  import ComfyQueue from "./ComfyQueue.svelte";
+ import ComfyTemplates from "./ComfyTemplates.svelte";
 	import { SvelteComponent } from "svelte";
 
  export let app: ComfyApp
@@ -22,6 +23,7 @@
 
  const MODES: [ComfyPaneMode, typeof SvelteComponent][] = [
      ["properties", Sliders2],
+     ["templates", BoxSeam],
      ["queue", LayoutTextSidebarReverse]
  ]
 
@@ -39,6 +41,8 @@
             <ComfyGraphView {app} />
         {:else if mode === "properties"}
             <ComfyProperties workflow={$workflowState.activeWorkflow} />
+        {:else if mode === "templates"}
+            <ComfyTemplates {app} />
         {:else if mode === "queue"}
             <ComfyQueue {app} />
         {:else}

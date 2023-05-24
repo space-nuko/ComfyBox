@@ -6,6 +6,7 @@ import { ComfyReroute } from "./nodes";
 import layoutStates from "./stores/layoutStates";
 import queueState from "./stores/queueState";
 import selectionState from "./stores/selectionState";
+import templateState from "./stores/templateState";
 import { createTemplate, type ComfyBoxTemplate, serializeTemplate, type SerializedComfyBoxTemplate } from "./ComfyBoxTemplate";
 import notify from "./notify";
 import { v4 as uuidv4 } from "uuid"
@@ -523,11 +524,20 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
 
         const template = result as ComfyBoxTemplate;
 
-        console.warn("TEMPLATEFOUND", template)
-
         const serialized = serializeTemplate(this, template);
 
-        download("template.svg", serialized.svg, "image/svg+xml");
+        try {
+            if (templateState.add(serialized)) {
+                notify("Template saved!", { type: "success" })
+            }
+            else {
+                notify("Failed to save template: already exists in LocalStorage", { type: "error" })
+            }
+        }
+        catch (error) {
+            // Quota exceeded?
+            notify(`Failed to save template: ${error}`, { type: "error", timeout: 10000 })
+        }
     }
 
     override getCanvasMenuOptions(): ContextMenuItem[] {

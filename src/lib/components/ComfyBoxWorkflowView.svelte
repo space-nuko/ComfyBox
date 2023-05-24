@@ -140,7 +140,7 @@
 
 {#if workflow != null}
     {#if layoutState != null}
-        <div id="comfy-workflow-view" on:contextmenu={onRightClick}>
+        <div class="comfy-workflow-view" on:contextmenu={onRightClick}>
             <WidgetContainer bind:dragItem={root} classes={["root-container"]} {layoutState} />
         </div>
     {/if}
@@ -185,7 +185,7 @@
 {/if}
 
 <style lang="scss">
- #comfy-workflow-view {
+ .comfy-workflow-view {
      width: 100%;
      height: 100%;
      overflow: auto;

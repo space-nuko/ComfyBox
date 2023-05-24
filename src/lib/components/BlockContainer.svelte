@@ -7,13 +7,13 @@
  import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 
  import {fade} from 'svelte/transition';
- // notice - fade in works fine but don't add svelte's fade-out (known issue)
  import {cubicIn} from 'svelte/easing';
  import { flip } from 'svelte/animate';
  import { type ContainerLayout, type WidgetLayout, type IDragItem, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
  import { startDrag, stopDrag } from "$lib/utils"
  import type { Writable } from "svelte/store";
  import { isHidden } from "$lib/widgets/utils";
+	import { handleContainerConsider, handleContainerFinalize } from "./utils";
 
  export let layoutState: WritableLayoutStateStore;
  export let container: ContainerLayout | null = null;
@@ -45,14 +45,12 @@
      attrsChanged = null
  }
 
- function handleConsider(evt: any) {
-     children = layoutState.updateChildren(container, evt.detail.items)
-     // console.log(dragItems);
+ function handleConsider(evt: CustomEvent<DndEvent<IDragItem>>) {
+     children = handleContainerConsider(layoutState, container, evt);
  };
 
- function handleFinalize(evt: any) {
-     children = layoutState.updateChildren(container, evt.detail.items)
-     // Ensure dragging is stopped on drag finish
+ function handleFinalize(evt: CustomEvent<DndEvent<IDragItem>>) {
+     children = handleContainerFinalize(layoutState, container, evt);
  };
 
  function _startDrag(e: MouseEvent | TouchEvent) {
@@ -83,6 +81,7 @@
                  class:empty={children.length === 0}
                  class:edit
                  use:dndzone="{{
+                      type: "layout",
                      items: children,
                      flipDurationMs,
                      centreDraggedOnCursor: true,

@@ -219,3 +219,8 @@ button {
     }
 
 }
+
+// fixes drop item shadow not appearing when dragging template items onto workflow
+:global([data-is-dnd-shadow-item]) {
+    min-height: 5rem;
+}

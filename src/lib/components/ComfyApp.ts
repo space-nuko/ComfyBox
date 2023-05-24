@@ -36,7 +36,8 @@ import { type SvelteComponentDev } from "svelte/internal";
 import { get, writable, type Writable } from "svelte/store";
 import ComfyPromptSerializer, { isActiveBackendNode, UpstreamNodeLocator } from "./ComfyPromptSerializer";
 import DanbooruTags from "$lib/DanbooruTags";
-import { deserializeTemplate } from "$lib/ComfyBoxTemplate";
+import { deserializeTemplateFromSVG } from "$lib/ComfyBoxTemplate";
+import templateState from "$lib/stores/templateState";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -234,6 +235,7 @@ export default class ComfyApp {
         this.addKeyboardHandler();
 
         await this.updateHistoryAndQueue();
+        templateState.load();
 
         await this.initFrontendFeatures();
 
@@ -1004,7 +1006,7 @@ export default class ComfyApp {
             };
             reader.readAsText(file);
         } else if (file.type === "image/svg+xml" || file.name.endsWith(".svg")) {
-            const templateAndSvg = await deserializeTemplate(file);
+            const templateAndSvg = await deserializeTemplateFromSVG(file);
             modalState.pushModal({
                 title: "ComfyBox Template Preview",
                 svelteComponent: EditTemplateModal,

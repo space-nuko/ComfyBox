@@ -1,9 +1,10 @@
-import { Subgraph, type LGraphNode, type LLink, type SerializedLGraphNode, type SerializedLLink, LGraph, type NodeID } from "@litegraph-ts/core"
+import { Subgraph, type LGraphNode, type LLink, type SerializedLGraphNode, type SerializedLLink, LGraph, type NodeID, type UUID } from "@litegraph-ts/core"
 import layoutStates, { isComfyWidgetNode, type ContainerLayout, type SerializedDragEntry, type WidgetLayout, type DragItemID, type WritableLayoutStateStore, type DragItemEntry, type SerializedLayoutState } from "./stores/layoutStates"
 import type { ComfyWidgetNode } from "./nodes/widgets"
 import type ComfyGraphCanvas from "./ComfyGraphCanvas"
 import C2S from "canvas-to-svg";
 import { download } from "./utils";
+import { v4 as uuidv4 } from "uuid";
 
 /*
  * In ComfyBox a template contains a subset of nodes in the graph and the set of
@@ -11,6 +12,7 @@ import { download } from "./utils";
  */
 export type ComfyBoxTemplate = {
     version: 1,
+    id: UUID,
     metadata: ComfyBoxTemplateMetadata,
     nodes: LGraphNode[],
     links: LLink[],
@@ -19,6 +21,17 @@ export type ComfyBoxTemplate = {
 
 export type SerializedTemplateLink = [NodeID, number, NodeID, number];
 
+export type ComfyBoxTemplateMetadata = {
+    title: string,
+    author: string,
+    description: string,
+    tags: string[],
+    category: string,
+    createdAt: number
+
+    // TODO required/optional python extensions
+}
+
 /*
  * In ComfyBox a template contains a subset of nodes in the graph and the set of
  * components they represent in the UI.
@@ -26,6 +39,7 @@ export type SerializedTemplateLink = [NodeID, number, NodeID, number];
 export type SerializedComfyBoxTemplate = {
     isComfyBoxTemplate: true,
     version: 1,
+    id: UUID,
 
     /*
      * Serialized metadata
@@ -46,29 +60,23 @@ export type SerializedComfyBoxTemplate = {
      * Serialized container type drag item
      */
     layout?: SerializedLayoutState
+
+    /*
+     * SVG of the graph ndoes
+     */
+    svg?: string
 }
 
 function isSerializedComfyBoxTemplate(param: any): param is SerializedComfyBoxTemplate {
     return param && param.isComfyBoxTemplate;
 }
 
-export type SerializedComfyBoxTemplateAndSVG = {
-    template: SerializedComfyBoxTemplate,
-    svg: string,
-}
-
-export type ComfyBoxTemplateMetadata = {
-    title: string,
-    author: string,
-    tags: string[],
-
-    // TODO required/optional python extensions
-}
-
 const DEFAULT_TEMPLATE_METADATA = {
     title: "New Template",
     author: "Anonymous",
-    tags: []
+    description: "A brand-new ComfyBox template",
+    tags: [],
+    category: "general"
 }
 
 export type ComfyBoxTemplateError = {
@@ -145,7 +153,7 @@ function unescapeXml(safe) {
 
 const TEMPLATE_SVG_PADDING: number = 50;
 
-function renderSvg(canvas: ComfyGraphCanvas, graph: LGraph, extraData: SerializedComfyBoxTemplate, padding: number): string {
+function renderSvg(canvas: ComfyGraphCanvas, graph: LGraph, padding: number, extraData?: SerializedComfyBoxTemplate | null): string {
     // Calculate the min max bounds for the nodes on the graph
     const bounds = graph._nodes.reduce(
         (p, n) => {
@@ -247,11 +255,16 @@ function renderSvg(canvas: ComfyGraphCanvas, graph: LGraph, extraData: Serialize
 
     canvas.draw(true, true);
 
-    // Convert to SVG, embed graph and save
-    // const json = JSON.stringify(app.graph.serialize());
-    const json = JSON.stringify(extraData);
-    const svg = svgCtx.getSerializedSvg(true).replace("</svg>", `<desc>${escapeXml(json)}</desc></svg>`);
+    let svg = svgCtx.getSerializedSvg(true)
+    return svg
+}
 
+export function embedTemplateInSvg(template: SerializedComfyBoxTemplate): string {
+    let oldSvg = template.svg;
+    template.svg = undefined;
+    const json = JSON.stringify(template);
+    const svg = oldSvg.replace("</svg>", `<desc>${escapeXml(json)}</desc></svg>`);
+    template.svg = oldSvg;
     return svg
 }
 
@@ -285,7 +298,7 @@ function convLinkForTemplate(link: LLink): SerializedTemplateLink {
     return [link.origin_id, link.origin_slot, link.target_id, link.target_slot];
 }
 
-export function serializeTemplate(canvas: ComfyGraphCanvas, template: ComfyBoxTemplate): SerializedComfyBoxTemplateAndSVG {
+export function serializeTemplate(canvas: ComfyGraphCanvas, template: ComfyBoxTemplate): SerializedComfyBoxTemplate {
     let graph: LGraph
     if (template.nodes.length === 1 && template.nodes[0].is(Subgraph)) {
         graph = template.nodes[0].subgraph
@@ -305,21 +318,23 @@ export function serializeTemplate(canvas: ComfyGraphCanvas, template: ComfyBoxTe
 
     [nodes, links] = pruneDetachedLinks(nodes, links);
 
-    let serTemplate: SerializedComfyBoxTemplate = {
+    const svg = renderSvg(canvas, graph, TEMPLATE_SVG_PADDING);
+
+    const serTemplate: SerializedComfyBoxTemplate = {
         isComfyBoxTemplate: true,
         version: 1,
+        id: template.id,
         metadata,
         nodes,
         links,
         layout,
+        svg
     }
 
-    const svg = renderSvg(canvas, graph, serTemplate, TEMPLATE_SVG_PADDING)
-
-    return { svg, template: serTemplate }
+    return serTemplate;
 }
 
-export function deserializeTemplate(file: File): Promise<SerializedComfyBoxTemplateAndSVG> {
+export function deserializeTemplateFromSVG(file: File): Promise<SerializedComfyBoxTemplate> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = async () => {
@@ -340,10 +355,8 @@ export function deserializeTemplate(file: File): Promise<SerializedComfyBoxTempl
                 reject("Invalid template format!")
             }
             else {
-                const result: SerializedComfyBoxTemplateAndSVG = {
-                    svg, template
-                }
-                resolve(result)
+                template.svg = svg;
+                resolve(template)
             }
         };
         reader.readAsText(file);
@@ -364,8 +377,13 @@ export function createTemplate(nodes: LGraphNode[]): ComfyBoxTemplateResult {
     const layout = layoutStates.getLayoutByNode(nodes[0])
     if (layout == null) {
         return {
-            error: "Subgraph not contained in a layout!"
+            error: "Node(s) not contained in a layout!"
         }
+    }
+
+    let title = "New Template";
+    if (nodes.length === 1) {
+        title = nodes[0].title || title;
     }
 
     if (widgetNodes.length > 0) {
@@ -386,7 +404,8 @@ export function createTemplate(nodes: LGraphNode[]): ComfyBoxTemplateResult {
 
         return {
             version: 1,
-            metadata: { ...DEFAULT_TEMPLATE_METADATA },
+            id: uuidv4(),
+            metadata: { ...DEFAULT_TEMPLATE_METADATA, title, createdAt: Date.now() },
             nodes: nodes,
             links: links,
             container: container
@@ -396,7 +415,8 @@ export function createTemplate(nodes: LGraphNode[]): ComfyBoxTemplateResult {
         // No UI to serialize.
         return {
             version: 1,
-            metadata: { ...DEFAULT_TEMPLATE_METADATA },
+            id: uuidv4(),
+            metadata: { ...DEFAULT_TEMPLATE_METADATA, title, createdAt: Date.now() },
             nodes: nodes,
             links: links,
         }
