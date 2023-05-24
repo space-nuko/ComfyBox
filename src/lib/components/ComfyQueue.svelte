@@ -354,10 +354,11 @@
 <style lang="scss">
  $pending-height: 200px;
  $display-mode-buttons-height: 2rem;
+ $pane-mode-buttons-height: 2.5rem;
  $bottom-bar-height: 70px;
  $workflow-tabs-height: 2.5rem;
  $mode-buttons-height: 30px;
- $queue-height: calc(100vh - #{$pending-height} - #{$mode-buttons-height} - #{$bottom-bar-height} - #{$workflow-tabs-height} - 0.9rem);
+ $queue-height: calc(100vh - #{$pending-height} - #{$pane-mode-buttons-height} - #{$mode-buttons-height} - #{$bottom-bar-height} - #{$workflow-tabs-height} - 0.9rem);
  $queue-height-history: calc(#{$queue-height} - #{$display-mode-buttons-height});
 
  .prompt-modal-header {
