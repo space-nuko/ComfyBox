@@ -211,7 +211,7 @@
          await tick(); // Wait for list size to be recalculated
          queueList.scroll({ top: queueList.scrollHeight })
      }
-     console.warn("[ComfyQueue] BUILDQUEUE", _entries, $queuePending, $queueRunning)
+     console.warn("[ComfyQueue] BUILDQUEUE", _entries.length, $queuePending.length, $queueRunning.length)
  }
 
  async function updateFromHistory() {
@@ -219,7 +219,7 @@
      if (queueList) {
          queueList.scrollTo(0, 0);
      }
-     console.warn("[ComfyQueue] BUILDHISTORY", _entries, $queueCompleted)
+     console.warn("[ComfyQueue] BUILDHISTORY", _entries.length, $queueCompleted.length)
  }
 
  async function interrupt() {

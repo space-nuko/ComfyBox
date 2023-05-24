@@ -1,4 +1,4 @@
-import { LConnectionKind, LGraph, LGraphNode, type INodeSlot, type SlotIndex, LiteGraph, getStaticProperty, type LGraphAddNodeOptions, LGraphCanvas, type LGraphRemoveNodeOptions, Subgraph, type LGraphAddNodeMode } from "@litegraph-ts/core";
+import { LConnectionKind, LGraph, LGraphNode, type INodeSlot, type SlotIndex, LiteGraph, getStaticProperty, type LGraphAddNodeOptions, LGraphCanvas, type LGraphRemoveNodeOptions, Subgraph, type LGraphAddNodeMode, type SerializedLGraphNode, type Vector2 } from "@litegraph-ts/core";
 import GraphSync from "./GraphSync";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
@@ -13,6 +13,7 @@ import type { WritableLayoutStateStore } from "./stores/layoutStates";
 import layoutStates from "./stores/layoutStates";
 import type { ComfyBoxWorkflow, WorkflowInstID } from "./stores/workflowState";
 import workflowState from "./stores/workflowState";
+import type { SerializedComfyBoxTemplate } from "./ComfyBoxTemplate";
 
 type ComfyGraphEvents = {
     configured: (graph: LGraph) => void

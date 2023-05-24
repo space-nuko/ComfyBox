@@ -219,8 +219,7 @@
 
  .animation-wrapper {
      position: relative;
-     flex-grow: 100;
-     flex-basis: 0;
+     flex: 1 1 0%;
  }
 
  .handle-widget:hover {

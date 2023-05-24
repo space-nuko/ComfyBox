@@ -116,7 +116,6 @@ export default class DanbooruTags {
         })
 
         console.log(`Parsed ${this.tags.length} tags in ${time / 1000}ms.`)
-        console.error(this.tags[0])
     }
 
     autocomplete(context: CompletionContext): CompletionResult {

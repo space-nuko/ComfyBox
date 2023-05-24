@@ -29,7 +29,7 @@ const store: Writable<UIState> = writable(
         uiEditMode: "widgets",
 
         reconnecting: false,
-        isSavingToLocalStorage: false
+        isSavingToLocalStorage: false,
     })
 
 function reconnecting() {
