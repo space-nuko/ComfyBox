@@ -76,6 +76,31 @@ export default class ComfyReroute extends ComfyGraphNode {
     };
 
     override getExtraMenuOptions(_, options: ContextMenuItem[]): ContextMenuItem[] | null {
+        const canSplice = this.getInputLink(0) != null && this.getOutputLinks(0).length > 0;
+
+        options.push({
+            content: "Splice & Remove",
+            disabled: !canSplice,
+            callback: () => {
+                const inputLink = this.getInputLink(0);
+                const outputLinks = this.getOutputLinks(0);
+                if (!inputLink || !outputLinks)
+                    return;
+
+                const inputNode = this.graph.getNodeById(inputLink.origin_id)
+                this.graph.removeLink(inputLink.id);
+
+                for (const outputLink of outputLinks) {
+                    const outputNode = this.graph.getNodeById(outputLink.target_id)
+                    this.graph.removeLink(outputLink.id);
+
+                    inputNode.connect(inputLink.origin_slot, outputNode, outputLink.target_slot);
+                }
+
+                this.graph.remove(this);
+            }
+        })
+
         options.unshift(
             {
                 content: (this.properties.showOutputText ? "Hide" : "Show") + " Type",

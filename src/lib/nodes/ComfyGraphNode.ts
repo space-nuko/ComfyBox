@@ -196,8 +196,9 @@ export default class ComfyGraphNode extends LGraphNode {
                                 updateNodes.push(node);
                             } else {
                                 // We've found an output
-                                const nodeOutType = node.inputs && node.inputs[link?.target_slot] && node.inputs[link.target_slot].type ? node.inputs[link.target_slot].type : null;
-                                if (inputType && nodeOutType !== inputType) {
+                                let nodeOutType = node.inputs && node.inputs[link?.target_slot] != null ? node.inputs[link.target_slot].type : null;
+                                nodeOutType ||= "*"
+                                if (inputType && nodeOutType !== inputType && nodeOutType !== "*") {
                                     // The output doesnt match our input so disconnect it
                                     node.disconnectInput(link.target_slot);
                                 } else {

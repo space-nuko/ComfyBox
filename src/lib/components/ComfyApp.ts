@@ -375,6 +375,9 @@ export default class ComfyApp {
         reg("COMFYBOX_IMAGE")
         reg("COMFYBOX_IMAGES")
         reg("COMFYBOX_REGION")
+
+        // hide base litegraph reroute from context menus since ComfyUI provides its own
+        LiteGraph.registered_node_types["basic/reroute"].hide_in_node_lists = true;
     }
 
     static registerDefaultSlotHandlers(nodeId: string, nodeDef: ComfyNodeDef) {
