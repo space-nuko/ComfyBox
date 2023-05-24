@@ -6,6 +6,8 @@ import { ComfyReroute } from "./nodes";
 import layoutStates from "./stores/layoutStates";
 import queueState from "./stores/queueState";
 import selectionState from "./stores/selectionState";
+import { createTemplate, type ComfyBoxTemplate, serializeTemplate } from "./ComfyBoxTemplate";
+import notify from "./notify";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
@@ -452,6 +454,24 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         return options
     }
 
+    saveAsTemplate(_value: IContextMenuItem, _options, mouseEvent, prevMenu, node?: LGraphNode) {
+        if (!this.selected_nodes || Object.values(this.selected_nodes).length === 0)
+            return;
+
+        const result = createTemplate(Object.values(this.selected_nodes));
+
+        if ("error" in result) {
+            notify(`Couldn't create template: ${result.error}`, { type: "error", timeout: 5000 });
+            return;
+        }
+
+        const template = result as ComfyBoxTemplate;
+
+        console.warn("TEMPLATEFOUND", template)
+
+        const serialized = serializeTemplate(this, template);
+    }
+
     override getNodeMenuOptions(node: LGraphNode): ContextMenuItem[] {
         const options = super.getNodeMenuOptions(node);
 
@@ -461,6 +481,15 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
                 has_submenu: false,
                 disabled: false,
                 callback: this.reinstantiate.bind(this)
+            },
+        )
+
+        options.push(
+            {
+                content: "Save as Template",
+                has_submenu: false,
+                disabled: false,
+                callback: this.saveAsTemplate.bind(this)
             },
         )
 

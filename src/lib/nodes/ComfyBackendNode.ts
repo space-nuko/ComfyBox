@@ -32,10 +32,7 @@ export class ComfyBackendNode extends ComfyGraphNode {
 
         this.setup(nodeDef)
 
-        // ComfyUI has no obvious way to identify if a node will return outputs back to the frontend based on its properties.
-        // It just returns a hash like { "ui": { "images": results } } internally.
-        // So this will need to be hardcoded for now.
-        if (["PreviewImage", "SaveImage"].indexOf(comfyClass) !== -1) {
+        if (nodeDef.output_node) {
             this.addOutput("OUTPUT", BuiltInSlotType.EVENT, { color_off: "rebeccapurple", color_on: "rebeccapurple" });
         }
     }
