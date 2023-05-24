@@ -5,6 +5,7 @@ export type ComfyNodeDef = {
     name: string
     display_name?: string
     category: string
+    output_node?: boolean,
     input: ComfyNodeDefInputs
     /** Output type like "LATENT" or "IMAGE" */
     output: string[]
