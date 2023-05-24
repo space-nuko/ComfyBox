@@ -6,8 +6,8 @@ import C2S from "canvas-to-svg";
 import { download } from "./utils";
 
 /*
- * InComfyBox a template contains a subgraph and the set of components it
- * represents in the UI.
+ * In ComfyBox a template contains a subset of nodes in the graph and the set of
+ * components they represent in the UI.
  */
 export type ComfyBoxTemplate = {
     nodes: LGraphNode[],
@@ -16,8 +16,8 @@ export type ComfyBoxTemplate = {
 }
 
 /*
- * InComfyBox a template contains a subgraph and the set of components it
- * represents in the UI.
+ * In ComfyBox a template contains a subset of nodes in the graph and the set of
+ * components they represent in the UI.
  */
 export type SerializedComfyBoxTemplate = {
     /*
