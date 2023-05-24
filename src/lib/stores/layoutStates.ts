@@ -9,6 +9,7 @@ import type { ComfyWidgetNode } from '$lib/nodes/widgets';
 import type ComfyGraph from '$lib/ComfyGraph';
 import type { ComfyBoxWorkflow, WorkflowAttributes, WorkflowInstID } from './workflowState';
 import workflowState from './workflowState';
+import type { SerializedComfyBoxTemplate } from '$lib/ComfyBoxTemplate';
 
 export function isComfyWidgetNode(node: LGraphNode): node is ComfyWidgetNode {
     return "svelteComponentType" in node
@@ -635,7 +636,7 @@ for (const cat of Object.values(ALL_ATTRIBUTES)) {
 export { ALL_ATTRIBUTES };
 
 // TODO Should be nested by category for name uniqueness?
-const defaultWidgetAttributes: Attributes = {} as any
+export const defaultWidgetAttributes: Attributes = {} as any
 export const defaultWorkflowAttributes: WorkflowAttributes = {} as any
 for (const cat of Object.values(ALL_ATTRIBUTES)) {
     for (const spec of Object.values(cat.specs)) {
@@ -657,7 +658,7 @@ export interface IDragItem {
     /*
      * Type of the item.
      */
-    type: "container" | "widget",
+    type: "container" | "widget" | "template",
 
     /*
      * Unique ID of the item.
@@ -705,6 +706,21 @@ export interface WidgetLayout extends IDragItem {
      * litegraph node this widget is bound to.
      */
     node: ComfyWidgetNode
+}
+
+/*
+ * A template being dragged into the workflow UI.
+ *
+ * These will never be saved, instead they will be expanded inside
+ * updateChildren() and then removed.
+ */
+export interface TemplateLayout extends IDragItem {
+    type: "template",
+
+    /*
+     * Template to expand
+     */
+    template: SerializedComfyBoxTemplate
 }
 
 export type DefaultLayout = {
@@ -874,7 +890,7 @@ function createRaw(workflow: ComfyBoxWorkflow | null = null): WritableLayoutStat
         if (newChildren)
             state.allItems[parent.id].children = newChildren;
         for (const child of state.allItems[parent.id].children) {
-            if (child.id === SHADOW_PLACEHOLDER_ITEM_ID)
+            if (child.id === SHADOW_PLACEHOLDER_ITEM_ID || child.type === "template")
                 continue;
             state.allItems[child.id].parent = parent;
         }

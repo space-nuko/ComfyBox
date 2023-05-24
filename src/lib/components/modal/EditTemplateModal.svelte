@@ -1,5 +1,5 @@
 <script lang="ts">
- import type { ComfyBoxTemplate, SerializedComfyBoxTemplateAndSVG } from "$lib/ComfyBoxTemplate";
+ import type { ComfyBoxTemplate, SerializedComfyBoxTemplate } from "$lib/ComfyBoxTemplate";
  import type { SerializedDragEntry, SerializedLayoutState } from "$lib/stores/layoutStates";
  import { Block, BlockTitle } from "@gradio/atoms";
  import SerializedLayoutPreviewNode from "./SerializedLayoutPreviewNode.svelte";
@@ -10,7 +10,7 @@
 	import Textbox from "@gradio/form/src/Textbox.svelte";
  const DOMPurify = createDOMPurify(window);
 
- export let templateAndSvg: SerializedComfyBoxTemplateAndSVG;
+ export let templateAndSvg: SerializedComfyBoxTemplate;
  let layout: SerializedLayoutState | null
  let root: SerializedDragEntry | null
 
@@ -21,7 +21,7 @@
               : "";
 
  $: if (templateAndSvg) {
-     layout = templateAndSvg.template.layout;
+     layout = templateAndSvg.layout;
      if (layout) {
          root = layout.allItems[layout.root];
      }
