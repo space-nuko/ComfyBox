@@ -1,14 +1,11 @@
-import { BuiltInSlotShape, LGraph, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type MouseEventExt, type Vector2, type Vector4, TitleMode, type ContextMenuItem, type IContextMenuItem, Subgraph, LLink, type NodeID } from "@litegraph-ts/core";
-import type ComfyApp from "./components/ComfyApp";
-import queueState from "./stores/queueState";
+import { BuiltInSlotShape, LGraphCanvas, LGraphNode, LLink, LiteGraph, NodeMode, Subgraph, TitleMode, type ContextMenuItem, type IContextMenuItem, type NodeID, type Vector2, type Vector4, type MouseEventExt, ContextMenu } from "@litegraph-ts/core";
 import { get, type Unsubscriber } from "svelte/store";
-import uiState from "./stores/uiState";
-import { Watch } from "@litegraph-ts/nodes-basic";
-import { ComfyReroute } from "./nodes";
-import type { Progress } from "./components/ComfyApp";
-import selectionState from "./stores/selectionState";
 import type ComfyGraph from "./ComfyGraph";
+import type ComfyApp from "./components/ComfyApp";
+import { ComfyReroute } from "./nodes";
 import layoutStates from "./stores/layoutStates";
+import queueState from "./stores/queueState";
+import selectionState from "./stores/selectionState";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
@@ -403,6 +400,30 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         }
     }
 
+    private insertReroute(_value: IContextMenuItem, _options, mouseEvent: MouseEventExt, prevMenu?: ContextMenu, link?: LLink) {
+        if (link == null)
+            return
+
+        const originNode = this.graph.getNodeById(link.origin_id);
+        const targetNode = this.graph.getNodeById(link.target_id);
+
+        if (originNode == null || targetNode == null)
+            return;
+
+        if (typeof prevMenu?.options?.event?.canvasX === "number")
+            mouseEvent = prevMenu.options.event as MouseEventExt;
+
+        const reroute = LiteGraph.createNode(ComfyReroute);
+        const size = reroute.computeSize();
+        const pos: Vector2 = [mouseEvent.canvasX - size[0] * 0.5, mouseEvent.canvasY - size[1] * 0.5];
+
+        this.graph.removeLink(link.id);
+        this.graph.add(reroute, { pos });
+
+        originNode.connect(link.origin_slot, reroute, 0)
+        reroute.connect(0, targetNode, link.target_slot);
+    }
+
     private convertToSubgraph(_value: IContextMenuItem, _options, mouseEvent, prevMenu, callback?: (node: LGraphNode) => void) {
         if (Object.keys(this.selected_nodes).length === 0)
             return
@@ -440,6 +461,21 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
                 has_submenu: false,
                 disabled: false,
                 callback: this.reinstantiate.bind(this)
+            },
+        )
+
+        return options
+    }
+
+    override getLinkMenuOptions(link: LLink): ContextMenuItem[] {
+        const options = super.getLinkMenuOptions(link);
+
+        options.push(
+            {
+                content: "Insert Reroute",
+                has_submenu: false,
+                disabled: false,
+                callback: this.insertReroute.bind(this)
             },
         )
 
