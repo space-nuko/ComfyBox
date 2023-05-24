@@ -13,7 +13,7 @@ import init from '$lib/init';
 
 Framework7.use(Framework7Svelte);
 
-await init(true);
+init(true);
 
 const comfyApp = new ComfyApp();
 (window as any).app = comfyApp;
