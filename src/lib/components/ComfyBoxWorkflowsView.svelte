@@ -98,27 +98,27 @@
      }
  }
 
- let propsSidebarSize = 0;
+ let leftSidebarSize = 0;
 
- function toggleProps() {
-     if (propsSidebarSize == 0) {
-         propsSidebarSize = 15;
+ function toggleLeft() {
+     if (leftSidebarSize == 0) {
+         leftSidebarSize = 15;
          app.resizeCanvas();
      }
      else {
-         propsSidebarSize = 0;
+         leftSidebarSize = 0;
      }
  }
 
- let queueSidebarSize = 20;
+ let rightSidebarSize = 20;
 
- function toggleQueue() {
-     if (queueSidebarSize == 0) {
-         queueSidebarSize = 20;
+ function toggleRight() {
+     if (rightSidebarSize == 0) {
+         rightSidebarSize = 20;
          app.resizeCanvas();
      }
      else {
-         queueSidebarSize = 0;
+         rightSidebarSize = 0;
      }
  }
 
@@ -186,8 +186,8 @@
 
 <div id="comfy-content" bind:this={containerElem} class:loading>
     <Splitpanes theme="comfy" on:resize={refreshView}>
-        <Pane bind:size={propsSidebarSize}>
-            <ComfyPaneView {app} mode="properties"/>
+        <Pane bind:size={leftSidebarSize}>
+            <ComfyPaneView {app} mode="properties" showSwitcher={true} />
         </Pane>
         <Pane>
             <Splitpanes theme="comfy" on:resize={refreshView} horizontal="{true}">
@@ -199,8 +199,8 @@
                 </Pane>
             </Splitpanes>
         </Pane>
-        <Pane bind:size={queueSidebarSize}>
-            <ComfyPaneView {app} mode="queue"/>
+        <Pane bind:size={rightSidebarSize}>
+            <ComfyPaneView {app} mode="queue" showSwitcher={true} />
         </Pane>
     </Splitpanes>
     <div id="workflow-tabs">
@@ -252,11 +252,11 @@
                 <Button variant="secondary" disabled={loading} on:click={toggleGraph}>
                     Toggle Graph
                 </Button>
-                <Button variant="secondary" disabled={loading} on:click={toggleProps}>
-                    Toggle Props
+                <Button variant="secondary" disabled={loading} on:click={toggleLeft}>
+                    Toggle Left
                 </Button>
-                <Button variant="secondary" disabled={loading} on:click={toggleQueue}>
-                    Toggle Queue
+                <Button variant="secondary" disabled={loading} on:click={toggleRight}>
+                    Toggle Right
                 </Button>
                 <Button variant="secondary" disabled={loading} on:click={doSave}>
                     Save

@@ -86,7 +86,7 @@ const COLOR_MAP: [string, string][] = [
      _node ||= node;
      bboxes ||= $nodeValue
 
-     console.debug("[MultiRegionWidget] Recreate!", bboxes, imageElem, _node)
+     // console.debug("[MultiRegionWidget] Recreate!", bboxes, _node)
 
      if (_node != null && imageElem != null && imageContainer != null) {
          selectedIndex = clamp(selectedIndex, 0, bboxes.length - 1);
