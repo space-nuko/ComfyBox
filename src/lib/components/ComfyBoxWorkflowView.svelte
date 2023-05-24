@@ -8,10 +8,10 @@
  import Menu from './menu/Menu.svelte';
  import MenuOption from './menu/MenuOption.svelte';
  import MenuDivider from './menu/MenuDivider.svelte';
-	import type { ComfyWorkflow } from "$lib/stores/workflowState";
+	import type { ComfyBoxWorkflow } from "$lib/stores/workflowState";
 
  export let app: ComfyApp;
- export let workflow: ComfyWorkflow;
+ export let workflow: ComfyBoxWorkflow;
 
  let layoutState: WritableLayoutStateStore | null;
 

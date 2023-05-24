@@ -4,13 +4,13 @@
  import type ComfyApp from "$lib/components/ComfyApp";
  import { writable, type Writable } from "svelte/store";
  import type { WritableLayoutStateStore } from "$lib/stores/layoutStates";
- import workflowState, { type ComfyWorkflow } from "$lib/stores/workflowState";
+ import workflowState, { type ComfyBoxWorkflow } from "$lib/stores/workflowState";
 
  export let subworkflowID: number = -1;
  export let app: ComfyApp
 
  // TODO move
- let workflow: ComfyWorkflow | null = null
+ let workflow: ComfyBoxWorkflow | null = null
  let layoutState: WritableLayoutStateStore | null = null;
 
  $: workflow = $workflowState.activeWorkflow;

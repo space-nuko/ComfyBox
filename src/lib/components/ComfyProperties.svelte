@@ -11,9 +11,9 @@
  import ComfyNumberProperty from "./ComfyNumberProperty.svelte";
  import ComfyComboProperty from "./ComfyComboProperty.svelte";
  import type { ComfyWidgetNode } from "$lib/nodes/widgets";
-	import type { ComfyWorkflow } from "$lib/stores/workflowState";
+	import type { ComfyBoxWorkflow } from "$lib/stores/workflowState";
 
- export let workflow: ComfyWorkflow | null;
+ export let workflow: ComfyBoxWorkflow | null;
 
  let layoutState: WritableLayoutStateStore | null = null
 

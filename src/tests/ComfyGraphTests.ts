@@ -10,11 +10,11 @@ import { graphToGraphVis } from "$lib/utils";
 import { ComfyNumberNode } from "$lib/nodes/widgets";
 import { get } from "svelte/store";
 import layoutStates from "$lib/stores/layoutStates";
-import { ComfyWorkflow } from "$lib/stores/workflowState";
+import { ComfyBoxWorkflow } from "$lib/stores/workflowState";
 
 export default class ComfyGraphTests extends UnitTest {
     test__onNodeAdded__updatesLayoutState() {
-        const [{ graph }, layoutState] = ComfyWorkflow.create()
+        const [{ graph }, layoutState] = ComfyBoxWorkflow.create()
         layoutState.initDefaultLayout() // adds 3 containers
 
         const state = get(layoutState)
@@ -39,7 +39,7 @@ export default class ComfyGraphTests extends UnitTest {
     }
 
     test__onNodeAdded__handlesNodesAddedInSubgraphs() {
-        const [{ graph }, layoutState] = ComfyWorkflow.create()
+        const [{ graph }, layoutState] = ComfyBoxWorkflow.create()
         layoutState.initDefaultLayout()
 
         const subgraph = LiteGraph.createNode(Subgraph);
@@ -58,7 +58,7 @@ export default class ComfyGraphTests extends UnitTest {
     }
 
     test__onNodeAdded__handlesSubgraphsWithNodes() {
-        const [{ graph }, layoutState] = ComfyWorkflow.create()
+        const [{ graph }, layoutState] = ComfyBoxWorkflow.create()
         layoutState.initDefaultLayout()
 
         const state = get(layoutState)
@@ -76,7 +76,7 @@ export default class ComfyGraphTests extends UnitTest {
     }
 
     test__onNodeRemoved__updatesLayoutState() {
-        const [{ graph }, layoutState] = ComfyWorkflow.create()
+        const [{ graph }, layoutState] = ComfyBoxWorkflow.create()
         layoutState.initDefaultLayout()
 
         const widget = LiteGraph.createNode(ComfyNumberNode);

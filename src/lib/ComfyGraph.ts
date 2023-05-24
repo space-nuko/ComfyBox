@@ -11,7 +11,7 @@ import type { ComfyComboNode, ComfyWidgetNode } from "./nodes/widgets";
 import selectionState from "./stores/selectionState";
 import type { WritableLayoutStateStore } from "./stores/layoutStates";
 import layoutStates from "./stores/layoutStates";
-import type { ComfyWorkflow, WorkflowInstID } from "./stores/workflowState";
+import type { ComfyBoxWorkflow, WorkflowInstID } from "./stores/workflowState";
 import workflowState from "./stores/workflowState";
 
 type ComfyGraphEvents = {
@@ -30,7 +30,7 @@ export default class ComfyGraph extends LGraph {
 
     workflowID: WorkflowInstID | null = null;
 
-    get workflow(): ComfyWorkflow | null {
+    get workflow(): ComfyBoxWorkflow | null {
         const workflowID = (this.getRootGraph() as ComfyGraph)?.workflowID;
         if (workflowID == null)
             return null;

@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
  export type SendOutputModalResult = {
-     workflow?: ComfyWorkflow,
+     workflow?: ComfyBoxWorkflow,
      targetNode?: ComfyReceiveOutputNode,
  }
 </script>
@@ -11,7 +11,7 @@
  import type { SlotType } from "@litegraph-ts/core";
  import type { Writable } from "svelte/store";
  import { StaticImage } from "$lib/components/gradio/image";
-	import type { ComfyWorkflow, WorkflowReceiveOutputTargets } from "$lib/stores/workflowState";
+	import type { ComfyBoxWorkflow, WorkflowReceiveOutputTargets } from "$lib/stores/workflowState";
 	import { comfyBoxImageToComfyURL } from "$lib/utils";
 	import { Button } from "@gradio/button";
 	import type { ComfyReceiveOutputNode } from "$lib/nodes/actions";
@@ -29,7 +29,7 @@
      images = [comfyBoxImageToComfyURL(value)];
  }
 
- function sendOutput(workflow: ComfyWorkflow, targetNode: ComfyReceiveOutputNode) {
+ function sendOutput(workflow: ComfyBoxWorkflow, targetNode: ComfyReceiveOutputNode) {
      const result: SendOutputModalResult = {
          workflow,
          targetNode
