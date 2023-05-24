@@ -10,7 +10,7 @@ import { get } from "svelte/store";
 import configState from "$lib/stores/configState";
 import type { WidgetLayout, WritableLayoutStateStore } from "$lib/stores/layoutStates";
 import layoutStates from "$lib/stores/layoutStates";
-import workflowStateStore, { ComfyWorkflow } from "$lib/stores/workflowState";
+import workflowStateStore, { ComfyBoxWorkflow } from "$lib/stores/workflowState";
 
 export type DefaultWidgetSpec = {
     defaultWidgetNode: new (name?: string) => ComfyWidgetNode,
@@ -111,7 +111,7 @@ export default class ComfyGraphNode extends LGraphNode {
         return layoutStates.getDragItemByNode(this);
     }
 
-    get workflow(): ComfyWorkflow | null {
+    get workflow(): ComfyBoxWorkflow | null {
         return workflowStateStore.getWorkflowByNode(this);
     }
 

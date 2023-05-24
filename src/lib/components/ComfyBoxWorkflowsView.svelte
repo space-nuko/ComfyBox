@@ -3,7 +3,7 @@
  import { PlusSquareDotted } from 'svelte-bootstrap-icons';
  import { Button } from "@gradio/button";
  import { BlockTitle } from "@gradio/atoms";
- import ComfyWorkflowView from "./ComfyWorkflowView.svelte";
+ import ComfyBoxWorkflowView from "./ComfyBoxWorkflowView.svelte";
  import { Checkbox, TextBox } from "@gradio/form"
  import ComfyQueue from "./ComfyQueue.svelte";
  import ComfyUnlockUIButton from "./ComfyUnlockUIButton.svelte";
@@ -11,7 +11,7 @@
  import { get, writable, type Writable } from "svelte/store";
  import ComfyProperties from "./ComfyProperties.svelte";
  import uiState from "$lib/stores/uiState";
- import workflowState, { ComfyWorkflow } from "$lib/stores/workflowState";
+ import workflowState, { ComfyBoxWorkflow } from "$lib/stores/workflowState";
  import selectionState from "$lib/stores/selectionState";
  import type ComfyApp from './ComfyApp';
  import { onMount } from "svelte";
@@ -23,7 +23,7 @@
  export let app: ComfyApp;
  export let uiTheme: string = "gradio-dark" // TODO config
 
- let workflow: ComfyWorkflow | null = null;
+ let workflow: ComfyBoxWorkflow | null = null;
  let openedWorkflows = []
 
  let containerElem: HTMLDivElement;
@@ -160,7 +160,7 @@
      app.createNewWorkflow();
  }
 
- function closeWorkflow(event: Event, workflow: ComfyWorkflow) {
+ function closeWorkflow(event: Event, workflow: ComfyBoxWorkflow) {
      event.preventDefault();
      event.stopImmediatePropagation()
 
@@ -202,7 +202,7 @@
             <Splitpanes theme="comfy" on:resize={refreshView} horizontal="{true}">
                 <Pane>
                     {#if $workflowState.activeWorkflow != null}
-                        <ComfyWorkflowView {app} workflow={$workflowState.activeWorkflow} />
+                        <ComfyBoxWorkflowView {app} workflow={$workflowState.activeWorkflow} />
                     {:else}
                         <span style:color="var(--body-text-color)">No workflow loaded</span>
                     {/if}

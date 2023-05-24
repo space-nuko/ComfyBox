@@ -1,8 +1,8 @@
 import { parse } from 'csv-parse/browser/esm/sync';
 import { timeExecutionMs } from './utils';
-import { insertCompletionText, type Completion, type CompletionContext, type CompletionResult, type CompletionSource, type CompletionConfig, autocompletion } from '@codemirror/autocomplete';
+import { insertCompletionText, type Completion, type CompletionContext, type CompletionResult, type CompletionSource, autocompletion } from '@codemirror/autocomplete';
 import { syntaxTree } from '@codemirror/language';
-import type { Extension, TransactionSpec } from '@codemirror/state';
+import type { Extension } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
 import type { StyleSpec } from "style-mod"
 
@@ -43,7 +43,7 @@ export const TAG_CATEGORY_COLORS: StyleSpec = Object.values(TAG_CATEGORY_DATA)
             [`.cm-autocompletion-${d.name}`, { color: d.color + " !important" }],
         ]
     })
-    .reduce((dict, el) => (dict[el[0]] = el[1], dict), {})
+    .reduce((dict: StyleSpec, el: [string, any]) => (dict[el[0]] = el[1], dict), {})
 
 export type DanbooruTag = {
     text: string,

@@ -27,7 +27,7 @@ import modalState from "$lib/stores/modalState";
 import queueState from "$lib/stores/queueState";
 import selectionState from "$lib/stores/selectionState";
 import uiState from "$lib/stores/uiState";
-import workflowState, { ComfyWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
+import workflowState, { ComfyBoxWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
 import type { SerializedPromptOutput } from "$lib/utils";
 import { basename, capitalize, download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range } from "$lib/utils";
 import { tick } from "svelte";
@@ -55,7 +55,7 @@ export type OpenWorkflowOptions = {
 type PromptQueueItem = {
     num: number,
     batchCount: number
-    workflow: ComfyWorkflow
+    workflow: ComfyBoxWorkflow
 }
 
 export type A1111PromptAndInfo = {
@@ -256,7 +256,7 @@ export default class ComfyApp {
         this.lCanvas.draw(true, true);
     }
 
-    serialize(workflow: ComfyWorkflow, canvas?: SerializedGraphCanvasState): SerializedAppState {
+    serialize(workflow: ComfyBoxWorkflow, canvas?: SerializedGraphCanvasState): SerializedAppState {
         const layoutState = layoutStates.getLayout(workflow.id);
         if (layoutState == null)
             throw new Error("Workflow has no layout!")
@@ -631,7 +631,7 @@ export default class ComfyApp {
         refreshCombos: true,
         warnMissingNodeTypes: true
     }
-    ): Promise<ComfyWorkflow> {
+    ): Promise<ComfyBoxWorkflow> {
         if (data.version !== COMFYBOX_SERIAL_VERSION) {
             const mes = `Invalid ComfyBox saved data format: ${data.version} `
             notify(mes, { type: "error" })
@@ -640,7 +640,7 @@ export default class ComfyApp {
 
         this.clean();
 
-        let workflow: ComfyWorkflow;
+        let workflow: ComfyBoxWorkflow;
         try {
             workflow = workflowState.openWorkflow(this.lCanvas, data, options.setActive);
         }
@@ -831,7 +831,7 @@ export default class ComfyApp {
      * Converts the current graph workflow for sending to the API
      * @returns The workflow and node links
      */
-    graphToPrompt(workflow: ComfyWorkflow, tag: string | null = null): SerializedPrompt {
+    graphToPrompt(workflow: ComfyBoxWorkflow, tag: string | null = null): SerializedPrompt {
         return this.promptSerializer.serialize(workflow.graph, tag)
     }
 
@@ -853,7 +853,7 @@ export default class ComfyApp {
             tag = null;
 
         this.processingQueue = true;
-        let workflow: ComfyWorkflow;
+        let workflow: ComfyBoxWorkflow;
 
         try {
             while (this.queueItems.length) {
@@ -1017,7 +1017,7 @@ export default class ComfyApp {
     /**
      * Refresh combo list on whole nodes
      */
-    async refreshComboInNodes(workflow?: ComfyWorkflow, defs?: Record<string, ComfyNodeDef>, flashUI: boolean = false) {
+    async refreshComboInNodes(workflow?: ComfyBoxWorkflow, defs?: Record<string, ComfyNodeDef>, flashUI: boolean = false) {
         workflow ||= workflowState.getActiveWorkflow();
         if (workflow == null) {
             notify("No active workflow!", { type: "error" })

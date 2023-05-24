@@ -1,17 +1,17 @@
 <script lang="ts">
  import type { ComfyReceiveOutputNode } from "$lib/nodes/actions";
- import type { ComfyWorkflow, WorkflowReceiveOutputTargets } from "$lib/stores/workflowState";
+ import type { ComfyBoxWorkflow, WorkflowReceiveOutputTargets } from "$lib/stores/workflowState";
  import { Block, BlockTitle } from "@gradio/atoms";
  import { Button } from "@gradio/button";
  import { createEventDispatcher } from "svelte";
 
  const dispatch = createEventDispatcher<{
-     select: { workflow: ComfyWorkflow, targetNode: ComfyReceiveOutputNode };
+     select: { workflow: ComfyBoxWorkflow, targetNode: ComfyReceiveOutputNode };
  }>();
 
  export let receiveTargets: WorkflowReceiveOutputTargets[] = [];
 
- function onSelected( workflow: ComfyWorkflow, targetNode: ComfyReceiveOutputNode ) {
+ function onSelected( workflow: ComfyBoxWorkflow, targetNode: ComfyReceiveOutputNode ) {
      dispatch("select", {
          workflow,
          targetNode

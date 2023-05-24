@@ -7,7 +7,7 @@ import type { ComfyNodeID } from '$lib/api';
 import { v4 as uuidv4 } from "uuid";
 import type { ComfyWidgetNode } from '$lib/nodes/widgets';
 import type ComfyGraph from '$lib/ComfyGraph';
-import type { ComfyWorkflow, WorkflowAttributes, WorkflowInstID } from './workflowState';
+import type { ComfyBoxWorkflow, WorkflowAttributes, WorkflowInstID } from './workflowState';
 import workflowState from './workflowState';
 
 export function isComfyWidgetNode(node: LGraphNode): node is ComfyWidgetNode {
@@ -716,7 +716,7 @@ export type DefaultLayout = {
 export type DragItemID = UUID;
 
 type LayoutStateOps = {
-    workflow: ComfyWorkflow | null,
+    workflow: ComfyBoxWorkflow | null,
 
     addContainer: (parent: ContainerLayout | null, attrs?: Partial<Attributes>, index?: number) => ContainerLayout,
     addWidget: (parent: ContainerLayout, node: ComfyWidgetNode, attrs?: Partial<Attributes>, index?: number) => WidgetLayout,
@@ -758,7 +758,7 @@ export type SerializedDragItem = {
 
 export type WritableLayoutStateStore = Writable<LayoutState> & LayoutStateOps;
 
-function createRaw(workflow: ComfyWorkflow | null = null): WritableLayoutStateStore {
+function createRaw(workflow: ComfyBoxWorkflow | null = null): WritableLayoutStateStore {
     const store: Writable<LayoutState> = writable({
         root: null,
         allItems: {},
@@ -1299,7 +1299,7 @@ function createRaw(workflow: ComfyWorkflow | null = null): WritableLayoutStateSt
     return layoutStateStore
 }
 
-function create(workflow: ComfyWorkflow): WritableLayoutStateStore {
+function create(workflow: ComfyBoxWorkflow): WritableLayoutStateStore {
     if (get(layoutStates).all[workflow.id] != null) {
         throw new Error(`Layout state already created! ${id}`)
     }
@@ -1369,8 +1369,8 @@ export type LayoutStateStores = {
 }
 
 export type LayoutStateStoresOps = {
-    create: (workflow: ComfyWorkflow) => WritableLayoutStateStore,
-    createRaw: (workflow?: ComfyWorkflow | null) => WritableLayoutStateStore,
+    create: (workflow: ComfyBoxWorkflow) => WritableLayoutStateStore,
+    createRaw: (workflow?: ComfyBoxWorkflow | null) => WritableLayoutStateStore,
     remove: (workflowID: WorkflowInstID) => void,
     getLayout: (workflowID: WorkflowInstID) => WritableLayoutStateStore | null,
     getLayoutByGraph: (graph: LGraph) => WritableLayoutStateStore | null,

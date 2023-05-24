@@ -10,7 +10,7 @@
  import type { Styles } from "@gradio/utils";
  import { comfyFileToComfyBoxMetadata, comfyURLToComfyFile, countNewLines } from "$lib/utils";
  import ReceiveOutputTargets from "./modal/ReceiveOutputTargets.svelte";
- import workflowState, { type ComfyWorkflow, type WorkflowReceiveOutputTargets } from "$lib/stores/workflowState";
+ import workflowState, { type ComfyBoxWorkflow, type WorkflowReceiveOutputTargets } from "$lib/stores/workflowState";
  import type { ComfyReceiveOutputNode } from "$lib/nodes/actions";
  import type ComfyApp from "./ComfyApp";
 
@@ -100,7 +100,7 @@
      // ImageViewer.instance.showLightbox(e.detail)
  }
 
- function sendOutput(workflow: ComfyWorkflow, targetNode: ComfyReceiveOutputNode) {
+ function sendOutput(workflow: ComfyBoxWorkflow, targetNode: ComfyReceiveOutputNode) {
      if (workflow == null || targetNode == null)
          return
 
