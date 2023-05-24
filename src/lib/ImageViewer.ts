@@ -6,7 +6,7 @@ export class ImageViewer {
     currentImages: string[] = []
     selectedIndex: number = -1;
     currentGallery: HTMLDivElement | null = null;
-    static _instance: ImageViewer;
+    private static _instance: ImageViewer;
 
     static get instance(): ImageViewer {
         if (!ImageViewer._instance)
