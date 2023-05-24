@@ -50,6 +50,10 @@ export default class ComfyReroute extends ComfyGraphNode {
         }
     }
 
+    override onExecute() {
+        this.setOutputData(0, this.getInputData(0));
+    }
+
     override getUpstreamLink(): LLink | null {
         const link = this.getInputLink(0)
         const node = this.getInputNode(0)
