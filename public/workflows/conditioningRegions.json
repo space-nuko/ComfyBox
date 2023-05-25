@@ -2,7 +2,7 @@
   "comfyBoxWorkflow": true,
   "createdBy": "ComfyBox",
   "version": 1,
-  "commitHash": "test",
+  "commitHash": "574d3170a4e829df366dc12c3aaa049121052d8f\n",
   "workflow": {
     "last_node_id": 0,
     "last_link_id": 0,
@@ -59,7 +59,7 @@
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "A",
+        "comfyValue": null,
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -115,7 +115,7 @@
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "A",
+        "comfyValue": null,
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -190,18 +190,18 @@
         "title": "UI.Number",
         "properties": {
           "tags": [],
-          "defaultValue": 8,
+          "defaultValue": 11.5,
           "min": 0,
           "max": 40,
           "step": 0.5,
           "precision": 0
         },
         "widgets_values": [
-          "8.000"
+          "11.500"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": 8,
+        "comfyValue": 11.5,
         "shownOutputProperties": {
           "min": {
             "type": "number",
@@ -342,7 +342,7 @@
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "A",
+        "comfyValue": null,
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -400,7 +400,7 @@
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "A",
+        "comfyValue": null,
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -611,7 +611,7 @@
         "title": "UI.Number",
         "properties": {
           "tags": [],
-          "defaultValue": 1,
+          "defaultValue": 0.56,
           "min": 0,
           "max": 1,
           "step": 0.01,
@@ -713,18 +713,18 @@
         "title": "UI.Number",
         "properties": {
           "tags": [],
-          "defaultValue": 20,
+          "defaultValue": 26,
           "min": 1,
           "max": 1000,
           "step": 1,
           "precision": 0
         },
         "widgets_values": [
-          "20.000"
+          "26.000"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": 20,
+        "comfyValue": 26,
         "shownOutputProperties": {
           "min": {
             "type": "number",
@@ -814,18 +814,18 @@
         "title": "UI.Number",
         "properties": {
           "tags": [],
-          "defaultValue": 0,
+          "defaultValue": 16,
           "min": 1,
           "max": 200,
           "step": 1,
           "precision": 1
         },
         "widgets_values": [
-          "20.000"
+          "16.000"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": 20,
+        "comfyValue": 16,
         "shownOutputProperties": {
           "min": {
             "type": "number",
@@ -1263,7 +1263,32 @@
               "title": "UI.MultiRegion",
               "properties": {
                 "tags": [],
-                "defaultValue": false,
+                "defaultValue": [
+                  [
+                    0,
+                    0,
+                    0.7472222222222226,
+                    1
+                  ],
+                  [
+                    0.3758101807700262,
+                    0,
+                    0.6241898192299737,
+                    1
+                  ],
+                  [
+                    0.69,
+                    0,
+                    0.31,
+                    1
+                  ],
+                  [
+                    0.71,
+                    0,
+                    0.29,
+                    1
+                  ]
+                ],
                 "regionCount": 4,
                 "canvasWidth": 1152,
                 "canvasHeight": 768,
@@ -1271,7 +1296,7 @@
                 "inputType": "size"
               },
               "widgets_values": [
-                "[[0.000,0.000,0.350,1.000],[0.183,0.000,0.350,1.000],[0.449,0.000,0.350,1.000],[0.650,0.000,0.350,1.000]]",
+                "[[0.000,0.000,0.747,1.000],[0.376,0.000,0.624,1.000],[0.690,0.000,0.310,1.000],[0.710,0.000,0.290,1.000]]",
                 "size",
                 4
               ],
@@ -1281,25 +1306,25 @@
                 [
                   0,
                   0,
-                  0.35,
+                  0.7472222222222226,
                   1
                 ],
                 [
-                  0.18263888888888896,
+                  0.3758101807700262,
                   0,
-                  0.35,
+                  0.6241898192299737,
                   1
                 ],
                 [
-                  0.448611111111111,
+                  0.69,
                   0,
-                  0.35,
+                  0.31,
                   1
                 ],
                 [
-                  0.65,
+                  0.71,
                   0,
-                  0.35,
+                  0.29,
                   1
                 ]
               ],
@@ -2789,18 +2814,18 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [],
-                      "defaultValue": 1,
+                      "defaultValue": 0,
                       "min": 0,
                       "max": 10,
                       "step": 0.01,
                       "precision": 0
                     },
                     "widgets_values": [
-                      "1.000"
+                      "0.000"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": 1,
+                    "comfyValue": 0,
                     "shownOutputProperties": {
                       "min": {
                         "type": "number",
@@ -2891,18 +2916,18 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [],
-                      "defaultValue": 1,
+                      "defaultValue": 0,
                       "min": 0,
                       "max": 10,
                       "step": 0.01,
                       "precision": 0
                     },
                     "widgets_values": [
-                      "1.000"
+                      "0.000"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": 1,
+                    "comfyValue": 0,
                     "shownOutputProperties": {
                       "min": {
                         "type": "number",
@@ -3306,17 +3331,17 @@
                     "title": "UI.Text",
                     "properties": {
                       "tags": [],
-                      "defaultValue": "",
+                      "defaultValue": "masterpiece, 1girl, (yuri:1.2), city street, cityscape, open shirt, breasts, large breasts, nipples, shiny skin, full body, happy, red hair, red eyes, looking at another, eye contact, red skirt",
                       "multiline": true,
                       "lines": 5,
                       "maxLines": 5
                     },
                     "widgets_values": [
-                      "masterpiece, 1girl, city street, cityscape, full body, happy, red hair, red eyes, looking at another, eye contact, red skirt"
+                      "masterpiece, 1girl, (yuri:1.2), city street, cityscape, open shirt, breasts, large breasts, nipples, shiny skin, full body, happy, red hair, red eyes, looking at another, eye contact, red skirt"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "masterpiece, 1girl, city street, cityscape, full body, happy, red hair, red eyes, looking at another, eye contact, red skirt",
+                    "comfyValue": "masterpiece, 1girl, (yuri:1.2), city street, cityscape, open shirt, breasts, large breasts, nipples, shiny skin, full body, happy, red hair, red eyes, looking at another, eye contact, red skirt",
                     "shownOutputProperties": {},
                     "saveUserState": true
                   },
@@ -3371,17 +3396,17 @@
                     "title": "UI.Text",
                     "properties": {
                       "tags": [],
-                      "defaultValue": "",
+                      "defaultValue": "masterpiece, 1girl, (yuri:1.2), open shirt, breasts, medium breasts, nipples, city street, cityscape, full body, happy, blue hair, blue eyes, looking at another, eye contact, blue skirt",
                       "multiline": true,
                       "lines": 5,
                       "maxLines": 5
                     },
                     "widgets_values": [
-                      "masterpiece, 1girl, city street, cityscape, full body, happy, blue hair, blue eyes, looking at another, eye contact, blue skirt"
+                      "masterpiece, 1girl, (yuri:1.2), open shirt, breasts, medium breasts, nipples, city street, cityscape, full body, happy, blue hair, blue eyes, looking at another, eye contact, blue skirt"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "masterpiece, 1girl, city street, cityscape, full body, happy, blue hair, blue eyes, looking at another, eye contact, blue skirt",
+                    "comfyValue": "masterpiece, 1girl, (yuri:1.2), open shirt, breasts, medium breasts, nipples, city street, cityscape, full body, happy, blue hair, blue eyes, looking at another, eye contact, blue skirt",
                     "shownOutputProperties": {},
                     "saveUserState": true
                   },
@@ -3436,17 +3461,17 @@
                     "title": "UI.Text",
                     "properties": {
                       "tags": [],
-                      "defaultValue": "",
+                      "defaultValue": "masterpiece, 2girls, (yuri:1.2), open shirt, small breasts, nipples, city street, cityscape, full body, happy, yellow hair, yellow eyes, looking at another, eye contact, yellow skirt",
                       "multiline": true,
                       "lines": 5,
                       "maxLines": 5
                     },
                     "widgets_values": [
-                      "masterpiece, 1girl, city street, cityscape, full body, happy, yellow hair, yellow eyes, looking at another, eye contact, yellow skirt"
+                      "masterpiece, 2girls, (yuri:1.2), open shirt, small breasts, nipples, city street, cityscape, full body, happy, yellow hair, yellow eyes, looking at another, eye contact, yellow skirt"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "masterpiece, 1girl, city street, cityscape, full body, happy, yellow hair, yellow eyes, looking at another, eye contact, yellow skirt",
+                    "comfyValue": "masterpiece, 2girls, (yuri:1.2), open shirt, small breasts, nipples, city street, cityscape, full body, happy, yellow hair, yellow eyes, looking at another, eye contact, yellow skirt",
                     "shownOutputProperties": {},
                     "saveUserState": true
                   },
@@ -3501,17 +3526,17 @@
                     "title": "UI.Text",
                     "properties": {
                       "tags": [],
-                      "defaultValue": "",
+                      "defaultValue": "masterpiece, 2girls, (yuri:1.2), open shirt, flat chest, nipples, city street, cityscape, full body, happy, green hair, green eyes, looking at another, eye contact, green skirt",
                       "multiline": true,
                       "lines": 5,
                       "maxLines": 5
                     },
                     "widgets_values": [
-                      "masterpiece, 1girl, city street, cityscape, full body, happy, green hair, green eyes, looking at another, eye contact, green skirt"
+                      "masterpiece, 2girls, (yuri:1.2), open shirt, flat chest, nipples, city street, cityscape, full body, happy, green hair, green eyes, looking at another, eye contact, green skirt"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "masterpiece, 1girl, city street, cityscape, full body, happy, green hair, green eyes, looking at another, eye contact, green skirt",
+                    "comfyValue": "masterpiece, 2girls, (yuri:1.2), open shirt, flat chest, nipples, city street, cityscape, full body, happy, green hair, green eyes, looking at another, eye contact, green skirt",
                     "shownOutputProperties": {},
                     "saveUserState": true
                   },
@@ -4681,17 +4706,17 @@
               "title": "UI.Text",
               "properties": {
                 "tags": [],
-                "defaultValue": "",
+                "defaultValue": "nsfw, masterpiece, 4girls, multiple girls, city street, cityscape, landscape, jeans, shoes, shirt, kanpai, happy, red hair, yellow hair, blue hair, green hair, looking at another, eye contact",
                 "multiline": true,
                 "lines": 5,
                 "maxLines": 5
               },
               "widgets_values": [
-                "masterpiece, 4girls, multiple girls, city street, cityscape, landscape, jeans, shoes, shirt, kanpai, happy, red hair, yellow hair, blue hair, green hair, looking at another, eye contact"
+                "nsfw, masterpiece, 4girls, multiple girls, city street, cityscape, landscape, jeans, shoes, shirt, kanpai, happy, red hair, yellow hair, blue hair, green hair, looking at another, eye contact"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": "masterpiece, 4girls, multiple girls, city street, cityscape, landscape, jeans, shoes, shirt, kanpai, happy, red hair, yellow hair, blue hair, green hair, looking at another, eye contact",
+              "comfyValue": "nsfw, masterpiece, 4girls, multiple girls, city street, cityscape, landscape, jeans, shoes, shirt, kanpai, happy, red hair, yellow hair, blue hair, green hair, looking at another, eye contact",
               "shownOutputProperties": {},
               "saveUserState": true
             },
@@ -4799,17 +4824,17 @@
               "title": "UI.Text",
               "properties": {
                 "tags": [],
-                "defaultValue": "",
+                "defaultValue": "looking at viewer, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, worst quality, low quality, normal quality, wide shot, jpeg artifacts, signature, watermark, username, blurry, deformed, disfigured, poorly drawn face, mutation, mutated, extra limb, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, out of focus, long neck, long body, fuzzy, abstract",
                 "multiline": true,
                 "lines": 5,
                 "maxLines": 5
               },
               "widgets_values": [
-                "nsfw, looking at viewer, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, worst quality, low quality, normal quality, wide shot, jpeg artifacts, signature, watermark, username, blurry, deformed, disfigured, poorly drawn face, mutation, mutated, extra limb, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, out of focus, long neck, long body, fuzzy, abstract"
+                "looking at viewer, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, worst quality, low quality, normal quality, wide shot, jpeg artifacts, signature, watermark, username, blurry, deformed, disfigured, poorly drawn face, mutation, mutated, extra limb, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, out of focus, long neck, long body, fuzzy, abstract"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": "nsfw, looking at viewer, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, worst quality, low quality, normal quality, wide shot, jpeg artifacts, signature, watermark, username, blurry, deformed, disfigured, poorly drawn face, mutation, mutated, extra limb, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, out of focus, long neck, long body, fuzzy, abstract",
+              "comfyValue": "looking at viewer, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, worst quality, low quality, normal quality, wide shot, jpeg artifacts, signature, watermark, username, blurry, deformed, disfigured, poorly drawn face, mutation, mutated, extra limb, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, out of focus, long neck, long body, fuzzy, abstract",
               "shownOutputProperties": {},
               "saveUserState": true
             },
@@ -5362,7 +5387,7 @@
               "title": "Comfy.ValueControl",
               "properties": {
                 "tags": [],
-                "value": 265785165591479,
+                "value": 1116696127994821,
                 "action": "randomize",
                 "min": 0,
                 "max": 18446744073709552000,
@@ -5423,7 +5448,7 @@
               "widgets_values": [],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": "A",
+              "comfyValue": null,
               "shownOutputProperties": {},
               "saveUserState": false
             },
@@ -5587,18 +5612,18 @@
               "title": "UI.Number",
               "properties": {
                 "tags": [],
-                "defaultValue": 0,
+                "defaultValue": 1116696127994821,
                 "min": 0,
                 "max": 18446744073709552000,
                 "step": 1,
                 "precision": 0
               },
               "widgets_values": [
-                "265785165591479.000"
+                "1116696127994821.000"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": 265785165591479,
+              "comfyValue": 1116696127994821,
               "shownOutputProperties": {
                 "min": {
                   "type": "number",
@@ -5769,7 +5794,7 @@
         "title": "Operation",
         "properties": {
           "A": 1234,
-          "B": 265785165591479,
+          "B": 1116696127994821,
           "OP": "+",
           "tags": []
         }
@@ -5807,73 +5832,6 @@
           "value": 1234,
           "tags": []
         }
-      },
-      {
-        "id": "65d58159-d87b-4fb9-a078-f503885336eb",
-        "type": "ui/gallery",
-        "pos": [
-          2171.1057169999985,
-          238.43802200000007
-        ],
-        "size": [
-          210,
-          126
-        ],
-        "flags": {},
-        "order": 32,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "images",
-            "type": "OUTPUT",
-            "link": null,
-            "properties": {}
-          },
-          {
-            "name": "store",
-            "type": -1,
-            "link": "4e35cf03-cda3-4d75-8fc7-10790b3a3342",
-            "properties": {},
-            "color_off": "rebeccapurple",
-            "color_on": "rebeccapurple",
-            "shape": 1,
-            "slot_index": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "images",
-            "type": "COMFYBOX_IMAGES",
-            "links": [
-              "30e795a0-6790-450d-815c-bb5f20bf53ed"
-            ],
-            "properties": {},
-            "slot_index": 0
-          },
-          {
-            "name": "selected_index",
-            "type": "number",
-            "links": [
-              "96493a1f-6de1-4130-8ea2-041a04e5b3e8"
-            ],
-            "properties": {},
-            "slot_index": 1
-          }
-        ],
-        "title": "UI.Gallery",
-        "properties": {
-          "tags": [],
-          "defaultValue": null,
-          "index": 9,
-          "updateMode": "append",
-          "autoSelectOnUpdate": true
-        },
-        "widgets_values": [],
-        "color": "#223",
-        "bgColor": "#335",
-        "comfyValue": [],
-        "shownOutputProperties": {},
-        "saveUserState": false
       },
       {
         "id": "c144a016-4a67-45dd-ba14-67086c12f93f",
@@ -6017,127 +5975,6 @@
           "tags": []
         },
         "saveUserState": true
-      },
-      {
-        "id": "15ae90b1-faac-4447-bfef-8e3a5f5ac200",
-        "type": "events/wrap_as_event",
-        "pos": [
-          1963.1057169999983,
-          332.43802199999993
-        ],
-        "size": [
-          140,
-          46
-        ],
-        "flags": {
-          "collapsed": false
-        },
-        "order": 21,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "trigger",
-            "type": -1,
-            "link": "9ef372d0-fde4-43c8-8b96-53905bbc5b97",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "param",
-            "type": "",
-            "link": "307047a2-f35d-4a63-b5d5-ccf299e55f56",
-            "properties": {},
-            "slot_index": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "event",
-            "type": -2,
-            "links": [
-              "6e0a7214-01d1-4a1b-a21e-ecf8b5883673"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          }
-        ],
-        "title": "Wrap As Event",
-        "properties": {
-          "tags": []
-        }
-      },
-      {
-        "id": "b5bae397-2c92-4241-9658-6ce61d43b9bd",
-        "type": "events/sequence",
-        "pos": [
-          2039.105716999998,
-          277.43802199999993
-        ],
-        "size": [
-          140,
-          86
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 39,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "",
-            "type": -1,
-            "link": "54d7994c-777a-4b5d-a5e7-46ad8f78caac",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "",
-            "type": -1,
-            "link": "ec928820-0d7a-4d9e-9c0d-aee1ef9b44d7",
-            "properties": {},
-            "shape": 1,
-            "slot_index": 1
-          },
-          {
-            "name": "",
-            "type": -1,
-            "link": "6e0a7214-01d1-4a1b-a21e-ecf8b5883673",
-            "properties": {},
-            "shape": 1,
-            "slot_index": 2
-          },
-          {
-            "name": "",
-            "type": -1,
-            "link": null,
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "",
-            "type": -2,
-            "links": [
-              "4e35cf03-cda3-4d75-8fc7-10790b3a3342"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          },
-          {
-            "name": "",
-            "type": -2,
-            "links": [],
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "title": "Sequence",
-        "properties": {
-          "tags": []
-        }
       },
       {
         "id": "0a53404e-479c-4b2f-92ca-32297caf3435",
@@ -6376,7 +6213,7 @@
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "A",
+        "comfyValue": null,
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -6749,7 +6586,7 @@
               "title": "UI.Text",
               "properties": {
                 "tags": [],
-                "defaultValue": "",
+                "defaultValue": "1728",
                 "multiline": false,
                 "lines": 5,
                 "maxLines": 5
@@ -6812,7 +6649,7 @@
               "title": "UI.Text",
               "properties": {
                 "tags": [],
-                "defaultValue": "",
+                "defaultValue": "1152",
                 "multiline": false,
                 "lines": 5,
                 "maxLines": 5
@@ -6897,7 +6734,7 @@
               "title": "UI.Number",
               "properties": {
                 "tags": [],
-                "defaultValue": 0,
+                "defaultValue": 1.5,
                 "min": 1,
                 "max": 4,
                 "step": 0.01,
@@ -7014,7 +6851,7 @@
               "inputs": [
                 {
                   "name": "",
-                  "type": "",
+                  "type": "number",
                   "link": "18e4f924-d725-4db8-ae92-0c7eefd59105",
                   "properties": {}
                 }
@@ -7045,7 +6882,7 @@
               "inputs": [
                 {
                   "name": "",
-                  "type": "",
+                  "type": "number",
                   "link": "9a4f27f6-40ba-4b30-81f0-f0e013d01e99",
                   "properties": {}
                 }
@@ -7217,7 +7054,7 @@
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "A",
+        "comfyValue": null,
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -7294,7 +7131,7 @@
         "title": "UI.Number",
         "properties": {
           "tags": [],
-          "defaultValue": 512,
+          "defaultValue": 768,
           "min": 64,
           "max": 2048,
           "step": 64,
@@ -7400,7 +7237,7 @@
         "title": "UI.Number",
         "properties": {
           "tags": [],
-          "defaultValue": 512,
+          "defaultValue": 1152,
           "min": 64,
           "max": 2048,
           "step": 64,
@@ -7664,6 +7501,328 @@
         "color": "#432",
         "bgColor": "#653",
         "saveUserState": true
+      },
+      {
+        "id": "65d58159-d87b-4fb9-a078-f503885336eb",
+        "type": "ui/gallery",
+        "pos": [
+          2171.1057169999985,
+          238.43802200000007
+        ],
+        "size": [
+          210,
+          126
+        ],
+        "flags": {},
+        "order": 32,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "images",
+            "type": "OUTPUT",
+            "link": null,
+            "properties": {}
+          },
+          {
+            "name": "store",
+            "type": -1,
+            "link": "f00abe60-5c13-41f8-badd-aa51752e0466",
+            "properties": {},
+            "color_off": "rebeccapurple",
+            "color_on": "rebeccapurple",
+            "shape": 1,
+            "slot_index": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "images",
+            "type": "COMFYBOX_IMAGES",
+            "links": [
+              "30e795a0-6790-450d-815c-bb5f20bf53ed"
+            ],
+            "properties": {},
+            "slot_index": 0
+          },
+          {
+            "name": "selected_index",
+            "type": "number",
+            "links": [
+              "96493a1f-6de1-4130-8ea2-041a04e5b3e8"
+            ],
+            "properties": {},
+            "slot_index": 1
+          }
+        ],
+        "title": "UI.Gallery",
+        "properties": {
+          "tags": [],
+          "defaultValue": [
+            {
+              "isComfyBoxImageMetadata": true,
+              "comfyUIFile": {
+                "filename": "ComfyUI_06079_.png",
+                "subfolder": "",
+                "type": "output"
+              },
+              "name": "File",
+              "tags": []
+            },
+            {
+              "isComfyBoxImageMetadata": true,
+              "comfyUIFile": {
+                "filename": "ComfyUI_06079_.png",
+                "subfolder": "",
+                "type": "output"
+              },
+              "name": "File",
+              "tags": [],
+              "width": 1152,
+              "height": 768
+            },
+            {
+              "isComfyBoxImageMetadata": true,
+              "comfyUIFile": {
+                "filename": "ComfyUI_06080_.png",
+                "subfolder": "",
+                "type": "output"
+              },
+              "name": "File",
+              "tags": [],
+              "width": 1728,
+              "height": 1152
+            },
+            {
+              "isComfyBoxImageMetadata": true,
+              "comfyUIFile": {
+                "filename": "ComfyUI_06081_.png",
+                "subfolder": "",
+                "type": "output"
+              },
+              "name": "File",
+              "tags": []
+            },
+            {
+              "isComfyBoxImageMetadata": true,
+              "comfyUIFile": {
+                "filename": "ComfyUI_06081_.png",
+                "subfolder": "",
+                "type": "output"
+              },
+              "name": "File",
+              "tags": [],
+              "width": 1152,
+              "height": 768
+            },
+            {
+              "isComfyBoxImageMetadata": true,
+              "comfyUIFile": {
+                "filename": "ComfyUI_06082_.png",
+                "subfolder": "",
+                "type": "output"
+              },
+              "name": "File",
+              "tags": []
+            }
+          ],
+          "index": 4,
+          "updateMode": "append",
+          "autoSelectOnUpdate": true
+        },
+        "widgets_values": [],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": [
+          {
+            "isComfyBoxImageMetadata": true,
+            "comfyUIFile": {
+              "filename": "ComfyUI_06079_.png",
+              "subfolder": "",
+              "type": "output"
+            },
+            "name": "File",
+            "tags": []
+          },
+          {
+            "isComfyBoxImageMetadata": true,
+            "comfyUIFile": {
+              "filename": "ComfyUI_06079_.png",
+              "subfolder": "",
+              "type": "output"
+            },
+            "name": "File",
+            "tags": [],
+            "width": 1152,
+            "height": 768
+          },
+          {
+            "isComfyBoxImageMetadata": true,
+            "comfyUIFile": {
+              "filename": "ComfyUI_06080_.png",
+              "subfolder": "",
+              "type": "output"
+            },
+            "name": "File",
+            "tags": [],
+            "width": 1728,
+            "height": 1152
+          },
+          {
+            "isComfyBoxImageMetadata": true,
+            "comfyUIFile": {
+              "filename": "ComfyUI_06081_.png",
+              "subfolder": "",
+              "type": "output"
+            },
+            "name": "File",
+            "tags": []
+          },
+          {
+            "isComfyBoxImageMetadata": true,
+            "comfyUIFile": {
+              "filename": "ComfyUI_06081_.png",
+              "subfolder": "",
+              "type": "output"
+            },
+            "name": "File",
+            "tags": [],
+            "width": 1152,
+            "height": 768
+          },
+          {
+            "isComfyBoxImageMetadata": true,
+            "comfyUIFile": {
+              "filename": "ComfyUI_06082_.png",
+              "subfolder": "",
+              "type": "output"
+            },
+            "name": "File",
+            "tags": []
+          }
+        ],
+        "shownOutputProperties": {},
+        "saveUserState": false
+      },
+      {
+        "id": "15ae90b1-faac-4447-bfef-8e3a5f5ac200",
+        "type": "events/wrap_as_event",
+        "pos": [
+          1963,
+          332
+        ],
+        "size": [
+          140,
+          46
+        ],
+        "flags": {
+          "collapsed": false
+        },
+        "order": 21,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "trigger",
+            "type": -1,
+            "link": "9ef372d0-fde4-43c8-8b96-53905bbc5b97",
+            "properties": {},
+            "shape": 1
+          },
+          {
+            "name": "param",
+            "type": "",
+            "link": "307047a2-f35d-4a63-b5d5-ccf299e55f56",
+            "properties": {},
+            "slot_index": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "event",
+            "type": -2,
+            "links": [
+              "6e0a7214-01d1-4a1b-a21e-ecf8b5883673"
+            ],
+            "properties": {},
+            "shape": 1,
+            "slot_index": 0
+          }
+        ],
+        "title": "Wrap As Event",
+        "properties": {
+          "tags": []
+        }
+      },
+      {
+        "id": "b5bae397-2c92-4241-9658-6ce61d43b9bd",
+        "type": "events/sequence",
+        "pos": [
+          2004,
+          277
+        ],
+        "size": [
+          140,
+          86
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 39,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "",
+            "type": -1,
+            "link": "54d7994c-777a-4b5d-a5e7-46ad8f78caac",
+            "properties": {},
+            "shape": 1
+          },
+          {
+            "name": "",
+            "type": -1,
+            "link": "ec928820-0d7a-4d9e-9c0d-aee1ef9b44d7",
+            "properties": {},
+            "shape": 1,
+            "slot_index": 1
+          },
+          {
+            "name": "",
+            "type": -1,
+            "link": "6e0a7214-01d1-4a1b-a21e-ecf8b5883673",
+            "properties": {},
+            "shape": 1,
+            "slot_index": 2
+          },
+          {
+            "name": "",
+            "type": -1,
+            "link": null,
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "",
+            "type": -2,
+            "links": [
+              "f00abe60-5c13-41f8-badd-aa51752e0466"
+            ],
+            "properties": {},
+            "shape": 1,
+            "slot_index": 0
+          },
+          {
+            "name": "",
+            "type": -2,
+            "links": [],
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "title": "Sequence",
+        "properties": {
+          "tags": []
+        }
       }
     ],
     "links": [
@@ -7972,14 +8131,6 @@
         -1
       ],
       [
-        "4e35cf03-cda3-4d75-8fc7-10790b3a3342",
-        "b5bae397-2c92-4241-9658-6ce61d43b9bd",
-        0,
-        "65d58159-d87b-4fb9-a078-f503885336eb",
-        1,
-        -1
-      ],
-      [
         "fc2d2bf6-ff19-4ac6-a97e-f3898a2172f8",
         "c69d01b8-90c7-456c-80b4-db4db5cc5585",
         0,
@@ -8234,6 +8385,14 @@
         "0bb0fc82-c36d-4d2f-aaef-47d03351fc7f",
         2,
         -1
+      ],
+      [
+        "f00abe60-5c13-41f8-badd-aa51752e0466",
+        "b5bae397-2c92-4241-9658-6ce61d43b9bd",
+        0,
+        "65d58159-d87b-4fb9-a078-f503885336eb",
+        1,
+        -1
       ]
     ],
     "groups": [],
@@ -8266,7 +8425,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -8291,7 +8451,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -8321,7 +8482,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -8347,7 +8509,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8370,7 +8533,8 @@
             "openOnStartup": true,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -8396,7 +8560,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8420,7 +8585,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8444,7 +8610,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8468,7 +8635,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8491,7 +8659,8 @@
             "openOnStartup": true,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -8517,7 +8686,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -8544,7 +8714,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -8570,7 +8741,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8593,7 +8765,8 @@
             "openOnStartup": true,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -8623,7 +8796,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8647,7 +8821,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8671,7 +8846,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8694,7 +8870,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -8720,7 +8897,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -8747,7 +8925,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8771,7 +8950,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8795,7 +8975,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8819,7 +9000,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8843,7 +9025,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8867,7 +9050,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8890,7 +9074,8 @@
             "openOnStartup": true,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -8919,7 +9104,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8942,7 +9128,8 @@
             "openOnStartup": true,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -8969,7 +9156,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -8993,7 +9181,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9016,7 +9205,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9043,7 +9233,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9066,7 +9257,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9091,7 +9283,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9116,7 +9309,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9143,7 +9337,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9166,7 +9361,8 @@
             "openOnStartup": true,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9194,7 +9390,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9217,7 +9414,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9244,7 +9442,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9267,7 +9466,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": true
           }
         },
         "children": [
@@ -9293,7 +9493,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9317,7 +9518,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9341,7 +9543,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9365,7 +9568,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9388,7 +9592,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9414,7 +9619,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9441,7 +9647,8 @@
             "openOnStartup": false,
             "buttonVariant": "secondary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9464,7 +9671,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9491,7 +9699,8 @@
             "openOnStartup": false,
             "buttonVariant": "secondary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9514,7 +9723,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9540,7 +9750,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9564,7 +9775,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9588,7 +9800,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9612,7 +9825,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9636,7 +9850,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9659,7 +9874,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9685,7 +9901,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9711,7 +9928,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9736,7 +9954,8 @@
             "openOnStartup": true,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9764,7 +9983,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -9784,14 +10004,15 @@
             "disabled": false,
             "direction": "vertical",
             "classes": "",
-            "style": "flex-grow: 1; min-width: 0;",
+            "style": "flex-grow: 10; min-width: 0;",
             "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "secondary",
             "buttonSize": "small",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -9801,9 +10022,9 @@
   },
   "canvas": {
     "offset": [
-      -607.2128109237503,
-      314.37823956
+      0,
+      0
     ],
-    "scale": 0.5644739300537776
+    "scale": 1
   }
 }

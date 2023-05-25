@@ -228,7 +228,7 @@ export default class ComfyApp {
                 setActive: false
             }
             await this.initDefaultWorkflow("defaultWorkflow", options);
-            await this.initDefaultWorkflow("upscale", options);
+            await this.initDefaultWorkflow("upscaleByModel", options);
             await this.initDefaultWorkflow("conditioningRegions", options);
         }
 
