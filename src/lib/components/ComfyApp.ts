@@ -297,7 +297,9 @@ export default class ComfyApp {
                     if (templateAndSvg == null) {
                         errors.push("Invalid SVG template format")
                     }
-                    templates.push(templateAndSvg)
+                    else {
+                        templates.push(templateAndSvg)
+                    }
                 }
             }
 

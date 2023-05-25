@@ -85,10 +85,8 @@ export default class DanbooruTags {
     }
 
     async load(force: boolean = false) {
-        console.log("Parsing danbooru tags CSV...")
-
         if (this.tags.length > 0 && !force) {
-            console.info("Danbooru tags already parsed")
+            console.warn("Danbooru tags already parsed")
             return;
         }
 
