@@ -42,6 +42,7 @@ export type SerializedComfyBoxTemplate = {
     version: 1,
     id: UUID,
     commitHash: string,
+    isBuiltIn?: boolean,
 
     /*
      * Serialized metadata

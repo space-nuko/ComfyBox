@@ -1,6 +1,7 @@
 <script lang="ts">
  import { embedTemplateInSvg, type SerializedComfyBoxTemplate } from "$lib/ComfyBoxTemplate";
- import templateState from "$lib/stores/templateState";
+ import templateState, { type TemplateState, type WritableTemplateStateStore } from "$lib/stores/templateState";
+ import { BoxSeam } from "svelte-bootstrap-icons";
  import uiState from "$lib/stores/uiState";
  import { download, truncateString } from "$lib/utils";
  import type ComfyApp from "./ComfyApp";
@@ -28,10 +29,10 @@
 
  let _sorted: TemplateLayout[] = []
 
- $: rebuildTemplates($templateState.templates);
+ $: $templateState && rebuildTemplates(templateState.getAllTemplates());
 
- function rebuildTemplates(templates: SerializedComfyBoxTemplate[]) {
-     _sorted = Array.from(templates).map(t => {
+ function rebuildTemplates(allTemplates: SerializedComfyBoxTemplate[]): void {
+     _sorted = Array.from(allTemplates).map(t => {
          return {
              type: "template", id: uuidv4(), template: t, attrs: {...defaultWidgetAttributes}, attrsChanged: writable(0)
          }
@@ -88,7 +89,7 @@
      const saveTemplate = (modal: ModalData) => {
          updateTemplate(modal);
          try {
-             templateState.update(layout.template);
+             templateState.updateTemplate(layout.template);
              notify("Saved template!", { type: "success" })
          }
          catch (error) {
@@ -101,7 +102,7 @@
              return false;
 
          try {
-             if (templateState.remove(layout.template.id)) {
+             if (templateState.removeTemplate(layout.template.id)) {
                  notify("Template deleted!", { type: "success" })
              }
              else {
@@ -165,17 +166,17 @@
                 </div>
                 <div class="template-entries-wrapper"
                      use:dndzone={{
-                                 type: "layout",
-                                 items: _sorted,
-                                 flipDurationMs,
-                                 dragDisabled: !draggable,
-                                 dropFromOthersDisabled: true
+                                    type: "layout",
+                                    items: _sorted,
+                                    flipDurationMs,
+                                    dragDisabled: !draggable,
+                                    dropFromOthersDisabled: true
                                  }}
                      on:consider={handleDndConsider}
                      on:finalize={handleDndFinalize}>
                     {#each _sorted.filter(i => i.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <div class="template-entry" class:draggable on:click={() => handleClick(item)}>
+                        <div class="template-entry" class:built-in={item.template.isBuiltIn} class:draggable on:click={() => handleClick(item)}>
                             <div class="template-name">{item.template.metadata.title}</div>
                             <div class="template-desc">{item.template.metadata.description}</div>
                         </div>
@@ -186,8 +187,13 @@
                 </div>
             </div>
         {:else}
-            <div class="no-templates">
-                <span>(No templates)</span>
+            <div class="no-templates-container">
+                <div class="no-templates-icon">
+                    <BoxSeam width="100%" height="8rem" />
+                </div>
+                <div class="no-templates-message">
+                    (No templates)
+                </div>
             </div>
         {/if}
     </div>
@@ -253,15 +259,19 @@
      }
  }
 
- .no-templates {
+ .no-templates-container {
      display: flex;
      color: var(--comfy-accent-soft);
-     flex-direction: row;
+     flex-direction: column;
      margin: auto;
-     height: 100%;
      color: var(--comfy-accent-soft);
 
-     span {
+     .no-templates-icon {
+         margin: auto;
+         margin-bottom: 1rem;
+     }
+
+     .no-templates-message {
          margin: auto;
          font-size: 32px;
          font-weight: bolder;

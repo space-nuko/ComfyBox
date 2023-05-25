@@ -36,7 +36,7 @@ import { type SvelteComponentDev } from "svelte/internal";
 import { get, writable, type Writable } from "svelte/store";
 import ComfyPromptSerializer, { isActiveBackendNode, UpstreamNodeLocator } from "./ComfyPromptSerializer";
 import DanbooruTags from "$lib/DanbooruTags";
-import { deserializeTemplateFromSVG } from "$lib/ComfyBoxTemplate";
+import { deserializeTemplateFromSVG, type SerializedComfyBoxTemplate } from "$lib/ComfyBoxTemplate";
 import templateState from "$lib/stores/templateState";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
@@ -240,7 +240,9 @@ export default class ComfyApp {
         this.addKeyboardHandler();
 
         await this.updateHistoryAndQueue();
-        templateState.load();
+
+        const builtInTemplates = await this.loadBuiltInTemplates();
+        templateState.load(builtInTemplates);
 
         await this.initFrontendFeatures();
 
@@ -269,6 +271,10 @@ export default class ComfyApp {
         catch (error) {
             console.error(`Failed to load config`, error)
         }
+    }
+
+    async loadBuiltInTemplates(): Promise<SerializedComfyBoxTemplate[]> {
+        return []
     }
 
     resizeCanvas() {
@@ -1062,7 +1068,7 @@ export default class ComfyApp {
 
             const importTemplate = () => {
                 try {
-                    if (templateState.add(templateAndSvg)) {
+                    if (templateState.addTemplate(templateAndSvg)) {
                         notify("Template imported successfully!", { type: "success" })
                     }
                     else {
