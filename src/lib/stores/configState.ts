@@ -35,7 +35,7 @@ const store: Writable<ConfigState> = writable(
 
 function getBackendURL(): string {
     const state = get(store);
-    return `${window.location.protocol}://${state.comfyUIHostname}:${state.comfyUIPort}`
+    return `${window.location.protocol}//${state.comfyUIHostname}:${state.comfyUIPort}`
 }
 
 const configStateStore: WritableConfigStateStore =
