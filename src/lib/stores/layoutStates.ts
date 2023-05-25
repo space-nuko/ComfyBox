@@ -740,6 +740,7 @@ type LayoutStateOps = {
     updateChildren: (parent: IDragItem, children: IDragItem[]) => IDragItem[],
     nodeAdded: (node: LGraphNode, options: LGraphAddNodeOptions) => void,
     nodeRemoved: (node: LGraphNode, options: LGraphRemoveNodeOptions) => void,
+    insertTemplate: (template: SerializedComfyBoxTemplate, graph: LGraph, templateNodeIDToNode: Record<NodeID, LGraphNode>, container: ContainerLayout, childIndex: number) => IDragItem,
     moveItem: (target: IDragItem, to: ContainerLayout, index?: number) => void,
     groupItems: (dragItemIDs: DragItemID[], attrs?: Partial<Attributes>) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
@@ -768,7 +769,7 @@ export type SerializedDragEntry = {
 export type SerializedDragItem = {
     type: string,
     id: DragItemID,
-    nodeId: UUID | null,
+    nodeId: NodeID | null,
     attrs: Attributes
 }
 
@@ -928,7 +929,11 @@ function createRaw(workflow: ComfyBoxWorkflow | null = null): WritableLayoutStat
 
         let attrs: Partial<Attributes> = {}
 
-        if (options.addedBy === "moveIntoSubgraph" || options.addedBy === "moveOutOfSubgraph") {
+        if ((options.addedBy as any) === "template") {
+            // Template layout will be deserialized shortly
+            return;
+        }
+        else if (options.addedBy === "moveIntoSubgraph" || options.addedBy === "moveOutOfSubgraph") {
             // All we need to do is update the nodeID linked to this node.
             const item = state.allItemsByNode[options.prevNodeID]
             delete state.allItemsByNode[options.prevNodeID]
@@ -998,6 +1003,53 @@ function createRaw(workflow: ComfyBoxWorkflow | null = null): WritableLayoutStat
         }
 
         store.set(state)
+    }
+
+    function insertTemplate(template: SerializedComfyBoxTemplate, graph: LGraph, templateNodeIDToNode: Record<NodeID, LGraphNode>, container: ContainerLayout, childIndex: number): IDragItem {
+        const idMapping: Record<DragItemID, DragItemID> = {};
+
+        const getDragItemID = (id: DragItemID): DragItemID => {
+            idMapping[id] ||= uuidv4();
+            return idMapping[id];
+        }
+
+        // Ensure all IDs are unique, and rewrite node IDs in widgets to point
+        // to newly created nodes
+        for (const [id, entry] of Object.entries(template.layout.allItems)) {
+            const newId = getDragItemID(id);
+            template.layout.allItems[newId] = entry;
+            entry.dragItem.id = newId;
+
+            if (entry.parent)
+                entry.parent = getDragItemID(entry.parent)
+            entry.children = entry.children.map(getDragItemID);
+
+            if (entry.dragItem.type === "widget") {
+                entry.dragItem.nodeId = templateNodeIDToNode[entry.dragItem.nodeId].id;
+            }
+        }
+
+        if (template.layout.root) {
+            template.layout.root = getDragItemID(template.layout.root)
+
+            // make sure the new root doesn't have a parent since that parent
+            // was detached from the serialized layout and won't be found in
+            // template.layout.allItems
+            template.layout.allItems[template.layout.root].parent = null;
+        }
+
+        const raw = deserializeRaw(template.layout, graph);
+
+        // merge the template's detached layout tree into this layout
+        store.update(s => {
+            s.allItems = { ...s.allItems, ...raw.allItems }
+            s.allItemsByNode = { ...s.allItemsByNode, ...raw.allItemsByNode }
+            return s;
+        })
+
+        moveItem(raw.root, container, childIndex);
+
+        return raw.root
     }
 
     function moveItem(target: IDragItem, to: ContainerLayout, index?: number) {
@@ -1164,6 +1216,13 @@ function createRaw(workflow: ComfyBoxWorkflow | null = null): WritableLayoutStat
         const queue = [state.allItems[rootID]]
         while (queue.length > 0) {
             const entry = queue.shift();
+
+            if (entry.dragItem.type === "template") {
+                // If this happens then there's a bug somewhere
+                console.error("[layoutState] Found template drag item in current layout, skipping!")
+                continue;
+            }
+
             allItems[entry.dragItem.id] = {
                 dragItem: {
                     type: entry.dragItem.type,
@@ -1193,6 +1252,13 @@ function createRaw(workflow: ComfyBoxWorkflow | null = null): WritableLayoutStat
         const allItems: Record<DragItemID, SerializedDragEntry> = {}
         for (const pair of Object.entries(state.allItems)) {
             const [id, entry] = pair;
+
+            if (entry.dragItem.type === "template") {
+                // If this happens then there's a bug somewhere
+                console.error("[layoutState] Found template drag item in current layout, skipping!")
+                continue;
+            }
+
             allItems[id] = {
                 dragItem: {
                     type: entry.dragItem.type,
@@ -1211,11 +1277,18 @@ function createRaw(workflow: ComfyBoxWorkflow | null = null): WritableLayoutStat
         }
     }
 
-    function deserialize(data: SerializedLayoutState, graph: LGraph) {
+    function deserializeRaw(data: SerializedLayoutState, graph: LGraph): LayoutState {
         const allItems: Record<DragItemID, DragItemEntry> = {}
         const allItemsByNode: Record<number, DragItemEntry> = {}
+
         for (const pair of Object.entries(data.allItems)) {
             const [id, entry] = pair;
+
+            if (entry.dragItem.type === "template") {
+                // If this happens then there's a bug somewhere
+                console.error("[layoutState] Found template drag item in serialized layout, skipping!")
+                continue;
+            }
 
             const dragItem: IDragItem = {
                 type: entry.dragItem.type,
@@ -1265,6 +1338,12 @@ function createRaw(workflow: ComfyBoxWorkflow | null = null): WritableLayoutStat
             isConfiguring: false,
         }
 
+        return state
+    }
+
+    function deserialize(data: SerializedLayoutState, graph: LGraph) {
+        const state = deserializeRaw(data, graph);
+
         console.debug("[layoutState] deserialize", data, state, defaultWorkflowAttributes)
 
         store.set(state)
@@ -1298,6 +1377,7 @@ function createRaw(workflow: ComfyBoxWorkflow | null = null): WritableLayoutStat
         updateChildren,
         nodeAdded,
         nodeRemoved,
+        insertTemplate,
         moveItem,
         groupItems,
         findLayoutEntryForNode,

@@ -8,16 +8,31 @@
 	import Column from "../gradio/app/Column.svelte";
 	import Accordion from "../gradio/app/Accordion.svelte";
 	import Textbox from "@gradio/form/src/Textbox.svelte";
+	import type { ModalData } from "$lib/stores/modalState";
+	import { writable, type Writable } from "svelte/store";
  const DOMPurify = createDOMPurify(window);
 
  export let templateAndSvg: SerializedComfyBoxTemplate;
+ export let editable: boolean = true;
+ export let _modal: ModalData;
  let layout: SerializedLayoutState | null
  let root: SerializedDragEntry | null
+ let state: Writable<any> = writable({})
+
+ $: {
+     state = _modal.state;
+     if (!("name" in $state)) {
+         $state.name = templateAndSvg.metadata.title;
+         $state.author = templateAndSvg.metadata.author;
+         $state.description = templateAndSvg.metadata.description;
+     }
+ }
 
  let saneSvg: string = "";
 
  $: saneSvg = templateAndSvg
               ? DOMPurify.sanitize(templateAndSvg.svg, { USE_PROFILES: { svg: true, svgFilters: true } })
+                         .replace("<svg", "<svg style='background: url(\"image/graph-bg.png\")'")
               : "";
 
  $: if (templateAndSvg) {
@@ -42,9 +57,9 @@
                 <Block>
                     <BlockTitle>Metadata</BlockTitle>
                     <div>
-                        <Textbox label="Name" value="Text" lines={1} max_lines={1} />
-                        <Textbox label="Author" value="Text" lines={1} max_lines={1} />
-                        <Textbox label="Description" value="Text" lines={5} max_lines={5} />
+                        <Textbox label="Name" disabled={!editable} bind:value={$state.name} lines={1} max_lines={1} />
+                        <Textbox label="Author" disabled={!editable} bind:value={$state.author} lines={1} max_lines={1} />
+                        <Textbox label="Description" disabled={!editable} bind:value={$state.description} lines={5} max_lines={5} />
                     </div>
                 </Block>
             </div>
@@ -75,7 +90,7 @@
 
 <style lang="scss">
  .template-preview {
-     width: 60vw;
+     width: 70vw;
      height: 70vh;
      display: flex;
 
@@ -90,9 +105,6 @@
      :global(> .block) {
          background: var(--panel-background-fill);
      }
- }
-
- .template-rows {
  }
 
  .template-layout-preview {

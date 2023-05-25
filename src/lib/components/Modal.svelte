@@ -94,9 +94,6 @@
      display: flex;
      flex-direction: row;
      padding-top: 0.5em;
- }
-
- .button-row, .buttons {
-     gap: var(--spacing-sm);
+     gap: var(--spacing-md);
  }
 </style>

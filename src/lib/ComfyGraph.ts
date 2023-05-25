@@ -1,4 +1,4 @@
-import { LConnectionKind, LGraph, LGraphNode, type INodeSlot, type SlotIndex, LiteGraph, getStaticProperty, type LGraphAddNodeOptions, LGraphCanvas, type LGraphRemoveNodeOptions, Subgraph, type LGraphAddNodeMode, type SerializedLGraphNode, type Vector2 } from "@litegraph-ts/core";
+import { LConnectionKind, LGraph, LGraphNode, type INodeSlot, type SlotIndex, LiteGraph, getStaticProperty, type LGraphAddNodeOptions, LGraphCanvas, type LGraphRemoveNodeOptions, Subgraph, type LGraphAddNodeMode, type SerializedLGraphNode, type Vector2, type NodeID, reassignGraphIDs, type GraphIDMapping, type SerializedLGraph } from "@litegraph-ts/core";
 import GraphSync from "./GraphSync";
 import EventEmitter from "events";
 import type TypedEmitter from "typed-emitter";
@@ -14,6 +14,31 @@ import layoutStates from "./stores/layoutStates";
 import type { ComfyBoxWorkflow, WorkflowInstID } from "./stores/workflowState";
 import workflowState from "./stores/workflowState";
 import type { SerializedComfyBoxTemplate } from "./ComfyBoxTemplate";
+import { v4 as uuidv4 } from "uuid"
+
+function calculateMinPosOfNodes(nodes: SerializedLGraphNode[]): Vector2 {
+    var posMin: Vector2 = [0, 0]
+    var posMinIndexes: [number, number] | null = null;
+
+    for (var i = 0; i < nodes.length; ++i) {
+        if (posMin) {
+            if (posMin[0] > nodes[i].pos[0]) {
+                posMin[0] = nodes[i].pos[0];
+                posMinIndexes[0] = i;
+            }
+            if (posMin[1] > nodes[i].pos[1]) {
+                posMin[1] = nodes[i].pos[1];
+                posMinIndexes[1] = i;
+            }
+        }
+        else {
+            posMin = [nodes[i].pos[0], nodes[i].pos[1]];
+            posMinIndexes = [i, i];
+        }
+    }
+
+    return posMin;
+}
 
 type ComfyGraphEvents = {
     configured: (graph: LGraph) => void
@@ -36,6 +61,10 @@ export default class ComfyGraph extends LGraph {
         if (workflowID == null)
             return null;
         return workflowState.getWorkflow(workflowID)
+    }
+
+    get layout(): WritableLayoutStateStore | null {
+        return this.workflow?.layout;
     }
 
     constructor(workflowID?: WorkflowInstID) {
@@ -217,5 +246,63 @@ export default class ComfyGraph extends LGraph {
 
         // console.debug("ConnectionChange", node);
         this.eventBus.emit("nodeConnectionChanged", kind, node, slot, targetNode, targetSlot);
+    }
+
+    /*
+     * Inserts a template.
+     * Layout deserialization must be handled afterwards!
+     */
+    insertTemplate(template: SerializedComfyBoxTemplate, pos: Vector2): Record<NodeID, LGraphNode> {
+        const minPos = calculateMinPosOfNodes(template.nodes);
+
+        const templateNodeIDToNewNode: Record<NodeID, LGraphNode> = {}
+
+        var nodes = [];
+        for (var i = 0; i < template.nodes.length; ++i) {
+            var node_data = template.nodes[i];
+            var node = LiteGraph.createNode(node_data.type);
+
+            let mapping: GraphIDMapping = null;
+            if (node_data.type === "graph/subgraph") {
+                mapping = reassignGraphIDs((node_data as any).subgraph as SerializedLGraph);
+            }
+
+            if (node) {
+                const prevNodeId = node_data.id;
+                node_data.id = uuidv4();
+                templateNodeIDToNewNode[prevNodeId] = node
+
+                node.configure(node_data);
+
+                if (mapping) {
+                    for (const subnode of (node as Subgraph).subgraph.iterateNodesInOrderRecursive()) {
+                        const oldNodeID = mapping.nodeIDs[subnode.id];
+                        templateNodeIDToNewNode[oldNodeID] = subnode;
+                    }
+                }
+
+                node.pos[0] += pos[0] - minPos[0]; //+= 5;
+                node.pos[1] += pos[1] - minPos[1]; //+= 5;
+
+                this.add(node, { doProcessChange: false, addedBy: "template" as any });
+
+                nodes.push(node);
+            }
+        }
+
+        //create links
+        for (var i = 0; i < template.links.length; ++i) {
+            var link_info = template.links[i];
+            var origin_node = templateNodeIDToNewNode[link_info[0]];
+            var target_node = templateNodeIDToNewNode[link_info[2]];
+            if (origin_node && target_node)
+                origin_node.connect(link_info[1], target_node, link_info[3]);
+            else
+                console.error("[ComfyGraphCanvas] nodes missing on template insertion!", link_info);
+        }
+
+        this.afterChange();
+
+        return templateNodeIDToNewNode;
     }
 }

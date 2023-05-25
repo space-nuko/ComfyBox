@@ -91,6 +91,7 @@
     "style-mod": "^4.0.3",
     "svelte-bootstrap-icons": "^2.3.1",
     "svelte-feather-icons": "^4.0.0",
+    "svelte-floating-ui": "^1.5.2",
     "svelte-preprocess": "^5.0.3",
     "svelte-select": "^5.5.3",
     "svelte-splitpanes": "^0.7.13",

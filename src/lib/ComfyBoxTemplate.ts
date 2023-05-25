@@ -40,6 +40,7 @@ export type SerializedComfyBoxTemplate = {
     isComfyBoxTemplate: true,
     version: 1,
     id: UUID,
+    commitHash: string,
 
     /*
      * Serialized metadata
@@ -182,6 +183,7 @@ function renderSvg(canvas: ComfyGraphCanvas, graph: LGraph, padding: number, ext
     const offset = canvas.ds.offset;
     const show_info = canvas.show_info;
     const background_image = canvas.background_image;
+    const clear_background = canvas.clear_background;
     const render_canvas_border = canvas.render_canvas_border;
     const render_subgraph_panels = canvas.render_subgraph_panels
     const render_subgraph_stack_header = canvas.render_subgraph_stack_header
@@ -189,6 +191,7 @@ function renderSvg(canvas: ComfyGraphCanvas, graph: LGraph, padding: number, ext
     canvas.openSubgraph(graph)
     canvas.show_info = false;
     canvas.background_image = null;
+    canvas.clear_background = false;
     canvas.render_canvas_border = false;
     canvas.render_subgraph_panels = false;
     canvas.render_subgraph_stack_header = false;
@@ -233,12 +236,10 @@ function renderSvg(canvas: ComfyGraphCanvas, graph: LGraph, padding: number, ext
     canvas.ds.offset = [-bounds[0], -bounds[1]];
     canvas.ctx = svgCtx;
 
-    let saving = false;
-
     // Trigger saving
-    saving = true;
+    canvas.isExportingSVG = true;
     canvas.draw(true, true);
-    saving = false;
+    canvas.isExportingSVG = false;
 
     // Restore original settings
     canvas.closeSubgraph();
@@ -248,6 +249,7 @@ function renderSvg(canvas: ComfyGraphCanvas, graph: LGraph, padding: number, ext
     canvas.ds.offset = offset;
     canvas.ctx = ctx;
     canvas.show_info = show_info;
+    canvas.clear_background = clear_background;
     canvas.background_image = background_image;
     canvas.render_canvas_border = render_canvas_border;
     canvas.render_subgraph_panels = render_subgraph_panels;
@@ -323,6 +325,7 @@ export function serializeTemplate(canvas: ComfyGraphCanvas, template: ComfyBoxTe
     const serTemplate: SerializedComfyBoxTemplate = {
         isComfyBoxTemplate: true,
         version: 1,
+        commitHash: __GIT_COMMIT_HASH__,
         id: template.id,
         metadata,
         nodes,
