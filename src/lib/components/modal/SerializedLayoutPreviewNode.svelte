@@ -12,7 +12,7 @@
     {#if entry.dragItem.type === "container"}
         <div class="layout-container">
             <Block>
-                <Accordion label={entry.dragItem.attrs.title || "(Container)"} open={true}>
+                <Accordion label={entry.dragItem.attrs.title || "(Container)"} open={false}>
                     {#each entry.children as childID}
                         {@const child = layout.allItems[childID]}
                         <svelte:self {layout} entry={child} entryID={childID} />

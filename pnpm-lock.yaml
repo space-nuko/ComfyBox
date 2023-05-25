@@ -151,6 +151,9 @@ importers:
       svelte-feather-icons:
         specifier: ^4.0.0
         version: 4.0.0
+      svelte-floating-ui:
+        specifier: ^1.5.2
+        version: 1.5.2
       svelte-preprocess:
         specifier: ^5.0.3
         version: 5.0.3(sass@1.61.0)(svelte@3.58.0)(typescript@5.0.3)
@@ -8130,6 +8133,13 @@ packages:
 
   /svelte-floating-ui@1.2.8:
     resolution: {integrity: sha512-8Ifi5CD2Ui7FX7NjJRmutFtXjrB8T/FMNoS2H8P81t5LHK4I9G4NIs007rLWG/nRl7y+zJUXa3tWuTjYXw/O5A==}
+    dependencies:
+      '@floating-ui/core': 1.2.6
+      '@floating-ui/dom': 1.2.8
+    dev: false
+
+  /svelte-floating-ui@1.5.2:
+    resolution: {integrity: sha512-nV50eno74CEsFfFJ6iyN/oNYDEOck1TZjGV3lmJksVRbiiUAVF6bHspyAhR7GZ7c/4qbRWp9UyX24J+UXdEpag==}
     dependencies:
       '@floating-ui/core': 1.2.6
       '@floating-ui/dom': 1.2.8

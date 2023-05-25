@@ -29,9 +29,11 @@
             {/if}
         </div>
         <svelte:fragment>
-            {#if modal != null && modal.svelteComponent != null}
-                <svelte:component this={modal.svelteComponent} {...modal.svelteProps} _modal={modal}/>
-            {/if}
+            <div class="modal-body">
+                {#if modal != null && modal.svelteComponent != null}
+                    <svelte:component this={modal.svelteComponent} {...modal.svelteProps} _modal={modal}/>
+                {/if}
+            </div>
         </svelte:fragment>
         <div slot="buttons" class="buttons" let:closeDialog>
             {#if modal != null && modal.buttons?.length > 0}
@@ -52,6 +54,12 @@
 
 <style lang="scss">
  .buttons {
-     gap: var(--spacing-sm);
+     display: flex;
+     flex-direction: row;
+     gap: var(--spacing-md);
+ }
+
+ .modal-body {
+     overflow: auto;
  }
 </style>

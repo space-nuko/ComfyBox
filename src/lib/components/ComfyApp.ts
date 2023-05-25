@@ -1013,7 +1013,8 @@ export default class ComfyApp {
                 closeOnClick: false,
                 showCloseButton: false,
                 svelteProps: {
-                    templateAndSvg
+                    templateAndSvg,
+                    editable: false
                 },
                 buttons: [
                     {

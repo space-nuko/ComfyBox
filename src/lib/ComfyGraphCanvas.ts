@@ -3,47 +3,22 @@ import { get, type Unsubscriber } from "svelte/store";
 import type ComfyGraph from "./ComfyGraph";
 import type ComfyApp from "./components/ComfyApp";
 import { ComfyReroute } from "./nodes";
-import layoutStates from "./stores/layoutStates";
+import layoutStates, { type ContainerLayout } from "./stores/layoutStates";
 import queueState from "./stores/queueState";
 import selectionState from "./stores/selectionState";
 import templateState from "./stores/templateState";
 import { createTemplate, type ComfyBoxTemplate, serializeTemplate, type SerializedComfyBoxTemplate } from "./ComfyBoxTemplate";
 import notify from "./notify";
-import { v4 as uuidv4 } from "uuid"
-import { download } from "./utils";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
     scale: number
 }
 
-function getMinPos(nodes: SerializedLGraphNode[]): Vector2 {
-    var posMin: Vector2 = [0, 0]
-    var posMinIndexes: [number, number] | null = null;
-
-    for (var i = 0; i < nodes.length; ++i) {
-        if (posMin) {
-            if (posMin[0] > nodes[i].pos[0]) {
-                posMin[0] = nodes[i].pos[0];
-                posMinIndexes[0] = i;
-            }
-            if (posMin[1] > nodes[i].pos[1]) {
-                posMin[1] = nodes[i].pos[1];
-                posMinIndexes[1] = i;
-            }
-        }
-        else {
-            posMin = [nodes[i].pos[0], nodes[i].pos[1]];
-            posMinIndexes = [i, i];
-        }
-    }
-
-    return posMin;
-}
-
 export default class ComfyGraphCanvas extends LGraphCanvas {
     app: ComfyApp | null;
     private _unsubscribe: Unsubscriber;
+    isExportingSVG: boolean = false;
 
     get comfyGraph(): ComfyGraph | null {
         return this.graph as ComfyGraph;
@@ -470,45 +445,21 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
      * Inserts a ComfyBox template. Logic is similar to pasting from the
      * clipboard in vanilla litegraph.
      */
-    insertTemplate(template: SerializedComfyBoxTemplate, pos: Vector2) {
-        const minPos = getMinPos(template.nodes);
+    insertTemplate(template: SerializedComfyBoxTemplate, pos: Vector2, container: ContainerLayout, containerIndex: number): [LGraphNode[], IDragItem] {
+        const comfyGraph = this.graph as ComfyGraph;
 
-        const templateNodeIDToNewNode: Record<NodeID, LGraphNode> = {}
-
-        var nodes = [];
-        for (var i = 0; i < template.nodes.length; ++i) {
-            var node_data = template.nodes[i];
-            var node = LiteGraph.createNode(node_data.type);
-            if (node) {
-                const prevNodeId = node_data.id;
-                node_data.id = uuidv4();
-                templateNodeIDToNewNode[prevNodeId] = node
-
-                node.configure(node_data);
-
-                node.pos[0] += pos[0] - minPos[0]; //+= 5;
-                node.pos[1] += pos[1] - minPos[1]; //+= 5;
-
-                this.graph.add(node, { doProcessChange: false, addedBy: "template" as any });
-
-                nodes.push(node);
-            }
+        const layout = comfyGraph.layout;
+        if (layout == null) {
+            console.error("[ComfyGraphCanvas] graph has no layout!", comfyGraph)
+            return;
         }
 
-        //create links
-        for (var i = 0; i < template.links.length; ++i) {
-            var link_info = template.links[i];
-            var origin_node = templateNodeIDToNewNode[link_info[0]];
-            var target_node = templateNodeIDToNewNode[link_info[2]];
-            if (origin_node && target_node)
-                origin_node.connect(link_info[1], target_node, link_info[3]);
-            else
-                console.error("[ComfyGraphCanvas] nodes missing on template insertion!", link_info);
-        }
+        const nodeMapping = comfyGraph.insertTemplate(template, pos);
+        const templateLayoutRoot = layout.insertTemplate(template, comfyGraph, nodeMapping, container, containerIndex);
 
-        this.selectNodes(nodes);
+        this.selectNodes(Object.values(nodeMapping).filter(n => n.graph === this.graph));
 
-        this.graph.afterChange();
+        return [Object.values(nodeMapping), templateLayoutRoot]
     }
 
     saveAsTemplate(_value: IContextMenuItem, _options, mouseEvent, prevMenu, node?: LGraphNode) {
@@ -592,5 +543,18 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         )
 
         return options
+    }
+
+    override onRenderBackground(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): boolean {
+        if (this.isExportingSVG) {
+            ctx.clearRect(
+                this.visible_area[0],
+                this.visible_area[1],
+                this.visible_area[2],
+                this.visible_area[3]
+            );
+            return true;
+        }
+        return false;
     }
 }

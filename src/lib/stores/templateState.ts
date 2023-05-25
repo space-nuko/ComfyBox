@@ -2,6 +2,7 @@ import type { SerializedComfyBoxTemplate } from '$lib/ComfyBoxTemplate';
 import type { UUID } from '@litegraph-ts/core';
 import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
+import { v4 as uuidv4 } from "uuid";
 
 export type TemplateState = {
     templates: SerializedComfyBoxTemplate[]
@@ -12,6 +13,7 @@ type TemplateStateOps = {
     save: () => void,
     load: () => void,
     add: (template: SerializedComfyBoxTemplate) => boolean,
+    update: (template: SerializedComfyBoxTemplate) => boolean,
     remove: (templateID: UUID) => boolean,
 }
 
@@ -49,6 +51,30 @@ function remove(templateID: UUID): boolean {
         const index = s.templates.findIndex(t => t.id === templateID)
         s.templates.splice(index, 1);
         delete s.templatesByID[templateID];
+        return s;
+    })
+
+    save();
+
+    return true;
+}
+
+function update(template: SerializedComfyBoxTemplate): boolean {
+    const state = get(store);
+    if (!state.templatesByID[template.id]) {
+        return false;
+    }
+
+    store.update(s => {
+        const oldId = template.id
+        const index = s.templates.findIndex(t => t.id === oldId)
+        s.templates.splice(index, 1);
+        delete s.templatesByID[oldId];
+
+        template.id = uuidv4();
+
+        s.templates.push(template);
+        s.templatesByID[template.id] = template;
         return s;
     })
 
@@ -95,6 +121,7 @@ const templateStateStore: WritableTemplateStateStore =
     ...store,
     add,
     remove,
+    update,
     save,
     load,
 }

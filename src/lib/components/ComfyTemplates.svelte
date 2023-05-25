@@ -1,8 +1,8 @@
 <script lang="ts">
- import type { SerializedComfyBoxTemplate } from "$lib/ComfyBoxTemplate";
+ import { embedTemplateInSvg, type SerializedComfyBoxTemplate } from "$lib/ComfyBoxTemplate";
  import templateState from "$lib/stores/templateState";
  import uiState from "$lib/stores/uiState";
- import { truncateString } from "$lib/utils";
+ import { download, truncateString } from "$lib/utils";
  import type ComfyApp from "./ComfyApp";
  import { flip } from 'svelte/animate';
  import {fade} from 'svelte/transition';
@@ -10,7 +10,10 @@
  import { dndzone, TRIGGERS, SHADOW_PLACEHOLDER_ITEM_ID, SHADOW_ITEM_MARKER_PROPERTY_NAME } from 'svelte-dnd-action';
  import { defaultWidgetAttributes, type TemplateLayout } from "$lib/stores/layoutStates";
  import { v4 as uuidv4 } from "uuid"
- import { writable } from "svelte/store";
+ import { get, writable } from "svelte/store";
+	import EditTemplateModal from "./modal/EditTemplateModal.svelte";
+	import modalState, { type ModalData } from "$lib/stores/modalState";
+	import notify from "$lib/notify";
 
  export let app: ComfyApp
 
@@ -71,6 +74,61 @@
          shouldIgnoreDndEvents = false;
      }
  }
+
+ function handleClick(layout: TemplateLayout) {
+     const updateTemplate = (modal: ModalData) => {
+         const state = get(modal.state);
+         layout.template.metadata.title = state.name || layout.template.metadata.title
+         layout.template.metadata.author = state.author || layout.template.metadata.author
+         layout.template.metadata.description = state.description || layout.template.metadata.description
+     }
+
+     const saveTemplate = (modal: ModalData) => {
+         updateTemplate(modal);
+         try {
+             templateState.update(layout.template);
+             notify("Saved template!", { type: "success" })
+         }
+         catch (error) {
+             notify(`Failed to save template: ${error}`, { type: "error", timeout: 10000 })
+         }
+     }
+
+     const downloadTemplate = (modal: ModalData) => {
+         updateTemplate(modal);
+         const svg = embedTemplateInSvg(layout.template);
+         const title = layout.template.metadata.title || "template";
+         download(`${title}.svg`, svg, "image/svg+xml");
+     }
+
+     modalState.pushModal({
+         svelteComponent: EditTemplateModal,
+         svelteProps: {
+             templateAndSvg: layout.template
+         },
+         showCloseButton: false,
+         closeOnClick: false,
+         buttons: [
+             {
+                 name: "Save",
+                 variant: "primary",
+                 onClick: saveTemplate
+             },
+             {
+                 name: "Download",
+                 variant: "secondary",
+                 onClick: downloadTemplate,
+                 closeOnClick: false
+             },
+             {
+                 name: "Close",
+                 variant: "secondary",
+                 onClick: () => {
+                 }
+             },
+         ]
+     })
+ }
 </script>
 
 <div class="template-list">
@@ -92,9 +150,10 @@
                      on:consider={handleDndConsider}
                      on:finalize={handleDndFinalize}>
                     {#each _sorted.filter(i => i.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
-                        <div class="template-entry" class:draggable>
-                            <div class="template-name">{truncateString(item.template.metadata.title, 16)}</div>
-                            <div class="template-desc">{truncateString(item.template.metadata.description, 24)}</div>
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <div class="template-entry" class:draggable on:click={() => handleClick(item)}>
+                            <div class="template-name">{item.template.metadata.title}</div>
+                            <div class="template-desc">{item.template.metadata.description}</div>
                         </div>
                         {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
                             <div in:fade={{duration:200, easing: cubicIn}} class='template-drag-item-shadow'/>
@@ -140,6 +199,9 @@
      background: var(--panel-background-fill);
      max-height: 14rem;
      position: relative;
+     user-select: none;
+     text-overflow: ellipsis;
+     overflow: hidden;
 
      font-size: 13pt;
      .template-desc {
@@ -147,11 +209,19 @@
          font-size: 11pt;
      }
 
+     &.draggable {
+         border: 5px dashed var(--secondary-500);
+         margin: 0.2em;
+     }
+
      &:hover:not(:has(img:hover)):not(:has(button:hover)) {
+         cursor: pointer;
+         background: var(--block-background-fill);
+
          &.draggable {
              cursor: grab;
+             background: var(--secondary-700);
          }
-         background: var(--block-background-fill);
 
          &.running {
              background: var(--comfy-accent-soft);
