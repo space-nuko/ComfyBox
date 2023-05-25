@@ -525,7 +525,37 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 canShow: (di: IDragItem) => di.type === "container"
             },
 
+            // Combo
+            {
+                name: "defaultValue",
+                type: "string",
+                location: "nodeProps",
+                editable: true,
+                defaultValue: "A",
+                validNodeTypes: ["ui/combo"],
+            },
+
+            // Checkbox
+            {
+                name: "defaultValue",
+                type: "boolean",
+                location: "nodeProps",
+                editable: true,
+                defaultValue: true,
+                validNodeTypes: ["ui/checkbox"],
+            },
+
             // Range
+            {
+                name: "defaultValue",
+                type: "number",
+                location: "nodeProps",
+                editable: true,
+                defaultValue: 0,
+                min: -2 ^ 16,
+                max: 2 ^ 16,
+                validNodeTypes: ["ui/number"],
+            },
             {
                 name: "min",
                 type: "number",
@@ -588,6 +618,14 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
 
             // Radio
             {
+                name: "defaultValue",
+                type: "string",
+                location: "nodeProps",
+                editable: true,
+                defaultValue: "Choice A",
+                validNodeTypes: ["ui/radio"],
+            },
+            {
                 name: "choices",
                 type: "string",
                 location: "nodeProps",
@@ -596,6 +634,16 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: ["Choice A", "Choice B", "Choice C"],
                 serialize: serializeStringArray,
                 deserialize: deserializeStringArray,
+            },
+
+            // Text
+            {
+                name: "defaultValue",
+                type: "string",
+                location: "nodeProps",
+                editable: true,
+                defaultValue: "",
+                validNodeTypes: ["ui/text"],
             },
 
             // Workflow

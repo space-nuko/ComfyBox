@@ -23,7 +23,7 @@ import { ComfyComboNode } from "$lib/nodes/widgets";
 import notify from "$lib/notify";
 import parseA1111, { type A1111ParsedInfotext } from "$lib/parseA1111";
 import configState, { type ConfigState } from "$lib/stores/configState";
-import layoutStates, { defaultWorkflowAttributes, type SerializedLayoutState } from "$lib/stores/layoutStates";
+import layoutStates, { defaultWorkflowAttributes, isComfyWidgetNode, type SerializedLayoutState } from "$lib/stores/layoutStates";
 import modalState from "$lib/stores/modalState";
 import queueState from "$lib/stores/queueState";
 import selectionState from "$lib/stores/selectionState";
@@ -272,6 +272,9 @@ export default class ComfyApp {
     }
 
     resizeCanvas() {
+        if (!this.canvasEl)
+            return;
+
         this.canvasEl.width = this.canvasEl.parentElement.offsetWidth;
         this.canvasEl.height = this.canvasEl.parentElement.offsetHeight;
         this.canvasEl.style.width = ""
@@ -482,12 +485,16 @@ export default class ComfyApp {
                 } catch (error) { }
             }
 
-            if (workflow && typeof workflow.createdBy === "string") {
-                this.openWorkflow(workflow);
-            }
-            else {
-                // TODO handle vanilla workflows
-                throw new Error("Workflow was not in ComfyBox format!")
+            if (workflow == null)
+                return;
+
+            if (typeof workflow === "object") {
+                if (typeof workflow.createdBy === "string")
+                    this.openWorkflow(workflow);
+                else {
+                    // TODO handle vanilla workflows
+                    throw new Error("Workflow was not in ComfyBox format!")
+                }
             }
         });
     }
@@ -784,6 +791,30 @@ export default class ComfyApp {
         await this.openWorkflow(state, options)
     }
 
+    saveWorkflowStateAsDefault(workflow: ComfyBoxWorkflow | null) {
+        workflow ||= workflowState.getActiveWorkflow();
+        if (workflow == null)
+            return;
+
+        for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
+            if (isComfyWidgetNode(node)) {
+                node.properties.defaultValue = node.getValue();
+            }
+        }
+    }
+
+    resetCurrentWorkflow() {
+        const workflow = workflowState.getActiveWorkflow();
+        if (workflow == null)
+            return;
+
+        for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
+            if (isComfyWidgetNode(node)) {
+                node.setValue(node.properties.defaultValue);
+            }
+        }
+    }
+
     clear() {
         this.clean();
 
@@ -820,6 +851,8 @@ export default class ComfyApp {
             notify("No active workflow!", { type: "error" })
             return;
         }
+
+        this.saveWorkflowStateAsDefault(workflow);
 
         const promptFilename = get(configState).promptForWorkflowName;
 

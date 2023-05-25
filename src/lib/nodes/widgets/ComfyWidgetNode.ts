@@ -355,7 +355,6 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
 
     override stripUserState(o: SerializedLGraphNode) {
         super.stripUserState(o);
-        (o as any).comfyValue = this.defaultValue;
-        o.properties.defaultValue = null;
+        (o as any).comfyValue = this.properties.defaultValue;
     }
 }
