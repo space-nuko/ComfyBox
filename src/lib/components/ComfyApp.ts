@@ -29,7 +29,7 @@ import queueState from "$lib/stores/queueState";
 import selectionState from "$lib/stores/selectionState";
 import uiState from "$lib/stores/uiState";
 import workflowState, { ComfyBoxWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
-import type { SerializedPromptOutput } from "$lib/utils";
+import { readFileToText, type SerializedPromptOutput } from "$lib/utils";
 import { basename, capitalize, download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range } from "$lib/utils";
 import { tick } from "svelte";
 import { type SvelteComponentDev } from "svelte/internal";
@@ -264,9 +264,9 @@ export default class ComfyApp {
      */
     async loadConfig() {
         try {
-            const config = await fetch(`/config.json`);
-            const state = await config.json() as ConfigState;
-            configState.set(state);
+            const config = await fetch(`/config.json`, { cache: "no-store" });
+            const newConfig = await config.json() as ConfigState;
+            configState.set({ ...get(configState), ...newConfig });
         }
         catch (error) {
             console.error(`Failed to load config`, error)
@@ -274,7 +274,44 @@ export default class ComfyApp {
     }
 
     async loadBuiltInTemplates(): Promise<SerializedComfyBoxTemplate[]> {
-        return []
+        const builtInTemplates = get(configState).builtInTemplates
+        const options: RequestInit = get(configState).cacheBuiltInResources ? {} : { cache: "no-store" }
+        const promises = builtInTemplates.map(basename => {
+            return fetch(`/templates/${basename}.svg`, options)
+                .then(res => res.text())
+                .catch(error => error)
+        })
+
+        const [templates, error] = await Promise.all(promises).then((results) => {
+            const templates: SerializedComfyBoxTemplate[] = []
+            const errors: string[] = []
+
+            for (const r of results) {
+                if (r instanceof Error) {
+                    errors.push(r.toString())
+                }
+                else {
+                    // bare filename of image
+                    const svg = r as string;
+                    const templateAndSvg = deserializeTemplateFromSVG(svg)
+                    if (templateAndSvg == null) {
+                        errors.push("Invalid SVG template format")
+                    }
+                    templates.push(templateAndSvg)
+                }
+            }
+
+            let error = null;
+            if (errors && errors.length > 0)
+                error = "Error(s) loading builtin templates:\n" + errors.join("\n");
+
+            return [templates, error]
+        })
+
+        if (error)
+            notify(error, { type: "error" })
+
+        return templates;
     }
 
     resizeCanvas() {
@@ -786,7 +823,8 @@ export default class ComfyApp {
     async initDefaultWorkflow(name: string = "defaultWorkflow", options?: OpenWorkflowOptions) {
         let state = null;
         try {
-            const graphResponse = await fetch(`/workflows/${name}.json`);
+            const options: RequestInit = get(configState).cacheBuiltInResources ? {} : { cache: "no-store" }
+            const graphResponse = await fetch(`/workflows/${name}.json`, options);
             state = await graphResponse.json() as SerializedAppState;
         }
         catch (error) {
@@ -1061,7 +1099,12 @@ export default class ComfyApp {
             };
             reader.readAsText(file);
         } else if (file.type === "image/svg+xml" || file.name.endsWith(".svg")) {
-            const templateAndSvg = await deserializeTemplateFromSVG(file);
+            const svg = await readFileToText(file);
+            const templateAndSvg = deserializeTemplateFromSVG(svg);
+            if (templateAndSvg == null) {
+                notify("Invalid SVG template format!", { type: "error" })
+                return;
+            }
 
             const importTemplate = () => {
                 try {

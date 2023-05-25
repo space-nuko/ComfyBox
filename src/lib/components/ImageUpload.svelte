@@ -89,7 +89,7 @@
 
                        for (const r of results) {
                            if (r instanceof Error) {
-                               errors.push(r.cause)
+                               errors.push(r.toString())
                            }
                            else {
                                // bare filename of image

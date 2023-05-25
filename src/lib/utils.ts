@@ -598,3 +598,13 @@ export function calcNodesBoundingBox(nodes: SerializedLGraphNode[]): Vector4 {
 
     return [min_x, min_y, max_x, max_y];
 }
+
+export async function readFileToText(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async () => {
+            resolve(reader.result as string);
+        };
+        reader.readAsText(file);
+    })
+}

@@ -338,7 +338,6 @@ export function serializeTemplate(canvas: ComfyGraphCanvas, template: ComfyBoxTe
     uiState.update(s => { s.forceSaveUserState = null; return s; });
 
     nodes = relocateNodes(nodes);
-    nodes = removeTags(nodes);
     [nodes, links] = pruneDetachedLinks(nodes, links);
 
     const svg = renderSvg(canvas, graph, TEMPLATE_SVG_PADDING);
@@ -378,28 +377,20 @@ export function extractTemplateJSONFromSVG(svg: string): string | null {
 /*
  * Credit goes to pythongosssss for this format
  */
-export function deserializeTemplateFromSVG(file: File): Promise<SerializedComfyBoxTemplate> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = async () => {
-            const svg = reader.result as string;
-            let template = null;
-            let templateJSON = extractTemplateJSONFromSVG(svg);
-            if (templateJSON)
-                template = JSON.parse(templateJSON);
+export function deserializeTemplateFromSVG(svg: string): SerializedComfyBoxTemplate | null {
+    let template = null;
+    let templateJSON = extractTemplateJSONFromSVG(svg);
+    if (templateJSON)
+        template = JSON.parse(templateJSON);
 
-            if (!isSerializedComfyBoxTemplate(template)) {
-                reject("Invalid template format!")
-            }
-            else {
-                template.svg = svg;
-                resolve(template)
-            }
-        };
-        reader.readAsText(file);
-    });
+    if (!isSerializedComfyBoxTemplate(template)) {
+        return null;
+    }
+    else {
+        template.svg = svg;
+        return template;
+    }
 }
-
 
 export function createTemplate(nodes: LGraphNode[]): ComfyBoxTemplateResult {
     if (nodes.length === 0) {
