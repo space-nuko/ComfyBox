@@ -13,6 +13,9 @@
  }
 
  function onButtonClicked(modal: ModalData, button: ModalButton, closeDialog: Function) {
+     if (button.disabled)
+         return;
+
      if (button.onClick(modal) === false)
          return
 
@@ -39,7 +42,7 @@
         <div slot="buttons" class="buttons" let:closeDialog>
             {#if modal != null && modal.buttons?.length > 0}
                 {#each modal.buttons as button}
-                    <Button variant={button.variant} on:click={() => onButtonClicked(modal, button, closeDialog)}>
+                    <Button variant={button.variant} disabled={button.disabled} on:click={() => onButtonClicked(modal, button, closeDialog)}>
                         {button.name}
                     </Button>
                 {/each}

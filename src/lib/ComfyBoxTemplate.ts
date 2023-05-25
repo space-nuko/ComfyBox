@@ -338,6 +338,7 @@ export function serializeTemplate(canvas: ComfyGraphCanvas, template: ComfyBoxTe
     uiState.update(s => { s.forceSaveUserState = null; return s; });
 
     nodes = relocateNodes(nodes);
+    nodes = removeTags(nodes);
     [nodes, links] = pruneDetachedLinks(nodes, links);
 
     const svg = renderSvg(canvas, graph, TEMPLATE_SVG_PADDING);
@@ -357,22 +358,35 @@ export function serializeTemplate(canvas: ComfyGraphCanvas, template: ComfyBoxTe
     return serTemplate;
 }
 
+
+/*
+ * Extract embedded workflow from desc tags
+ */
+export function extractTemplateJSONFromSVG(svg: string): string | null {
+    const descEnd = svg.lastIndexOf("</desc>");
+    if (descEnd !== -1) {
+        const descStart = svg.lastIndexOf("<desc>", descEnd);
+        if (descStart !== -1) {
+            const json = svg.substring(descStart + 6, descEnd);
+            return unescapeXml(json);
+        }
+    }
+
+    return null;
+}
+
+/*
+ * Credit goes to pythongosssss for this format
+ */
 export function deserializeTemplateFromSVG(file: File): Promise<SerializedComfyBoxTemplate> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = async () => {
             const svg = reader.result as string;
             let template = null;
-
-            // Extract embedded workflow from desc tags
-            const descEnd = svg.lastIndexOf("</desc>");
-            if (descEnd !== -1) {
-                const descStart = svg.lastIndexOf("<desc>", descEnd);
-                if (descStart !== -1) {
-                    const json = svg.substring(descStart + 6, descEnd);
-                    template = JSON.parse(unescapeXml(json));
-                }
-            }
+            let templateJSON = extractTemplateJSONFromSVG(svg);
+            if (templateJSON)
+                template = JSON.parse(templateJSON);
 
             if (!isSerializedComfyBoxTemplate(template)) {
                 reject("Invalid template format!")

@@ -73,7 +73,6 @@
     "@sveltejs/vite-plugin-svelte": "^2.1.1",
     "@tsconfig/svelte": "^4.0.1",
     "@types/dompurify": "^3.0.2",
-    "@zerodevx/svelte-json-view": "^1.0.5",
     "canvas-to-svg": "^1.0.3",
     "cm6-theme-basic-dark": "^0.2.0",
     "cm6-theme-basic-light": "^0.2.0",

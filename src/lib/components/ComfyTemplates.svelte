@@ -143,7 +143,8 @@
              {
                  name: "Delete",
                  variant: "secondary",
-                 onClick: deleteTemplate
+                 onClick: deleteTemplate,
+                 disabled: layout.template.isBuiltIn
              },
              {
                  name: "Close",
