@@ -2,7 +2,7 @@
   "comfyBoxWorkflow": true,
   "createdBy": "ComfyBox",
   "version": 1,
-  "commitHash": "test",
+  "commitHash": "574d3170a4e829df366dc12c3aaa049121052d8f\n",
   "workflow": {
     "last_node_id": 0,
     "last_link_id": 0,
@@ -97,8 +97,8 @@
         "title": "UI.Gallery",
         "properties": {
           "tags": [],
-          "defaultValue": null,
-          "index": 8,
+          "defaultValue": [],
+          "index": 0,
           "updateMode": "append",
           "autoSelectOnUpdate": true
         },
@@ -321,7 +321,7 @@
         "title": "UI.Number",
         "properties": {
           "tags": [],
-          "defaultValue": 1,
+          "defaultValue": 4,
           "min": 1,
           "max": 16,
           "step": 1,
@@ -827,7 +827,7 @@
         "title": "UI.Checkbox",
         "properties": {
           "tags": [],
-          "defaultValue": false
+          "defaultValue": true
         },
         "widgets_values": [
           "true"
@@ -1311,11 +1311,11 @@
           "precision": 0
         },
         "widgets_values": [
-          "7.000"
+          "8.000"
         ],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": 7,
+        "comfyValue": 8,
         "shownOutputProperties": {
           "min": {
             "type": "number",
@@ -1390,7 +1390,7 @@
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "A",
+        "comfyValue": null,
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -1448,7 +1448,7 @@
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "A",
+        "comfyValue": null,
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -2124,7 +2124,7 @@
                 "tags": [
                   "lora"
                 ],
-                "defaultValue": false
+                "defaultValue": true
               },
               "widgets_values": [
                 "true"
@@ -2300,7 +2300,7 @@
                     "widgets_values": [],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "A",
+                    "comfyValue": null,
                     "shownOutputProperties": {},
                     "saveUserState": false
                   },
@@ -2482,7 +2482,7 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [],
-                      "defaultValue": 1,
+                      "defaultValue": 0,
                       "min": -2,
                       "max": 2,
                       "step": 0.05,
@@ -2586,7 +2586,7 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [],
-                      "defaultValue": 1,
+                      "defaultValue": 0,
                       "min": -2,
                       "max": 2,
                       "step": 0.05,
@@ -3636,7 +3636,7 @@
                     "widgets_values": [],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "A",
+                    "comfyValue": null,
                     "shownOutputProperties": {},
                     "saveUserState": false
                   },
@@ -3756,7 +3756,7 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [],
-                      "defaultValue": 1,
+                      "defaultValue": 0,
                       "min": -2,
                       "max": 2,
                       "step": 0.05,
@@ -3860,7 +3860,7 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [],
-                      "defaultValue": 1,
+                      "defaultValue": 0,
                       "min": -2,
                       "max": 2,
                       "step": 0.05,
@@ -4876,7 +4876,7 @@
                     "widgets_values": [],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "A",
+                    "comfyValue": null,
                     "shownOutputProperties": {},
                     "saveUserState": false
                   },
@@ -5124,7 +5124,7 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [],
-                      "defaultValue": 1,
+                      "defaultValue": 0,
                       "min": -2,
                       "max": 2,
                       "step": 0.05,
@@ -5228,7 +5228,7 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [],
-                      "defaultValue": 1,
+                      "defaultValue": 0,
                       "min": -2,
                       "max": 2,
                       "step": 0.05,
@@ -6071,7 +6071,7 @@
                     "widgets_values": [],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "A",
+                    "comfyValue": null,
                     "shownOutputProperties": {},
                     "saveUserState": false
                   },
@@ -6285,7 +6285,7 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [],
-                      "defaultValue": 1,
+                      "defaultValue": 0,
                       "min": -2,
                       "max": 2,
                       "step": 0.05,
@@ -6452,7 +6452,7 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [],
-                      "defaultValue": 1,
+                      "defaultValue": 0,
                       "min": -2,
                       "max": 2,
                       "step": 0.05,
@@ -7352,7 +7352,7 @@
                     "widgets_values": [],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "A",
+                    "comfyValue": null,
                     "shownOutputProperties": {},
                     "saveUserState": false
                   },
@@ -7599,7 +7599,7 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [],
-                      "defaultValue": 1,
+                      "defaultValue": 0,
                       "min": -2,
                       "max": 2,
                       "step": 0.05,
@@ -7703,7 +7703,7 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [],
-                      "defaultValue": 1,
+                      "defaultValue": 0,
                       "min": -2,
                       "max": 2,
                       "step": 0.05,
@@ -8936,7 +8936,7 @@
               "title": "UI.Text",
               "properties": {
                 "tags": [],
-                "defaultValue": "",
+                "defaultValue": "masterpiece, hyper detailed background, 1girl, cowboy shot, solo, a fluffy corgi girl wearing sunglasses, dark theme, baggy nylon jacket, gyaru, cyberpunk, airy, futuristic city, animal ear fluff, animal ears, smile, v, trees, leaves, nature, forest, overgrowth",
                 "multiline": true,
                 "lines": 5,
                 "maxLines": 5
@@ -9038,7 +9038,7 @@
               "title": "UI.Text",
               "properties": {
                 "tags": [],
-                "defaultValue": "",
+                "defaultValue": "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, worst quality, low quality, normal quality, wide shot, jpeg artifacts, signature, watermark, username, blurry, deformed, disfigured, poorly drawn face, mutation, mutated, extra limb, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, out of focus, long neck, long body, fuzzy, abstract",
                 "multiline": true,
                 "lines": 5,
                 "maxLines": 5
@@ -9721,7 +9721,7 @@
               "title": "Comfy.ValueControl",
               "properties": {
                 "tags": [],
-                "value": 288679537931148,
+                "value": 582554067195160,
                 "action": "randomize",
                 "min": 0,
                 "max": 18446744073709552000,
@@ -9892,7 +9892,7 @@
               "widgets_values": [],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": "A",
+              "comfyValue": null,
               "shownOutputProperties": {},
               "saveUserState": false
             },
@@ -10258,11 +10258,11 @@
                 "precision": 0
               },
               "widgets_values": [
-                "26.000"
+                "20.000"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": 26,
+              "comfyValue": 20,
               "shownOutputProperties": {
                 "min": {
                   "type": "number",
@@ -10337,7 +10337,7 @@
               "widgets_values": [],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": "A",
+              "comfyValue": null,
               "shownOutputProperties": {},
               "saveUserState": false
             },
@@ -10395,7 +10395,7 @@
               "widgets_values": [],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": "A",
+              "comfyValue": null,
               "shownOutputProperties": {},
               "saveUserState": false
             },
@@ -10960,7 +10960,7 @@
                   "txt2img",
                   "img2img"
                 ],
-                "defaultValue": "Choice A"
+                "defaultValue": "txt2img"
               },
               "widgets_values": [
                 "txt2img",
@@ -11771,14 +11771,14 @@
                 "tags": [
                   "img2img"
                 ],
-                "defaultValue": false
+                "defaultValue": true
               },
               "widgets_values": [
-                "false"
+                "true"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": false,
+              "comfyValue": true,
               "shownOutputProperties": {},
               "saveUserState": true
             },
@@ -12290,11 +12290,11 @@
                       "precision": 0
                     },
                     "widgets_values": [
-                      "832.000"
+                      "512.000"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": 832,
+                    "comfyValue": 512,
                     "shownOutputProperties": {
                       "min": {
                         "type": "number",
@@ -12572,7 +12572,7 @@
                     "title": "Operation",
                     "properties": {
                       "A": 0,
-                      "B": 1.25,
+                      "B": 2,
                       "OP": "*",
                       "tags": []
                     }
@@ -12621,7 +12621,7 @@
                     "title": "Operation",
                     "properties": {
                       "A": 0,
-                      "B": 1.25,
+                      "B": 2,
                       "OP": "*",
                       "tags": []
                     }
@@ -12880,18 +12880,18 @@
                         "img2img",
                         "img2imgScaleSize"
                       ],
-                      "defaultValue": 0,
+                      "defaultValue": 2,
                       "min": 1,
                       "max": 4,
                       "step": 0.05,
                       "precision": 1
                     },
                     "widgets_values": [
-                      "1.250"
+                      "2.000"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": 1.25,
+                    "comfyValue": 2,
                     "shownOutputProperties": {
                       "min": {
                         "type": "number",
@@ -13044,7 +13044,7 @@
                     "title": "UI.Text",
                     "properties": {
                       "tags": [],
-                      "defaultValue": "",
+                      "defaultValue": "0",
                       "multiline": false,
                       "lines": 5,
                       "maxLines": 5
@@ -13107,7 +13107,7 @@
                     "title": "UI.Text",
                     "properties": {
                       "tags": [],
-                      "defaultValue": "",
+                      "defaultValue": "0",
                       "multiline": false,
                       "lines": 5,
                       "maxLines": 5
@@ -13978,7 +13978,7 @@
                 "tags": [
                   "img2img"
                 ],
-                "defaultValue": 1,
+                "defaultValue": 0.65,
                 "min": 0,
                 "max": 1,
                 "step": 0.01,
@@ -14767,7 +14767,7 @@
               ],
               "title": "UI.ImageUpload",
               "properties": {
-                "defaultValue": null,
+                "defaultValue": [],
                 "tags": [
                   "img2img"
                 ]
@@ -15866,7 +15866,7 @@
               "widgets_values": [],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": "A",
+              "comfyValue": null,
               "shownOutputProperties": {},
               "saveUserState": false
             },
@@ -15948,11 +15948,11 @@
                 "precision": 0
               },
               "widgets_values": [
-                "0.550"
+                "1.000"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": 0.55,
+              "comfyValue": 1,
               "shownOutputProperties": {
                 "min": {
                   "type": "number",
@@ -16051,11 +16051,11 @@
                 "precision": 0
               },
               "widgets_values": [
-                "0.000"
+                "1.000"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": 0,
+              "comfyValue": 1,
               "shownOutputProperties": {
                 "min": {
                   "type": "number",
@@ -16513,7 +16513,7 @@
               ],
               "title": "UI.ImageUpload",
               "properties": {
-                "defaultValue": null,
+                "defaultValue": [],
                 "tags": [
                   "controlnet"
                 ]
@@ -17323,7 +17323,7 @@
           "outputJSON": true,
           "tags": []
         },
-        "boxcolor": "#AEA"
+        "boxcolor": "red"
       },
       {
         "id": "88ce296c-c21e-4929-90fe-b00310072880",
@@ -17663,11 +17663,11 @@
                 "precision": 0
               },
               "widgets_values": [
-                "30.000"
+                "20.000"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": 30,
+              "comfyValue": 20,
               "shownOutputProperties": {
                 "min": {
                   "type": "number",
@@ -17937,7 +17937,7 @@
               "title": "UI.Number",
               "properties": {
                 "tags": [],
-                "defaultValue": 1,
+                "defaultValue": 0.65,
                 "min": 0,
                 "max": 1,
                 "step": 0.01,
@@ -18301,7 +18301,7 @@
               "widgets_values": [],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": "A",
+              "comfyValue": null,
               "shownOutputProperties": {},
               "saveUserState": false
             },
@@ -18357,7 +18357,7 @@
               "widgets_values": [],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": "A",
+              "comfyValue": null,
               "shownOutputProperties": {},
               "saveUserState": false
             },
@@ -18376,7 +18376,7 @@
                 "collapsed": true
               },
               "order": 14,
-              "mode": 2,
+              "mode": 0,
               "inputs": [],
               "outputs": [
                 {
@@ -18552,7 +18552,7 @@
                       "collapsed": true
                     },
                     "order": 3,
-                    "mode": 2,
+                    "mode": 0,
                     "inputs": [
                       {
                         "name": "store",
@@ -18658,7 +18658,7 @@
                       "collapsed": true
                     },
                     "order": 5,
-                    "mode": 2,
+                    "mode": 0,
                     "inputs": [
                       {
                         "name": "store",
@@ -18764,7 +18764,7 @@
                       "collapsed": true
                     },
                     "order": 0,
-                    "mode": 2,
+                    "mode": 0,
                     "inputs": [],
                     "outputs": [
                       {
@@ -19099,11 +19099,11 @@
                 "defaultValue": false
               },
               "widgets_values": [
-                "true"
+                "false"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": true,
+              "comfyValue": false,
               "shownOutputProperties": {},
               "saveUserState": true
             },
@@ -19237,7 +19237,7 @@
               ],
               "title": "GenericCompare",
               "properties": {
-                "A": "ComfyUI_05881_.png [output]",
+                "A": null,
                 "B": "",
                 "OP": "==",
                 "enabled": true,
@@ -20412,7 +20412,7 @@
                 "collapsed": true
               },
               "order": 29,
-              "mode": 0,
+              "mode": 2,
               "inputs": [
                 {
                   "name": "height",
@@ -20539,8 +20539,8 @@
                     ],
                     "title": "Operation",
                     "properties": {
-                      "A": 512,
-                      "B": 2,
+                      "A": 0,
+                      "B": 1,
                       "OP": "*",
                       "tags": []
                     }
@@ -20588,8 +20588,8 @@
                     ],
                     "title": "Operation",
                     "properties": {
-                      "A": 512,
-                      "B": 2,
+                      "A": 0,
+                      "B": 1,
                       "OP": "*",
                       "tags": []
                     }
@@ -20789,7 +20789,7 @@
                       "collapsed": true
                     },
                     "order": 2,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "store",
@@ -20848,18 +20848,18 @@
                         "hr",
                         "hrScaleSize"
                       ],
-                      "defaultValue": 0,
+                      "defaultValue": 1,
                       "min": 1,
                       "max": 4,
                       "step": 0.05,
                       "precision": 1
                     },
                     "widgets_values": [
-                      "2.000"
+                      "1.000"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": 2,
+                    "comfyValue": 1,
                     "shownOutputProperties": {
                       "min": {
                         "type": "number",
@@ -20977,7 +20977,7 @@
                       "collapsed": true
                     },
                     "order": 12,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "value",
@@ -21015,17 +21015,17 @@
                         "hr",
                         "hrScaleSize"
                       ],
-                      "defaultValue": "",
+                      "defaultValue": "0",
                       "multiline": false,
                       "lines": 5,
                       "maxLines": 5
                     },
                     "widgets_values": [
-                      "1024"
+                      "0"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "1024",
+                    "comfyValue": "0",
                     "shownOutputProperties": {},
                     "saveUserState": true
                   },
@@ -21044,7 +21044,7 @@
                       "collapsed": true
                     },
                     "order": 11,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "value",
@@ -21081,17 +21081,17 @@
                         "hr",
                         "hrScaleSize"
                       ],
-                      "defaultValue": "",
+                      "defaultValue": "0",
                       "multiline": false,
                       "lines": 5,
                       "maxLines": 5
                     },
                     "widgets_values": [
-                      "1024"
+                      "0"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "1024",
+                    "comfyValue": "0",
                     "shownOutputProperties": {},
                     "saveUserState": true
                   }
@@ -21803,8 +21803,8 @@
         "title": "UI.Gallery",
         "properties": {
           "tags": [],
-          "defaultValue": null,
-          "index": 2,
+          "defaultValue": [],
+          "index": 0,
           "updateMode": "append",
           "autoSelectOnUpdate": true
         },
@@ -21874,6 +21874,78 @@
           }
         ],
         "title": "Comfy.PickImage",
+        "properties": {
+          "tags": []
+        },
+        "saveUserState": true
+      },
+      {
+        "id": "b089ede0-c788-4276-93df-3321a7ca3671",
+        "type": "actions/send_output",
+        "pos": [
+          3100,
+          189
+        ],
+        "size": [
+          184.79999999999998,
+          46
+        ],
+        "flags": {},
+        "order": 63,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "*",
+            "link": "800aab7b-ac43-48e3-9047-446c827a5eea",
+            "properties": {}
+          },
+          {
+            "name": "trigger",
+            "type": -1,
+            "link": "78d35af4-2984-41ce-ab37-48c0e4dc0d91",
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "outputs": [],
+        "title": "Comfy.SendOutputAction",
+        "properties": {
+          "tags": []
+        },
+        "saveUserState": true
+      },
+      {
+        "id": "7999653f-9085-4387-b86f-49d3f0a5ac8b",
+        "type": "actions/send_output",
+        "pos": [
+          3091,
+          85
+        ],
+        "size": [
+          184.79999999999998,
+          46
+        ],
+        "flags": {},
+        "order": 55,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "*",
+            "link": "83af87c9-1177-4a6d-8412-f3ab9b3c3105",
+            "properties": {}
+          },
+          {
+            "name": "trigger",
+            "type": -1,
+            "link": "8b9f4d46-6a55-4f1e-86bc-7c1dbd415e62",
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "outputs": [],
+        "title": "Comfy.SendOutputAction",
         "properties": {
           "tags": []
         },
@@ -21989,7 +22061,7 @@
               "widgets_values": [],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": "A",
+              "comfyValue": null,
               "shownOutputProperties": {},
               "saveUserState": false
             },
@@ -22140,7 +22212,7 @@
               "widgets_values": [],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": "A",
+              "comfyValue": null,
               "shownOutputProperties": {},
               "saveUserState": false
             },
@@ -22547,78 +22619,6 @@
           "extra": {},
           "version": 10
         }
-      },
-      {
-        "id": "b089ede0-c788-4276-93df-3321a7ca3671",
-        "type": "actions/send_output",
-        "pos": [
-          3100,
-          189
-        ],
-        "size": [
-          184.79999999999998,
-          46
-        ],
-        "flags": {},
-        "order": 63,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "value",
-            "type": "*",
-            "link": "800aab7b-ac43-48e3-9047-446c827a5eea",
-            "properties": {}
-          },
-          {
-            "name": "trigger",
-            "type": -1,
-            "link": "78d35af4-2984-41ce-ab37-48c0e4dc0d91",
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "outputs": [],
-        "title": "Comfy.SendOutputAction",
-        "properties": {
-          "tags": []
-        },
-        "saveUserState": true
-      },
-      {
-        "id": "7999653f-9085-4387-b86f-49d3f0a5ac8b",
-        "type": "actions/send_output",
-        "pos": [
-          3091,
-          85
-        ],
-        "size": [
-          184.79999999999998,
-          46
-        ],
-        "flags": {},
-        "order": 55,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "value",
-            "type": "*",
-            "link": "83af87c9-1177-4a6d-8412-f3ab9b3c3105",
-            "properties": {}
-          },
-          {
-            "name": "trigger",
-            "type": -1,
-            "link": "8b9f4d46-6a55-4f1e-86bc-7c1dbd415e62",
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "outputs": [],
-        "title": "Comfy.SendOutputAction",
-        "properties": {
-          "tags": []
-        },
-        "saveUserState": true
       }
     ],
     "links": [
@@ -23362,7 +23362,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -23387,7 +23388,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -23418,7 +23420,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -23444,7 +23447,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23467,7 +23471,8 @@
             "openOnStartup": true,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -23494,7 +23499,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23518,7 +23524,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23542,7 +23549,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23566,7 +23574,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23590,7 +23599,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23614,7 +23624,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23638,7 +23649,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23661,7 +23673,8 @@
             "openOnStartup": true,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -23684,12 +23697,13 @@
             "classes": "",
             "style": "",
             "nodeDisabledState": "hidden",
-            "variant": "gallery",
+            "variant": "code",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23712,7 +23726,8 @@
             "openOnStartup": true,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -23734,12 +23749,13 @@
             "classes": "",
             "style": "",
             "nodeDisabledState": "hidden",
-            "variant": "gallery",
+            "variant": "code",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23763,7 +23779,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23787,7 +23804,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23810,7 +23828,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -23838,7 +23857,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23862,7 +23882,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23886,7 +23907,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23910,7 +23932,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23934,7 +23957,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23958,7 +23982,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -23981,7 +24006,8 @@
             "openOnStartup": true,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24011,7 +24037,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24031,14 +24058,15 @@
             "disabled": false,
             "direction": "vertical",
             "classes": "",
-            "style": "flex-grow: 1; min-width: 0",
+            "style": "flex-grow: 15; min-width: 0",
             "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "secondary",
             "buttonSize": "small",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24063,7 +24091,8 @@
             "buttonSize": "large",
             "tags": [
               "img2img"
-            ]
+            ],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24093,7 +24122,8 @@
             "buttonSize": "large",
             "tags": [
               "img2img"
-            ]
+            ],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24119,7 +24149,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24139,14 +24170,15 @@
             "disabled": false,
             "direction": "vertical",
             "classes": "",
-            "style": "flex-grow: 1; min-width: 0",
+            "style": "flex-grow: 15; min-width: 0",
             "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "secondary",
             "buttonSize": "small",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24170,7 +24202,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24194,7 +24227,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24219,7 +24253,8 @@
             "buttonSize": "large",
             "tags": [
               "txt2img"
-            ]
+            ],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24246,7 +24281,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24272,7 +24308,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24299,7 +24336,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24324,7 +24362,8 @@
             "buttonSize": "large",
             "tags": [
               "img2img"
-            ]
+            ],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24351,7 +24390,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24375,7 +24415,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24398,7 +24439,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24425,7 +24467,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24449,7 +24492,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24473,7 +24517,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24499,7 +24544,8 @@
             "tags": [
               "img2img",
               "img2imgScaleSize"
-            ]
+            ],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24526,7 +24572,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24543,14 +24590,15 @@
             "disabled": false,
             "direction": "vertical",
             "classes": "",
-            "style": "flex-grow: 1; min-width: 0;",
+            "style": "flex-grow: 15; min-width: 0;",
             "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "secondary",
             "buttonSize": "small",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24567,14 +24615,15 @@
             "disabled": false,
             "direction": "vertical",
             "classes": "",
-            "style": "flex-grow: 10; min-width: 0;",
+            "style": "flex-grow: 80; min-width: 0;",
             "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24597,7 +24646,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24623,7 +24673,8 @@
             "openOnStartup": true,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24653,7 +24704,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24677,7 +24729,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24701,7 +24754,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24724,7 +24778,8 @@
             "openOnStartup": true,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24754,7 +24809,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24778,7 +24834,8 @@
             "openOnStartup": false,
             "buttonVariant": "secondary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24801,7 +24858,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24827,7 +24885,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -24847,14 +24906,15 @@
             "disabled": false,
             "direction": "vertical",
             "classes": "",
-            "style": "flex-grow: 1; min-width: 0",
+            "style": "flex-grow: 15; min-width: 0",
             "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "secondary",
             "buttonSize": "small",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24878,7 +24938,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24902,7 +24963,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24926,7 +24988,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24950,7 +25013,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24974,7 +25038,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -24998,7 +25063,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25010,7 +25076,7 @@
           "id": "158a0aab-dcc9-4da2-b9eb-fea21755f603",
           "attrs": {
             "title": "",
-            "hidden": false,
+            "hidden": true,
             "disabled": false,
             "direction": "horizontal",
             "classes": "",
@@ -25024,7 +25090,8 @@
             "tags": [
               "hr",
               "hrScaleSize"
-            ]
+            ],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25050,7 +25117,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25078,7 +25146,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25104,7 +25173,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25127,7 +25197,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25154,7 +25225,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25178,7 +25250,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25202,7 +25275,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25226,7 +25300,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25249,7 +25324,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25273,14 +25349,15 @@
             "disabled": false,
             "direction": "vertical",
             "classes": "",
-            "style": "flex-grow: 1; min-width: 0;",
+            "style": "flex-grow: 15; min-width: 0;",
             "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "secondary",
             "buttonSize": "small",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25303,7 +25380,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25332,7 +25410,8 @@
             "buttonSize": "large",
             "tags": [
               "lora"
-            ]
+            ],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25358,7 +25437,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25377,14 +25457,15 @@
             "disabled": false,
             "direction": "vertical",
             "classes": "",
-            "style": "flex-grow: 1; min-width: 0;",
+            "style": "flex-grow: 15; min-width: 0;",
             "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "secondary",
             "buttonSize": "small",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25408,7 +25489,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25432,7 +25514,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25456,7 +25539,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25473,14 +25557,15 @@
             "disabled": false,
             "direction": "vertical",
             "classes": "",
-            "style": "flex-grow: 1; min-width: 0;",
+            "style": "flex-grow: 15; min-width: 0;",
             "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "secondary",
             "buttonSize": "small",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25504,7 +25589,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25528,7 +25614,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25552,7 +25639,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25569,14 +25657,15 @@
             "disabled": false,
             "direction": "vertical",
             "classes": "",
-            "style": "flex-grow: 1; min-width: 0;",
+            "style": "flex-grow: 15; min-width: 0;",
             "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "secondary",
             "buttonSize": "small",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25600,7 +25689,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25624,7 +25714,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25648,7 +25739,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25665,14 +25757,15 @@
             "disabled": false,
             "direction": "vertical",
             "classes": "",
-            "style": "flex-grow: 1; min-width: 0;",
+            "style": "flex-grow: 15; min-width: 0;",
             "nodeDisabledState": "hidden",
             "variant": "gallery",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "secondary",
             "buttonSize": "small",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25696,7 +25789,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25720,7 +25814,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25744,7 +25839,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25768,7 +25864,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -25791,7 +25888,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25818,7 +25916,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25845,7 +25944,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25872,7 +25972,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25899,7 +26000,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25924,7 +26026,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25949,7 +26052,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -25974,7 +26078,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -26001,7 +26106,8 @@
             "buttonSize": "large",
             "tags": [
               "lora"
-            ]
+            ],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -26029,7 +26135,8 @@
             "buttonSize": "large",
             "tags": [
               "lora"
-            ]
+            ],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -26057,7 +26164,8 @@
             "buttonSize": "large",
             "tags": [
               "lora"
-            ]
+            ],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -26085,7 +26193,8 @@
             "buttonSize": "large",
             "tags": [
               "lora"
-            ]
+            ],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -26111,7 +26220,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -26138,7 +26248,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -26162,7 +26273,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -26187,7 +26299,8 @@
             "buttonSize": "large",
             "tags": [
               "controlnet"
-            ]
+            ],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -26213,7 +26326,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -26237,7 +26351,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -26261,7 +26376,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -26285,7 +26401,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -26308,7 +26425,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -26336,7 +26454,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -26363,7 +26482,8 @@
             "buttonSize": "large",
             "tags": [
               "controlnet"
-            ]
+            ],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -26390,7 +26510,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -26414,7 +26535,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -26437,7 +26559,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [

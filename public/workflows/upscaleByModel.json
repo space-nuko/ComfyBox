@@ -2,7 +2,7 @@
   "comfyBoxWorkflow": true,
   "createdBy": "ComfyBox",
   "version": 1,
-  "commitHash": "test",
+  "commitHash": "574d3170a4e829df366dc12c3aaa049121052d8f\n",
   "workflow": {
     "last_node_id": 0,
     "last_link_id": 0,
@@ -176,7 +176,7 @@
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": "A",
+        "comfyValue": null,
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -391,7 +391,20 @@
         "title": "UI.Gallery",
         "properties": {
           "tags": [],
-          "defaultValue": null,
+          "defaultValue": [
+            {
+              "isComfyBoxImageMetadata": true,
+              "comfyUIFile": {
+                "filename": "ComfyUI_04712_.png",
+                "subfolder": "",
+                "type": "output"
+              },
+              "name": "File",
+              "tags": [],
+              "width": 6656,
+              "height": 4096
+            }
+          ],
           "index": 0,
           "updateMode": "replace",
           "autoSelectOnUpdate": true
@@ -399,7 +412,20 @@
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": [],
+        "comfyValue": [
+          {
+            "isComfyBoxImageMetadata": true,
+            "comfyUIFile": {
+              "filename": "ComfyUI_04712_.png",
+              "subfolder": "",
+              "type": "output"
+            },
+            "name": "File",
+            "tags": [],
+            "width": 6656,
+            "height": 4096
+          }
+        ],
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -502,13 +528,39 @@
         ],
         "title": "UI.ImageUpload",
         "properties": {
-          "defaultValue": null,
+          "defaultValue": [
+            {
+              "isComfyBoxImageMetadata": true,
+              "comfyUIFile": {
+                "filename": "ComfyUI_05835_.png",
+                "type": "output",
+                "subfolder": ""
+              },
+              "name": "File",
+              "tags": [],
+              "width": 640,
+              "height": 768
+            }
+          ],
           "tags": []
         },
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": [],
+        "comfyValue": [
+          {
+            "isComfyBoxImageMetadata": true,
+            "comfyUIFile": {
+              "filename": "ComfyUI_05835_.png",
+              "type": "output",
+              "subfolder": ""
+            },
+            "name": "File",
+            "tags": [],
+            "width": 640,
+            "height": 768
+          }
+        ],
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -654,7 +706,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -679,7 +732,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -705,7 +759,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -732,7 +787,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -744,7 +800,7 @@
           "id": "2f0371e8-559e-4a58-a5d1-0a50117675fc",
           "nodeId": "578edfae-2767-4b23-9a3b-6edd8ccad1dd",
           "attrs": {
-            "title": "model_name",
+            "title": "Modal Name",
             "hidden": false,
             "disabled": false,
             "direction": "vertical",
@@ -756,7 +812,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -779,7 +836,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -793,7 +851,7 @@
           "id": "db12215f-fd9c-463f-9fbd-26b79e994e0e",
           "nodeId": "59feacdf-de02-4b1e-b8ba-e219ba5126b7",
           "attrs": {
-            "title": "filename_prefix",
+            "title": "Filename Prefix",
             "hidden": false,
             "disabled": false,
             "direction": "vertical",
@@ -805,7 +863,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
@@ -828,7 +887,8 @@
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [
@@ -849,12 +909,13 @@
             "classes": "",
             "style": "",
             "nodeDisabledState": "hidden",
-            "variant": "gallery",
+            "variant": "image",
             "containerVariant": "hidden",
             "openOnStartup": false,
             "buttonVariant": "primary",
             "buttonSize": "large",
-            "tags": []
+            "tags": [],
+            "destroyChildOnCLose": false
           }
         },
         "children": [],
