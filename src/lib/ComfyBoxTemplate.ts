@@ -1,10 +1,11 @@
-import { Subgraph, type LGraphNode, type LLink, type SerializedLGraphNode, type SerializedLLink, LGraph, type NodeID, type UUID } from "@litegraph-ts/core"
+import { Subgraph, type LGraphNode, type LLink, type SerializedLGraphNode, type SerializedLLink, LGraph, type NodeID, type UUID, type Vector2 } from "@litegraph-ts/core"
 import layoutStates, { isComfyWidgetNode, type ContainerLayout, type SerializedDragEntry, type WidgetLayout, type DragItemID, type WritableLayoutStateStore, type DragItemEntry, type SerializedLayoutState } from "./stores/layoutStates"
 import type { ComfyWidgetNode } from "./nodes/widgets"
 import type ComfyGraphCanvas from "./ComfyGraphCanvas"
 import C2S from "canvas-to-svg";
-import { download } from "./utils";
+import { calcNodesBoundingBox, download } from "./utils";
 import { v4 as uuidv4 } from "uuid";
+import uiState from "./stores/uiState";
 
 /*
  * In ComfyBox a template contains a subset of nodes in the graph and the set of
@@ -270,6 +271,19 @@ export function embedTemplateInSvg(template: SerializedComfyBoxTemplate): string
     return svg
 }
 
+/*
+ * Moves nodes so their origin is at (0, 0)
+ */
+function relocateNodes(nodes: SerializedLGraphNode[]): SerializedLGraphNode[] {
+    let [min_x, min_y, max_x, max_y] = calcNodesBoundingBox(nodes);
+
+    for (const node of nodes) {
+        node.pos = [node.pos[0] - min_x, node.pos[1] - min_y];
+    }
+
+    return nodes;
+}
+
 function pruneDetachedLinks(nodes: SerializedLGraphNode[], links: SerializedTemplateLink[]): [SerializedLGraphNode[], SerializedTemplateLink[]] {
     const nodeIds = new Set(nodes.map(n => n.id));
 
@@ -313,11 +327,16 @@ export function serializeTemplate(canvas: ComfyGraphCanvas, template: ComfyBoxTe
     if (layoutState == null)
         throw "Couldn't find layout for template being serialized!"
 
+    uiState.update(s => { s.forceSaveUserState = false; return s; });
+
     const metadata = template.metadata;
     let nodes = template.nodes.map(n => n.serialize());
     let links = template.links.map(convLinkForTemplate);
     const layout = layoutState.serializeAtRoot(template.container.dragItem.id);
 
+    uiState.update(s => { s.forceSaveUserState = null; return s; });
+
+    nodes = relocateNodes(nodes);
     [nodes, links] = pruneDetachedLinks(nodes, links);
 
     const svg = renderSvg(canvas, graph, TEMPLATE_SVG_PADDING);

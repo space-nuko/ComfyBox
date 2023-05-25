@@ -1,12 +1,13 @@
 import { type WidgetLayout, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
 import selectionState from "$lib/stores/selectionState";
 import type { FileData as GradioFileData } from "@gradio/upload";
-import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, type NodeID, type SlotType } from "@litegraph-ts/core";
+import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, type NodeID, type SlotType, type Vector4, type SerializedLGraphNode } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import type { ComfyNodeID } from "./api";
 import { type SerializedPrompt } from "./components/ComfyApp";
 import workflowState from "./stores/workflowState";
 import { ImageViewer } from "./ImageViewer";
+import configState from "$lib/stores/configState";
 
 export function clamp(n: number, min: number, max: number): number {
     if (max <= min)
@@ -73,6 +74,18 @@ export function download(filename: string, text: string, type: string = "text/pl
         window.URL.revokeObjectURL(url);
     }, 0);
 }
+
+export function getLocalStorageUsed(): number {
+    var total = 0;
+    for (const x in localStorage) {
+        // Value is multiplied by 2 due to data being stored in `utf-16` format, which requires twice the space.
+        const amount = (localStorage[x].length * 2) / 1024 / 1024;
+        if (!isNaN(amount) && localStorage.hasOwnProperty(x)) {
+            total += amount;
+        }
+    }
+    return total
+};
 
 export function startDrag(evt: MouseEvent, layoutState: WritableLayoutStateStore) {
     const dragItemId: string = evt.target.dataset["dragItemId"];
@@ -276,7 +289,7 @@ export function convertComfyOutputToGradio(output: SerializedPromptOutput): Grad
 }
 
 export function convertComfyOutputEntryToGradio(r: ComfyImageLocation): GradioFileData {
-    const url = `http://${location.hostname}:8188` // TODO make configurable
+    const url = configState.getBackendURL();
     const params = new URLSearchParams(r)
     const fileData: GradioFileData = {
         name: r.filename,
@@ -292,12 +305,12 @@ export function convertComfyOutputToComfyURL(output: string | ComfyImageLocation
         return output;
 
     const params = new URLSearchParams(output)
-    const url = `http://${location.hostname}:8188` // TODO make configurable
+    const url = configState.getBackendURL();
     return url + "/view?" + params
 }
 
 export function convertGradioFileDataToComfyURL(image: GradioFileData, type: ComfyUploadImageType = "input"): string {
-    const baseUrl = `http://${location.hostname}:8188` // TODO make configurable
+    const baseUrl = configState.getBackendURL();
     const params = new URLSearchParams({ filename: image.name, subfolder: "", type })
     return `${baseUrl}/view?${params}`
 }
@@ -321,7 +334,7 @@ export function convertFilenameToComfyURL(filename: string,
         subfolder,
         type
     })
-    const url = `http://${location.hostname}:8188` // TODO make configurable
+    const url = configState.getBackendURL();
     return url + "/view?" + params
 }
 
@@ -353,7 +366,7 @@ export interface ComfyUploadImageAPIResponse {
 export async function uploadImageToComfyUI(blob: Blob, filename: string, type: ComfyUploadImageType, subfolder: string = "", overwrite: boolean = false): Promise<ComfyImageLocation> {
     console.debug("[utils] Uploading image to ComfyUI", filename, blob.size)
 
-    const url = `http://${location.hostname}:8188` // TODO make configurable
+    const url = configState.getBackendURL();
 
     const formData = new FormData();
     formData.append("image", blob, filename);
@@ -484,7 +497,7 @@ export function parseWhateverIntoImageMetadata(param: any): ComfyBoxImageMetadat
 
     if (isComfyBoxImageMetadata(param)) {
         meta = [param];
-    }
+    }
     else if (Array.isArray(param) && param.every(isComfyBoxImageMetadata)) {
         meta = param
     }
@@ -568,4 +581,20 @@ export function getLitegraphType(param: any): SlotType | null {
         default:
             return null;
     }
+}
+
+export function calcNodesBoundingBox(nodes: SerializedLGraphNode[]): Vector4 {
+    let min_x = Number.MAX_SAFE_INTEGER;
+    let max_x = 0;
+    let min_y = Number.MAX_SAFE_INTEGER;
+    let max_y = 0;
+
+    for (const node of Object.values(nodes)) {
+        min_x = Math.min(node.pos[0], min_x);
+        max_x = Math.max(node.pos[0] + node.size[0], max_x);
+        min_y = Math.min(node.pos[1], min_y);
+        max_y = Math.max(node.pos[1] + node.size[1], max_y);
+    }
+
+    return [min_x, min_y, max_x, max_y];
 }

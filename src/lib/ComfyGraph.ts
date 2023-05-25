@@ -16,30 +16,6 @@ import workflowState from "./stores/workflowState";
 import type { SerializedComfyBoxTemplate } from "./ComfyBoxTemplate";
 import { v4 as uuidv4 } from "uuid"
 
-function calculateMinPosOfNodes(nodes: SerializedLGraphNode[]): Vector2 {
-    var posMin: Vector2 = [0, 0]
-    var posMinIndexes: [number, number] | null = null;
-
-    for (var i = 0; i < nodes.length; ++i) {
-        if (posMin) {
-            if (posMin[0] > nodes[i].pos[0]) {
-                posMin[0] = nodes[i].pos[0];
-                posMinIndexes[0] = i;
-            }
-            if (posMin[1] > nodes[i].pos[1]) {
-                posMin[1] = nodes[i].pos[1];
-                posMinIndexes[1] = i;
-            }
-        }
-        else {
-            posMin = [nodes[i].pos[0], nodes[i].pos[1]];
-            posMinIndexes = [i, i];
-        }
-    }
-
-    return posMin;
-}
-
 type ComfyGraphEvents = {
     configured: (graph: LGraph) => void
     nodeAdded: (node: LGraphNode) => void
@@ -250,10 +226,11 @@ export default class ComfyGraph extends LGraph {
 
     /*
      * Inserts a template.
-     * Layout deserialization must be handled afterwards!
+     * Layout deserialization must be handled afterwards.
+     * NOTE: Modifies the template in-place, be sure you cloned it beforehand!
      */
     insertTemplate(template: SerializedComfyBoxTemplate, pos: Vector2): Record<NodeID, LGraphNode> {
-        const minPos = calculateMinPosOfNodes(template.nodes);
+        const minPos = [0, 0]
 
         const templateNodeIDToNewNode: Record<NodeID, LGraphNode> = {}
 

@@ -22,7 +22,7 @@ import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import { ComfyComboNode } from "$lib/nodes/widgets";
 import notify from "$lib/notify";
 import parseA1111, { type A1111ParsedInfotext } from "$lib/parseA1111";
-import configState from "$lib/stores/configState";
+import configState, { type ConfigState } from "$lib/stores/configState";
 import layoutStates, { defaultWorkflowAttributes, type SerializedLayoutState } from "$lib/stores/layoutStates";
 import modalState from "$lib/stores/modalState";
 import queueState from "$lib/stores/queueState";
@@ -192,6 +192,11 @@ export default class ComfyApp {
             return;
         }
 
+        await this.loadConfig();
+
+        this.api.hostname = get(configState).comfyUIHostname
+        this.api.port = get(configState).comfyUIPort
+
         this.setupColorScheme()
 
         this.rootEl = document.getElementById("app-root") as HTMLDivElement;
@@ -252,6 +257,20 @@ export default class ComfyApp {
         return Promise.resolve();
     }
 
+    /*
+     * TODO
+     */
+    async loadConfig() {
+        try {
+            const config = await fetch(`/config.json`);
+            const state = await config.json() as ConfigState;
+            configState.set(state);
+        }
+        catch (error) {
+            console.error(`Failed to load config`, error)
+        }
+    }
+
     resizeCanvas() {
         this.canvasEl.width = this.canvasEl.parentElement.offsetWidth;
         this.canvasEl.height = this.canvasEl.parentElement.offsetHeight;
@@ -282,7 +301,7 @@ export default class ComfyApp {
 
     saveStateToLocalStorage() {
         try {
-            uiState.update(s => { s.isSavingToLocalStorage = true; return s; })
+            uiState.update(s => { s.forceSaveUserState = true; return s; })
             const state = get(workflowState)
             const workflows = state.openedWorkflows
             const savedWorkflows = workflows.map(w => this.serialize(w));
@@ -298,7 +317,7 @@ export default class ComfyApp {
             notify(`Failed saving to local storage:\n${err}`, { type: "error" })
         }
         finally {
-            uiState.update(s => { s.isSavingToLocalStorage = false; return s; })
+            uiState.update(s => { s.forceSaveUserState = null; return s; })
         }
     }
 
@@ -1007,6 +1026,21 @@ export default class ComfyApp {
             reader.readAsText(file);
         } else if (file.type === "image/svg+xml" || file.name.endsWith(".svg")) {
             const templateAndSvg = await deserializeTemplateFromSVG(file);
+
+            const importTemplate = () => {
+                try {
+                    if (templateState.add(templateAndSvg)) {
+                        notify("Template imported successfully!", { type: "success" })
+                    }
+                    else {
+                        notify("Template already exists in saved list.", { type: "warning" })
+                    }
+                }
+                catch (error) {
+                    notify(`Error importing template: ${error}`, { type: "error", timeout: 10000 })
+                }
+            }
+
             modalState.pushModal({
                 title: "ComfyBox Template Preview",
                 svelteComponent: EditTemplateModal,
@@ -1017,6 +1051,11 @@ export default class ComfyApp {
                     editable: false
                 },
                 buttons: [
+                    {
+                        name: "Import",
+                        variant: "primary",
+                        onClick: importTemplate
+                    },
                     {
                         name: "Close",
                         variant: "secondary",

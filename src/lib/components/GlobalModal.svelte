@@ -13,7 +13,8 @@
  }
 
  function onButtonClicked(modal: ModalData, button: ModalButton, closeDialog: Function) {
-     button.onClick(modal);
+     if (button.onClick(modal) === false)
+         return
 
      if (button.closeOnClick !== false) {
          closeDialog()

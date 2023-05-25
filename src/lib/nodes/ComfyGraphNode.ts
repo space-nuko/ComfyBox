@@ -312,7 +312,13 @@ export default class ComfyGraphNode extends LGraphNode {
         }
 
         (o as any).saveUserState = this.saveUserState
-        if (!this.saveUserState && (!get(uiState).isSavingToLocalStorage || get(configState).alwaysStripUserState)) {
+
+        let saveUserState = this.saveUserState || get(configState).alwaysStripUserState;
+        const forceSaveUserState = get(uiState).forceSaveUserState;
+        if (forceSaveUserState !== null)
+            saveUserState = forceSaveUserState;
+
+        if (!saveUserState) {
             this.stripUserState(o)
             console.debug("[ComfyGraphNode] stripUserState", this, o)
         }

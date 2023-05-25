@@ -2,6 +2,7 @@
  import UploadText from "$lib/components/gradio/app/UploadText.svelte";
  import type { ComfyImageLocation } from "$lib/nodes/ComfyWidgetNodes";
  import notify from "$lib/notify";
+ import configState from "$lib/stores/configState";
  import { convertComfyOutputEntryToGradio, convertComfyOutputToComfyURL, type ComfyUploadImageAPIResponse } from "$lib/utils";
  import { Block, BlockLabel } from "@gradio/atoms";
  import { File as FileIcon } from "@gradio/icons";
@@ -68,7 +69,7 @@
 
      dispatch("uploading")
 
-     const url = `http://${location.hostname}:8188` // TODO make configurable
+     const url = configState.getBackendURL();
 
      const requests = files.map(async (file) => {
          const formData = new FormData();

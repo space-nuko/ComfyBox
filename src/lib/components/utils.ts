@@ -1,6 +1,6 @@
 import type ComfyGraphCanvas from "$lib/ComfyGraphCanvas";
 import { type ContainerLayout, type IDragItem, type TemplateLayout, type WritableLayoutStateStore } from "$lib/stores/layoutStates"
-import type { LGraphCanvas } from "@litegraph-ts/core";
+import type { LGraphCanvas, Vector2 } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 
 export function handleContainerConsider(layoutState: WritableLayoutStateStore, container: ContainerLayout, evt: CustomEvent<DndEvent<IDragItem>>): IDragItem[] {
@@ -39,12 +39,9 @@ function doInsertTemplate(layoutState: WritableLayoutStateStore, droppedTemplate
 
     layoutState.updateChildren(container, newChildren);
 
-    const rect = canvas.ds.element.getBoundingClientRect();
-    const width = rect?.width || 1;
-    const height = rect?.height || 1;
-    const center = canvas.convertOffsetToCanvas([width * 0.5, height * 0.5]);
+    const newPos: Vector2 = [canvas.visible_area[0] + canvas.visible_area[2] / 2, canvas.visible_area[1] + canvas.visible_area[3] / 2]
 
-    canvas.insertTemplate(droppedTemplate.template, center, container, templateItemIndex);
+    canvas.insertTemplate(droppedTemplate.template, newPos, container, templateItemIndex);
 
     return get(layoutState).allItems[container.id].children;
 }

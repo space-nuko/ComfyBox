@@ -11,6 +11,7 @@
  import "klecks/style/style.scss";
  import ImageUpload from "$lib/components/ImageUpload.svelte";
  import { uploadImageToComfyUI, type ComfyBoxImageMetadata, comfyFileToComfyBoxMetadata, comfyBoxImageToComfyURL, comfyBoxImageToComfyFile, type ComfyUploadImageType, type ComfyImageLocation } from "$lib/utils";
+ import configState from "$lib/stores/configState";
  import notify from "$lib/notify";
  import NumberInput from "$lib/components/NumberInput.svelte";
 	import type { ComfyImageEditorNode } from "$lib/nodes/widgets";
@@ -102,7 +103,7 @@
 
      showModal = true;
 
-     const url = `http://${location.hostname}:8188` // TODO make configurable
+     const url = configState.getBackendURL();
 
      kl = new Klecks({
          embedUrl: url,

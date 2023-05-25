@@ -31,7 +31,6 @@
  $: rebuildTemplates($templateState.templates);
 
  function rebuildTemplates(templates: SerializedComfyBoxTemplate[]) {
-     console.error("recreate");
      _sorted = Array.from(templates).map(t => {
          return {
              type: "template", id: uuidv4(), template: t, attrs: {...defaultWidgetAttributes}, attrsChanged: writable(0)
@@ -76,6 +75,9 @@
  }
 
  function handleClick(layout: TemplateLayout) {
+     if ($uiState.uiUnlocked)
+         return;
+
      const updateTemplate = (modal: ModalData) => {
          const state = get(modal.state);
          layout.template.metadata.title = state.name || layout.template.metadata.title
@@ -91,6 +93,23 @@
          }
          catch (error) {
              notify(`Failed to save template: ${error}`, { type: "error", timeout: 10000 })
+         }
+     }
+
+     const deleteTemplate = (modal: ModalData) => {
+         if (!confirm("Are you sure you want to delete this template?"))
+             return false;
+
+         try {
+             if (templateState.remove(layout.template.id)) {
+                 notify("Template deleted!", { type: "success" })
+             }
+             else {
+                 notify("Failed to delete template: not saved to local storage.", { type: "warning" })
+             }
+         }
+         catch (error) {
+             notify(`Failed to delete template: ${error}`, { type: "error", timeout: 10000 })
          }
      }
 
@@ -119,6 +138,11 @@
                  variant: "secondary",
                  onClick: downloadTemplate,
                  closeOnClick: false
+             },
+             {
+                 name: "Delete",
+                 variant: "secondary",
+                 onClick: deleteTemplate
              },
              {
                  name: "Close",
