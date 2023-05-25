@@ -8,10 +8,10 @@
  import Menu from './menu/Menu.svelte';
  import MenuOption from './menu/MenuOption.svelte';
  import MenuDivider from './menu/MenuDivider.svelte';
-	import type { ComfyWorkflow } from "$lib/stores/workflowState";
+	import type { ComfyBoxWorkflow } from "$lib/stores/workflowState";
 
  export let app: ComfyApp;
- export let workflow: ComfyWorkflow;
+ export let workflow: ComfyBoxWorkflow | null = null;
 
  let layoutState: WritableLayoutStateStore | null;
 
@@ -111,9 +111,9 @@
  let menuPos = { x: 0, y: 0 };
  let showMenu = false;
 
- $: $layoutState.isMenuOpen = showMenu;
+ $: if (layoutState) $layoutState.isMenuOpen = showMenu;
 
- $: if ($layoutState.root) {
+ $: if (layoutState && $layoutState.root) {
      root = $layoutState.root
  } else {
      root = null;
@@ -138,51 +138,70 @@
  }
 </script>
 
-{#if layoutState != null}
-    <div id="comfy-workflow-view" on:contextmenu={onRightClick}>
-        <WidgetContainer bind:dragItem={root} classes={["root-container"]} {layoutState} />
+{#if workflow != null}
+    {#if layoutState != null}
+        <div class="comfy-workflow-view" on:contextmenu={onRightClick}>
+            <WidgetContainer bind:dragItem={root} classes={["root-container"]} {layoutState} />
+        </div>
+    {/if}
+
+    {#if showMenu}
+        <Menu {...menuPos} on:click={closeMenu} on:clickoutside={closeMenu}>
+            <MenuOption
+                isDisabled={$selectionState.currentSelection.length !== 1}
+                on:click={() => moveUp()}
+                text="Move Up" />
+            <MenuOption
+                isDisabled={$selectionState.currentSelection.length !== 1}
+                on:click={() => moveDown()}
+                text="Move Down" />
+            <MenuOption
+                isDisabled={$selectionState.currentSelection.length !== 1}
+                on:click={() => sendToTop()}
+                text="Send to Top" />
+            <MenuOption
+                isDisabled={$selectionState.currentSelection.length !== 1}
+                on:click={() => sendToBottom()}
+                text="Send to Bottom" />
+            <MenuDivider/>
+            <MenuOption
+                isDisabled={$selectionState.currentSelection.length === 0}
+                on:click={() => groupWidgets(false)}
+                text="Group" />
+            <MenuOption
+                isDisabled={$selectionState.currentSelection.length === 0}
+                on:click={() => groupWidgets(true)}
+                text="Group Horizontally" />
+            <MenuOption
+                isDisabled={!canUngroup}
+                on:click={ungroup}
+                text={isDeleteGroup ? "Delete Group" : "Ungroup"} />
+        </Menu>
+    {/if}
+{:else}
+    <div class="no-workflows">
+        <span>No workflow loaded</span>
     </div>
 {/if}
 
-{#if showMenu}
-    <Menu {...menuPos} on:click={closeMenu} on:clickoutside={closeMenu}>
-        <MenuOption
-            isDisabled={$selectionState.currentSelection.length !== 1}
-            on:click={() => moveUp()}
-            text="Move Up" />
-        <MenuOption
-            isDisabled={$selectionState.currentSelection.length !== 1}
-            on:click={() => moveDown()}
-            text="Move Down" />
-        <MenuOption
-            isDisabled={$selectionState.currentSelection.length !== 1}
-            on:click={() => sendToTop()}
-            text="Send to Top" />
-        <MenuOption
-            isDisabled={$selectionState.currentSelection.length !== 1}
-            on:click={() => sendToBottom()}
-            text="Send to Bottom" />
-        <MenuDivider/>
-        <MenuOption
-            isDisabled={$selectionState.currentSelection.length === 0}
-            on:click={() => groupWidgets(false)}
-            text="Group" />
-        <MenuOption
-            isDisabled={$selectionState.currentSelection.length === 0}
-            on:click={() => groupWidgets(true)}
-            text="Group Horizontally" />
-        <MenuOption
-            isDisabled={!canUngroup}
-            on:click={ungroup}
-            text={isDeleteGroup ? "Delete Group" : "Ungroup"} />
-    </Menu>
-{/if}
-
 <style lang="scss">
- #comfy-workflow-view {
+ .comfy-workflow-view {
      width: 100%;
      height: 100%;
      overflow: auto;
  }
 
+ .no-workflows {
+     width: 100%;
+     height: 100%;
+     justify-content: center;
+     align-items: center;
+     display: flex;
+     position: relative;
+     color: var(--body-text-color);
+
+     > span {
+         margin: auto;
+     }
+ }
 </style>

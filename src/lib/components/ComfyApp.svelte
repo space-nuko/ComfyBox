@@ -10,7 +10,7 @@
  import Sidebar from "./Sidebar.svelte";
  import SidebarItem from "./SidebarItem.svelte";
  import notify from "$lib/notify";
- import ComfyWorkflowsView from "./ComfyWorkflowsView.svelte";
+ import ComfyBoxWorkflowsView from "./ComfyBoxWorkflowsView.svelte";
  import GlobalModal from "./GlobalModal.svelte";
 
  export let app: ComfyApp = undefined;
@@ -60,7 +60,7 @@
     <div id="container">
         <Sidebar selected="generate">
             <SidebarItem id="generate" name="Generate" icon={Image}>
-                <ComfyWorkflowsView {app} {uiTheme} />
+                <ComfyBoxWorkflowsView {app} {uiTheme} />
             </SidebarItem>
             <SidebarItem id="settings" name="Settings" icon={Gear}>
             </SidebarItem>

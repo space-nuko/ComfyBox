@@ -297,6 +297,9 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
     }
 
     notifyPropsChanged() {
+        if (!this.layoutState)
+            return;
+
         const layoutEntry = this.layoutState.findLayoutEntryForNode(this.id as ComfyNodeID)
         if (layoutEntry && layoutEntry.parent) {
             layoutEntry.parent.attrsChanged.set(get(layoutEntry.parent.attrsChanged) + 1)
@@ -352,7 +355,6 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
 
     override stripUserState(o: SerializedLGraphNode) {
         super.stripUserState(o);
-        (o as any).comfyValue = this.defaultValue;
-        o.properties.defaultValue = null;
+        (o as any).comfyValue = this.properties.defaultValue;
     }
 }

@@ -1,0 +1,7 @@
+{
+  "comfyUIHostname": "localhost",
+  "comfyUIPort": 8188,
+  "alwaysStripUserState": false,
+  "promptForWorkflowName": false,
+  "confirmWhenUnloadingUnsavedChanges": true
+}

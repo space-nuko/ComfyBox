@@ -1,35 +1,73 @@
-<script>
-	import { setContext, createEventDispatcher } from 'svelte';
-	import { fade } from 'svelte/transition';
-	import { key } from './menu.ts';
+<script lang="ts">
+ import { setContext, createEventDispatcher } from 'svelte';
+ import { key } from './menu.ts';
 
-	export let x;
-	export let y;
+ import { offset, flip, shift } from "svelte-floating-ui/dom";
+ import { createFloatingActions, type ClientRectObject, type VirtualElement } from "svelte-floating-ui";
+	import { writable, type Writable } from 'svelte/store';
 
-	// whenever x and y is changed, restrict box to be within bounds
-	$: (() => {
-		if (!menuEl) return;
+ const [floatingRef, floatingContent] = createFloatingActions({
+     placement: "right-start",
+     strategy: "fixed",
+     middleware: [
+         offset({ mainAxis: 5, alignmentAxis: 4 }),
+         flip({
+             fallbackPlacements: ["left-start"]
+         }),
+         shift({ padding: 10 })
+     ],
+ });
 
-		const rect = menuEl.getBoundingClientRect();
-		x = Math.min(window.innerWidth - rect.width, x);
-		if (y > window.innerHeight - rect.height) y -= rect.height;
-	})(x, y);
 
-	const dispatch = createEventDispatcher();
+ export let x;
+ export let y;
 
-	setContext(key, {
-		dispatchClick: () => dispatch('click')
-	});
+ // whenever x and y is changed, restrict box to be within bounds
+ $: (() => {
+     if (!menuEl) return;
 
-	let menuEl;
-	function onPageClick(e) {
-		if (e.target === menuEl || menuEl.contains(e.target)) return;
-		dispatch('clickoutside');
-	}
+     const rect = menuEl.getBoundingClientRect();
+     x = Math.min(window.innerWidth - rect.width, x);
+     if (y > window.innerHeight - rect.height) y -= rect.height;
+ })();
+
+ const dispatch = createEventDispatcher();
+
+ setContext(key, {
+     dispatchClick: () => dispatch('click')
+ });
+
+ let menuEl;
+ function onPageClick(e) {
+     if (e.target === menuEl || menuEl.contains(e.target)) return;
+     dispatch('clickoutside');
+ }
+
+
+ let getBoundingClientRect: () => ClientRectObject;
+
+  $: getBoundingClientRect = (): ClientRectObject => {
+    return {
+      x,
+      y,
+      top: y,
+      left: x,
+      bottom: y,
+      right: x,
+      width: 0,
+      height: 0
+    }
+  }
+
+  const virtualElement: Writable<VirtualElement> = writable({ getBoundingClientRect })
+
+  $: virtualElement.set({ getBoundingClientRect })
+
+  floatingRef(virtualElement)
 </script>
 
 <svelte:body on:click={onPageClick} />
-<div class="menu" bind:this={menuEl} style="top: {y}px; left: {x}px;">
+<div class="menu" bind:this={menuEl} style="top: {y}px; left: {x}px;" use:floatingContent>
     <slot />
 </div>
 

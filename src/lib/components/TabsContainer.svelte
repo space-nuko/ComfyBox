@@ -15,6 +15,7 @@
  import { startDrag, stopDrag } from "$lib/utils"
  import type { Writable } from "svelte/store";
  import { isHidden } from "$lib/widgets/utils";
+	import { handleContainerConsider, handleContainerFinalize } from "./utils";
 
  export let layoutState: WritableLayoutStateStore;
  export let container: ContainerLayout | null = null;
@@ -38,14 +39,12 @@
      // attrsChanged = writable(0)
  }
 
- function handleConsider(evt: any) {
-     children = layoutState.updateChildren(container, evt.detail.items)
-     // console.log(dragItems);
+ function handleConsider(evt: CustomEvent<DndEvent<IDragItem>>) {
+     children = handleContainerConsider(layoutState, container, evt)
  };
 
- function handleFinalize(evt: any) {
-     children = layoutState.updateChildren(container, evt.detail.items)
-     // Ensure dragging is stopped on drag finish
+ function handleFinalize(evt: CustomEvent<DndEvent<IDragItem>>) {
+     children = handleContainerFinalize(layoutState, container, evt)
  };
 
  function getTabName(container: ContainerLayout, i: number): string {
@@ -89,6 +88,7 @@
                      class:empty={children.length === 0}
                      class:edit={edit}
                      use:dndzone="{{
+                          type: "layout",
                           items: children,
                           flipDurationMs,
                           centreDraggedOnCursor: true,
@@ -222,8 +222,7 @@
 
  .animation-wrapper {
      position: relative;
-     flex-grow: 100;
-     flex-basis: 0;
+     flex: 1 100 0%;
  }
 
  .handle-widget:hover {

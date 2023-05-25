@@ -5,6 +5,7 @@ import A1111PromptModal from "./modal/A1111PromptModal.svelte";
 import ConfirmConvertWithMissingNodeTypesModal from "./modal/ConfirmConvertWithMissingNodeTypesModal.svelte";
 import MissingNodeTypesModal from "./modal/MissingNodeTypesModal.svelte";
 import WorkflowLoadErrorModal from "./modal/WorkflowLoadErrorModal.svelte";
+import EditTemplateModal from "./modal/EditTemplateModal.svelte";
 
 import * as nodes from "$lib/nodes/index";
 
@@ -21,13 +22,13 @@ import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import { ComfyComboNode } from "$lib/nodes/widgets";
 import notify from "$lib/notify";
 import parseA1111, { type A1111ParsedInfotext } from "$lib/parseA1111";
-import configState from "$lib/stores/configState";
-import layoutStates, { defaultWorkflowAttributes, type SerializedLayoutState } from "$lib/stores/layoutStates";
+import configState, { type ConfigState } from "$lib/stores/configState";
+import layoutStates, { defaultWorkflowAttributes, isComfyWidgetNode, type SerializedLayoutState } from "$lib/stores/layoutStates";
 import modalState from "$lib/stores/modalState";
 import queueState from "$lib/stores/queueState";
 import selectionState from "$lib/stores/selectionState";
 import uiState from "$lib/stores/uiState";
-import workflowState, { ComfyWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
+import workflowState, { ComfyBoxWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
 import type { SerializedPromptOutput } from "$lib/utils";
 import { basename, capitalize, download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range } from "$lib/utils";
 import { tick } from "svelte";
@@ -35,6 +36,8 @@ import { type SvelteComponentDev } from "svelte/internal";
 import { get, writable, type Writable } from "svelte/store";
 import ComfyPromptSerializer, { isActiveBackendNode, UpstreamNodeLocator } from "./ComfyPromptSerializer";
 import DanbooruTags from "$lib/DanbooruTags";
+import { deserializeTemplateFromSVG } from "$lib/ComfyBoxTemplate";
+import templateState from "$lib/stores/templateState";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -55,7 +58,7 @@ export type OpenWorkflowOptions = {
 type PromptQueueItem = {
     num: number,
     batchCount: number
-    workflow: ComfyWorkflow
+    workflow: ComfyBoxWorkflow
 }
 
 export type A1111PromptAndInfo = {
@@ -189,6 +192,11 @@ export default class ComfyApp {
             return;
         }
 
+        await this.loadConfig();
+
+        this.api.hostname = get(configState).comfyUIHostname
+        this.api.port = get(configState).comfyUIPort
+
         this.setupColorScheme()
 
         this.rootEl = document.getElementById("app-root") as HTMLDivElement;
@@ -220,7 +228,7 @@ export default class ComfyApp {
                 setActive: false
             }
             await this.initDefaultWorkflow("defaultWorkflow", options);
-            await this.initDefaultWorkflow("upscale", options);
+            await this.initDefaultWorkflow("upscaleByModel", options);
             await this.initDefaultWorkflow("conditioningRegions", options);
         }
 
@@ -232,6 +240,7 @@ export default class ComfyApp {
         this.addKeyboardHandler();
 
         await this.updateHistoryAndQueue();
+        templateState.load();
 
         await this.initFrontendFeatures();
 
@@ -248,7 +257,24 @@ export default class ComfyApp {
         return Promise.resolve();
     }
 
+    /*
+     * TODO
+     */
+    async loadConfig() {
+        try {
+            const config = await fetch(`/config.json`);
+            const state = await config.json() as ConfigState;
+            configState.set(state);
+        }
+        catch (error) {
+            console.error(`Failed to load config`, error)
+        }
+    }
+
     resizeCanvas() {
+        if (!this.canvasEl)
+            return;
+
         this.canvasEl.width = this.canvasEl.parentElement.offsetWidth;
         this.canvasEl.height = this.canvasEl.parentElement.offsetHeight;
         this.canvasEl.style.width = ""
@@ -256,7 +282,7 @@ export default class ComfyApp {
         this.lCanvas.draw(true, true);
     }
 
-    serialize(workflow: ComfyWorkflow, canvas?: SerializedGraphCanvasState): SerializedAppState {
+    serialize(workflow: ComfyBoxWorkflow, canvas?: SerializedGraphCanvasState): SerializedAppState {
         const layoutState = layoutStates.getLayout(workflow.id);
         if (layoutState == null)
             throw new Error("Workflow has no layout!")
@@ -278,7 +304,7 @@ export default class ComfyApp {
 
     saveStateToLocalStorage() {
         try {
-            uiState.update(s => { s.isSavingToLocalStorage = true; return s; })
+            uiState.update(s => { s.forceSaveUserState = true; return s; })
             const state = get(workflowState)
             const workflows = state.openedWorkflows
             const savedWorkflows = workflows.map(w => this.serialize(w));
@@ -294,7 +320,7 @@ export default class ComfyApp {
             notify(`Failed saving to local storage:\n${err}`, { type: "error" })
         }
         finally {
-            uiState.update(s => { s.isSavingToLocalStorage = false; return s; })
+            uiState.update(s => { s.forceSaveUserState = null; return s; })
         }
     }
 
@@ -459,12 +485,16 @@ export default class ComfyApp {
                 } catch (error) { }
             }
 
-            if (workflow && typeof workflow.createdBy === "string") {
-                this.openWorkflow(workflow);
-            }
-            else {
-                // TODO handle vanilla workflows
-                throw new Error("Workflow was not in ComfyBox format!")
+            if (workflow == null)
+                return;
+
+            if (typeof workflow === "object") {
+                if (typeof workflow.createdBy === "string")
+                    this.openWorkflow(workflow);
+                else {
+                    // TODO handle vanilla workflows
+                    throw new Error("Workflow was not in ComfyBox format!")
+                }
             }
         });
     }
@@ -631,7 +661,7 @@ export default class ComfyApp {
         refreshCombos: true,
         warnMissingNodeTypes: true
     }
-    ): Promise<ComfyWorkflow> {
+    ): Promise<ComfyBoxWorkflow> {
         if (data.version !== COMFYBOX_SERIAL_VERSION) {
             const mes = `Invalid ComfyBox saved data format: ${data.version} `
             notify(mes, { type: "error" })
@@ -640,7 +670,7 @@ export default class ComfyApp {
 
         this.clean();
 
-        let workflow: ComfyWorkflow;
+        let workflow: ComfyBoxWorkflow;
         try {
             workflow = workflowState.openWorkflow(this.lCanvas, data, options.setActive);
         }
@@ -761,6 +791,30 @@ export default class ComfyApp {
         await this.openWorkflow(state, options)
     }
 
+    saveWorkflowStateAsDefault(workflow: ComfyBoxWorkflow | null) {
+        workflow ||= workflowState.getActiveWorkflow();
+        if (workflow == null)
+            return;
+
+        for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
+            if (isComfyWidgetNode(node)) {
+                node.properties.defaultValue = node.getValue();
+            }
+        }
+    }
+
+    resetCurrentWorkflow() {
+        const workflow = workflowState.getActiveWorkflow();
+        if (workflow == null)
+            return;
+
+        for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
+            if (isComfyWidgetNode(node)) {
+                node.setValue(node.properties.defaultValue);
+            }
+        }
+    }
+
     clear() {
         this.clean();
 
@@ -798,6 +852,8 @@ export default class ComfyApp {
             return;
         }
 
+        this.saveWorkflowStateAsDefault(workflow);
+
         const promptFilename = get(configState).promptForWorkflowName;
 
         const title = workflow.attrs.title.trim() || "workflow"
@@ -831,7 +887,7 @@ export default class ComfyApp {
      * Converts the current graph workflow for sending to the API
      * @returns The workflow and node links
      */
-    graphToPrompt(workflow: ComfyWorkflow, tag: string | null = null): SerializedPrompt {
+    graphToPrompt(workflow: ComfyBoxWorkflow, tag: string | null = null): SerializedPrompt {
         return this.promptSerializer.serialize(workflow.graph, tag)
     }
 
@@ -853,7 +909,7 @@ export default class ComfyApp {
             tag = null;
 
         this.processingQueue = true;
-        let workflow: ComfyWorkflow;
+        let workflow: ComfyBoxWorkflow;
 
         try {
             while (this.queueItems.length) {
@@ -1001,6 +1057,45 @@ export default class ComfyApp {
                 }
             };
             reader.readAsText(file);
+        } else if (file.type === "image/svg+xml" || file.name.endsWith(".svg")) {
+            const templateAndSvg = await deserializeTemplateFromSVG(file);
+
+            const importTemplate = () => {
+                try {
+                    if (templateState.add(templateAndSvg)) {
+                        notify("Template imported successfully!", { type: "success" })
+                    }
+                    else {
+                        notify("Template already exists in saved list.", { type: "warning" })
+                    }
+                }
+                catch (error) {
+                    notify(`Error importing template: ${error}`, { type: "error", timeout: 10000 })
+                }
+            }
+
+            modalState.pushModal({
+                title: "ComfyBox Template Preview",
+                svelteComponent: EditTemplateModal,
+                closeOnClick: false,
+                showCloseButton: false,
+                svelteProps: {
+                    templateAndSvg,
+                    editable: false
+                },
+                buttons: [
+                    {
+                        name: "Import",
+                        variant: "primary",
+                        onClick: importTemplate
+                    },
+                    {
+                        name: "Close",
+                        variant: "secondary",
+                        onClick: () => { }
+                    },
+                ]
+            })
         }
     }
 
@@ -1017,7 +1112,7 @@ export default class ComfyApp {
     /**
      * Refresh combo list on whole nodes
      */
-    async refreshComboInNodes(workflow?: ComfyWorkflow, defs?: Record<string, ComfyNodeDef>, flashUI: boolean = false) {
+    async refreshComboInNodes(workflow?: ComfyBoxWorkflow, defs?: Record<string, ComfyNodeDef>, flashUI: boolean = false) {
         workflow ||= workflowState.getActiveWorkflow();
         if (workflow == null) {
             notify("No active workflow!", { type: "error" })
