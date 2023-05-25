@@ -151,6 +151,13 @@
      }
  }
 
+ async function doReset() {
+     var confirmed = confirm("Are you sure you want to reset this workflow to its default state?");
+     if (confirmed) {
+         app.resetCurrentWorkflow();
+     }
+ }
+
  function createNewWorkflow() {
      app.createNewWorkflow();
  }
@@ -273,28 +280,31 @@
                 <Button variant="secondary" disabled={loading} on:click={doLoadDefault}>
                     Load Default
                 </Button>
+                <Button variant="secondary" disabled={loading} on:click={doReset}>
+                    Reset
+                </Button>
                 <Button variant="secondary" disabled={loading} on:click={doRefreshCombos}>
                     🔄
                 </Button>
                 <!-- <Checkbox label="Lock Nodes" bind:value={$uiState.nodesLocked}/>
                      <Checkbox label="Disable Interaction" bind:value={$uiState.graphLocked}/> -->
-                <span style="display: inline-flex !important">
+                <span style="display: inline-flex !important; padding: 0 0.75rem;">
                     <Checkbox label="Auto-Add UI" bind:value={$uiState.autoAddUI}/>
                 </span>
-                <span class="label" for="ui-edit-mode">
-                    <BlockTitle>UI Edit mode</BlockTitle>
-                    <select id="ui-edit-mode" name="ui-edit-mode" bind:value={$uiState.uiEditMode}>
-                        <option value="widgets">Widgets</option>
-                    </select>
-                </span>
-                <span class="label" for="ui-theme">
-                    <BlockTitle>Theme</BlockTitle>
-                    <select id="ui-theme" name="ui-theme" bind:value={uiTheme}>
-                        <option value="gradio-dark">Gradio Dark</option>
-                        <option value="gradio-light">Gradio Light</option>
-                        <option value="anapnoe">Anapnoe</option>
-                    </select>
-                </span>
+                <!-- <span class="label" for="ui-edit-mode">
+                     <BlockTitle>UI Edit mode</BlockTitle>
+                     <select id="ui-edit-mode" name="ui-edit-mode" bind:value={$uiState.uiEditMode}>
+                     <option value="widgets">Widgets</option>
+                     </select>
+                     </span> -->
+                <!-- <span class="label" for="ui-theme">
+                     <BlockTitle>Theme</BlockTitle>
+                     <select id="ui-theme" name="ui-theme" bind:value={uiTheme}>
+                     <option value="gradio-dark">Gradio Dark</option>
+                     <option value="gradio-light">Gradio Light</option>
+                     <option value="anapnoe">Anapnoe</option>
+                     </select>
+                     </span> -->
             </div>
             <div class="right">
                 <ComfyUnlockUIButton bind:toggled={$uiState.uiUnlocked} />
