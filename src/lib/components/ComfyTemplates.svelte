@@ -266,10 +266,10 @@
      &.built-in {
          background: repeating-linear-gradient(
              45deg,
-             var(--neutral-900),
-             var(--neutral-900) 5px,
-             var(--neutral-800) 5px,
-             var(--neutral-800) 10px
+             var(--neutral-800),
+             var(--neutral-800) 15px,
+             #1f293780 15px,
+             #1f293780 30px,
          );
      }
 
