@@ -1,6 +1,6 @@
 import { parseWhateverIntoImageMetadata, type ComfyBoxImageMetadata } from "$lib/utils";
 import type { FileData as GradioFileData } from "@gradio/upload";
-import { BuiltInSlotType, LiteGraph, type SlotLayout } from "@litegraph-ts/core";
+import { BuiltInSlotType, LiteGraph, type SerializedLGraphNode, type SlotLayout } from "@litegraph-ts/core";
 
 import ImageUploadWidget from "$lib/widgets/ImageUploadWidget.svelte";
 import type { ComfyWidgetProperties } from "./ComfyWidgetNode";
@@ -54,6 +54,12 @@ export default class ComfyImageUploadNode extends ComfyWidgetNode<ComfyBoxImageM
 
     override formatValue(value: GradioFileData[]): string {
         return `Images: ${value?.length || 0}`
+    }
+
+    override stripUserState(o: SerializedLGraphNode) {
+        super.stripUserState(o);
+        o.properties.defaultValue = [];
+        (o as any).comfyValue = [];
     }
 }
 
