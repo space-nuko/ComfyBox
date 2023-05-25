@@ -97,50 +97,7 @@
         "title": "UI.Gallery",
         "properties": {
           "tags": [],
-          "defaultValue": [
-            {
-              "isComfyBoxImageMetadata": true,
-              "comfyUIFile": {
-                "filename": "ComfyUI_06374_.png",
-                "subfolder": "",
-                "type": "output"
-              },
-              "name": "File",
-              "tags": [],
-              "width": 512,
-              "height": 512
-            },
-            {
-              "isComfyBoxImageMetadata": true,
-              "comfyUIFile": {
-                "filename": "ComfyUI_06375_.png",
-                "subfolder": "",
-                "type": "output"
-              },
-              "name": "File",
-              "tags": []
-            },
-            {
-              "isComfyBoxImageMetadata": true,
-              "comfyUIFile": {
-                "filename": "ComfyUI_06376_.png",
-                "subfolder": "",
-                "type": "output"
-              },
-              "name": "File",
-              "tags": []
-            },
-            {
-              "isComfyBoxImageMetadata": true,
-              "comfyUIFile": {
-                "filename": "ComfyUI_06377_.png",
-                "subfolder": "",
-                "type": "output"
-              },
-              "name": "File",
-              "tags": []
-            }
-          ],
+          "defaultValue": [],
           "index": 0,
           "updateMode": "append",
           "autoSelectOnUpdate": true
@@ -148,50 +105,7 @@
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": [
-          {
-            "isComfyBoxImageMetadata": true,
-            "comfyUIFile": {
-              "filename": "ComfyUI_06374_.png",
-              "subfolder": "",
-              "type": "output"
-            },
-            "name": "File",
-            "tags": [],
-            "width": 512,
-            "height": 512
-          },
-          {
-            "isComfyBoxImageMetadata": true,
-            "comfyUIFile": {
-              "filename": "ComfyUI_06375_.png",
-              "subfolder": "",
-              "type": "output"
-            },
-            "name": "File",
-            "tags": []
-          },
-          {
-            "isComfyBoxImageMetadata": true,
-            "comfyUIFile": {
-              "filename": "ComfyUI_06376_.png",
-              "subfolder": "",
-              "type": "output"
-            },
-            "name": "File",
-            "tags": []
-          },
-          {
-            "isComfyBoxImageMetadata": true,
-            "comfyUIFile": {
-              "filename": "ComfyUI_06377_.png",
-              "subfolder": "",
-              "type": "output"
-            },
-            "name": "File",
-            "tags": []
-          }
-        ],
+        "comfyValue": [],
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -2586,20 +2500,7 @@
         "title": "UI.Gallery",
         "properties": {
           "tags": [],
-          "defaultValue": [
-            {
-              "isComfyBoxImageMetadata": true,
-              "comfyUIFile": {
-                "filename": "ComfyUI_06378_.png",
-                "subfolder": "",
-                "type": "output"
-              },
-              "name": "File",
-              "tags": [],
-              "width": 0,
-              "height": 0
-            }
-          ],
+          "defaultValue": [],
           "index": 0,
           "updateMode": "append",
           "autoSelectOnUpdate": true
@@ -2607,20 +2508,7 @@
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": [
-          {
-            "isComfyBoxImageMetadata": true,
-            "comfyUIFile": {
-              "filename": "ComfyUI_06378_.png",
-              "subfolder": "",
-              "type": "output"
-            },
-            "name": "File",
-            "tags": [],
-            "width": 0,
-            "height": 0
-          }
-        ],
+        "comfyValue": [],
         "shownOutputProperties": {},
         "saveUserState": false
       },
