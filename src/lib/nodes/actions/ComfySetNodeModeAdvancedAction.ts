@@ -2,6 +2,7 @@ import { type DragItemID } from "$lib/stores/layoutStates";
 import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWidget, type PropertyLayout, type SlotLayout } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "../ComfyGraphNode";
+import { nodeHasTag } from "$lib/components/ComfyPromptSerializer";
 
 export type TagAction = {
     tag: string,
@@ -68,7 +69,7 @@ export default class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
         for (const node of this.graph.iterateNodesInOrderRecursive()) {
             if ("tags" in node.properties) {
                 const comfyNode = node as ComfyGraphNode;
-                const hasTag = comfyNode.properties.tags.indexOf(action.tag) != -1;
+                const hasTag = nodeHasTag(comfyNode, action.tag);
 
                 if (hasTag) {
                     let newMode: NodeMode;

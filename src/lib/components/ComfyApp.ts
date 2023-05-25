@@ -34,7 +34,7 @@ import { basename, capitalize, download, graphToGraphVis, jsonToJsObject, prompt
 import { tick } from "svelte";
 import { type SvelteComponentDev } from "svelte/internal";
 import { get, writable, type Writable } from "svelte/store";
-import ComfyPromptSerializer, { isActiveBackendNode, UpstreamNodeLocator } from "./ComfyPromptSerializer";
+import ComfyPromptSerializer, { isActiveBackendNode, nodeHasTag, UpstreamNodeLocator } from "./ComfyPromptSerializer";
 import DanbooruTags from "$lib/DanbooruTags";
 import { deserializeTemplateFromSVG, type SerializedComfyBoxTemplate } from "$lib/ComfyBoxTemplate";
 import templateState from "$lib/stores/templateState";
@@ -924,10 +924,7 @@ export default class ComfyApp {
 
                 const thumbnails = []
                 for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
-                    if (node.mode !== NodeMode.ALWAYS
-                        || (tag != null
-                            && Array.isArray(node.properties.tags)
-                            && node.properties.tags.indexOf(tag) === -1))
+                    if (node.mode !== NodeMode.ALWAYS || (tag != null && !nodeHasTag(node, tag)))
                         continue;
 
                     if ("getPromptThumbnails" in node) {

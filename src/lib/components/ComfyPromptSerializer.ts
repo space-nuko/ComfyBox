@@ -4,13 +4,34 @@ import type ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
 import { GraphInput, GraphOutput, LGraph, LGraphNode, LLink, NodeMode, Subgraph, type SlotIndex } from "@litegraph-ts/core";
 import type { SerializedPrompt, SerializedPromptInput, SerializedPromptInputsForNode, SerializedPromptInputsAll, SerializedPromptInputs } from "./ComfyApp";
 import type IComfyInputSlot from "$lib/IComfyInputSlot";
+import { Reroute } from "@litegraph-ts/nodes-basic";
+import { ComfyReroute } from "$lib/nodes";
 
-function hasTag(node: LGraphNode, tag: string): boolean {
-    return "tags" in node.properties && node.properties.tags.indexOf(tag) !== -1
+function isReroute(node: LGraphNode): boolean {
+    return node.is(Reroute) || node.is(ComfyReroute)
 }
 
 function isGraphInputOutput(node: LGraphNode): boolean {
     return node.is(GraphInput) || node.is(GraphOutput)
+}
+
+export function nodeHasTag(node: LGraphNode, tag: string): boolean {
+    // Ignore tags on reroutes since they're just movable wires and it defeats
+    // the convenience gains to have to set tags for all them
+    if (isReroute(node))
+        return true;
+
+    while (node != null) {
+        if ("tags" in node.properties) {
+            if (node.properties.tags.indexOf(tag) !== -1)
+                return true;
+        }
+
+        // Count parent subgraphs having the tag also.
+        node = node.graph?._subgraph_node;
+    }
+
+    return false;
 }
 
 export function isActiveNode(node: LGraphNode, tag: string | null = null): boolean {
@@ -18,7 +39,7 @@ export function isActiveNode(node: LGraphNode, tag: string | null = null): boole
         return false;
 
     // Check tags but not on graph inputs/outputs
-    if (!isGraphInputOutput(node) && (tag && !hasTag(node, tag))) {
+    if (!isGraphInputOutput(node) && (tag && !nodeHasTag(node, tag))) {
         console.debug("Skipping tagged node", tag, node.properties.tags, node)
         return false;
     }

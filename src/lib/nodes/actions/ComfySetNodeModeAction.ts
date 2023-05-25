@@ -2,6 +2,7 @@ import type { ComfyWidgetNode } from "$lib/nodes/widgets";
 import { BuiltInSlotType, LiteGraph, NodeMode, type ITextWidget, type IToggleWidget, type SlotLayout } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "../ComfyGraphNode";
+import { nodeHasTag } from "$lib/components/ComfyPromptSerializer";
 
 export interface ComfySetNodeModeActionProperties extends ComfyGraphNodeProperties {
     targetTags: string,
@@ -52,7 +53,7 @@ export default class ComfySetNodeModeAction extends ComfyGraphNode {
         for (const node of this.graph._nodes) {
             if ("tags" in node.properties) {
                 const comfyNode = node as ComfyGraphNode;
-                const hasTag = tags.some(t => comfyNode.properties.tags.indexOf(t) != -1);
+                const hasTag = tags.some(t => nodeHasTag(comfyNode, t));
                 if (hasTag) {
                     let newMode: NodeMode;
                     if (enabled) {
