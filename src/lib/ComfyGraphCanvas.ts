@@ -9,6 +9,7 @@ import selectionState from "./stores/selectionState";
 import templateState from "./stores/templateState";
 import { createTemplate, type ComfyBoxTemplate, serializeTemplate, type SerializedComfyBoxTemplate } from "./ComfyBoxTemplate";
 import notify from "./notify";
+import { calcNodesBoundingBox } from "./utils";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
@@ -448,14 +449,24 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     insertTemplate(template: SerializedComfyBoxTemplate, pos: Vector2, container: ContainerLayout, containerIndex: number): [LGraphNode[], IDragItem] {
         const comfyGraph = this.graph as ComfyGraph;
 
+        let [min_x, min_y, max_x, max_y] = calcNodesBoundingBox(template.nodes);
+
+        const width = max_x - min_x
+        const height = max_y - min_y
+
+        pos[0] -= width / 2
+        pos[1] -= height / 2
+
         const layout = comfyGraph.layout;
         if (layout == null) {
             console.error("[ComfyGraphCanvas] graph has no layout!", comfyGraph)
             return;
         }
 
-        const nodeMapping = comfyGraph.insertTemplate(template, pos);
-        const templateLayoutRoot = layout.insertTemplate(template, comfyGraph, nodeMapping, container, containerIndex);
+        // The following operations modify the template in-place, so be sure it's been cloned first
+        const cloned = LiteGraph.cloneObject(template)
+        const nodeMapping = comfyGraph.insertTemplate(cloned, pos);
+        const templateLayoutRoot = layout.insertTemplate(cloned, comfyGraph, nodeMapping, container, containerIndex);
 
         this.selectNodes(Object.values(nodeMapping).filter(n => n.graph === this.graph));
 

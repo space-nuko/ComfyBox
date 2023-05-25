@@ -1005,6 +1005,9 @@ function createRaw(workflow: ComfyBoxWorkflow | null = null): WritableLayoutStat
         store.set(state)
     }
 
+    /*
+     * NOTE: Modifies the template in-place, be sure you cloned it beforehand!
+     */
     function insertTemplate(template: SerializedComfyBoxTemplate, graph: LGraph, templateNodeIDToNode: Record<NodeID, LGraphNode>, container: ContainerLayout, childIndex: number): IDragItem {
         const idMapping: Record<DragItemID, DragItemID> = {};
 

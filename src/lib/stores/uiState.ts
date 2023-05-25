@@ -11,7 +11,7 @@ export type UIState = {
     uiEditMode: UIEditMode,
 
     reconnecting: boolean,
-    isSavingToLocalStorage: boolean
+    forceSaveUserState: boolean | null
 }
 
 type UIStateOps = {
@@ -29,7 +29,7 @@ const store: Writable<UIState> = writable(
         uiEditMode: "widgets",
 
         reconnecting: false,
-        isSavingToLocalStorage: false,
+        forceSaveUserState: null,
     })
 
 function reconnecting() {

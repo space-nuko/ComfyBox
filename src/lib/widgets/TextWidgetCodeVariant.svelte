@@ -12,6 +12,7 @@
  import { basicSetup } from "./TextWidgetCodeVariant";
 	import { createEventDispatcher, onMount } from "svelte";
 	import { TAG_CATEGORY_COLORS } from "$lib/DanbooruTags";
+	import { Block, BlockTitle } from "@gradio/atoms";
 
  export let widget: WidgetLayout;
  export let node: ComfyTextNode;
@@ -176,7 +177,7 @@
  function getExtensions(): Extension[] {
      // TODO
      const readonly = false;
-     const placeholder = "Placeholder..."
+     const placeholder = ""
      const dark_mode = true;
 
      const stateExtensions: Extension[] = [
@@ -206,12 +207,22 @@
  }
 </script>
 
-<div class="wrap">
-    <div class="codemirror-wrapper {classNames}" bind:this={element} />
+<div class="code-editor-wrapper">
+    <Block>
+        <BlockTitle>{widget.attrs.title}</BlockTitle>
+        <div class="wrap">
+            <div class="codemirror-wrapper {classNames}" bind:this={element} />
+        </div>
+    </Block>
 </div>
-<!-- <CodeMirror bind:value={$nodeValue} {styles} /> -->
 
 <style lang="scss">
+ .code-editor-wrapper {
+     :global(> .block) {
+         background: var(--panel-background-fill) !important;
+     }
+ }
+
  .wrap {
      display: flex;
      flex-direction: column;
