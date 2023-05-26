@@ -54,6 +54,13 @@ export type WorkflowAttributes = {
      * Comfy.QueueEvents node.
      */
     queuePromptButtonRunWorkflow: boolean,
+
+    /*
+     * If true, notifications will be shown when a prompt is queued and
+     * completed. Set to false if you need more detailed control over the
+     * notification type/contents, and use the `ComfyNotifyAction` node instead.
+     */
+    showDefaultNotifications: boolean,
 }
 
 export class ComfyBoxWorkflow {
@@ -217,7 +224,7 @@ export class ComfyBoxWorkflow {
             // this.#invokeExtensions("loadedGraphNode", node);
         }
 
-        this.attrs = data.attrs;
+        this.attrs = { ...defaultWorkflowAttributes, ...data.attrs };
 
         // Now restore the layout
         // Subsequent added nodes will add the UI data to layoutState

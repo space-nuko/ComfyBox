@@ -3331,17 +3331,17 @@
                     "title": "UI.Text",
                     "properties": {
                       "tags": [],
-                      "defaultValue": "masterpiece, 1girl, (yuri:1.2), city street, cityscape, open shirt, breasts, large breasts, nipples, shiny skin, full body, happy, red hair, red eyes, looking at another, eye contact, red skirt",
+                      "defaultValue": "masterpiece, 1girl, city street, cityscape, large shiny skin, full body, happy, red hair, red eyes, looking at another, eye contact, red skirt",
                       "multiline": true,
                       "lines": 5,
                       "maxLines": 5
                     },
                     "widgets_values": [
-                      "masterpiece, 1girl, (yuri:1.2), city street, cityscape, open shirt, breasts, large breasts, nipples, shiny skin, full body, happy, red hair, red eyes, looking at another, eye contact, red skirt"
+                      "masterpiece, 1girl, city street, cityscape, large shiny skin, full body, happy, red hair, red eyes, looking at another, eye contact, red skirt"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "masterpiece, 1girl, (yuri:1.2), city street, cityscape, open shirt, breasts, large breasts, nipples, shiny skin, full body, happy, red hair, red eyes, looking at another, eye contact, red skirt",
+                    "comfyValue": "masterpiece, 1girl, city street, cityscape, large shiny skin, full body, happy, red hair, red eyes, looking at another, eye contact, red skirt",
                     "shownOutputProperties": {},
                     "saveUserState": true
                   },
@@ -3396,17 +3396,17 @@
                     "title": "UI.Text",
                     "properties": {
                       "tags": [],
-                      "defaultValue": "masterpiece, 1girl, (yuri:1.2), open shirt, breasts, medium breasts, nipples, city street, cityscape, full body, happy, blue hair, blue eyes, looking at another, eye contact, blue skirt",
+                      "defaultValue": "masterpiece, 1girl, city street, cityscape, full body, happy, blue hair, blue eyes, looking at another, eye contact, blue skirt",
                       "multiline": true,
                       "lines": 5,
                       "maxLines": 5
                     },
                     "widgets_values": [
-                      "masterpiece, 1girl, (yuri:1.2), open shirt, breasts, medium breasts, nipples, city street, cityscape, full body, happy, blue hair, blue eyes, looking at another, eye contact, blue skirt"
+                      "masterpiece, 1girl, city street, cityscape, full body, happy, blue hair, blue eyes, looking at another, eye contact, blue skirt"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "masterpiece, 1girl, (yuri:1.2), open shirt, breasts, medium breasts, nipples, city street, cityscape, full body, happy, blue hair, blue eyes, looking at another, eye contact, blue skirt",
+                    "comfyValue": "masterpiece, 1girl, city street, cityscape, full body, happy, blue hair, blue eyes, looking at another, eye contact, blue skirt",
                     "shownOutputProperties": {},
                     "saveUserState": true
                   },
@@ -3461,17 +3461,17 @@
                     "title": "UI.Text",
                     "properties": {
                       "tags": [],
-                      "defaultValue": "masterpiece, 2girls, (yuri:1.2), open shirt, small breasts, nipples, city street, cityscape, full body, happy, yellow hair, yellow eyes, looking at another, eye contact, yellow skirt",
+                      "defaultValue": "masterpiece, 2girls, small city street, cityscape, full body, happy, yellow hair, yellow eyes, looking at another, eye contact, yellow skirt",
                       "multiline": true,
                       "lines": 5,
                       "maxLines": 5
                     },
                     "widgets_values": [
-                      "masterpiece, 2girls, (yuri:1.2), open shirt, small breasts, nipples, city street, cityscape, full body, happy, yellow hair, yellow eyes, looking at another, eye contact, yellow skirt"
+                      "masterpiece, 2girls, small city street, cityscape, full body, happy, yellow hair, yellow eyes, looking at another, eye contact, yellow skirt"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "masterpiece, 2girls, (yuri:1.2), open shirt, small breasts, nipples, city street, cityscape, full body, happy, yellow hair, yellow eyes, looking at another, eye contact, yellow skirt",
+                    "comfyValue": "masterpiece, 2girls, small city street, cityscape, full body, happy, yellow hair, yellow eyes, looking at another, eye contact, yellow skirt",
                     "shownOutputProperties": {},
                     "saveUserState": true
                   },
@@ -3526,17 +3526,17 @@
                     "title": "UI.Text",
                     "properties": {
                       "tags": [],
-                      "defaultValue": "masterpiece, 2girls, (yuri:1.2), open shirt, flat chest, nipples, city street, cityscape, full body, happy, green hair, green eyes, looking at another, eye contact, green skirt",
+                      "defaultValue": "masterpiece, 2girls, city street, cityscape, full body, happy, green hair, green eyes, looking at another, eye contact, green skirt",
                       "multiline": true,
                       "lines": 5,
                       "maxLines": 5
                     },
                     "widgets_values": [
-                      "masterpiece, 2girls, (yuri:1.2), open shirt, flat chest, nipples, city street, cityscape, full body, happy, green hair, green eyes, looking at another, eye contact, green skirt"
+                      "masterpiece, 2girls, city street, cityscape, full body, happy, green hair, green eyes, looking at another, eye contact, green skirt"
                     ],
                     "color": "#223",
                     "bgColor": "#335",
-                    "comfyValue": "masterpiece, 2girls, (yuri:1.2), open shirt, flat chest, nipples, city street, cityscape, full body, happy, green hair, green eyes, looking at another, eye contact, green skirt",
+                    "comfyValue": "masterpiece, 2girls, city street, cityscape, full body, happy, green hair, green eyes, looking at another, eye contact, green skirt",
                     "shownOutputProperties": {},
                     "saveUserState": true
                   },
@@ -4706,17 +4706,17 @@
               "title": "UI.Text",
               "properties": {
                 "tags": [],
-                "defaultValue": "nsfw, masterpiece, 4girls, multiple girls, city street, cityscape, landscape, jeans, shoes, shirt, kanpai, happy, red hair, yellow hair, blue hair, green hair, looking at another, eye contact",
+                "defaultValue": "masterpiece, 4girls, multiple girls, city street, cityscape, landscape, jeans, shoes, shirt, kanpai, happy, red hair, yellow hair, blue hair, green hair, looking at another, eye contact",
                 "multiline": true,
                 "lines": 5,
                 "maxLines": 5
               },
               "widgets_values": [
-                "nsfw, masterpiece, 4girls, multiple girls, city street, cityscape, landscape, jeans, shoes, shirt, kanpai, happy, red hair, yellow hair, blue hair, green hair, looking at another, eye contact"
+                "masterpiece, 4girls, multiple girls, city street, cityscape, landscape, jeans, shoes, shirt, kanpai, happy, red hair, yellow hair, blue hair, green hair, looking at another, eye contact"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": "nsfw, masterpiece, 4girls, multiple girls, city street, cityscape, landscape, jeans, shoes, shirt, kanpai, happy, red hair, yellow hair, blue hair, green hair, looking at another, eye contact",
+              "comfyValue": "masterpiece, 4girls, multiple girls, city street, cityscape, landscape, jeans, shoes, shirt, kanpai, happy, red hair, yellow hair, blue hair, green hair, looking at another, eye contact",
               "shownOutputProperties": {},
               "saveUserState": true
             },

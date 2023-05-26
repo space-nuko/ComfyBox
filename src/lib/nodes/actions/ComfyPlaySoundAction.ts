@@ -1,5 +1,6 @@
 import { BuiltInSlotType, LiteGraph, type SlotLayout } from "@litegraph-ts/core";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "../ComfyGraphNode";
+import { playSound } from "$lib/utils";
 
 export interface ComfyPlaySoundActionProperties extends ComfyGraphNodeProperties {
     sound: string,
@@ -21,9 +22,7 @@ export default class ComfyPlaySoundAction extends ComfyGraphNode {
     override onAction(action: any, param: any) {
         const sound = this.getInputData(0) || this.properties.sound;
         if (sound) {
-            const url = `${location.origin}/sound/${sound}`;
-            const audio = new Audio(url);
-            audio.play();
+            playSound(sound)
         }
     };
 }

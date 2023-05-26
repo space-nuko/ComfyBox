@@ -47,7 +47,7 @@ export default class ComfyExecuteSubgraphAction extends ComfyGraphNode {
 
         // Hold control to queue at the front
         const num = app.ctrlDown ? -1 : 0;
-        app.queuePrompt(num, 1, tag);
+        app.queuePrompt(this.workflow, num, 1, tag);
     }
 }
 

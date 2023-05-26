@@ -622,3 +622,9 @@ export function nextLetter(s: string): string {
         }
     });
 }
+
+export function playSound(sound: string) {
+    const url = `${location.origin}/sound/${sound}`;
+    const audio = new Audio(url);
+    audio.play();
+}

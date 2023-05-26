@@ -3,6 +3,8 @@ import type { Progress, SerializedPromptInputsAll, SerializedPromptOutputs, Work
 import type { ComfyExecutionResult } from "$lib/nodes/ComfyWidgetNodes";
 import notify from "$lib/notify";
 import { get, writable, type Writable } from "svelte/store";
+import workflowState from "./workflowState";
+import { playSound } from "$lib/utils";
 
 export type QueueEntryStatus = "success" | "error" | "interrupted" | "all_cached" | "unknown";
 
@@ -267,6 +269,11 @@ function executingUpdated(promptID: PromptID, runningNodeID: ComfyNodeID | null)
                     moveToCompleted(index, queue, "all_cached", "(Execution was cached)");
                 }
                 else if (entry.nodesRan.size >= totalNodesInPrompt) {
+                    const workflow = workflowState.getWorkflow(entry.extraData.workflowID);
+                    if (workflow?.attrs.showDefaultNotifications) {
+                        notify("Prompt finished!", { type: "success" });
+                        playSound("notification.mp3")
+                    }
                     moveToCompleted(index, queue, "success")
                 }
                 else {

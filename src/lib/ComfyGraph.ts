@@ -249,6 +249,11 @@ export default class ComfyGraph extends LGraph {
                 node_data.id = uuidv4();
                 templateNodeIDToNewNode[prevNodeId] = node
 
+                // Strip tags from top-level nodes
+                if (Array.isArray(node_data.properties.tags)) {
+                    node_data.properties.tags = []
+                }
+
                 node.configure(node_data);
 
                 if (mapping) {

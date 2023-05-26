@@ -2,7 +2,7 @@
   "comfyBoxWorkflow": true,
   "createdBy": "ComfyBox",
   "version": 1,
-  "commitHash": "574d3170a4e829df366dc12c3aaa049121052d8f\n",
+  "commitHash": "60bd9899150678dbc46df543ac16e1099d58a07f\n",
   "workflow": {
     "last_node_id": 0,
     "last_link_id": 0,
@@ -391,20 +391,7 @@
         "title": "UI.Gallery",
         "properties": {
           "tags": [],
-          "defaultValue": [
-            {
-              "isComfyBoxImageMetadata": true,
-              "comfyUIFile": {
-                "filename": "ComfyUI_04712_.png",
-                "subfolder": "",
-                "type": "output"
-              },
-              "name": "File",
-              "tags": [],
-              "width": 6656,
-              "height": 4096
-            }
-          ],
+          "defaultValue": [],
           "index": 0,
           "updateMode": "replace",
           "autoSelectOnUpdate": true
@@ -412,20 +399,7 @@
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": [
-          {
-            "isComfyBoxImageMetadata": true,
-            "comfyUIFile": {
-              "filename": "ComfyUI_04712_.png",
-              "subfolder": "",
-              "type": "output"
-            },
-            "name": "File",
-            "tags": [],
-            "width": 6656,
-            "height": 4096
-          }
-        ],
+        "comfyValue": [],
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -528,39 +502,13 @@
         ],
         "title": "UI.ImageUpload",
         "properties": {
-          "defaultValue": [
-            {
-              "isComfyBoxImageMetadata": true,
-              "comfyUIFile": {
-                "filename": "ComfyUI_05835_.png",
-                "type": "output",
-                "subfolder": ""
-              },
-              "name": "File",
-              "tags": [],
-              "width": 640,
-              "height": 768
-            }
-          ],
+          "defaultValue": [],
           "tags": []
         },
         "widgets_values": [],
         "color": "#223",
         "bgColor": "#335",
-        "comfyValue": [
-          {
-            "isComfyBoxImageMetadata": true,
-            "comfyUIFile": {
-              "filename": "ComfyUI_05835_.png",
-              "type": "output",
-              "subfolder": ""
-            },
-            "name": "File",
-            "tags": [],
-            "width": 640,
-            "height": 768
-          }
-        ],
+        "comfyValue": [],
         "shownOutputProperties": {},
         "saveUserState": false
       },
@@ -684,7 +632,8 @@
   "attrs": {
     "title": "Upscale by Model",
     "queuePromptButtonName": "Queue Prompt",
-    "queuePromptButtonRunWorkflow": true
+    "queuePromptButtonRunWorkflow": true,
+    "showDefaultNotifications": true
   },
   "layout": {
     "root": "46a08906-61a9-4a23-881b-9615cf165e33",
