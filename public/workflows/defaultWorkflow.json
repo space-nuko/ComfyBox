@@ -13618,504 +13618,6 @@
               "saveUserState": false
             },
             {
-              "id": "5ed14352-4cc1-4b49-ac3a-acc42c2fbd4f",
-              "type": "graph/subgraph",
-              "pos": [
-                89,
-                458
-              ],
-              "size": [
-                200,
-                50
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 14,
-              "mode": 0,
-              "inputs": [],
-              "outputs": [
-                {
-                  "name": "width",
-                  "type": "number",
-                  "links": [
-                    "2486cdf8-cc57-45cc-82bc-30eeca736f0f"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "height",
-                  "type": "number",
-                  "links": [
-                    "83217cc8-be20-4337-9851-59b2fa5d52db"
-                  ],
-                  "properties": {},
-                  "slot_index": 1
-                }
-              ],
-              "title": "Dim. Sliders",
-              "properties": {
-                "enabled": true,
-                "tags": [
-                  "hrPixelSize"
-                ]
-              },
-              "color": "#2a363b",
-              "bgColor": "#3f5159",
-              "subgraph": {
-                "last_node_id": 0,
-                "last_link_id": 0,
-                "nodes": [
-                  {
-                    "id": "6a4aa170-b899-4246-9941-73737a151fa3",
-                    "type": "graph/output",
-                    "pos": [
-                      410,
-                      -31
-                    ],
-                    "size": [
-                      210,
-                      62
-                    ],
-                    "flags": {},
-                    "order": 2,
-                    "mode": 0,
-                    "inputs": [
-                      {
-                        "name": "",
-                        "type": "number",
-                        "link": "8a4da085-5cc2-441a-ab97-69a499db00f6",
-                        "properties": {},
-                        "shape": 0
-                      }
-                    ],
-                    "outputs": [],
-                    "title": "Output",
-                    "properties": {
-                      "name": "width",
-                      "type": "number",
-                      "subgraphID": "5ed14352-4cc1-4b49-ac3a-acc42c2fbd4f",
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "31c57d04-1a47-43a8-9980-631e1f71ce11",
-                    "type": "graph/output",
-                    "pos": [
-                      410,
-                      51
-                    ],
-                    "size": [
-                      210,
-                      62
-                    ],
-                    "flags": {},
-                    "order": 1,
-                    "mode": 0,
-                    "inputs": [
-                      {
-                        "name": "",
-                        "type": "number",
-                        "link": "48bf0ac5-fc6a-41f4-896e-4f25f7a3a2d9",
-                        "properties": {},
-                        "shape": 0
-                      }
-                    ],
-                    "outputs": [],
-                    "title": "Output",
-                    "properties": {
-                      "name": "height",
-                      "type": "number",
-                      "subgraphID": "5ed14352-4cc1-4b49-ac3a-acc42c2fbd4f",
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "e770fe92-5bba-4192-9744-4f45c64d8f11",
-                    "type": "actions/swap",
-                    "pos": [
-                      200,
-                      -3
-                    ],
-                    "size": [
-                      140,
-                      66
-                    ],
-                    "flags": {},
-                    "order": 4,
-                    "mode": 0,
-                    "inputs": [
-                      {
-                        "name": "A",
-                        "type": "*",
-                        "link": "52220d37-ee8a-46be-95dc-ecf7c3591eae",
-                        "properties": {}
-                      },
-                      {
-                        "name": "B",
-                        "type": "*",
-                        "link": "18f4e925-e07a-4f3c-ad0b-c3dac88c8a8d",
-                        "properties": {}
-                      },
-                      {
-                        "name": "swap",
-                        "type": -1,
-                        "link": "aa76cccd-1c29-4336-a5fe-c2c7470ef4cd",
-                        "properties": {},
-                        "shape": 1
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "B",
-                        "type": -2,
-                        "links": [
-                          "c8b56de0-d7e4-444f-9cba-d9bfe820cce0"
-                        ],
-                        "properties": {},
-                        "shape": 1,
-                        "slot_index": 0
-                      },
-                      {
-                        "name": "A",
-                        "type": -2,
-                        "links": [
-                          "a8710f7a-5b61-4148-9ade-e3504d8bd962"
-                        ],
-                        "properties": {},
-                        "shape": 1,
-                        "slot_index": 1
-                      }
-                    ],
-                    "title": "Comfy.SwapAction",
-                    "properties": {
-                      "tags": []
-                    },
-                    "saveUserState": true
-                  },
-                  {
-                    "id": "760a76a9-1784-4c0a-a107-caec9d5ba23b",
-                    "type": "ui/number",
-                    "pos": [
-                      47,
-                      16
-                    ],
-                    "size": [
-                      210,
-                      158
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 3,
-                    "mode": 0,
-                    "inputs": [
-                      {
-                        "name": "store",
-                        "type": -1,
-                        "link": "c8b56de0-d7e4-444f-9cba-d9bfe820cce0",
-                        "properties": {},
-                        "shape": 1
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "value",
-                        "type": "number",
-                        "links": [
-                          "52220d37-ee8a-46be-95dc-ecf7c3591eae",
-                          "8a4da085-5cc2-441a-ab97-69a499db00f6"
-                        ],
-                        "properties": {},
-                        "slot_index": 0
-                      },
-                      {
-                        "name": "changed",
-                        "type": -2,
-                        "links": [],
-                        "properties": {},
-                        "shape": 1
-                      },
-                      {
-                        "name": "@min",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@max",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@step",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@precision",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      }
-                    ],
-                    "title": "UI.Number",
-                    "properties": {
-                      "tags": [
-                        "hrPixelSize"
-                      ],
-                      "defaultValue": 512,
-                      "min": 64,
-                      "max": 2048,
-                      "step": 64,
-                      "precision": 0
-                    },
-                    "widgets_values": [
-                      "512.000"
-                    ],
-                    "color": "#223",
-                    "bgColor": "#335",
-                    "comfyValue": 512,
-                    "shownOutputProperties": {
-                      "min": {
-                        "type": "number",
-                        "outputName": "@min"
-                      },
-                      "max": {
-                        "type": "number",
-                        "outputName": "@max"
-                      },
-                      "step": {
-                        "type": "number",
-                        "outputName": "@step"
-                      },
-                      "precision": {
-                        "type": "number",
-                        "outputName": "@precision"
-                      }
-                    },
-                    "saveUserState": true
-                  },
-                  {
-                    "id": "e895b0ce-8df2-42fc-8618-c8b713ca4747",
-                    "type": "ui/number",
-                    "pos": [
-                      45,
-                      49
-                    ],
-                    "size": [
-                      210,
-                      158
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 5,
-                    "mode": 0,
-                    "inputs": [
-                      {
-                        "name": "store",
-                        "type": -1,
-                        "link": "a8710f7a-5b61-4148-9ade-e3504d8bd962",
-                        "properties": {},
-                        "shape": 1
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "value",
-                        "type": "number",
-                        "links": [
-                          "18f4e925-e07a-4f3c-ad0b-c3dac88c8a8d",
-                          "48bf0ac5-fc6a-41f4-896e-4f25f7a3a2d9"
-                        ],
-                        "properties": {},
-                        "slot_index": 0
-                      },
-                      {
-                        "name": "changed",
-                        "type": -2,
-                        "links": [],
-                        "properties": {},
-                        "shape": 1
-                      },
-                      {
-                        "name": "@min",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@max",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@step",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@precision",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      }
-                    ],
-                    "title": "UI.Number",
-                    "properties": {
-                      "tags": [
-                        "hrPixelSize"
-                      ],
-                      "defaultValue": 512,
-                      "min": 64,
-                      "max": 2048,
-                      "step": 64,
-                      "precision": 0
-                    },
-                    "widgets_values": [
-                      "512.000"
-                    ],
-                    "color": "#223",
-                    "bgColor": "#335",
-                    "comfyValue": 512,
-                    "shownOutputProperties": {
-                      "min": {
-                        "type": "number",
-                        "outputName": "@min"
-                      },
-                      "max": {
-                        "type": "number",
-                        "outputName": "@max"
-                      },
-                      "step": {
-                        "type": "number",
-                        "outputName": "@step"
-                      },
-                      "precision": {
-                        "type": "number",
-                        "outputName": "@precision"
-                      }
-                    },
-                    "saveUserState": true
-                  },
-                  {
-                    "id": "060493ab-465d-4705-935e-2e53506b2369",
-                    "type": "ui/button",
-                    "pos": [
-                      28,
-                      85
-                    ],
-                    "size": [
-                      210,
-                      58
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 0,
-                    "mode": 0,
-                    "inputs": [],
-                    "outputs": [
-                      {
-                        "name": "clicked",
-                        "type": -2,
-                        "links": [
-                          "aa76cccd-1c29-4336-a5fe-c2c7470ef4cd"
-                        ],
-                        "properties": {},
-                        "shape": 1,
-                        "slot_index": 0
-                      }
-                    ],
-                    "title": "UI.Button",
-                    "properties": {
-                      "tags": [
-                        "hrPixelSize"
-                      ],
-                      "defaultValue": false,
-                      "param": "bang"
-                    },
-                    "widgets_values": [
-                      "false"
-                    ],
-                    "color": "#223",
-                    "bgColor": "#335",
-                    "comfyValue": false,
-                    "shownOutputProperties": {},
-                    "saveUserState": true
-                  }
-                ],
-                "links": [
-                  [
-                    "52220d37-ee8a-46be-95dc-ecf7c3591eae",
-                    "760a76a9-1784-4c0a-a107-caec9d5ba23b",
-                    0,
-                    "e770fe92-5bba-4192-9744-4f45c64d8f11",
-                    0,
-                    "*"
-                  ],
-                  [
-                    "18f4e925-e07a-4f3c-ad0b-c3dac88c8a8d",
-                    "e895b0ce-8df2-42fc-8618-c8b713ca4747",
-                    0,
-                    "e770fe92-5bba-4192-9744-4f45c64d8f11",
-                    1,
-                    "*"
-                  ],
-                  [
-                    "aa76cccd-1c29-4336-a5fe-c2c7470ef4cd",
-                    "060493ab-465d-4705-935e-2e53506b2369",
-                    0,
-                    "e770fe92-5bba-4192-9744-4f45c64d8f11",
-                    2,
-                    -1
-                  ],
-                  [
-                    "a8710f7a-5b61-4148-9ade-e3504d8bd962",
-                    "e770fe92-5bba-4192-9744-4f45c64d8f11",
-                    1,
-                    "e895b0ce-8df2-42fc-8618-c8b713ca4747",
-                    0,
-                    -1
-                  ],
-                  [
-                    "c8b56de0-d7e4-444f-9cba-d9bfe820cce0",
-                    "e770fe92-5bba-4192-9744-4f45c64d8f11",
-                    0,
-                    "760a76a9-1784-4c0a-a107-caec9d5ba23b",
-                    0,
-                    -1
-                  ],
-                  [
-                    "8a4da085-5cc2-441a-ab97-69a499db00f6",
-                    "760a76a9-1784-4c0a-a107-caec9d5ba23b",
-                    0,
-                    "6a4aa170-b899-4246-9941-73737a151fa3",
-                    0,
-                    "number"
-                  ],
-                  [
-                    "48bf0ac5-fc6a-41f4-896e-4f25f7a3a2d9",
-                    "e895b0ce-8df2-42fc-8618-c8b713ca4747",
-                    0,
-                    "31c57d04-1a47-43a8-9980-631e1f71ce11",
-                    0,
-                    "number"
-                  ]
-                ],
-                "groups": [],
-                "config": {},
-                "extra": {},
-                "version": 10
-              }
-            },
-            {
               "id": "df4ba5a6-ad14-4689-9c60-448e4967c90c",
               "type": "events/filter",
               "pos": [
@@ -16481,6 +15983,504 @@
                 "extra": {},
                 "version": 10
               }
+            },
+            {
+              "id": "5ed14352-4cc1-4b49-ac3a-acc42c2fbd4f",
+              "type": "graph/subgraph",
+              "pos": [
+                89,
+                458
+              ],
+              "size": [
+                200,
+                50
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 14,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "width",
+                  "type": "number",
+                  "links": [
+                    "2486cdf8-cc57-45cc-82bc-30eeca736f0f"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "height",
+                  "type": "number",
+                  "links": [
+                    "83217cc8-be20-4337-9851-59b2fa5d52db"
+                  ],
+                  "properties": {},
+                  "slot_index": 1
+                }
+              ],
+              "title": "Dim. Sliders",
+              "properties": {
+                "enabled": true,
+                "tags": [
+                  "hrPixelSize"
+                ]
+              },
+              "color": "#2a363b",
+              "bgColor": "#3f5159",
+              "subgraph": {
+                "last_node_id": 0,
+                "last_link_id": 0,
+                "nodes": [
+                  {
+                    "id": "6a4aa170-b899-4246-9941-73737a151fa3",
+                    "type": "graph/output",
+                    "pos": [
+                      410,
+                      -31
+                    ],
+                    "size": [
+                      210,
+                      62
+                    ],
+                    "flags": {},
+                    "order": 2,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "",
+                        "type": "number",
+                        "link": "8a4da085-5cc2-441a-ab97-69a499db00f6",
+                        "properties": {},
+                        "shape": 0
+                      }
+                    ],
+                    "outputs": [],
+                    "title": "Output",
+                    "properties": {
+                      "name": "width",
+                      "type": "number",
+                      "subgraphID": "5ed14352-4cc1-4b49-ac3a-acc42c2fbd4f",
+                      "tags": []
+                    }
+                  },
+                  {
+                    "id": "31c57d04-1a47-43a8-9980-631e1f71ce11",
+                    "type": "graph/output",
+                    "pos": [
+                      410,
+                      51
+                    ],
+                    "size": [
+                      210,
+                      62
+                    ],
+                    "flags": {},
+                    "order": 1,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "",
+                        "type": "number",
+                        "link": "48bf0ac5-fc6a-41f4-896e-4f25f7a3a2d9",
+                        "properties": {},
+                        "shape": 0
+                      }
+                    ],
+                    "outputs": [],
+                    "title": "Output",
+                    "properties": {
+                      "name": "height",
+                      "type": "number",
+                      "subgraphID": "5ed14352-4cc1-4b49-ac3a-acc42c2fbd4f",
+                      "tags": []
+                    }
+                  },
+                  {
+                    "id": "e770fe92-5bba-4192-9744-4f45c64d8f11",
+                    "type": "actions/swap",
+                    "pos": [
+                      200,
+                      -3
+                    ],
+                    "size": [
+                      140,
+                      66
+                    ],
+                    "flags": {},
+                    "order": 4,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "A",
+                        "type": "*",
+                        "link": "52220d37-ee8a-46be-95dc-ecf7c3591eae",
+                        "properties": {}
+                      },
+                      {
+                        "name": "B",
+                        "type": "*",
+                        "link": "18f4e925-e07a-4f3c-ad0b-c3dac88c8a8d",
+                        "properties": {}
+                      },
+                      {
+                        "name": "swap",
+                        "type": -1,
+                        "link": "aa76cccd-1c29-4336-a5fe-c2c7470ef4cd",
+                        "properties": {},
+                        "shape": 1
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "B",
+                        "type": -2,
+                        "links": [
+                          "c8b56de0-d7e4-444f-9cba-d9bfe820cce0"
+                        ],
+                        "properties": {},
+                        "shape": 1,
+                        "slot_index": 0
+                      },
+                      {
+                        "name": "A",
+                        "type": -2,
+                        "links": [
+                          "a8710f7a-5b61-4148-9ade-e3504d8bd962"
+                        ],
+                        "properties": {},
+                        "shape": 1,
+                        "slot_index": 1
+                      }
+                    ],
+                    "title": "Comfy.SwapAction",
+                    "properties": {
+                      "tags": []
+                    },
+                    "saveUserState": true
+                  },
+                  {
+                    "id": "760a76a9-1784-4c0a-a107-caec9d5ba23b",
+                    "type": "ui/number",
+                    "pos": [
+                      47,
+                      16
+                    ],
+                    "size": [
+                      210,
+                      158
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 3,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "store",
+                        "type": -1,
+                        "link": "c8b56de0-d7e4-444f-9cba-d9bfe820cce0",
+                        "properties": {},
+                        "shape": 1
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "value",
+                        "type": "number",
+                        "links": [
+                          "52220d37-ee8a-46be-95dc-ecf7c3591eae",
+                          "8a4da085-5cc2-441a-ab97-69a499db00f6"
+                        ],
+                        "properties": {},
+                        "slot_index": 0
+                      },
+                      {
+                        "name": "changed",
+                        "type": -2,
+                        "links": [],
+                        "properties": {},
+                        "shape": 1
+                      },
+                      {
+                        "name": "@min",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@max",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@step",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@precision",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      }
+                    ],
+                    "title": "UI.Number",
+                    "properties": {
+                      "tags": [
+                        "hrPixelSize"
+                      ],
+                      "defaultValue": 512,
+                      "min": 64,
+                      "max": 2048,
+                      "step": 64,
+                      "precision": 0
+                    },
+                    "widgets_values": [
+                      "512.000"
+                    ],
+                    "color": "#223",
+                    "bgColor": "#335",
+                    "comfyValue": 512,
+                    "shownOutputProperties": {
+                      "min": {
+                        "type": "number",
+                        "outputName": "@min"
+                      },
+                      "max": {
+                        "type": "number",
+                        "outputName": "@max"
+                      },
+                      "step": {
+                        "type": "number",
+                        "outputName": "@step"
+                      },
+                      "precision": {
+                        "type": "number",
+                        "outputName": "@precision"
+                      }
+                    },
+                    "saveUserState": true
+                  },
+                  {
+                    "id": "e895b0ce-8df2-42fc-8618-c8b713ca4747",
+                    "type": "ui/number",
+                    "pos": [
+                      45,
+                      49
+                    ],
+                    "size": [
+                      210,
+                      158
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 5,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "store",
+                        "type": -1,
+                        "link": "a8710f7a-5b61-4148-9ade-e3504d8bd962",
+                        "properties": {},
+                        "shape": 1
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "value",
+                        "type": "number",
+                        "links": [
+                          "18f4e925-e07a-4f3c-ad0b-c3dac88c8a8d",
+                          "48bf0ac5-fc6a-41f4-896e-4f25f7a3a2d9"
+                        ],
+                        "properties": {},
+                        "slot_index": 0
+                      },
+                      {
+                        "name": "changed",
+                        "type": -2,
+                        "links": [],
+                        "properties": {},
+                        "shape": 1
+                      },
+                      {
+                        "name": "@min",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@max",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@step",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@precision",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      }
+                    ],
+                    "title": "UI.Number",
+                    "properties": {
+                      "tags": [
+                        "hrPixelSize"
+                      ],
+                      "defaultValue": 512,
+                      "min": 64,
+                      "max": 2048,
+                      "step": 64,
+                      "precision": 0
+                    },
+                    "widgets_values": [
+                      "512.000"
+                    ],
+                    "color": "#223",
+                    "bgColor": "#335",
+                    "comfyValue": 512,
+                    "shownOutputProperties": {
+                      "min": {
+                        "type": "number",
+                        "outputName": "@min"
+                      },
+                      "max": {
+                        "type": "number",
+                        "outputName": "@max"
+                      },
+                      "step": {
+                        "type": "number",
+                        "outputName": "@step"
+                      },
+                      "precision": {
+                        "type": "number",
+                        "outputName": "@precision"
+                      }
+                    },
+                    "saveUserState": true
+                  },
+                  {
+                    "id": "060493ab-465d-4705-935e-2e53506b2369",
+                    "type": "ui/button",
+                    "pos": [
+                      28,
+                      85
+                    ],
+                    "size": [
+                      210,
+                      58
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 0,
+                    "mode": 0,
+                    "inputs": [],
+                    "outputs": [
+                      {
+                        "name": "clicked",
+                        "type": -2,
+                        "links": [
+                          "aa76cccd-1c29-4336-a5fe-c2c7470ef4cd"
+                        ],
+                        "properties": {},
+                        "shape": 1,
+                        "slot_index": 0
+                      }
+                    ],
+                    "title": "UI.Button",
+                    "properties": {
+                      "tags": [
+                        "hrPixelSize"
+                      ],
+                      "defaultValue": false,
+                      "param": "bang"
+                    },
+                    "widgets_values": [
+                      "false"
+                    ],
+                    "color": "#223",
+                    "bgColor": "#335",
+                    "comfyValue": false,
+                    "shownOutputProperties": {},
+                    "saveUserState": true
+                  }
+                ],
+                "links": [
+                  [
+                    "52220d37-ee8a-46be-95dc-ecf7c3591eae",
+                    "760a76a9-1784-4c0a-a107-caec9d5ba23b",
+                    0,
+                    "e770fe92-5bba-4192-9744-4f45c64d8f11",
+                    0,
+                    "*"
+                  ],
+                  [
+                    "18f4e925-e07a-4f3c-ad0b-c3dac88c8a8d",
+                    "e895b0ce-8df2-42fc-8618-c8b713ca4747",
+                    0,
+                    "e770fe92-5bba-4192-9744-4f45c64d8f11",
+                    1,
+                    "*"
+                  ],
+                  [
+                    "aa76cccd-1c29-4336-a5fe-c2c7470ef4cd",
+                    "060493ab-465d-4705-935e-2e53506b2369",
+                    0,
+                    "e770fe92-5bba-4192-9744-4f45c64d8f11",
+                    2,
+                    -1
+                  ],
+                  [
+                    "a8710f7a-5b61-4148-9ade-e3504d8bd962",
+                    "e770fe92-5bba-4192-9744-4f45c64d8f11",
+                    1,
+                    "e895b0ce-8df2-42fc-8618-c8b713ca4747",
+                    0,
+                    -1
+                  ],
+                  [
+                    "c8b56de0-d7e4-444f-9cba-d9bfe820cce0",
+                    "e770fe92-5bba-4192-9744-4f45c64d8f11",
+                    0,
+                    "760a76a9-1784-4c0a-a107-caec9d5ba23b",
+                    0,
+                    -1
+                  ],
+                  [
+                    "8a4da085-5cc2-441a-ab97-69a499db00f6",
+                    "760a76a9-1784-4c0a-a107-caec9d5ba23b",
+                    0,
+                    "6a4aa170-b899-4246-9941-73737a151fa3",
+                    0,
+                    "number"
+                  ],
+                  [
+                    "48bf0ac5-fc6a-41f4-896e-4f25f7a3a2d9",
+                    "e895b0ce-8df2-42fc-8618-c8b713ca4747",
+                    0,
+                    "31c57d04-1a47-43a8-9980-631e1f71ce11",
+                    0,
+                    "number"
+                  ]
+                ],
+                "groups": [],
+                "config": {},
+                "extra": {},
+                "version": 10
+              }
             }
           ],
           "links": [
@@ -16907,6 +16907,499 @@
               "d1316cca-081d-4e6a-857e-958d796580e7",
               1,
               "VAE"
+            ]
+          ],
+          "groups": [],
+          "config": {},
+          "extra": {},
+          "version": 10
+        }
+      },
+      {
+        "id": "7191f2eb-f4ca-4884-8778-7f10bea6c07e",
+        "type": "graph/subgraph",
+        "pos": [
+          1488,
+          271
+        ],
+        "size": [
+          200,
+          30
+        ],
+        "flags": {},
+        "order": 47,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "error",
+            "type": "string",
+            "link": "842b3edb-9121-40d7-8b65-7d7937105c16",
+            "properties": {}
+          }
+        ],
+        "outputs": [],
+        "title": "Default Queue Action",
+        "properties": {
+          "enabled": true,
+          "tags": []
+        },
+        "color": "#2a363b",
+        "bgColor": "#3f5159",
+        "subgraph": {
+          "last_node_id": 0,
+          "last_link_id": 0,
+          "nodes": [
+            {
+              "id": "8cec9619-2b37-43ff-9914-b3865b40211d",
+              "type": "events/queue_events",
+              "pos": [
+                0,
+                1.617036428000958
+              ],
+              "size": [
+                178,
+                66
+              ],
+              "flags": {},
+              "order": 0,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "beforeQueued",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "afterQueued",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "onDefaultQueueAction",
+                  "type": -2,
+                  "links": [
+                    "2761c4cc-4320-4a62-8129-1f41c5bab6c8"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 2
+                }
+              ],
+              "title": "Comfy.QueueEvents",
+              "properties": {
+                "tags": []
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "b39bc040-9da5-438b-9cd6-9f43827915fd",
+              "type": "actions/execute_subgraph",
+              "pos": [
+                495.647050142044,
+                85.37617015380874
+              ],
+              "size": [
+                226.79999999999998,
+                78
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 6,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "execute",
+                  "type": -1,
+                  "link": "3ad75c82-765e-416b-b056-357ab7a400bb",
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 0
+                },
+                {
+                  "name": "targetTag",
+                  "type": "string",
+                  "link": null,
+                  "properties": {}
+                }
+              ],
+              "outputs": [],
+              "title": "Comfy.ExecuteSubgraphAction",
+              "properties": {
+                "tags": [],
+                "targetTag": "gen"
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "03245291-9b21-4ab5-a028-fe8dffca3237",
+              "type": "actions/notify",
+              "pos": [
+                467.4614243607948,
+                31.00000000000007
+              ],
+              "size": [
+                151.2,
+                46
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 7,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "message",
+                  "type": "string",
+                  "link": "0af75e29-3cf3-4e56-94c4-23f18f6e5aa3",
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "trigger",
+                  "type": -1,
+                  "link": "c2e20c2f-fe3f-4872-8a82-b6abc9e678f0",
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 1
+                }
+              ],
+              "outputs": [],
+              "title": "Comfy.NotifyAction",
+              "properties": {
+                "tags": [],
+                "message": "Nya.",
+                "type": "info"
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "2d020869-19b4-44ce-9ba6-1cbb4b6eddd1",
+              "type": "basic/string",
+              "pos": [
+                472.4614243607948,
+                0
+              ],
+              "size": [
+                210,
+                38
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 1,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "string",
+                  "type": "string",
+                  "links": [
+                    "0af75e29-3cf3-4e56-94c4-23f18f6e5aa3"
+                  ],
+                  "properties": {}
+                }
+              ],
+              "title": "Const String",
+              "properties": {
+                "value": "Prompt queued.",
+                "tags": []
+              }
+            },
+            {
+              "id": "c9f62e61-b9a4-4092-8318-50aa5c04a24d",
+              "type": "events/branch",
+              "pos": [
+                241.45525053267033,
+                16.21200283741959
+              ],
+              "size": [
+                140,
+                46
+              ],
+              "flags": {},
+              "order": 5,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "in",
+                  "type": -1,
+                  "link": "2761c4cc-4320-4a62-8129-1f41c5bab6c8",
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "cond",
+                  "type": "boolean",
+                  "link": "4ca15e60-3b79-4ba5-bb9c-89cca55cb1aa",
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "true",
+                  "type": -2,
+                  "links": [
+                    "3ad75c82-765e-416b-b056-357ab7a400bb",
+                    "c2e20c2f-fe3f-4872-8a82-b6abc9e678f0"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 0
+                },
+                {
+                  "name": "false",
+                  "type": -2,
+                  "links": [
+                    "44dcf2d9-31ad-4737-b541-d38d3a3065b6"
+                  ],
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "title": "Branch",
+              "properties": {
+                "tags": []
+              }
+            },
+            {
+              "id": "877d8e92-b7dc-455b-8fce-a11b4821e476",
+              "type": "actions/notify",
+              "pos": [
+                281.45525053267033,
+                130.2120028374196
+              ],
+              "size": [
+                151.2,
+                46
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 8,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "message",
+                  "type": "string",
+                  "link": "87b70717-9d21-466f-aa74-3d542baa58cf",
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "trigger",
+                  "type": -1,
+                  "link": "44dcf2d9-31ad-4737-b541-d38d3a3065b6",
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 1
+                }
+              ],
+              "outputs": [],
+              "title": "Comfy.NotifyAction",
+              "properties": {
+                "tags": [],
+                "message": "Nya.",
+                "type": "error"
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "cc67bc97-06ec-4368-b935-ab4ed561af1f",
+              "type": "graph/input",
+              "pos": [
+                -272,
+                178
+              ],
+              "size": [
+                210,
+                86
+              ],
+              "flags": {},
+              "order": 2,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "string",
+                  "links": [
+                    "87b70717-9d21-466f-aa74-3d542baa58cf",
+                    "605a07ad-c5f8-40de-91b8-3ce24f22cc03"
+                  ],
+                  "properties": {},
+                  "shape": 0,
+                  "slot_index": 0
+                }
+              ],
+              "title": "Input",
+              "properties": {
+                "name": "error",
+                "type": "string",
+                "value": "",
+                "subgraphID": "7191f2eb-f4ca-4884-8778-7f10bea6c07e",
+                "tags": []
+              }
+            },
+            {
+              "id": "2fa2f5cc-3cba-437f-aba3-081c81e8495a",
+              "type": "logic/truthy",
+              "pos": [
+                -43,
+                150
+              ],
+              "size": [
+                140,
+                26
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 3,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "in",
+                  "type": "*",
+                  "link": "605a07ad-c5f8-40de-91b8-3ce24f22cc03",
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "truthy",
+                  "type": "boolean",
+                  "links": [
+                    "67ea4f93-f71b-4bc7-9cd1-fc8bf0fb27c4"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "~= TRUE",
+              "properties": {
+                "tags": []
+              }
+            },
+            {
+              "id": "e0c4fc39-ddab-4f59-a30b-8e2ab4cb72c7",
+              "type": "logic/NOT",
+              "pos": [
+                70,
+                148
+              ],
+              "size": [
+                140,
+                26
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 4,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "in",
+                  "type": "boolean",
+                  "link": "67ea4f93-f71b-4bc7-9cd1-fc8bf0fb27c4",
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "out",
+                  "type": "boolean",
+                  "links": [
+                    "4ca15e60-3b79-4ba5-bb9c-89cca55cb1aa"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "NOT",
+              "properties": {
+                "tags": []
+              }
+            }
+          ],
+          "links": [
+            [
+              "2761c4cc-4320-4a62-8129-1f41c5bab6c8",
+              "8cec9619-2b37-43ff-9914-b3865b40211d",
+              2,
+              "c9f62e61-b9a4-4092-8318-50aa5c04a24d",
+              0,
+              -1
+            ],
+            [
+              "3ad75c82-765e-416b-b056-357ab7a400bb",
+              "c9f62e61-b9a4-4092-8318-50aa5c04a24d",
+              0,
+              "b39bc040-9da5-438b-9cd6-9f43827915fd",
+              0,
+              -1
+            ],
+            [
+              "0af75e29-3cf3-4e56-94c4-23f18f6e5aa3",
+              "2d020869-19b4-44ce-9ba6-1cbb4b6eddd1",
+              0,
+              "03245291-9b21-4ab5-a028-fe8dffca3237",
+              0,
+              "string"
+            ],
+            [
+              "c2e20c2f-fe3f-4872-8a82-b6abc9e678f0",
+              "c9f62e61-b9a4-4092-8318-50aa5c04a24d",
+              0,
+              "03245291-9b21-4ab5-a028-fe8dffca3237",
+              1,
+              -1
+            ],
+            [
+              "44dcf2d9-31ad-4737-b541-d38d3a3065b6",
+              "c9f62e61-b9a4-4092-8318-50aa5c04a24d",
+              1,
+              "877d8e92-b7dc-455b-8fce-a11b4821e476",
+              1,
+              -1
+            ],
+            [
+              "87b70717-9d21-466f-aa74-3d542baa58cf",
+              "cc67bc97-06ec-4368-b935-ab4ed561af1f",
+              0,
+              "877d8e92-b7dc-455b-8fce-a11b4821e476",
+              0,
+              "string"
+            ],
+            [
+              "67ea4f93-f71b-4bc7-9cd1-fc8bf0fb27c4",
+              "2fa2f5cc-3cba-437f-aba3-081c81e8495a",
+              0,
+              "e0c4fc39-ddab-4f59-a30b-8e2ab4cb72c7",
+              0,
+              "boolean"
+            ],
+            [
+              "4ca15e60-3b79-4ba5-bb9c-89cca55cb1aa",
+              "e0c4fc39-ddab-4f59-a30b-8e2ab4cb72c7",
+              0,
+              "c9f62e61-b9a4-4092-8318-50aa5c04a24d",
+              1,
+              "boolean"
+            ],
+            [
+              "605a07ad-c5f8-40de-91b8-3ce24f22cc03",
+              "cc67bc97-06ec-4368-b935-ab4ed561af1f",
+              0,
+              "2fa2f5cc-3cba-437f-aba3-081c81e8495a",
+              0,
+              "*"
             ]
           ],
           "groups": [],
@@ -20008,6 +20501,1154 @@
               "saveUserState": true
             },
             {
+              "id": "54804b59-f75e-49bf-b97a-3f5f6495841d",
+              "type": "image/pick_image",
+              "pos": [
+                -509.96356572265597,
+                558.2719379394534
+              ],
+              "size": [
+                210,
+                190
+              ],
+              "flags": {},
+              "order": 31,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "images",
+                  "type": "COMFYBOX_IMAGES",
+                  "link": "bda9dcb6-b906-4dbb-902c-55f71aa67277",
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "index",
+                  "type": "number",
+                  "link": null,
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "image",
+                  "type": "COMFYBOX_IMAGE",
+                  "links": [
+                    "74f5d77e-bd47-4a0c-9ad5-00e7d30c2bd5",
+                    "d18dbb43-b2e2-47cb-831b-7a668ca484c4"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "filename",
+                  "type": "string",
+                  "links": [
+                    "5a796a62-0bd1-4f1e-b7f5-9888e79e40f0"
+                  ],
+                  "properties": {},
+                  "slot_index": 1
+                },
+                {
+                  "name": "width",
+                  "type": "number",
+                  "links": [
+                    "00442883-6157-4ad7-ab50-81cf96f96c31"
+                  ],
+                  "properties": {},
+                  "slot_index": 2
+                },
+                {
+                  "name": "height",
+                  "type": "number",
+                  "links": [
+                    "27982f07-e18c-4eac-99cb-cbd29e1ebb83"
+                  ],
+                  "properties": {}
+                }
+              ],
+              "title": "Comfy.PickImage",
+              "properties": {
+                "tags": []
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "def44ce3-6b61-4294-b0bd-abe3b7c6045a",
+              "type": "logic/AND",
+              "pos": [
+                -1191.1844044826491,
+                183.72368589138844
+              ],
+              "size": [
+                140,
+                46
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 40,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "a",
+                  "type": "boolean",
+                  "link": "e85e7aa8-51a3-449a-b4f1-621eeedcc1a4",
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "b",
+                  "type": "boolean",
+                  "link": "0de603d9-0126-460c-bef0-c45bcb5d4d77",
+                  "properties": {},
+                  "slot_index": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "out",
+                  "type": "boolean",
+                  "links": [
+                    "f76bbdf2-d953-4f77-ab22-e07b87cb66ee"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "AND",
+              "properties": {
+                "tags": []
+              }
+            },
+            {
+              "id": "a502386b-f168-4086-a512-623496b78199",
+              "type": "basic/string",
+              "pos": [
+                -1332.1844044826487,
+                148.72368589138858
+              ],
+              "size": [
+                210,
+                38
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 21,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "string",
+                  "type": "string",
+                  "links": [
+                    "c1d8a7ed-fa02-4871-843b-4e4fd31327ac"
+                  ],
+                  "properties": {}
+                }
+              ],
+              "title": "Const String",
+              "properties": {
+                "value": "Upload an image to be used with img2img first.",
+                "tags": []
+              }
+            },
+            {
+              "id": "ad7226d8-a707-4abd-ba61-9261b0c9a20d",
+              "type": "basic/CompareValues",
+              "pos": [
+                -1317.1844044826487,
+                182.72368589138844
+              ],
+              "size": [
+                210,
+                78
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 24,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "A",
+                  "type": 0,
+                  "link": "cb24e437-7fe2-400a-b39c-2a0e8d0d0b7e",
+                  "properties": {}
+                },
+                {
+                  "name": "B",
+                  "type": 0,
+                  "link": "24d5f780-5151-4908-9e4e-db1d00f52534",
+                  "properties": {},
+                  "slot_index": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "true",
+                  "type": "boolean",
+                  "links": [
+                    "e85e7aa8-51a3-449a-b4f1-621eeedcc1a4"
+                  ],
+                  "properties": {}
+                },
+                {
+                  "name": "false",
+                  "type": "boolean",
+                  "links": [],
+                  "properties": {}
+                }
+              ],
+              "title": "GenericCompare",
+              "properties": {
+                "A": "txt2img",
+                "B": "img2img",
+                "OP": "==",
+                "enabled": true,
+                "tags": []
+              }
+            },
+            {
+              "id": "b15eb076-8464-4e6d-bc47-011dd1a5a10d",
+              "type": "basic/is_null",
+              "pos": [
+                -1317.1844044826487,
+                216.7236858913887
+              ],
+              "size": [
+                140,
+                26
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 35,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "in",
+                  "type": "*",
+                  "link": "d18dbb43-b2e2-47cb-831b-7a668ca484c4",
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "is_null",
+                  "type": "boolean",
+                  "links": [
+                    "0de603d9-0126-460c-bef0-c45bcb5d4d77"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "== Null",
+              "properties": {
+                "strictEquality": true,
+                "tags": []
+              }
+            },
+            {
+              "id": "5c453a8e-e6b5-4260-8489-2eca1b459a5a",
+              "type": "graph/output",
+              "pos": [
+                -931.1844044826495,
+                173.72368589138856
+              ],
+              "size": [
+                210,
+                62
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 48,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "",
+                  "type": "string",
+                  "link": "893c8ef0-04ed-4f92-9e11-34ad0290d9a3",
+                  "properties": {},
+                  "shape": 0
+                }
+              ],
+              "outputs": [],
+              "title": "Output",
+              "properties": {
+                "name": "error",
+                "type": "string",
+                "subgraphID": "70361963-27f5-471d-b735-dbe2351a5ebd",
+                "tags": []
+              }
+            },
+            {
+              "id": "0e607e1f-114a-419f-bbdc-0b04eb82dff5",
+              "type": "utils/switch",
+              "pos": [
+                -1110.7330271701492,
+                129.55119853984132
+              ],
+              "size": [
+                140,
+                86
+              ],
+              "flags": {},
+              "order": 45,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "A_value",
+                  "type": "*",
+                  "link": "c1d8a7ed-fa02-4871-843b-4e4fd31327ac",
+                  "properties": {}
+                },
+                {
+                  "name": "A_cond",
+                  "type": "boolean",
+                  "link": "f76bbdf2-d953-4f77-ab22-e07b87cb66ee",
+                  "properties": {},
+                  "slot_index": 1
+                },
+                {
+                  "name": "B_value",
+                  "type": "*",
+                  "link": null,
+                  "properties": {}
+                },
+                {
+                  "name": "B_cond",
+                  "type": "boolean",
+                  "link": null,
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "string",
+                  "links": [
+                    "893c8ef0-04ed-4f92-9e11-34ad0290d9a3"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "Comfy.Switch",
+              "properties": {
+                "tags": []
+              },
+              "color": "#232",
+              "bgColor": "#353",
+              "saveUserState": true
+            },
+            {
+              "id": "18428189-e387-4034-a8da-333e88da29f6",
+              "type": "graph/subgraph",
+              "pos": [
+                -70,
+                667
+              ],
+              "size": [
+                200,
+                50
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 37,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "width",
+                  "type": "number",
+                  "link": "00442883-6157-4ad7-ab50-81cf96f96c31",
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "height",
+                  "type": "number",
+                  "link": "27982f07-e18c-4eac-99cb-cbd29e1ebb83",
+                  "properties": {},
+                  "slot_index": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "width",
+                  "type": "number",
+                  "links": [
+                    "fa009346-1bb8-4ed9-a505-ebdc9ea803e1"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "height",
+                  "type": "number",
+                  "links": [
+                    "831bc76d-0920-4215-8161-3bdf035f5fb2"
+                  ],
+                  "properties": {},
+                  "slot_index": 1
+                }
+              ],
+              "title": "Scale By Slider",
+              "properties": {
+                "enabled": true,
+                "tags": [
+                  "img2img",
+                  "img2imgScaleSize"
+                ]
+              },
+              "color": "#2a363b",
+              "bgColor": "#3f5159",
+              "subgraph": {
+                "last_node_id": 0,
+                "last_link_id": 0,
+                "nodes": [
+                  {
+                    "id": "136e6181-4d24-4224-a956-812bf021d46d",
+                    "type": "graph/input",
+                    "pos": [
+                      408.0700000000001,
+                      403.89
+                    ],
+                    "size": [
+                      210,
+                      86
+                    ],
+                    "flags": {},
+                    "order": 0,
+                    "mode": 0,
+                    "inputs": [],
+                    "outputs": [
+                      {
+                        "name": "",
+                        "type": "number",
+                        "links": [
+                          "a511c62f-d680-4c56-b3c1-d82945cee862"
+                        ],
+                        "properties": {},
+                        "shape": 0
+                      }
+                    ],
+                    "title": "Input",
+                    "properties": {
+                      "name": "height",
+                      "type": "number",
+                      "value": 0,
+                      "subgraphID": "18428189-e387-4034-a8da-333e88da29f6",
+                      "tags": []
+                    }
+                  },
+                  {
+                    "id": "1a61ef88-92d0-4ebf-a2c8-c05f538ad8fd",
+                    "type": "math/operation",
+                    "pos": [
+                      884,
+                      402
+                    ],
+                    "size": [
+                      140,
+                      46
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 4,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "A",
+                        "type": "number,array,object",
+                        "link": "a511c62f-d680-4c56-b3c1-d82945cee862",
+                        "properties": {},
+                        "slot_index": 0
+                      },
+                      {
+                        "name": "B",
+                        "type": "number",
+                        "link": "58135e31-98b2-4d6b-8c54-4742a11d2c0f",
+                        "properties": {}
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "=",
+                        "type": "number",
+                        "links": [
+                          "b04786a1-13d1-48b4-85bf-65f19c75084c"
+                        ],
+                        "properties": {},
+                        "slot_index": 0
+                      }
+                    ],
+                    "title": "Operation",
+                    "properties": {
+                      "A": 0,
+                      "B": 2,
+                      "OP": "*",
+                      "tags": []
+                    }
+                  },
+                  {
+                    "id": "7059ce4d-6526-430f-aceb-f8d81b93bbd2",
+                    "type": "math/floor",
+                    "pos": [
+                      966,
+                      405
+                    ],
+                    "size": [
+                      140,
+                      26
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 6,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "in",
+                        "type": "number",
+                        "link": "b04786a1-13d1-48b4-85bf-65f19c75084c",
+                        "properties": {},
+                        "slot_index": 0
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "out",
+                        "type": "number",
+                        "links": [
+                          "3042fbc4-2d8d-421e-a33d-01f2ac569e3f",
+                          "14cfc1a9-1abb-4baf-8374-9c7f196fdae8"
+                        ],
+                        "properties": {},
+                        "slot_index": 0
+                      }
+                    ],
+                    "title": "Floor",
+                    "properties": {
+                      "tags": []
+                    }
+                  },
+                  {
+                    "id": "2ef62e0e-e061-44fc-b92e-a053a882423f",
+                    "type": "graph/output",
+                    "pos": [
+                      1220,
+                      378
+                    ],
+                    "size": [
+                      210,
+                      62
+                    ],
+                    "flags": {},
+                    "order": 10,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "",
+                        "type": "number",
+                        "link": "14cfc1a9-1abb-4baf-8374-9c7f196fdae8",
+                        "properties": {},
+                        "shape": 0
+                      }
+                    ],
+                    "outputs": [],
+                    "title": "Output",
+                    "properties": {
+                      "name": "height",
+                      "type": "number",
+                      "subgraphID": "18428189-e387-4034-a8da-333e88da29f6",
+                      "tags": []
+                    }
+                  },
+                  {
+                    "id": "aa88e2b1-2faf-4971-9421-6276b5892067",
+                    "type": "graph/output",
+                    "pos": [
+                      1222,
+                      277
+                    ],
+                    "size": [
+                      210,
+                      62
+                    ],
+                    "flags": {},
+                    "order": 8,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "",
+                        "type": "number",
+                        "link": "7cbde9b6-8890-45c8-b3e9-6318a76331de",
+                        "properties": {},
+                        "shape": 0
+                      }
+                    ],
+                    "outputs": [],
+                    "title": "Output",
+                    "properties": {
+                      "name": "width",
+                      "type": "number",
+                      "subgraphID": "18428189-e387-4034-a8da-333e88da29f6",
+                      "tags": []
+                    }
+                  },
+                  {
+                    "id": "66c98a78-d9a2-47de-99ec-053995a254f0",
+                    "type": "string/toString",
+                    "pos": [
+                      1020,
+                      473
+                    ],
+                    "size": [
+                      140,
+                      26
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 9,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "in",
+                        "type": "",
+                        "link": "3042fbc4-2d8d-421e-a33d-01f2ac569e3f",
+                        "properties": {},
+                        "slot_index": 0
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "out",
+                        "type": "string",
+                        "links": [
+                          "ab27c7bf-64f5-47fc-abf3-408e2b2ac58c"
+                        ],
+                        "properties": {},
+                        "slot_index": 0
+                      }
+                    ],
+                    "title": "ToString",
+                    "properties": {
+                      "tags": []
+                    }
+                  },
+                  {
+                    "id": "b54a1fc0-44e9-461c-b743-62e9f651db12",
+                    "type": "ui/text",
+                    "pos": [
+                      1128,
+                      473
+                    ],
+                    "size": [
+                      210,
+                      78
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 12,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "value",
+                        "type": "string",
+                        "link": "ab27c7bf-64f5-47fc-abf3-408e2b2ac58c",
+                        "properties": {},
+                        "slot_index": 0
+                      },
+                      {
+                        "name": "store",
+                        "type": -1,
+                        "link": null,
+                        "properties": {},
+                        "shape": 1
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "value",
+                        "type": "string",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "changed",
+                        "type": -2,
+                        "links": [],
+                        "properties": {},
+                        "shape": 1
+                      }
+                    ],
+                    "title": "UI.Text",
+                    "properties": {
+                      "tags": [],
+                      "defaultValue": "0",
+                      "multiline": false,
+                      "lines": 5,
+                      "maxLines": 5
+                    },
+                    "widgets_values": [
+                      "0"
+                    ],
+                    "color": "#223",
+                    "bgColor": "#335",
+                    "comfyValue": "0",
+                    "shownOutputProperties": {},
+                    "saveUserState": true
+                  },
+                  {
+                    "id": "53c0e65d-3f57-481b-b163-cc5aa48f1a85",
+                    "type": "ui/text",
+                    "pos": [
+                      1108,
+                      233
+                    ],
+                    "size": [
+                      210,
+                      78
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 11,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "value",
+                        "type": "string",
+                        "link": "8fa77e0a-bd27-4cd0-a7c0-e34154a814af",
+                        "properties": {}
+                      },
+                      {
+                        "name": "store",
+                        "type": -1,
+                        "link": null,
+                        "properties": {},
+                        "shape": 1
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "value",
+                        "type": "string",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "changed",
+                        "type": -2,
+                        "links": [],
+                        "properties": {},
+                        "shape": 1
+                      }
+                    ],
+                    "title": "UI.Text",
+                    "properties": {
+                      "tags": [],
+                      "defaultValue": "0",
+                      "multiline": false,
+                      "lines": 5,
+                      "maxLines": 5
+                    },
+                    "widgets_values": [
+                      "0"
+                    ],
+                    "color": "#223",
+                    "bgColor": "#335",
+                    "comfyValue": "0",
+                    "shownOutputProperties": {},
+                    "saveUserState": true
+                  },
+                  {
+                    "id": "31eda029-17af-4a5f-8afb-77664a0a339e",
+                    "type": "graph/input",
+                    "pos": [
+                      410,
+                      278
+                    ],
+                    "size": [
+                      210,
+                      86
+                    ],
+                    "flags": {},
+                    "order": 1,
+                    "mode": 0,
+                    "inputs": [],
+                    "outputs": [
+                      {
+                        "name": "",
+                        "type": "number",
+                        "links": [
+                          "7ea42a09-cdfb-4bb0-b590-053284a5cbe3"
+                        ],
+                        "properties": {},
+                        "shape": 0
+                      }
+                    ],
+                    "title": "Input",
+                    "properties": {
+                      "name": "width",
+                      "type": "number",
+                      "value": 0,
+                      "subgraphID": "18428189-e387-4034-a8da-333e88da29f6",
+                      "tags": []
+                    }
+                  },
+                  {
+                    "id": "4f97b299-282f-4198-bb70-42ce83ce71c2",
+                    "type": "ui/number",
+                    "pos": [
+                      680,
+                      370
+                    ],
+                    "size": [
+                      210,
+                      158
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 2,
+                    "mode": 2,
+                    "inputs": [
+                      {
+                        "name": "store",
+                        "type": -1,
+                        "link": null,
+                        "properties": {},
+                        "shape": 1
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "value",
+                        "type": "number",
+                        "links": [
+                          "bd46bc61-44e2-4a93-9603-a91daa6d90fe",
+                          "58135e31-98b2-4d6b-8c54-4742a11d2c0f"
+                        ],
+                        "properties": {},
+                        "slot_index": 0
+                      },
+                      {
+                        "name": "changed",
+                        "type": -2,
+                        "links": [],
+                        "properties": {},
+                        "shape": 1
+                      },
+                      {
+                        "name": "@min",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@max",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@step",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@precision",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      }
+                    ],
+                    "title": "UI.Number",
+                    "properties": {
+                      "tags": [
+                        "img2img",
+                        "img2imgScaleSize"
+                      ],
+                      "defaultValue": 2,
+                      "min": 1,
+                      "max": 4,
+                      "step": 0.05,
+                      "precision": 1
+                    },
+                    "widgets_values": [
+                      "2.000"
+                    ],
+                    "color": "#223",
+                    "bgColor": "#335",
+                    "comfyValue": 2,
+                    "shownOutputProperties": {
+                      "min": {
+                        "type": "number",
+                        "outputName": "@min"
+                      },
+                      "max": {
+                        "type": "number",
+                        "outputName": "@max"
+                      },
+                      "step": {
+                        "type": "number",
+                        "outputName": "@step"
+                      },
+                      "precision": {
+                        "type": "number",
+                        "outputName": "@precision"
+                      }
+                    },
+                    "saveUserState": true
+                  },
+                  {
+                    "id": "605ebc25-3cfb-4b15-beca-cbe8750fab86",
+                    "type": "math/operation",
+                    "pos": [
+                      881,
+                      329
+                    ],
+                    "size": [
+                      140,
+                      46
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 3,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "A",
+                        "type": "number,array,object",
+                        "link": "7ea42a09-cdfb-4bb0-b590-053284a5cbe3",
+                        "properties": {},
+                        "slot_index": 0
+                      },
+                      {
+                        "name": "B",
+                        "type": "number",
+                        "link": "bd46bc61-44e2-4a93-9603-a91daa6d90fe",
+                        "properties": {}
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "=",
+                        "type": "number",
+                        "links": [
+                          "25e369c1-0d83-4321-a97a-fb85d9271b18"
+                        ],
+                        "properties": {}
+                      }
+                    ],
+                    "title": "Operation",
+                    "properties": {
+                      "A": 0,
+                      "B": 2,
+                      "OP": "*",
+                      "tags": []
+                    }
+                  },
+                  {
+                    "id": "f876126a-3d22-4fb0-b6d2-b6e955df1585",
+                    "type": "string/toString",
+                    "pos": [
+                      1005,
+                      235
+                    ],
+                    "size": [
+                      140,
+                      26
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 7,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "in",
+                        "type": "",
+                        "link": "851b0e53-f9fb-4eec-81a6-e79f2c5fd080",
+                        "properties": {},
+                        "slot_index": 0
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "out",
+                        "type": "string",
+                        "links": [
+                          "8fa77e0a-bd27-4cd0-a7c0-e34154a814af"
+                        ],
+                        "properties": {},
+                        "slot_index": 0
+                      }
+                    ],
+                    "title": "ToString",
+                    "properties": {
+                      "tags": []
+                    }
+                  },
+                  {
+                    "id": "d4c21ed8-df1f-458a-8716-b2cdf3f8166c",
+                    "type": "math/floor",
+                    "pos": [
+                      967,
+                      331
+                    ],
+                    "size": [
+                      140,
+                      26
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 5,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "in",
+                        "type": "number",
+                        "link": "25e369c1-0d83-4321-a97a-fb85d9271b18",
+                        "properties": {},
+                        "slot_index": 0
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "out",
+                        "type": "number",
+                        "links": [
+                          "851b0e53-f9fb-4eec-81a6-e79f2c5fd080",
+                          "7cbde9b6-8890-45c8-b3e9-6318a76331de"
+                        ],
+                        "properties": {},
+                        "slot_index": 0
+                      }
+                    ],
+                    "title": "Floor",
+                    "properties": {
+                      "tags": []
+                    }
+                  }
+                ],
+                "links": [
+                  [
+                    "bd46bc61-44e2-4a93-9603-a91daa6d90fe",
+                    "4f97b299-282f-4198-bb70-42ce83ce71c2",
+                    0,
+                    "605ebc25-3cfb-4b15-beca-cbe8750fab86",
+                    1,
+                    "number"
+                  ],
+                  [
+                    "58135e31-98b2-4d6b-8c54-4742a11d2c0f",
+                    "4f97b299-282f-4198-bb70-42ce83ce71c2",
+                    0,
+                    "1a61ef88-92d0-4ebf-a2c8-c05f538ad8fd",
+                    1,
+                    "number"
+                  ],
+                  [
+                    "7ea42a09-cdfb-4bb0-b590-053284a5cbe3",
+                    "31eda029-17af-4a5f-8afb-77664a0a339e",
+                    0,
+                    "605ebc25-3cfb-4b15-beca-cbe8750fab86",
+                    0,
+                    "number"
+                  ],
+                  [
+                    "a511c62f-d680-4c56-b3c1-d82945cee862",
+                    "136e6181-4d24-4224-a956-812bf021d46d",
+                    0,
+                    "1a61ef88-92d0-4ebf-a2c8-c05f538ad8fd",
+                    0,
+                    "number"
+                  ],
+                  [
+                    "b04786a1-13d1-48b4-85bf-65f19c75084c",
+                    "1a61ef88-92d0-4ebf-a2c8-c05f538ad8fd",
+                    0,
+                    "7059ce4d-6526-430f-aceb-f8d81b93bbd2",
+                    0,
+                    "number"
+                  ],
+                  [
+                    "25e369c1-0d83-4321-a97a-fb85d9271b18",
+                    "605ebc25-3cfb-4b15-beca-cbe8750fab86",
+                    0,
+                    "d4c21ed8-df1f-458a-8716-b2cdf3f8166c",
+                    0,
+                    "number"
+                  ],
+                  [
+                    "851b0e53-f9fb-4eec-81a6-e79f2c5fd080",
+                    "d4c21ed8-df1f-458a-8716-b2cdf3f8166c",
+                    0,
+                    "f876126a-3d22-4fb0-b6d2-b6e955df1585",
+                    0,
+                    "number"
+                  ],
+                  [
+                    "3042fbc4-2d8d-421e-a33d-01f2ac569e3f",
+                    "7059ce4d-6526-430f-aceb-f8d81b93bbd2",
+                    0,
+                    "66c98a78-d9a2-47de-99ec-053995a254f0",
+                    0,
+                    "number"
+                  ],
+                  [
+                    "14cfc1a9-1abb-4baf-8374-9c7f196fdae8",
+                    "7059ce4d-6526-430f-aceb-f8d81b93bbd2",
+                    0,
+                    "2ef62e0e-e061-44fc-b92e-a053a882423f",
+                    0,
+                    "number"
+                  ],
+                  [
+                    "7cbde9b6-8890-45c8-b3e9-6318a76331de",
+                    "d4c21ed8-df1f-458a-8716-b2cdf3f8166c",
+                    0,
+                    "aa88e2b1-2faf-4971-9421-6276b5892067",
+                    0,
+                    "number"
+                  ],
+                  [
+                    "8fa77e0a-bd27-4cd0-a7c0-e34154a814af",
+                    "f876126a-3d22-4fb0-b6d2-b6e955df1585",
+                    0,
+                    "53c0e65d-3f57-481b-b163-cc5aa48f1a85",
+                    0,
+                    "string"
+                  ],
+                  [
+                    "ab27c7bf-64f5-47fc-abf3-408e2b2ac58c",
+                    "66c98a78-d9a2-47de-99ec-053995a254f0",
+                    0,
+                    "b54a1fc0-44e9-461c-b743-62e9f651db12",
+                    0,
+                    "string"
+                  ]
+                ],
+                "groups": [],
+                "config": {},
+                "extra": {},
+                "version": 10
+              }
+            },
+            {
               "id": "5c624567-93f1-46d5-a105-91a4d746e0b2",
               "type": "graph/subgraph",
               "pos": [
@@ -20506,1154 +22147,6 @@
                 "extra": {},
                 "version": 10
               }
-            },
-            {
-              "id": "18428189-e387-4034-a8da-333e88da29f6",
-              "type": "graph/subgraph",
-              "pos": [
-                -70,
-                667
-              ],
-              "size": [
-                200,
-                50
-              ],
-              "flags": {
-                "collapsed": false
-              },
-              "order": 37,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "width",
-                  "type": "number",
-                  "link": "00442883-6157-4ad7-ab50-81cf96f96c31",
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "height",
-                  "type": "number",
-                  "link": "27982f07-e18c-4eac-99cb-cbd29e1ebb83",
-                  "properties": {},
-                  "slot_index": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "width",
-                  "type": "number",
-                  "links": [
-                    "fa009346-1bb8-4ed9-a505-ebdc9ea803e1"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "height",
-                  "type": "number",
-                  "links": [
-                    "831bc76d-0920-4215-8161-3bdf035f5fb2"
-                  ],
-                  "properties": {},
-                  "slot_index": 1
-                }
-              ],
-              "title": "Scale By Slider",
-              "properties": {
-                "enabled": true,
-                "tags": [
-                  "img2img",
-                  "img2imgScaleSize"
-                ]
-              },
-              "color": "#2a363b",
-              "bgColor": "#3f5159",
-              "subgraph": {
-                "last_node_id": 0,
-                "last_link_id": 0,
-                "nodes": [
-                  {
-                    "id": "136e6181-4d24-4224-a956-812bf021d46d",
-                    "type": "graph/input",
-                    "pos": [
-                      408.0700000000001,
-                      403.89
-                    ],
-                    "size": [
-                      210,
-                      86
-                    ],
-                    "flags": {},
-                    "order": 0,
-                    "mode": 2,
-                    "inputs": [],
-                    "outputs": [
-                      {
-                        "name": "",
-                        "type": "number",
-                        "links": [
-                          "a511c62f-d680-4c56-b3c1-d82945cee862"
-                        ],
-                        "properties": {},
-                        "shape": 0
-                      }
-                    ],
-                    "title": "Input",
-                    "properties": {
-                      "name": "height",
-                      "type": "number",
-                      "value": 0,
-                      "subgraphID": "18428189-e387-4034-a8da-333e88da29f6",
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "1a61ef88-92d0-4ebf-a2c8-c05f538ad8fd",
-                    "type": "math/operation",
-                    "pos": [
-                      884,
-                      402
-                    ],
-                    "size": [
-                      140,
-                      46
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 4,
-                    "mode": 2,
-                    "inputs": [
-                      {
-                        "name": "A",
-                        "type": "number,array,object",
-                        "link": "a511c62f-d680-4c56-b3c1-d82945cee862",
-                        "properties": {},
-                        "slot_index": 0
-                      },
-                      {
-                        "name": "B",
-                        "type": "number",
-                        "link": "58135e31-98b2-4d6b-8c54-4742a11d2c0f",
-                        "properties": {}
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "=",
-                        "type": "number",
-                        "links": [
-                          "b04786a1-13d1-48b4-85bf-65f19c75084c"
-                        ],
-                        "properties": {},
-                        "slot_index": 0
-                      }
-                    ],
-                    "title": "Operation",
-                    "properties": {
-                      "A": 0,
-                      "B": 2,
-                      "OP": "*",
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "605ebc25-3cfb-4b15-beca-cbe8750fab86",
-                    "type": "math/operation",
-                    "pos": [
-                      881,
-                      329
-                    ],
-                    "size": [
-                      140,
-                      46
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 3,
-                    "mode": 2,
-                    "inputs": [
-                      {
-                        "name": "A",
-                        "type": "number,array,object",
-                        "link": "7ea42a09-cdfb-4bb0-b590-053284a5cbe3",
-                        "properties": {},
-                        "slot_index": 0
-                      },
-                      {
-                        "name": "B",
-                        "type": "number",
-                        "link": "bd46bc61-44e2-4a93-9603-a91daa6d90fe",
-                        "properties": {}
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "=",
-                        "type": "number",
-                        "links": [
-                          "25e369c1-0d83-4321-a97a-fb85d9271b18"
-                        ],
-                        "properties": {}
-                      }
-                    ],
-                    "title": "Operation",
-                    "properties": {
-                      "A": 0,
-                      "B": 2,
-                      "OP": "*",
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "7059ce4d-6526-430f-aceb-f8d81b93bbd2",
-                    "type": "math/floor",
-                    "pos": [
-                      966,
-                      405
-                    ],
-                    "size": [
-                      140,
-                      26
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 6,
-                    "mode": 2,
-                    "inputs": [
-                      {
-                        "name": "in",
-                        "type": "number",
-                        "link": "b04786a1-13d1-48b4-85bf-65f19c75084c",
-                        "properties": {},
-                        "slot_index": 0
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "out",
-                        "type": "number",
-                        "links": [
-                          "3042fbc4-2d8d-421e-a33d-01f2ac569e3f",
-                          "14cfc1a9-1abb-4baf-8374-9c7f196fdae8"
-                        ],
-                        "properties": {},
-                        "slot_index": 0
-                      }
-                    ],
-                    "title": "Floor",
-                    "properties": {
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "d4c21ed8-df1f-458a-8716-b2cdf3f8166c",
-                    "type": "math/floor",
-                    "pos": [
-                      967,
-                      331
-                    ],
-                    "size": [
-                      140,
-                      26
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 5,
-                    "mode": 2,
-                    "inputs": [
-                      {
-                        "name": "in",
-                        "type": "number",
-                        "link": "25e369c1-0d83-4321-a97a-fb85d9271b18",
-                        "properties": {},
-                        "slot_index": 0
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "out",
-                        "type": "number",
-                        "links": [
-                          "851b0e53-f9fb-4eec-81a6-e79f2c5fd080",
-                          "7cbde9b6-8890-45c8-b3e9-6318a76331de"
-                        ],
-                        "properties": {},
-                        "slot_index": 0
-                      }
-                    ],
-                    "title": "Floor",
-                    "properties": {
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "2ef62e0e-e061-44fc-b92e-a053a882423f",
-                    "type": "graph/output",
-                    "pos": [
-                      1220,
-                      378
-                    ],
-                    "size": [
-                      210,
-                      62
-                    ],
-                    "flags": {},
-                    "order": 10,
-                    "mode": 2,
-                    "inputs": [
-                      {
-                        "name": "",
-                        "type": "number",
-                        "link": "14cfc1a9-1abb-4baf-8374-9c7f196fdae8",
-                        "properties": {},
-                        "shape": 0
-                      }
-                    ],
-                    "outputs": [],
-                    "title": "Output",
-                    "properties": {
-                      "name": "height",
-                      "type": "number",
-                      "subgraphID": "18428189-e387-4034-a8da-333e88da29f6",
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "aa88e2b1-2faf-4971-9421-6276b5892067",
-                    "type": "graph/output",
-                    "pos": [
-                      1222,
-                      277
-                    ],
-                    "size": [
-                      210,
-                      62
-                    ],
-                    "flags": {},
-                    "order": 8,
-                    "mode": 2,
-                    "inputs": [
-                      {
-                        "name": "",
-                        "type": "number",
-                        "link": "7cbde9b6-8890-45c8-b3e9-6318a76331de",
-                        "properties": {},
-                        "shape": 0
-                      }
-                    ],
-                    "outputs": [],
-                    "title": "Output",
-                    "properties": {
-                      "name": "width",
-                      "type": "number",
-                      "subgraphID": "18428189-e387-4034-a8da-333e88da29f6",
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "31eda029-17af-4a5f-8afb-77664a0a339e",
-                    "type": "graph/input",
-                    "pos": [
-                      410,
-                      278
-                    ],
-                    "size": [
-                      210,
-                      86
-                    ],
-                    "flags": {},
-                    "order": 1,
-                    "mode": 2,
-                    "inputs": [],
-                    "outputs": [
-                      {
-                        "name": "",
-                        "type": "number",
-                        "links": [
-                          "7ea42a09-cdfb-4bb0-b590-053284a5cbe3"
-                        ],
-                        "properties": {},
-                        "shape": 0
-                      }
-                    ],
-                    "title": "Input",
-                    "properties": {
-                      "name": "width",
-                      "type": "number",
-                      "value": 0,
-                      "subgraphID": "18428189-e387-4034-a8da-333e88da29f6",
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "4f97b299-282f-4198-bb70-42ce83ce71c2",
-                    "type": "ui/number",
-                    "pos": [
-                      680,
-                      370
-                    ],
-                    "size": [
-                      210,
-                      158
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 2,
-                    "mode": 2,
-                    "inputs": [
-                      {
-                        "name": "store",
-                        "type": -1,
-                        "link": null,
-                        "properties": {},
-                        "shape": 1
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "value",
-                        "type": "number",
-                        "links": [
-                          "bd46bc61-44e2-4a93-9603-a91daa6d90fe",
-                          "58135e31-98b2-4d6b-8c54-4742a11d2c0f"
-                        ],
-                        "properties": {},
-                        "slot_index": 0
-                      },
-                      {
-                        "name": "changed",
-                        "type": -2,
-                        "links": [],
-                        "properties": {},
-                        "shape": 1
-                      },
-                      {
-                        "name": "@min",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@max",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@step",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@precision",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      }
-                    ],
-                    "title": "UI.Number",
-                    "properties": {
-                      "tags": [
-                        "img2img",
-                        "img2imgScaleSize"
-                      ],
-                      "defaultValue": 2,
-                      "min": 1,
-                      "max": 4,
-                      "step": 0.05,
-                      "precision": 1
-                    },
-                    "widgets_values": [
-                      "2.000"
-                    ],
-                    "color": "#223",
-                    "bgColor": "#335",
-                    "comfyValue": 2,
-                    "shownOutputProperties": {
-                      "min": {
-                        "type": "number",
-                        "outputName": "@min"
-                      },
-                      "max": {
-                        "type": "number",
-                        "outputName": "@max"
-                      },
-                      "step": {
-                        "type": "number",
-                        "outputName": "@step"
-                      },
-                      "precision": {
-                        "type": "number",
-                        "outputName": "@precision"
-                      }
-                    },
-                    "saveUserState": true
-                  },
-                  {
-                    "id": "f876126a-3d22-4fb0-b6d2-b6e955df1585",
-                    "type": "string/toString",
-                    "pos": [
-                      1005,
-                      235
-                    ],
-                    "size": [
-                      140,
-                      26
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 7,
-                    "mode": 2,
-                    "inputs": [
-                      {
-                        "name": "in",
-                        "type": "",
-                        "link": "851b0e53-f9fb-4eec-81a6-e79f2c5fd080",
-                        "properties": {},
-                        "slot_index": 0
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "out",
-                        "type": "string",
-                        "links": [
-                          "8fa77e0a-bd27-4cd0-a7c0-e34154a814af"
-                        ],
-                        "properties": {},
-                        "slot_index": 0
-                      }
-                    ],
-                    "title": "ToString",
-                    "properties": {
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "66c98a78-d9a2-47de-99ec-053995a254f0",
-                    "type": "string/toString",
-                    "pos": [
-                      1020,
-                      473
-                    ],
-                    "size": [
-                      140,
-                      26
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 9,
-                    "mode": 2,
-                    "inputs": [
-                      {
-                        "name": "in",
-                        "type": "",
-                        "link": "3042fbc4-2d8d-421e-a33d-01f2ac569e3f",
-                        "properties": {},
-                        "slot_index": 0
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "out",
-                        "type": "string",
-                        "links": [
-                          "ab27c7bf-64f5-47fc-abf3-408e2b2ac58c"
-                        ],
-                        "properties": {},
-                        "slot_index": 0
-                      }
-                    ],
-                    "title": "ToString",
-                    "properties": {
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "b54a1fc0-44e9-461c-b743-62e9f651db12",
-                    "type": "ui/text",
-                    "pos": [
-                      1128,
-                      473
-                    ],
-                    "size": [
-                      210,
-                      78
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 12,
-                    "mode": 2,
-                    "inputs": [
-                      {
-                        "name": "value",
-                        "type": "string",
-                        "link": "ab27c7bf-64f5-47fc-abf3-408e2b2ac58c",
-                        "properties": {},
-                        "slot_index": 0
-                      },
-                      {
-                        "name": "store",
-                        "type": -1,
-                        "link": null,
-                        "properties": {},
-                        "shape": 1
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "value",
-                        "type": "string",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "changed",
-                        "type": -2,
-                        "links": [],
-                        "properties": {},
-                        "shape": 1
-                      }
-                    ],
-                    "title": "UI.Text",
-                    "properties": {
-                      "tags": [],
-                      "defaultValue": "0",
-                      "multiline": false,
-                      "lines": 5,
-                      "maxLines": 5
-                    },
-                    "widgets_values": [
-                      "0"
-                    ],
-                    "color": "#223",
-                    "bgColor": "#335",
-                    "comfyValue": "0",
-                    "shownOutputProperties": {},
-                    "saveUserState": true
-                  },
-                  {
-                    "id": "53c0e65d-3f57-481b-b163-cc5aa48f1a85",
-                    "type": "ui/text",
-                    "pos": [
-                      1108,
-                      233
-                    ],
-                    "size": [
-                      210,
-                      78
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 11,
-                    "mode": 2,
-                    "inputs": [
-                      {
-                        "name": "value",
-                        "type": "string",
-                        "link": "8fa77e0a-bd27-4cd0-a7c0-e34154a814af",
-                        "properties": {}
-                      },
-                      {
-                        "name": "store",
-                        "type": -1,
-                        "link": null,
-                        "properties": {},
-                        "shape": 1
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "value",
-                        "type": "string",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "changed",
-                        "type": -2,
-                        "links": [],
-                        "properties": {},
-                        "shape": 1
-                      }
-                    ],
-                    "title": "UI.Text",
-                    "properties": {
-                      "tags": [],
-                      "defaultValue": "0",
-                      "multiline": false,
-                      "lines": 5,
-                      "maxLines": 5
-                    },
-                    "widgets_values": [
-                      "0"
-                    ],
-                    "color": "#223",
-                    "bgColor": "#335",
-                    "comfyValue": "0",
-                    "shownOutputProperties": {},
-                    "saveUserState": true
-                  }
-                ],
-                "links": [
-                  [
-                    "bd46bc61-44e2-4a93-9603-a91daa6d90fe",
-                    "4f97b299-282f-4198-bb70-42ce83ce71c2",
-                    0,
-                    "605ebc25-3cfb-4b15-beca-cbe8750fab86",
-                    1,
-                    "number"
-                  ],
-                  [
-                    "58135e31-98b2-4d6b-8c54-4742a11d2c0f",
-                    "4f97b299-282f-4198-bb70-42ce83ce71c2",
-                    0,
-                    "1a61ef88-92d0-4ebf-a2c8-c05f538ad8fd",
-                    1,
-                    "number"
-                  ],
-                  [
-                    "7ea42a09-cdfb-4bb0-b590-053284a5cbe3",
-                    "31eda029-17af-4a5f-8afb-77664a0a339e",
-                    0,
-                    "605ebc25-3cfb-4b15-beca-cbe8750fab86",
-                    0,
-                    "number"
-                  ],
-                  [
-                    "a511c62f-d680-4c56-b3c1-d82945cee862",
-                    "136e6181-4d24-4224-a956-812bf021d46d",
-                    0,
-                    "1a61ef88-92d0-4ebf-a2c8-c05f538ad8fd",
-                    0,
-                    "number"
-                  ],
-                  [
-                    "b04786a1-13d1-48b4-85bf-65f19c75084c",
-                    "1a61ef88-92d0-4ebf-a2c8-c05f538ad8fd",
-                    0,
-                    "7059ce4d-6526-430f-aceb-f8d81b93bbd2",
-                    0,
-                    "number"
-                  ],
-                  [
-                    "25e369c1-0d83-4321-a97a-fb85d9271b18",
-                    "605ebc25-3cfb-4b15-beca-cbe8750fab86",
-                    0,
-                    "d4c21ed8-df1f-458a-8716-b2cdf3f8166c",
-                    0,
-                    "number"
-                  ],
-                  [
-                    "851b0e53-f9fb-4eec-81a6-e79f2c5fd080",
-                    "d4c21ed8-df1f-458a-8716-b2cdf3f8166c",
-                    0,
-                    "f876126a-3d22-4fb0-b6d2-b6e955df1585",
-                    0,
-                    "number"
-                  ],
-                  [
-                    "3042fbc4-2d8d-421e-a33d-01f2ac569e3f",
-                    "7059ce4d-6526-430f-aceb-f8d81b93bbd2",
-                    0,
-                    "66c98a78-d9a2-47de-99ec-053995a254f0",
-                    0,
-                    "number"
-                  ],
-                  [
-                    "14cfc1a9-1abb-4baf-8374-9c7f196fdae8",
-                    "7059ce4d-6526-430f-aceb-f8d81b93bbd2",
-                    0,
-                    "2ef62e0e-e061-44fc-b92e-a053a882423f",
-                    0,
-                    "number"
-                  ],
-                  [
-                    "7cbde9b6-8890-45c8-b3e9-6318a76331de",
-                    "d4c21ed8-df1f-458a-8716-b2cdf3f8166c",
-                    0,
-                    "aa88e2b1-2faf-4971-9421-6276b5892067",
-                    0,
-                    "number"
-                  ],
-                  [
-                    "8fa77e0a-bd27-4cd0-a7c0-e34154a814af",
-                    "f876126a-3d22-4fb0-b6d2-b6e955df1585",
-                    0,
-                    "53c0e65d-3f57-481b-b163-cc5aa48f1a85",
-                    0,
-                    "string"
-                  ],
-                  [
-                    "ab27c7bf-64f5-47fc-abf3-408e2b2ac58c",
-                    "66c98a78-d9a2-47de-99ec-053995a254f0",
-                    0,
-                    "b54a1fc0-44e9-461c-b743-62e9f651db12",
-                    0,
-                    "string"
-                  ]
-                ],
-                "groups": [],
-                "config": {},
-                "extra": {},
-                "version": 10
-              }
-            },
-            {
-              "id": "54804b59-f75e-49bf-b97a-3f5f6495841d",
-              "type": "image/pick_image",
-              "pos": [
-                -509.96356572265597,
-                558.2719379394534
-              ],
-              "size": [
-                210,
-                190
-              ],
-              "flags": {},
-              "order": 31,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "images",
-                  "type": "COMFYBOX_IMAGES",
-                  "link": "bda9dcb6-b906-4dbb-902c-55f71aa67277",
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "index",
-                  "type": "number",
-                  "link": null,
-                  "properties": {}
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "image",
-                  "type": "COMFYBOX_IMAGE",
-                  "links": [
-                    "74f5d77e-bd47-4a0c-9ad5-00e7d30c2bd5",
-                    "d18dbb43-b2e2-47cb-831b-7a668ca484c4"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "filename",
-                  "type": "string",
-                  "links": [
-                    "5a796a62-0bd1-4f1e-b7f5-9888e79e40f0"
-                  ],
-                  "properties": {},
-                  "slot_index": 1
-                },
-                {
-                  "name": "width",
-                  "type": "number",
-                  "links": [
-                    "00442883-6157-4ad7-ab50-81cf96f96c31"
-                  ],
-                  "properties": {},
-                  "slot_index": 2
-                },
-                {
-                  "name": "height",
-                  "type": "number",
-                  "links": [
-                    "27982f07-e18c-4eac-99cb-cbd29e1ebb83"
-                  ],
-                  "properties": {}
-                }
-              ],
-              "title": "Comfy.PickImage",
-              "properties": {
-                "tags": []
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "def44ce3-6b61-4294-b0bd-abe3b7c6045a",
-              "type": "logic/AND",
-              "pos": [
-                -1191.1844044826491,
-                183.72368589138844
-              ],
-              "size": [
-                140,
-                46
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 40,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "a",
-                  "type": "boolean",
-                  "link": "e85e7aa8-51a3-449a-b4f1-621eeedcc1a4",
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "b",
-                  "type": "boolean",
-                  "link": "0de603d9-0126-460c-bef0-c45bcb5d4d77",
-                  "properties": {},
-                  "slot_index": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "out",
-                  "type": "boolean",
-                  "links": [
-                    "f76bbdf2-d953-4f77-ab22-e07b87cb66ee"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "AND",
-              "properties": {
-                "tags": []
-              }
-            },
-            {
-              "id": "a502386b-f168-4086-a512-623496b78199",
-              "type": "basic/string",
-              "pos": [
-                -1332.1844044826487,
-                148.72368589138858
-              ],
-              "size": [
-                210,
-                38
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 21,
-              "mode": 0,
-              "inputs": [],
-              "outputs": [
-                {
-                  "name": "string",
-                  "type": "string",
-                  "links": [
-                    "c1d8a7ed-fa02-4871-843b-4e4fd31327ac"
-                  ],
-                  "properties": {}
-                }
-              ],
-              "title": "Const String",
-              "properties": {
-                "value": "Upload an image to be used with img2img first.",
-                "tags": []
-              }
-            },
-            {
-              "id": "ad7226d8-a707-4abd-ba61-9261b0c9a20d",
-              "type": "basic/CompareValues",
-              "pos": [
-                -1317.1844044826487,
-                182.72368589138844
-              ],
-              "size": [
-                210,
-                78
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 24,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "A",
-                  "type": 0,
-                  "link": "cb24e437-7fe2-400a-b39c-2a0e8d0d0b7e",
-                  "properties": {}
-                },
-                {
-                  "name": "B",
-                  "type": 0,
-                  "link": "24d5f780-5151-4908-9e4e-db1d00f52534",
-                  "properties": {},
-                  "slot_index": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "true",
-                  "type": "boolean",
-                  "links": [
-                    "e85e7aa8-51a3-449a-b4f1-621eeedcc1a4"
-                  ],
-                  "properties": {}
-                },
-                {
-                  "name": "false",
-                  "type": "boolean",
-                  "links": [],
-                  "properties": {}
-                }
-              ],
-              "title": "GenericCompare",
-              "properties": {
-                "A": "txt2img",
-                "B": "img2img",
-                "OP": "==",
-                "enabled": true,
-                "tags": []
-              }
-            },
-            {
-              "id": "b15eb076-8464-4e6d-bc47-011dd1a5a10d",
-              "type": "basic/is_null",
-              "pos": [
-                -1317.1844044826487,
-                216.7236858913887
-              ],
-              "size": [
-                140,
-                26
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 35,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "in",
-                  "type": "*",
-                  "link": "d18dbb43-b2e2-47cb-831b-7a668ca484c4",
-                  "properties": {}
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "is_null",
-                  "type": "boolean",
-                  "links": [
-                    "0de603d9-0126-460c-bef0-c45bcb5d4d77"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "== Null",
-              "properties": {
-                "strictEquality": true,
-                "tags": []
-              }
-            },
-            {
-              "id": "5c453a8e-e6b5-4260-8489-2eca1b459a5a",
-              "type": "graph/output",
-              "pos": [
-                -931.1844044826495,
-                173.72368589138856
-              ],
-              "size": [
-                210,
-                62
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 48,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "",
-                  "type": "string",
-                  "link": "893c8ef0-04ed-4f92-9e11-34ad0290d9a3",
-                  "properties": {},
-                  "shape": 0
-                }
-              ],
-              "outputs": [],
-              "title": "Output",
-              "properties": {
-                "name": "error",
-                "type": "string",
-                "subgraphID": "70361963-27f5-471d-b735-dbe2351a5ebd",
-                "tags": []
-              }
-            },
-            {
-              "id": "0e607e1f-114a-419f-bbdc-0b04eb82dff5",
-              "type": "utils/switch",
-              "pos": [
-                -1110.7330271701492,
-                129.55119853984132
-              ],
-              "size": [
-                140,
-                86
-              ],
-              "flags": {},
-              "order": 45,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "A_value",
-                  "type": "*",
-                  "link": "c1d8a7ed-fa02-4871-843b-4e4fd31327ac",
-                  "properties": {}
-                },
-                {
-                  "name": "A_cond",
-                  "type": "boolean",
-                  "link": "f76bbdf2-d953-4f77-ab22-e07b87cb66ee",
-                  "properties": {},
-                  "slot_index": 1
-                },
-                {
-                  "name": "B_value",
-                  "type": "*",
-                  "link": null,
-                  "properties": {}
-                },
-                {
-                  "name": "B_cond",
-                  "type": "boolean",
-                  "link": null,
-                  "properties": {}
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "string",
-                  "links": [
-                    "893c8ef0-04ed-4f92-9e11-34ad0290d9a3"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "Comfy.Switch",
-              "properties": {
-                "tags": []
-              },
-              "color": "#232",
-              "bgColor": "#353",
-              "saveUserState": true
             }
           ],
           "links": [
@@ -22230,499 +22723,6 @@
               "color": "#b06634"
             }
           ],
-          "config": {},
-          "extra": {},
-          "version": 10
-        }
-      },
-      {
-        "id": "7191f2eb-f4ca-4884-8778-7f10bea6c07e",
-        "type": "graph/subgraph",
-        "pos": [
-          1488,
-          271
-        ],
-        "size": [
-          200,
-          30
-        ],
-        "flags": {},
-        "order": 47,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "error",
-            "type": "string",
-            "link": "842b3edb-9121-40d7-8b65-7d7937105c16",
-            "properties": {}
-          }
-        ],
-        "outputs": [],
-        "title": "Default Queue Action",
-        "properties": {
-          "enabled": true,
-          "tags": []
-        },
-        "color": "#2a363b",
-        "bgColor": "#3f5159",
-        "subgraph": {
-          "last_node_id": 0,
-          "last_link_id": 0,
-          "nodes": [
-            {
-              "id": "8cec9619-2b37-43ff-9914-b3865b40211d",
-              "type": "events/queue_events",
-              "pos": [
-                0,
-                1.617036428000958
-              ],
-              "size": [
-                178,
-                66
-              ],
-              "flags": {},
-              "order": 0,
-              "mode": 0,
-              "inputs": [],
-              "outputs": [
-                {
-                  "name": "beforeQueued",
-                  "type": -2,
-                  "links": [],
-                  "properties": {},
-                  "shape": 1
-                },
-                {
-                  "name": "afterQueued",
-                  "type": -2,
-                  "links": [],
-                  "properties": {},
-                  "shape": 1
-                },
-                {
-                  "name": "onDefaultQueueAction",
-                  "type": -2,
-                  "links": [
-                    "2761c4cc-4320-4a62-8129-1f41c5bab6c8"
-                  ],
-                  "properties": {},
-                  "shape": 1,
-                  "slot_index": 2
-                }
-              ],
-              "title": "Comfy.QueueEvents",
-              "properties": {
-                "tags": []
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "b39bc040-9da5-438b-9cd6-9f43827915fd",
-              "type": "actions/execute_subgraph",
-              "pos": [
-                495.647050142044,
-                85.37617015380874
-              ],
-              "size": [
-                226.79999999999998,
-                78
-              ],
-              "flags": {
-                "collapsed": false
-              },
-              "order": 6,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "execute",
-                  "type": -1,
-                  "link": "3ad75c82-765e-416b-b056-357ab7a400bb",
-                  "properties": {},
-                  "shape": 1,
-                  "slot_index": 0
-                },
-                {
-                  "name": "targetTag",
-                  "type": "string",
-                  "link": null,
-                  "properties": {}
-                }
-              ],
-              "outputs": [],
-              "title": "Comfy.ExecuteSubgraphAction",
-              "properties": {
-                "tags": [],
-                "targetTag": "gen"
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "03245291-9b21-4ab5-a028-fe8dffca3237",
-              "type": "actions/notify",
-              "pos": [
-                467.4614243607948,
-                31.00000000000007
-              ],
-              "size": [
-                151.2,
-                46
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 7,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "message",
-                  "type": "string",
-                  "link": "0af75e29-3cf3-4e56-94c4-23f18f6e5aa3",
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "trigger",
-                  "type": -1,
-                  "link": "c2e20c2f-fe3f-4872-8a82-b6abc9e678f0",
-                  "properties": {},
-                  "shape": 1,
-                  "slot_index": 1
-                }
-              ],
-              "outputs": [],
-              "title": "Comfy.NotifyAction",
-              "properties": {
-                "tags": [],
-                "message": "Nya.",
-                "type": "info"
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "2d020869-19b4-44ce-9ba6-1cbb4b6eddd1",
-              "type": "basic/string",
-              "pos": [
-                472.4614243607948,
-                0
-              ],
-              "size": [
-                210,
-                38
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 1,
-              "mode": 0,
-              "inputs": [],
-              "outputs": [
-                {
-                  "name": "string",
-                  "type": "string",
-                  "links": [
-                    "0af75e29-3cf3-4e56-94c4-23f18f6e5aa3"
-                  ],
-                  "properties": {}
-                }
-              ],
-              "title": "Const String",
-              "properties": {
-                "value": "Prompt queued.",
-                "tags": []
-              }
-            },
-            {
-              "id": "c9f62e61-b9a4-4092-8318-50aa5c04a24d",
-              "type": "events/branch",
-              "pos": [
-                241.45525053267033,
-                16.21200283741959
-              ],
-              "size": [
-                140,
-                46
-              ],
-              "flags": {},
-              "order": 5,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "in",
-                  "type": -1,
-                  "link": "2761c4cc-4320-4a62-8129-1f41c5bab6c8",
-                  "properties": {},
-                  "shape": 1
-                },
-                {
-                  "name": "cond",
-                  "type": "boolean",
-                  "link": "4ca15e60-3b79-4ba5-bb9c-89cca55cb1aa",
-                  "properties": {}
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "true",
-                  "type": -2,
-                  "links": [
-                    "3ad75c82-765e-416b-b056-357ab7a400bb",
-                    "c2e20c2f-fe3f-4872-8a82-b6abc9e678f0"
-                  ],
-                  "properties": {},
-                  "shape": 1,
-                  "slot_index": 0
-                },
-                {
-                  "name": "false",
-                  "type": -2,
-                  "links": [
-                    "44dcf2d9-31ad-4737-b541-d38d3a3065b6"
-                  ],
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "title": "Branch",
-              "properties": {
-                "tags": []
-              }
-            },
-            {
-              "id": "877d8e92-b7dc-455b-8fce-a11b4821e476",
-              "type": "actions/notify",
-              "pos": [
-                281.45525053267033,
-                130.2120028374196
-              ],
-              "size": [
-                151.2,
-                46
-              ],
-              "flags": {
-                "collapsed": false
-              },
-              "order": 8,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "message",
-                  "type": "string",
-                  "link": "87b70717-9d21-466f-aa74-3d542baa58cf",
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "trigger",
-                  "type": -1,
-                  "link": "44dcf2d9-31ad-4737-b541-d38d3a3065b6",
-                  "properties": {},
-                  "shape": 1,
-                  "slot_index": 1
-                }
-              ],
-              "outputs": [],
-              "title": "Comfy.NotifyAction",
-              "properties": {
-                "tags": [],
-                "message": "Nya.",
-                "type": "error"
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "cc67bc97-06ec-4368-b935-ab4ed561af1f",
-              "type": "graph/input",
-              "pos": [
-                -272,
-                178
-              ],
-              "size": [
-                210,
-                86
-              ],
-              "flags": {},
-              "order": 2,
-              "mode": 0,
-              "inputs": [],
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "string",
-                  "links": [
-                    "87b70717-9d21-466f-aa74-3d542baa58cf",
-                    "605a07ad-c5f8-40de-91b8-3ce24f22cc03"
-                  ],
-                  "properties": {},
-                  "shape": 0,
-                  "slot_index": 0
-                }
-              ],
-              "title": "Input",
-              "properties": {
-                "name": "error",
-                "type": "string",
-                "value": "",
-                "subgraphID": "7191f2eb-f4ca-4884-8778-7f10bea6c07e",
-                "tags": []
-              }
-            },
-            {
-              "id": "2fa2f5cc-3cba-437f-aba3-081c81e8495a",
-              "type": "logic/truthy",
-              "pos": [
-                -43,
-                150
-              ],
-              "size": [
-                140,
-                26
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 3,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "in",
-                  "type": "*",
-                  "link": "605a07ad-c5f8-40de-91b8-3ce24f22cc03",
-                  "properties": {}
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "truthy",
-                  "type": "boolean",
-                  "links": [
-                    "67ea4f93-f71b-4bc7-9cd1-fc8bf0fb27c4"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "~= TRUE",
-              "properties": {
-                "tags": []
-              }
-            },
-            {
-              "id": "e0c4fc39-ddab-4f59-a30b-8e2ab4cb72c7",
-              "type": "logic/NOT",
-              "pos": [
-                70,
-                148
-              ],
-              "size": [
-                140,
-                26
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 4,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "in",
-                  "type": "boolean",
-                  "link": "67ea4f93-f71b-4bc7-9cd1-fc8bf0fb27c4",
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "out",
-                  "type": "boolean",
-                  "links": [
-                    "4ca15e60-3b79-4ba5-bb9c-89cca55cb1aa"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "NOT",
-              "properties": {
-                "tags": []
-              }
-            }
-          ],
-          "links": [
-            [
-              "2761c4cc-4320-4a62-8129-1f41c5bab6c8",
-              "8cec9619-2b37-43ff-9914-b3865b40211d",
-              2,
-              "c9f62e61-b9a4-4092-8318-50aa5c04a24d",
-              0,
-              -1
-            ],
-            [
-              "3ad75c82-765e-416b-b056-357ab7a400bb",
-              "c9f62e61-b9a4-4092-8318-50aa5c04a24d",
-              0,
-              "b39bc040-9da5-438b-9cd6-9f43827915fd",
-              0,
-              -1
-            ],
-            [
-              "0af75e29-3cf3-4e56-94c4-23f18f6e5aa3",
-              "2d020869-19b4-44ce-9ba6-1cbb4b6eddd1",
-              0,
-              "03245291-9b21-4ab5-a028-fe8dffca3237",
-              0,
-              "string"
-            ],
-            [
-              "c2e20c2f-fe3f-4872-8a82-b6abc9e678f0",
-              "c9f62e61-b9a4-4092-8318-50aa5c04a24d",
-              0,
-              "03245291-9b21-4ab5-a028-fe8dffca3237",
-              1,
-              -1
-            ],
-            [
-              "44dcf2d9-31ad-4737-b541-d38d3a3065b6",
-              "c9f62e61-b9a4-4092-8318-50aa5c04a24d",
-              1,
-              "877d8e92-b7dc-455b-8fce-a11b4821e476",
-              1,
-              -1
-            ],
-            [
-              "87b70717-9d21-466f-aa74-3d542baa58cf",
-              "cc67bc97-06ec-4368-b935-ab4ed561af1f",
-              0,
-              "877d8e92-b7dc-455b-8fce-a11b4821e476",
-              0,
-              "string"
-            ],
-            [
-              "67ea4f93-f71b-4bc7-9cd1-fc8bf0fb27c4",
-              "2fa2f5cc-3cba-437f-aba3-081c81e8495a",
-              0,
-              "e0c4fc39-ddab-4f59-a30b-8e2ab4cb72c7",
-              0,
-              "boolean"
-            ],
-            [
-              "4ca15e60-3b79-4ba5-bb9c-89cca55cb1aa",
-              "e0c4fc39-ddab-4f59-a30b-8e2ab4cb72c7",
-              0,
-              "c9f62e61-b9a4-4092-8318-50aa5c04a24d",
-              1,
-              "boolean"
-            ],
-            [
-              "605a07ad-c5f8-40de-91b8-3ce24f22cc03",
-              "cc67bc97-06ec-4368-b935-ab4ed561af1f",
-              0,
-              "2fa2f5cc-3cba-437f-aba3-081c81e8495a",
-              0,
-              "*"
-            ]
-          ],
-          "groups": [],
           "config": {},
           "extra": {},
           "version": 10
@@ -26688,7 +26688,10 @@
     }
   },
   "canvas": {
-    "offset": [0, 0],
-    "scale": 1.0
+    "offset": [
+      -1134.5299999999975,
+      -143.2984829989358
+    ],
+    "scale": 1
   }
 }
