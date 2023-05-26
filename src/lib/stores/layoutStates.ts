@@ -667,6 +667,13 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 location: "workflow",
                 editable: true,
                 defaultValue: true
+            },
+            {
+                name: "showDefaultNotifications",
+                type: "boolean",
+                location: "workflow",
+                editable: true,
+                defaultValue: true
             }
         ]
     }

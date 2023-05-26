@@ -29,7 +29,7 @@ import queueState from "$lib/stores/queueState";
 import selectionState from "$lib/stores/selectionState";
 import uiState from "$lib/stores/uiState";
 import workflowState, { ComfyBoxWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
-import { readFileToText, type SerializedPromptOutput } from "$lib/utils";
+import { playSound, readFileToText, type SerializedPromptOutput } from "$lib/utils";
 import { basename, capitalize, download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range } from "$lib/utils";
 import { tick } from "svelte";
 import { type SvelteComponentDev } from "svelte/internal";
@@ -891,7 +891,7 @@ export default class ComfyApp {
         if (workflow.attrs.queuePromptButtonRunWorkflow) {
             // Hold control to queue at the front
             const num = this.ctrlDown ? -1 : 0;
-            this.queuePrompt(num, 1);
+            this.queuePrompt(workflow, num, 1);
         }
     }
 
@@ -941,14 +941,8 @@ export default class ComfyApp {
         return this.promptSerializer.serialize(workflow.graph, tag)
     }
 
-    async queuePrompt(num: number, batchCount: number = 1, tag: string | null = null) {
-        const activeWorkflow = workflowState.getActiveWorkflow();
-        if (activeWorkflow == null) {
-            notify("No workflow is opened!", { type: "error" })
-            return;
-        }
-
-        this.queueItems.push({ num, batchCount, workflow: activeWorkflow });
+    async queuePrompt(targetWorkflow: ComfyBoxWorkflow, num: number, batchCount: number = 1, tag: string | null = null) {
+        this.queueItems.push({ num, batchCount, workflow: targetWorkflow });
 
         // Only have one action process the items so each one gets a unique seed correctly
         if (this.processingQueue) {
@@ -957,6 +951,10 @@ export default class ComfyApp {
 
         if (tag === "")
             tag = null;
+
+        if (targetWorkflow.attrs.showDefaultNotifications) {
+            notify("Prompt queued.", { type: "info" });
+        }
 
         this.processingQueue = true;
         let workflow: ComfyBoxWorkflow;
