@@ -1020,7 +1020,7 @@ export default class ComfyApp {
                     try {
                         const response = await this.api.queuePrompt(request);
                         if (response.error != null) {
-                            error = response.error;
+                            error = response;
                         }
                         else {
                             queueState.afterQueued(workflow.id, response.promptID, num, p.output, extraData)
@@ -1030,7 +1030,7 @@ export default class ComfyApp {
                     }
 
                     if (error != null) {
-                        const mes: string = error;
+                        const mes: any = error;
                         notify(`Error queuing prompt: \n${mes} `, { type: "error" })
                         console.error(graphToGraphVis(workflow.graph))
                         console.error(promptToGraphVis(p))

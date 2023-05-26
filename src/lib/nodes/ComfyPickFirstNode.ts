@@ -1,22 +1,12 @@
 import { BuiltInSlotType, LiteGraph, NodeMode, type INodeInputSlot, type SlotLayout, type INodeOutputSlot, LLink, LConnectionKind, type ITextWidget, type SerializedLGraphNode, type IComboWidget } from "@litegraph-ts/core";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 import { Watch } from "@litegraph-ts/nodes-basic";
+import { nextLetter } from "$lib/utils";
 
 export type PickFirstMode = "anyActiveLink" | "truthy" | "dataNonNull"
 
 export interface ComfyPickFirstNodeProperties extends ComfyGraphNodeProperties {
     mode: PickFirstMode
-}
-
-function nextLetter(s: string): string {
-    return s.replace(/([a-zA-Z])[^a-zA-Z]*$/, function(a) {
-        var c = a.charCodeAt(0);
-        switch (c) {
-            case 90: return 'A';
-            case 122: return 'a';
-            default: return String.fromCharCode(++c);
-        }
-    });
 }
 
 export default class ComfyPickFirstNode extends ComfyGraphNode {

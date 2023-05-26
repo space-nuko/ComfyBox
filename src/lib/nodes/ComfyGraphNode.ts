@@ -103,6 +103,16 @@ export default class ComfyGraphNode extends LGraphNode {
         return null;
     }
 
+    /*
+     * Traverses this node backwards in the graph in order to determine the type
+     * for slot type inheritance. This is used if there isn't a valid upstream
+     * link but the output type can be inferred otherwise (for example from
+     * properties or other connected inputs)
+     */
+    getUpstreamLinkForInheritedType(): LLink | null {
+        return this.getUpstreamLink();
+    }
+
     get layoutState(): WritableLayoutStateStore | null {
         return layoutStates.getLayoutByNode(this);
     }
@@ -151,7 +161,7 @@ export default class ComfyGraphNode extends LGraphNode {
 
         while (currentNode) {
             updateNodes.unshift(currentNode);
-            const link = currentNode.getUpstreamLink();
+            const link = currentNode.getUpstreamLinkForInheritedType();
             if (link !== null) {
                 const node = this.graph.getNodeById(link.origin_id) as ComfyGraphNode;
                 if (node.canInheritSlotTypes) {
