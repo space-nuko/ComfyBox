@@ -22349,14 +22349,14 @@
               "title": "UI.Checkbox",
               "properties": {
                 "tags": [],
-                "defaultValue": false
+                "defaultValue": true
               },
               "widgets_values": [
                 "false"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": false,
+              "comfyValue": true,
               "shownOutputProperties": {},
               "saveUserState": true
             },
