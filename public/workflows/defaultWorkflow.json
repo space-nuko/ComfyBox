@@ -2,7 +2,7 @@
   "comfyBoxWorkflow": true,
   "createdBy": "ComfyBox",
   "version": 1,
-  "commitHash": "574d3170a4e829df366dc12c3aaa049121052d8f\n",
+  "commitHash": "13b6d9dd8fb9697229d14704fc4a292fceec78d7\n",
   "workflow": {
     "last_node_id": 0,
     "last_link_id": 0,
@@ -1053,65 +1053,6 @@
         "saveUserState": true
       },
       {
-        "id": "4b86217c-eac6-4e44-88f1-fba72d182795",
-        "type": "SaveImage",
-        "pos": [
-          3168,
-          344
-        ],
-        "size": [
-          186.4,
-          46
-        ],
-        "flags": {},
-        "order": 57,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "images",
-            "type": "IMAGE",
-            "link": "b9634e37-b5f5-48cf-a5d9-a32896302548",
-            "properties": {},
-            "config": {}
-          },
-          {
-            "name": "filename_prefix",
-            "type": "string",
-            "link": "b8a7ec3a-979e-45ea-96bf-213a3f2e4b6c",
-            "properties": {},
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/text",
-            "serialize": true
-          }
-        ],
-        "outputs": [
-          {
-            "name": "OUTPUT",
-            "type": -2,
-            "links": [
-              "cbdd2597-722d-4154-be91-0b46254dc141",
-              "f9a02de5-ef6d-4279-a801-dabd2c00fa9e",
-              "d6a150e9-d000-41d1-8460-bb4614e7527c"
-            ],
-            "properties": {},
-            "color_off": "rebeccapurple",
-            "color_on": "rebeccapurple",
-            "shape": 1,
-            "slot_index": 0
-          }
-        ],
-        "title": "Save Image",
-        "properties": {
-          "tags": [
-            "hr"
-          ]
-        },
-        "color": "#432",
-        "bgColor": "#653",
-        "saveUserState": true
-      },
-      {
         "id": "f723f393-1b70-4056-887c-aeef1217969e",
         "type": "basic/reroute",
         "pos": [
@@ -1146,9 +1087,7 @@
         ],
         "title": "Reroute",
         "properties": {
-          "tags": [
-            "hr"
-          ]
+          "tags": []
         }
       },
       {
@@ -1187,9 +1126,7 @@
         ],
         "title": "Reroute",
         "properties": {
-          "tags": [
-            "hr"
-          ]
+          "tags": []
         }
       },
       {
@@ -1228,9 +1165,7 @@
         ],
         "title": "Reroute",
         "properties": {
-          "tags": [
-            "hr"
-          ]
+          "tags": []
         }
       },
       {
@@ -1487,9 +1422,7 @@
         ],
         "title": "Reroute",
         "properties": {
-          "tags": [
-            "hr"
-          ]
+          "tags": []
         }
       },
       {
@@ -1646,9 +1579,7 @@
         ],
         "title": "Reroute",
         "properties": {
-          "tags": [
-            "hr"
-          ]
+          "tags": []
         }
       },
       {
@@ -1679,9 +1610,7 @@
         "outputs": [],
         "title": "Comfy.SetPromptThumbnailsAction",
         "properties": {
-          "tags": [
-            "hr"
-          ],
+          "tags": [],
           "defaultFolderType": "input"
         },
         "saveUserState": true
@@ -1722,9 +1651,7 @@
         ],
         "title": "Reroute",
         "properties": {
-          "tags": [
-            "hr"
-          ]
+          "tags": []
         }
       },
       {
@@ -1763,17 +1690,1631 @@
         ],
         "title": "Reroute",
         "properties": {
+          "tags": []
+        }
+      },
+      {
+        "id": "ab681ebc-8042-4e00-807b-c3e505e4ff30",
+        "type": "basic/reroute",
+        "pos": [
+          689,
+          193
+        ],
+        "size": [
+          60,
+          30
+        ],
+        "flags": {},
+        "order": 40,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "",
+            "type": "",
+            "link": "7627d820-6bba-4263-b023-906c0752410a",
+            "properties": {}
+          }
+        ],
+        "outputs": [
+          {
+            "name": "",
+            "type": "",
+            "links": [
+              "f8299a81-0070-41e2-ace6-bf6fd5a47e73"
+            ],
+            "properties": {},
+            "slot_index": 0
+          }
+        ],
+        "title": "Reroute",
+        "properties": {
+          "tags": []
+        }
+      },
+      {
+        "id": "7737291d-4469-40bf-ab4f-3bcaf85d81cb",
+        "type": "basic/reroute",
+        "pos": [
+          736,
+          219
+        ],
+        "size": [
+          60,
+          30
+        ],
+        "flags": {},
+        "order": 42,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "",
+            "type": "",
+            "link": "65c3a5fd-0bfd-4162-ac80-5373a4a3d258",
+            "properties": {},
+            "slot_index": 0
+          }
+        ],
+        "outputs": [
+          {
+            "name": "",
+            "type": "",
+            "links": [
+              "d92857cb-048a-4394-a053-4347bbc88b92"
+            ],
+            "properties": {},
+            "slot_index": 0
+          }
+        ],
+        "title": "Reroute",
+        "properties": {
+          "tags": []
+        }
+      },
+      {
+        "id": "d02b1827-8ace-49db-95fe-27c218f5e25e",
+        "type": "basic/reroute",
+        "pos": [
+          420,
+          125
+        ],
+        "size": [
+          60,
+          30
+        ],
+        "flags": {},
+        "order": 30,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "",
+            "type": "",
+            "link": "a008d49f-dcc2-4a20-8a6f-1634349cf675",
+            "properties": {},
+            "slot_index": 0
+          }
+        ],
+        "outputs": [
+          {
+            "name": "",
+            "type": "",
+            "links": [
+              "f98dfcf1-2d97-42a3-835d-201357467e03"
+            ],
+            "properties": {},
+            "slot_index": 0
+          }
+        ],
+        "title": "Reroute",
+        "properties": {
+          "tags": []
+        }
+      },
+      {
+        "id": "24f6dbeb-f675-4f84-9560-050c43f7e519",
+        "type": "basic/string",
+        "pos": [
+          2055,
+          159
+        ],
+        "size": [
+          210,
+          38
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 12,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "string",
+            "type": "string",
+            "links": [
+              "11e9c032-7961-4386-b701-b6c2eeb502b3"
+            ],
+            "properties": {}
+          }
+        ],
+        "title": "Const String",
+        "properties": {
+          "value": "notification.mp3",
+          "tags": []
+        }
+      },
+      {
+        "id": "ba76aa27-d4e0-4640-9312-0dac597f3a25",
+        "type": "actions/play_sound",
+        "pos": [
+          2204,
+          155
+        ],
+        "size": [
+          176.4,
+          46
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 50,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "sound",
+            "type": "string",
+            "link": "11e9c032-7961-4386-b701-b6c2eeb502b3",
+            "properties": {},
+            "slot_index": 0
+          },
+          {
+            "name": "trigger",
+            "type": -1,
+            "link": "506fe533-e2dc-4eba-b814-0b6447950167",
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "outputs": [],
+        "title": "Comfy.PlaySoundAction",
+        "properties": {
+          "tags": [],
+          "sound": "notification.mp3"
+        },
+        "saveUserState": true
+      },
+      {
+        "id": "c57336fc-0e27-42ba-95b5-bf4a9071aebd",
+        "type": "basic/string",
+        "pos": [
+          2041,
+          196
+        ],
+        "size": [
+          210,
+          38
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 13,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "string",
+            "type": "string",
+            "links": [
+              "1a455af8-653b-47f6-87d9-50d9e46be039"
+            ],
+            "properties": {}
+          }
+        ],
+        "title": "Const String",
+        "properties": {
+          "value": "Generation finished!",
+          "tags": []
+        }
+      },
+      {
+        "id": "e49e00a6-c300-4a61-a5a8-d0296bd2535b",
+        "type": "actions/notify",
+        "pos": [
+          2216,
+          194
+        ],
+        "size": [
+          151.2,
+          46
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 51,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "message",
+            "type": "string",
+            "link": "1a455af8-653b-47f6-87d9-50d9e46be039",
+            "properties": {},
+            "slot_index": 0
+          },
+          {
+            "name": "trigger",
+            "type": -1,
+            "link": "b6a0feb1-9333-472f-b025-4a187fc691b2",
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "outputs": [],
+        "title": "Comfy.NotifyAction",
+        "properties": {
+          "tags": [],
+          "message": "Nya.",
+          "type": "success"
+        },
+        "saveUserState": true
+      },
+      {
+        "id": "55e5761e-ac95-4025-b8c1-378b989d0943",
+        "type": "actions/play_sound",
+        "pos": [
+          3534.699999999997,
+          240.40000000000003
+        ],
+        "size": [
+          176.4,
+          46
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 59,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "sound",
+            "type": "string",
+            "link": "7447eb89-883e-45cb-ab57-28b52f718447",
+            "properties": {},
+            "slot_index": 0
+          },
+          {
+            "name": "trigger",
+            "type": -1,
+            "link": "f9a02de5-ef6d-4279-a801-dabd2c00fa9e",
+            "properties": {},
+            "shape": 1,
+            "slot_index": 1
+          }
+        ],
+        "outputs": [],
+        "title": "Comfy.PlaySoundAction",
+        "properties": {
+          "tags": [],
+          "sound": "notification.mp3"
+        },
+        "saveUserState": true
+      },
+      {
+        "id": "ae3a9de2-5eae-4c69-9405-6bffd0ac628e",
+        "type": "basic/string",
+        "pos": [
+          3379.699999999997,
+          241.40000000000003
+        ],
+        "size": [
+          210,
+          38
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 14,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "string",
+            "type": "string",
+            "links": [
+              "7447eb89-883e-45cb-ab57-28b52f718447"
+            ],
+            "properties": {}
+          }
+        ],
+        "title": "Const String",
+        "properties": {
+          "value": "notification.mp3",
+          "tags": []
+        }
+      },
+      {
+        "id": "368b245b-3454-4959-a2da-8b51a291e78b",
+        "type": "basic/string",
+        "pos": [
+          3373.699999999997,
+          278.39999999999986
+        ],
+        "size": [
+          210,
+          38
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 15,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "string",
+            "type": "string",
+            "links": [
+              "a3ad2d86-5a90-4e40-a8ee-bdcbcf7623ed"
+            ],
+            "properties": {}
+          }
+        ],
+        "title": "Const String",
+        "properties": {
+          "value": "Upscale finished!",
+          "tags": []
+        }
+      },
+      {
+        "id": "5040035d-4fd5-4708-8c80-08829b0b4598",
+        "type": "actions/notify",
+        "pos": [
+          3526,
+          275
+        ],
+        "size": [
+          151.2,
+          46
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 60,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "message",
+            "type": "string",
+            "link": "a3ad2d86-5a90-4e40-a8ee-bdcbcf7623ed",
+            "properties": {},
+            "slot_index": 0
+          },
+          {
+            "name": "trigger",
+            "type": -1,
+            "link": "d6a150e9-d000-41d1-8460-bb4614e7527c",
+            "properties": {},
+            "shape": 1,
+            "slot_index": 1
+          }
+        ],
+        "outputs": [],
+        "title": "Comfy.NotifyAction",
+        "properties": {
+          "tags": [],
+          "message": "Nya.",
+          "type": "success"
+        },
+        "saveUserState": true
+      },
+      {
+        "id": "3162e077-a4cb-4672-b47c-da4a15eaed78",
+        "type": "events/receive_output",
+        "pos": [
+          1497,
+          486
+        ],
+        "size": [
+          210,
+          106
+        ],
+        "flags": {},
+        "order": 16,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "received",
+            "type": -2,
+            "links": [
+              "e4c06100-12af-4c17-9e9a-bd69c5a65832",
+              "d8483ae9-c9d6-4e96-83cb-49b07db5815a"
+            ],
+            "properties": {},
+            "shape": 1,
+            "slot_index": 0,
+            "color_on": "fuchsia",
+            "color_off": "fuchsia"
+          }
+        ],
+        "title": "Comfy.ReceiveOutput",
+        "properties": {
+          "tags": [],
+          "name": "HR Fix",
+          "description": "Triggers HR fix for this image.",
+          "type": "COMFYBOX_IMAGE"
+        },
+        "saveUserState": true
+      },
+      {
+        "id": "928a13d8-cfc6-417e-9088-53503efb1cd3",
+        "type": "events/sequence",
+        "pos": [
+          2065,
+          368
+        ],
+        "size": [
+          140,
+          86
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 49,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "",
+            "type": -1,
+            "link": "eeb1dfa6-eaaa-4ba6-b2a6-b13ae69c3462",
+            "properties": {},
+            "shape": 1
+          },
+          {
+            "name": "",
+            "type": -1,
+            "link": "27e9b2c9-72c5-48b0-aa80-2646590d8c2b",
+            "properties": {},
+            "shape": 1
+          },
+          {
+            "name": "",
+            "type": -1,
+            "link": "a80e5f8c-ecc2-40c8-b5c6-232261f1a532",
+            "properties": {},
+            "shape": 1
+          },
+          {
+            "name": "",
+            "type": -1,
+            "link": null,
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "",
+            "type": -2,
+            "links": [
+              "0f1bc87b-d1d6-4c04-be03-699eb7d1ab2a"
+            ],
+            "properties": {},
+            "shape": 1,
+            "slot_index": 0
+          },
+          {
+            "name": "",
+            "type": -2,
+            "links": [],
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "title": "Sequence",
+        "properties": {
+          "tags": []
+        }
+      },
+      {
+        "id": "9170d9a6-62e4-4aa3-8afa-0c61a36e8dd6",
+        "type": "events/frame_delay",
+        "pos": [
+          1765,
+          518
+        ],
+        "size": [
+          140,
+          26
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 23,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "event",
+            "type": -1,
+            "link": "e4c06100-12af-4c17-9e9a-bd69c5a65832",
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "on_time",
+            "type": -2,
+            "links": [
+              "84e724a1-9302-490f-b349-e1cc5062addf"
+            ],
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "title": "Frame Delay",
+        "properties": {
+          "timeInFrames": 60,
+          "tags": []
+        }
+      },
+      {
+        "id": "1073dce1-aa2e-474e-9015-7e3066a92b59",
+        "type": "actions/execute_subgraph",
+        "pos": [
+          1912,
+          520
+        ],
+        "size": [
+          226.79999999999998,
+          78
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 29,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "execute",
+            "type": -1,
+            "link": "84e724a1-9302-490f-b349-e1cc5062addf",
+            "properties": {},
+            "shape": 1,
+            "slot_index": 0
+          },
+          {
+            "name": "targetTag",
+            "type": "string",
+            "link": null,
+            "properties": {}
+          }
+        ],
+        "outputs": [],
+        "title": "Comfy.ExecuteSubgraphAction",
+        "properties": {
+          "tags": [],
+          "targetTag": "hr"
+        },
+        "saveUserState": true
+      },
+      {
+        "id": "b9b9158b-b79b-4408-a19d-85e4ccb29f6e",
+        "type": "string/template",
+        "pos": [
+          1845,
+          451
+        ],
+        "size": [
+          210,
+          98
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 24,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "",
+            "type": "string,array",
+            "link": null,
+            "properties": {}
+          },
+          {
+            "name": "",
+            "type": "string",
+            "link": null,
+            "properties": {}
+          },
+          {
+            "name": "update",
+            "type": -1,
+            "link": "d8483ae9-c9d6-4e96-83cb-49b07db5815a",
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "out",
+            "type": "*",
+            "links": [],
+            "properties": {},
+            "slot_index": 0
+          },
+          {
+            "name": "changed",
+            "type": -2,
+            "links": [
+              "a80e5f8c-ecc2-40c8-b5c6-232261f1a532"
+            ],
+            "properties": {},
+            "shape": 1,
+            "slot_index": 1
+          }
+        ],
+        "title": "Template",
+        "properties": {
+          "template": "{ \"galleryImages\": $1, \"selectedIndex\": 0, \"updateMode\": \"replace\" }",
+          "stringQuote": "",
+          "outputJSON": true,
+          "tags": []
+        },
+        "boxcolor": "red"
+      },
+      {
+        "id": "88ce296c-c21e-4929-90fe-b00310072880",
+        "type": "ui/button",
+        "pos": [
+          2853,
+          80
+        ],
+        "size": [
+          210,
+          58
+        ],
+        "flags": {},
+        "order": 17,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "clicked",
+            "type": -2,
+            "links": [
+              "8b9f4d46-6a55-4f1e-86bc-7c1dbd415e62"
+            ],
+            "properties": {},
+            "shape": 1,
+            "slot_index": 0
+          }
+        ],
+        "title": "UI.Button",
+        "properties": {
+          "tags": [],
+          "defaultValue": false,
+          "param": "bang"
+        },
+        "widgets_values": [
+          "false"
+        ],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": false,
+        "shownOutputProperties": {},
+        "saveUserState": true
+      },
+      {
+        "id": "773743fa-5945-4708-b74d-f95b1cc48154",
+        "type": "ui/button",
+        "pos": [
+          2846,
+          181
+        ],
+        "size": [
+          210,
+          58
+        ],
+        "flags": {},
+        "order": 18,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "clicked",
+            "type": -2,
+            "links": [
+              "78d35af4-2984-41ce-ab37-48c0e4dc0d91"
+            ],
+            "properties": {},
+            "shape": 1,
+            "slot_index": 0
+          }
+        ],
+        "title": "UI.Button",
+        "properties": {
+          "tags": [],
+          "defaultValue": false,
+          "param": "bang"
+        },
+        "widgets_values": [
+          "false"
+        ],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": false,
+        "shownOutputProperties": {},
+        "saveUserState": true
+      },
+      {
+        "id": "1ea393e8-e55a-4492-93fd-ce65a0b63084",
+        "type": "ui/gallery",
+        "pos": [
+          3559,
+          327
+        ],
+        "size": [
+          210,
+          126
+        ],
+        "flags": {},
+        "order": 61,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "images",
+            "type": "OUTPUT",
+            "link": null,
+            "properties": {}
+          },
+          {
+            "name": "store",
+            "type": -1,
+            "link": "7568e1d6-8f0c-491e-91a0-fc0b933ea0b0",
+            "properties": {},
+            "color_off": "rebeccapurple",
+            "color_on": "rebeccapurple",
+            "shape": 1,
+            "slot_index": 1
+          }
+        ],
+        "outputs": [
+          {
+            "name": "images",
+            "type": "COMFYBOX_IMAGES",
+            "links": [
+              "e604281f-d167-47b2-9f70-23fdae9d0fdd"
+            ],
+            "properties": {},
+            "slot_index": 0
+          },
+          {
+            "name": "selected_index",
+            "type": "number",
+            "links": [
+              "de3596a7-6bf6-4146-8b28-4abb74c6a796"
+            ],
+            "properties": {},
+            "slot_index": 1
+          }
+        ],
+        "title": "UI.Gallery",
+        "properties": {
+          "tags": [],
+          "defaultValue": [],
+          "index": 0,
+          "updateMode": "append",
+          "autoSelectOnUpdate": true
+        },
+        "widgets_values": [],
+        "color": "#223",
+        "bgColor": "#335",
+        "comfyValue": [],
+        "shownOutputProperties": {},
+        "saveUserState": false
+      },
+      {
+        "id": "afd8abd6-b55f-46aa-b719-e6a5a9c180c0",
+        "type": "image/pick_image",
+        "pos": [
+          3834,
+          328
+        ],
+        "size": [
+          210,
+          190
+        ],
+        "flags": {},
+        "order": 62,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "images",
+            "type": "COMFYBOX_IMAGES,COMFYBOX_IMAGE",
+            "link": "e604281f-d167-47b2-9f70-23fdae9d0fdd",
+            "properties": {},
+            "slot_index": 0
+          },
+          {
+            "name": "index",
+            "type": "number",
+            "link": "de3596a7-6bf6-4146-8b28-4abb74c6a796",
+            "properties": {}
+          }
+        ],
+        "outputs": [
+          {
+            "name": "image",
+            "type": "COMFYBOX_IMAGE",
+            "links": [
+              "800aab7b-ac43-48e3-9047-446c827a5eea"
+            ],
+            "properties": {},
+            "slot_index": 0
+          },
+          {
+            "name": "filename",
+            "type": "string",
+            "links": [],
+            "properties": {}
+          },
+          {
+            "name": "width",
+            "type": "number",
+            "links": [],
+            "properties": {}
+          },
+          {
+            "name": "height",
+            "type": "number",
+            "links": [],
+            "properties": {}
+          }
+        ],
+        "title": "Comfy.PickImage",
+        "properties": {
+          "tags": []
+        },
+        "saveUserState": true
+      },
+      {
+        "id": "b089ede0-c788-4276-93df-3321a7ca3671",
+        "type": "actions/send_output",
+        "pos": [
+          3100,
+          189
+        ],
+        "size": [
+          184.79999999999998,
+          46
+        ],
+        "flags": {},
+        "order": 63,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "*",
+            "link": "800aab7b-ac43-48e3-9047-446c827a5eea",
+            "properties": {}
+          },
+          {
+            "name": "trigger",
+            "type": -1,
+            "link": "78d35af4-2984-41ce-ab37-48c0e4dc0d91",
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "outputs": [],
+        "title": "Comfy.SendOutputAction",
+        "properties": {
+          "tags": []
+        },
+        "saveUserState": true
+      },
+      {
+        "id": "7999653f-9085-4387-b86f-49d3f0a5ac8b",
+        "type": "actions/send_output",
+        "pos": [
+          3091,
+          85
+        ],
+        "size": [
+          184.79999999999998,
+          46
+        ],
+        "flags": {},
+        "order": 55,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "*",
+            "link": "83af87c9-1177-4a6d-8412-f3ab9b3c3105",
+            "properties": {}
+          },
+          {
+            "name": "trigger",
+            "type": -1,
+            "link": "8b9f4d46-6a55-4f1e-86bc-7c1dbd415e62",
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "outputs": [],
+        "title": "Comfy.SendOutputAction",
+        "properties": {
+          "tags": []
+        },
+        "saveUserState": true
+      },
+      {
+        "id": "438b9e76-5a39-4e3c-a1e0-0cd338d34518",
+        "type": "graph/subgraph",
+        "pos": [
+          167,
+          127
+        ],
+        "size": [
+          200,
+          70
+        ],
+        "flags": {},
+        "order": 19,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "MODEL",
+            "type": "MODEL",
+            "links": [
+              "857760be-9202-4c7f-84a2-465ee7e0ee21"
+            ],
+            "properties": {}
+          },
+          {
+            "name": "CLIP",
+            "type": "CLIP",
+            "links": [
+              "39f6a12b-1267-45b5-adce-9160d1378c6d"
+            ],
+            "properties": {},
+            "slot_index": 1
+          },
+          {
+            "name": "VAE",
+            "type": "VAE",
+            "links": [
+              "f26f80aa-abf3-403f-b83e-f2f92e99d0d8",
+              "49b7145b-029e-471d-860d-cd17ea3fc5d1"
+            ],
+            "properties": {},
+            "slot_index": 2
+          }
+        ],
+        "title": "Model Loader",
+        "properties": {
+          "enabled": true,
           "tags": [
+            "gen",
             "hr"
           ]
+        },
+        "color": "#2a363b",
+        "bgColor": "#3f5159",
+        "subgraph": {
+          "last_node_id": 0,
+          "last_link_id": 0,
+          "nodes": [
+            {
+              "id": "56becd49-01fc-4cdd-9726-515db368471c",
+              "type": "ui/combo",
+              "pos": [
+                0,
+                24
+              ],
+              "size": [
+                210,
+                78
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 0,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "value",
+                  "type": "string",
+                  "links": [
+                    "05616b4c-366b-43ee-b328-06a4adf48a51"
+                  ],
+                  "properties": {}
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "title": "UI.Combo",
+              "properties": {
+                "tags": [],
+                "defaultValue": null,
+                "values": [],
+                "convertValueToLabelCode": ""
+              },
+              "widgets_values": [],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": null,
+              "shownOutputProperties": {},
+              "saveUserState": false
+            },
+            {
+              "id": "ed3226fd-e572-4a07-8923-a610cc3dddae",
+              "type": "graph/output",
+              "pos": [
+                739.19,
+                -31
+              ],
+              "size": [
+                210,
+                62
+              ],
+              "flags": {},
+              "order": 6,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "",
+                  "type": "MODEL",
+                  "link": "49f2f7fa-4c17-475d-a642-556dd939acc0",
+                  "properties": {}
+                }
+              ],
+              "outputs": [],
+              "title": "Output",
+              "properties": {
+                "name": "MODEL",
+                "type": "MODEL",
+                "subgraphID": "438b9e76-5a39-4e3c-a1e0-0cd338d34518",
+                "tags": []
+              }
+            },
+            {
+              "id": "19f3dedf-e18d-4969-9810-f37e7f6a3e2e",
+              "type": "graph/output",
+              "pos": [
+                739.19,
+                51
+              ],
+              "size": [
+                210,
+                62
+              ],
+              "flags": {},
+              "order": 7,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "",
+                  "type": "CLIP",
+                  "link": "16db93f3-d0f4-4124-91aa-9d4c53126901",
+                  "properties": {}
+                }
+              ],
+              "outputs": [],
+              "title": "Output",
+              "properties": {
+                "name": "CLIP",
+                "type": "CLIP",
+                "subgraphID": "438b9e76-5a39-4e3c-a1e0-0cd338d34518",
+                "tags": []
+              }
+            },
+            {
+              "id": "3a7fb51e-6229-4db0-80f6-ebfc8bb880fa",
+              "type": "graph/output",
+              "pos": [
+                740,
+                138
+              ],
+              "size": [
+                210,
+                62
+              ],
+              "flags": {},
+              "order": 10,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "",
+                  "type": "VAE",
+                  "link": "3803fc4e-8e09-421c-a421-a080895a87b4",
+                  "properties": {}
+                }
+              ],
+              "outputs": [],
+              "title": "Output",
+              "properties": {
+                "name": "VAE",
+                "type": "VAE",
+                "subgraphID": "438b9e76-5a39-4e3c-a1e0-0cd338d34518",
+                "tags": []
+              }
+            },
+            {
+              "id": "4c3ba829-f067-4c75-b468-d8b1a0ad3f11",
+              "type": "ui/combo",
+              "pos": [
+                4,
+                -47
+              ],
+              "size": [
+                210,
+                78
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 1,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "value",
+                  "type": "string",
+                  "links": [
+                    "ddd49443-27df-4d25-8d80-52ad9e650021"
+                  ],
+                  "properties": {}
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "title": "UI.Combo",
+              "properties": {
+                "tags": [
+                  "useInternalVae"
+                ],
+                "defaultValue": null,
+                "values": [],
+                "convertValueToLabelCode": ""
+              },
+              "widgets_values": [],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": null,
+              "shownOutputProperties": {},
+              "saveUserState": false
+            },
+            {
+              "id": "b9759212-cb72-4c03-b14b-5de6c0670a85",
+              "type": "ui/checkbox",
+              "pos": [
+                -301,
+                122
+              ],
+              "size": [
+                210,
+                78
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 2,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "value",
+                  "type": "boolean",
+                  "links": [
+                    "3a2bc48e-7033-4df8-8f21-df0cc8bab379"
+                  ],
+                  "properties": {}
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [
+                    "45917191-be6a-437f-a4fd-ca62e3e70181"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 1
+                }
+              ],
+              "title": "UI.Checkbox",
+              "properties": {
+                "tags": [],
+                "defaultValue": false
+              },
+              "widgets_values": [
+                "false"
+              ],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": false,
+              "shownOutputProperties": {},
+              "saveUserState": true
+            },
+            {
+              "id": "e6b7c473-7b9e-40fc-a0a0-b0430a2a1495",
+              "type": "actions/set_node_mode",
+              "pos": [
+                58,
+                122
+              ],
+              "size": [
+                210,
+                102
+              ],
+              "flags": {},
+              "order": 9,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "enabled",
+                  "type": "boolean",
+                  "link": "573590e3-de2b-419b-b600-3c7f29f8c537",
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "set",
+                  "type": -1,
+                  "link": "45917191-be6a-437f-a4fd-ca62e3e70181",
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [],
+              "title": "Comfy.SetNodeModeAction",
+              "properties": {
+                "targetTags": "useInternalVae",
+                "enable": false,
+                "tags": []
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "365f016d-d8fe-4191-823e-bb7f53ec12e0",
+              "type": "logic/NOT",
+              "pos": [
+                -52,
+                144
+              ],
+              "size": [
+                140,
+                26
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 5,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "in",
+                  "type": "boolean",
+                  "link": "3a2bc48e-7033-4df8-8f21-df0cc8bab379",
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "out",
+                  "type": "boolean",
+                  "links": [
+                    "573590e3-de2b-419b-b600-3c7f29f8c537"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "NOT",
+              "properties": {
+                "tags": []
+              }
+            },
+            {
+              "id": "99fb7916-2f46-4f4d-9444-879a0b844175",
+              "type": "utils/pick_first",
+              "pos": [
+                322,
+                -6
+              ],
+              "size": [
+                210,
+                122
+              ],
+              "flags": {},
+              "order": 8,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "A",
+                  "type": "*",
+                  "link": "4b6f85b0-1596-428b-84bc-e2d315bac9dc",
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "B",
+                  "type": "*",
+                  "link": "8b1a3fa6-06d1-4073-95e8-1f74934947ff",
+                  "properties": {}
+                },
+                {
+                  "name": "C",
+                  "type": "*",
+                  "link": null,
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "VAE",
+                  "links": [
+                    "3803fc4e-8e09-421c-a421-a080895a87b4"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "Comfy.PickFirst",
+              "properties": {
+                "tags": [],
+                "mode": "dataNonNull"
+              },
+              "color": "#232",
+              "bgColor": "#353",
+              "saveUserState": true
+            },
+            {
+              "id": "366f81c8-9097-4257-90b8-c2422d222865",
+              "type": "VAELoader",
+              "pos": [
+                134,
+                -72
+              ],
+              "size": [
+                140,
+                26
+              ],
+              "flags": {},
+              "order": 4,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "vae_name",
+                  "type": "string",
+                  "link": "ddd49443-27df-4d25-8d80-52ad9e650021",
+                  "properties": {},
+                  "config": {},
+                  "defaultWidgetNode": null,
+                  "widgetNodeType": "ui/combo",
+                  "serialize": true
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "VAE",
+                  "type": "VAE",
+                  "links": [
+                    "4b6f85b0-1596-428b-84bc-e2d315bac9dc"
+                  ],
+                  "properties": {},
+                  "shape": 3,
+                  "slot_index": 0
+                }
+              ],
+              "title": "Load VAE",
+              "properties": {
+                "tags": [
+                  "useInternalVae"
+                ]
+              },
+              "color": "#432",
+              "bgColor": "#653",
+              "saveUserState": true
+            },
+            {
+              "id": "4541b0ee-cef0-49a8-9207-3f930463f4e0",
+              "type": "CheckpointLoaderSimple",
+              "pos": [
+                130,
+                0
+              ],
+              "size": [
+                140,
+                66
+              ],
+              "flags": {},
+              "order": 3,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "ckpt_name",
+                  "type": "string",
+                  "link": "05616b4c-366b-43ee-b328-06a4adf48a51",
+                  "properties": {},
+                  "config": {},
+                  "defaultWidgetNode": null,
+                  "widgetNodeType": "ui/combo",
+                  "serialize": true
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "MODEL",
+                  "type": "MODEL",
+                  "links": [
+                    "49f2f7fa-4c17-475d-a642-556dd939acc0"
+                  ],
+                  "properties": {},
+                  "shape": 3,
+                  "slot_index": 0
+                },
+                {
+                  "name": "CLIP",
+                  "type": "CLIP",
+                  "links": [
+                    "16db93f3-d0f4-4124-91aa-9d4c53126901"
+                  ],
+                  "properties": {},
+                  "shape": 3,
+                  "slot_index": 1
+                },
+                {
+                  "name": "VAE",
+                  "type": "VAE",
+                  "links": [
+                    "8b1a3fa6-06d1-4073-95e8-1f74934947ff"
+                  ],
+                  "properties": {},
+                  "shape": 3,
+                  "slot_index": 2
+                }
+              ],
+              "title": "Load Checkpoint",
+              "properties": {
+                "tags": []
+              },
+              "color": "#432",
+              "bgColor": "#653",
+              "saveUserState": true
+            }
+          ],
+          "links": [
+            [
+              "49f2f7fa-4c17-475d-a642-556dd939acc0",
+              "4541b0ee-cef0-49a8-9207-3f930463f4e0",
+              0,
+              "ed3226fd-e572-4a07-8923-a610cc3dddae",
+              0,
+              "MODEL"
+            ],
+            [
+              "05616b4c-366b-43ee-b328-06a4adf48a51",
+              "56becd49-01fc-4cdd-9726-515db368471c",
+              0,
+              "4541b0ee-cef0-49a8-9207-3f930463f4e0",
+              0,
+              "string"
+            ],
+            [
+              "ddd49443-27df-4d25-8d80-52ad9e650021",
+              "4c3ba829-f067-4c75-b468-d8b1a0ad3f11",
+              0,
+              "366f81c8-9097-4257-90b8-c2422d222865",
+              0,
+              "string"
+            ],
+            [
+              "4b6f85b0-1596-428b-84bc-e2d315bac9dc",
+              "366f81c8-9097-4257-90b8-c2422d222865",
+              0,
+              "99fb7916-2f46-4f4d-9444-879a0b844175",
+              0,
+              "*"
+            ],
+            [
+              "8b1a3fa6-06d1-4073-95e8-1f74934947ff",
+              "4541b0ee-cef0-49a8-9207-3f930463f4e0",
+              2,
+              "99fb7916-2f46-4f4d-9444-879a0b844175",
+              1,
+              "*"
+            ],
+            [
+              "16db93f3-d0f4-4124-91aa-9d4c53126901",
+              "4541b0ee-cef0-49a8-9207-3f930463f4e0",
+              1,
+              "19f3dedf-e18d-4969-9810-f37e7f6a3e2e",
+              0,
+              "CLIP"
+            ],
+            [
+              "3803fc4e-8e09-421c-a421-a080895a87b4",
+              "99fb7916-2f46-4f4d-9444-879a0b844175",
+              0,
+              "3a7fb51e-6229-4db0-80f6-ebfc8bb880fa",
+              0,
+              "VAE"
+            ],
+            [
+              "45917191-be6a-437f-a4fd-ca62e3e70181",
+              "b9759212-cb72-4c03-b14b-5de6c0670a85",
+              1,
+              "e6b7c473-7b9e-40fc-a0a0-b0430a2a1495",
+              1,
+              -1
+            ],
+            [
+              "3a2bc48e-7033-4df8-8f21-df0cc8bab379",
+              "b9759212-cb72-4c03-b14b-5de6c0670a85",
+              0,
+              "365f016d-d8fe-4191-823e-bb7f53ec12e0",
+              0,
+              "boolean"
+            ],
+            [
+              "573590e3-de2b-419b-b600-3c7f29f8c537",
+              "365f016d-d8fe-4191-823e-bb7f53ec12e0",
+              0,
+              "e6b7c473-7b9e-40fc-a0a0-b0430a2a1495",
+              0,
+              "boolean"
+            ]
+          ],
+          "groups": [],
+          "config": {},
+          "extra": {},
+          "version": 10
         }
       },
       {
         "id": "de0b7278-0276-431e-9993-c797c62e7d5b",
         "type": "graph/subgraph",
         "pos": [
-          162.5999999999998,
-          239.11999999999998
+          163,
+          239
         ],
         "size": [
           200,
@@ -2193,9 +3734,7 @@
               "properties": {
                 "enabled": true,
                 "tags": [
-                  "lora",
-                  "gen",
-                  "hr"
+                  "lora"
                 ]
               },
               "color": "#2a363b",
@@ -3189,10 +4728,7 @@
                     ],
                     "title": "Load LoRA",
                     "properties": {
-                      "tags": [
-                        "gen",
-                        "hr"
-                      ]
+                      "tags": []
                     },
                     "color": "#432",
                     "bgColor": "#653",
@@ -3433,9 +4969,7 @@
               "properties": {
                 "enabled": true,
                 "tags": [
-                  "lora",
-                  "gen",
-                  "hr"
+                  "lora"
                 ]
               },
               "color": "#2a363b",
@@ -3574,10 +5108,7 @@
                     ],
                     "title": "Load LoRA",
                     "properties": {
-                      "tags": [
-                        "gen",
-                        "hr"
-                      ]
+                      "tags": []
                     },
                     "color": "#432",
                     "bgColor": "#653",
@@ -4673,9 +6204,7 @@
               "properties": {
                 "enabled": true,
                 "tags": [
-                  "lora",
-                  "gen",
-                  "hr"
+                  "lora"
                 ]
               },
               "color": "#2a363b",
@@ -4814,10 +6343,7 @@
                     ],
                     "title": "Load LoRA",
                     "properties": {
-                      "tags": [
-                        "gen",
-                        "hr"
-                      ]
+                      "tags": []
                     },
                     "color": "#432",
                     "bgColor": "#653",
@@ -5911,9 +7437,7 @@
               "properties": {
                 "enabled": true,
                 "tags": [
-                  "lora",
-                  "gen",
-                  "hr"
+                  "lora"
                 ]
               },
               "color": "#2a363b",
@@ -6009,10 +7533,7 @@
                     ],
                     "title": "Load LoRA",
                     "properties": {
-                      "tags": [
-                        "gen",
-                        "hr"
-                      ]
+                      "tags": []
                     },
                     "color": "#432",
                     "bgColor": "#653",
@@ -7149,9 +8670,7 @@
               "properties": {
                 "enabled": true,
                 "tags": [
-                  "lora",
-                  "gen",
-                  "hr"
+                  "lora"
                 ]
               },
               "color": "#2a363b",
@@ -7290,10 +8809,7 @@
                     ],
                     "title": "Load LoRA",
                     "properties": {
-                      "tags": [
-                        "gen",
-                        "hr"
-                      ]
+                      "tags": []
                     },
                     "color": "#432",
                     "bgColor": "#653",
@@ -8379,10 +9895,7 @@
               ],
               "title": "Comfy.PickFirst",
               "properties": {
-                "tags": [
-                  "gen",
-                  "hr"
-                ],
+                "tags": [],
                 "mode": "anyActiveLink"
               },
               "color": "#232",
@@ -8438,10 +9951,7 @@
               ],
               "title": "Comfy.PickFirst",
               "properties": {
-                "tags": [
-                  "gen",
-                  "hr"
-                ],
+                "tags": [],
                 "mode": "anyActiveLink"
               },
               "color": "#232",
@@ -8645,8 +10155,8 @@
         "id": "ac57884f-e48c-4bf5-b98e-191f75c0f2ea",
         "type": "graph/subgraph",
         "pos": [
-          160.59999999999974,
-          337.11999999999995
+          161,
+          337
         ],
         "size": [
           200,
@@ -8750,10 +10260,7 @@
               ],
               "title": "CLIP Text Encode (Prompt)",
               "properties": {
-                "tags": [
-                  "gen",
-                  "hr"
-                ]
+                "tags": []
               },
               "color": "#432",
               "bgColor": "#653",
@@ -8809,10 +10316,7 @@
               ],
               "title": "CLIP Text Encode (Prompt)",
               "properties": {
-                "tags": [
-                  "gen",
-                  "hr"
-                ]
+                "tags": []
               },
               "color": "#432",
               "bgColor": "#653",
@@ -9110,481 +10614,1315 @@
         }
       },
       {
-        "id": "ab681ebc-8042-4e00-807b-c3e505e4ff30",
-        "type": "basic/reroute",
+        "id": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
+        "type": "graph/subgraph",
         "pos": [
-          689,
-          193
+          393,
+          318
         ],
         "size": [
-          60,
-          30
+          200,
+          70
         ],
         "flags": {},
-        "order": 40,
+        "order": 37,
         "mode": 0,
         "inputs": [
           {
-            "name": "",
-            "type": "",
-            "link": "7627d820-6bba-4263-b023-906c0752410a",
+            "name": "model",
+            "type": "MODEL",
+            "link": "3130f01b-569e-41ee-8a0a-d91b374f21e7",
+            "properties": {}
+          },
+          {
+            "name": "positive",
+            "type": "CONDITIONING",
+            "link": "a0072557-0d6b-470e-b93a-d58b5dbf1c4a",
+            "properties": {}
+          },
+          {
+            "name": "negative",
+            "type": "CONDITIONING",
+            "link": "482abd71-9f0c-4dcb-bfb6-6b5643145d89",
             "properties": {}
           }
         ],
         "outputs": [
           {
-            "name": "",
-            "type": "",
+            "name": "positive",
+            "type": "CONDITIONING",
             "links": [
-              "f8299a81-0070-41e2-ace6-bf6fd5a47e73"
+              "7627d820-6bba-4263-b023-906c0752410a",
+              "e1a75b66-2558-41f5-b604-3d152d28d154"
             ],
             "properties": {},
-            "slot_index": 0
-          }
-        ],
-        "title": "Reroute",
-        "properties": {
-          "tags": [
-            "hr"
-          ]
-        }
-      },
-      {
-        "id": "7737291d-4469-40bf-ab4f-3bcaf85d81cb",
-        "type": "basic/reroute",
-        "pos": [
-          736,
-          219
-        ],
-        "size": [
-          60,
-          30
-        ],
-        "flags": {},
-        "order": 42,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "",
-            "type": "",
-            "link": "65c3a5fd-0bfd-4162-ac80-5373a4a3d258",
-            "properties": {},
-            "slot_index": 0
-          }
-        ],
-        "outputs": [
-          {
-            "name": "",
-            "type": "",
-            "links": [
-              "d92857cb-048a-4394-a053-4347bbc88b92"
-            ],
-            "properties": {},
-            "slot_index": 0
-          }
-        ],
-        "title": "Reroute",
-        "properties": {
-          "tags": [
-            "hr"
-          ]
-        }
-      },
-      {
-        "id": "d02b1827-8ace-49db-95fe-27c218f5e25e",
-        "type": "basic/reroute",
-        "pos": [
-          420,
-          125
-        ],
-        "size": [
-          60,
-          30
-        ],
-        "flags": {},
-        "order": 30,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "",
-            "type": "",
-            "link": "a008d49f-dcc2-4a20-8a6f-1634349cf675",
-            "properties": {},
-            "slot_index": 0
-          }
-        ],
-        "outputs": [
-          {
-            "name": "",
-            "type": "",
-            "links": [
-              "f98dfcf1-2d97-42a3-835d-201357467e03"
-            ],
-            "properties": {},
-            "slot_index": 0
-          }
-        ],
-        "title": "Reroute",
-        "properties": {
-          "tags": [
-            "hr"
-          ]
-        }
-      },
-      {
-        "id": "24f6dbeb-f675-4f84-9560-050c43f7e519",
-        "type": "basic/string",
-        "pos": [
-          2055,
-          159
-        ],
-        "size": [
-          210,
-          38
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 12,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "string",
-            "type": "string",
-            "links": [
-              "11e9c032-7961-4386-b701-b6c2eeb502b3"
-            ],
-            "properties": {}
-          }
-        ],
-        "title": "Const String",
-        "properties": {
-          "value": "notification.mp3",
-          "tags": []
-        }
-      },
-      {
-        "id": "d61b7ac0-b5f7-4a88-8226-28f9b017f3f4",
-        "type": "SaveImage",
-        "pos": [
-          1822,
-          303
-        ],
-        "size": [
-          186.4,
-          46
-        ],
-        "flags": {},
-        "order": 46,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "images",
-            "type": "IMAGE",
-            "link": "250486b4-7eae-4049-aa6f-1ff826687c9c",
-            "properties": {},
-            "config": {}
-          },
-          {
-            "name": "filename_prefix",
-            "type": "string",
-            "link": "8770aeee-7c02-418c-a925-36b57fa1d032",
-            "properties": {},
-            "config": {},
-            "defaultWidgetNode": null,
-            "widgetNodeType": "ui/text",
-            "serialize": true
-          }
-        ],
-        "outputs": [
-          {
-            "name": "OUTPUT",
-            "type": -2,
-            "links": [
-              "eeb1dfa6-eaaa-4ba6-b2a6-b13ae69c3462",
-              "506fe533-e2dc-4eba-b814-0b6447950167",
-              "b6a0feb1-9333-472f-b025-4a187fc691b2"
-            ],
-            "properties": {},
-            "color_off": "rebeccapurple",
-            "color_on": "rebeccapurple",
-            "shape": 1,
-            "slot_index": 0
-          }
-        ],
-        "title": "Save Image",
-        "properties": {
-          "tags": [
-            "gen"
-          ]
-        },
-        "color": "#432",
-        "bgColor": "#653",
-        "saveUserState": true
-      },
-      {
-        "id": "ba76aa27-d4e0-4640-9312-0dac597f3a25",
-        "type": "actions/play_sound",
-        "pos": [
-          2204,
-          155
-        ],
-        "size": [
-          176.4,
-          46
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 50,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "sound",
-            "type": "string",
-            "link": "11e9c032-7961-4386-b701-b6c2eeb502b3",
-            "properties": {},
-            "slot_index": 0
-          },
-          {
-            "name": "trigger",
-            "type": -1,
-            "link": "506fe533-e2dc-4eba-b814-0b6447950167",
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "outputs": [],
-        "title": "Comfy.PlaySoundAction",
-        "properties": {
-          "tags": [],
-          "sound": "notification.mp3"
-        },
-        "saveUserState": true
-      },
-      {
-        "id": "c57336fc-0e27-42ba-95b5-bf4a9071aebd",
-        "type": "basic/string",
-        "pos": [
-          2041,
-          196
-        ],
-        "size": [
-          210,
-          38
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 13,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "string",
-            "type": "string",
-            "links": [
-              "1a455af8-653b-47f6-87d9-50d9e46be039"
-            ],
-            "properties": {}
-          }
-        ],
-        "title": "Const String",
-        "properties": {
-          "value": "Generation finished!",
-          "tags": []
-        }
-      },
-      {
-        "id": "e49e00a6-c300-4a61-a5a8-d0296bd2535b",
-        "type": "actions/notify",
-        "pos": [
-          2216,
-          194
-        ],
-        "size": [
-          151.2,
-          46
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 51,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "message",
-            "type": "string",
-            "link": "1a455af8-653b-47f6-87d9-50d9e46be039",
-            "properties": {},
-            "slot_index": 0
-          },
-          {
-            "name": "trigger",
-            "type": -1,
-            "link": "b6a0feb1-9333-472f-b025-4a187fc691b2",
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "outputs": [],
-        "title": "Comfy.NotifyAction",
-        "properties": {
-          "tags": [],
-          "message": "Nya.",
-          "type": "success"
-        },
-        "saveUserState": true
-      },
-      {
-        "id": "55e5761e-ac95-4025-b8c1-378b989d0943",
-        "type": "actions/play_sound",
-        "pos": [
-          3534.699999999997,
-          240.40000000000003
-        ],
-        "size": [
-          176.4,
-          46
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 59,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "sound",
-            "type": "string",
-            "link": "7447eb89-883e-45cb-ab57-28b52f718447",
-            "properties": {},
-            "slot_index": 0
-          },
-          {
-            "name": "trigger",
-            "type": -1,
-            "link": "f9a02de5-ef6d-4279-a801-dabd2c00fa9e",
-            "properties": {},
-            "shape": 1,
             "slot_index": 1
-          }
-        ],
-        "outputs": [],
-        "title": "Comfy.PlaySoundAction",
-        "properties": {
-          "tags": [],
-          "sound": "notification.mp3"
-        },
-        "saveUserState": true
-      },
-      {
-        "id": "ae3a9de2-5eae-4c69-9405-6bffd0ac628e",
-        "type": "basic/string",
-        "pos": [
-          3379.699999999997,
-          241.40000000000003
-        ],
-        "size": [
-          210,
-          38
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 14,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "string",
-            "type": "string",
-            "links": [
-              "7447eb89-883e-45cb-ab57-28b52f718447"
-            ],
-            "properties": {}
-          }
-        ],
-        "title": "Const String",
-        "properties": {
-          "value": "notification.mp3",
-          "tags": []
-        }
-      },
-      {
-        "id": "368b245b-3454-4959-a2da-8b51a291e78b",
-        "type": "basic/string",
-        "pos": [
-          3373.699999999997,
-          278.39999999999986
-        ],
-        "size": [
-          210,
-          38
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 15,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "string",
-            "type": "string",
-            "links": [
-              "a3ad2d86-5a90-4e40-a8ee-bdcbcf7623ed"
-            ],
-            "properties": {}
-          }
-        ],
-        "title": "Const String",
-        "properties": {
-          "value": "Upscale finished!",
-          "tags": []
-        }
-      },
-      {
-        "id": "5040035d-4fd5-4708-8c80-08829b0b4598",
-        "type": "actions/notify",
-        "pos": [
-          3526,
-          275
-        ],
-        "size": [
-          151.2,
-          46
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 60,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "message",
-            "type": "string",
-            "link": "a3ad2d86-5a90-4e40-a8ee-bdcbcf7623ed",
-            "properties": {},
-            "slot_index": 0
           },
           {
-            "name": "trigger",
-            "type": -1,
-            "link": "d6a150e9-d000-41d1-8460-bb4614e7527c",
+            "name": "negative",
+            "type": "CONDITIONING",
+            "links": [
+              "2da0832c-5de3-4989-bf49-b5c3e7a0196d",
+              "65c3a5fd-0bfd-4162-ac80-5373a4a3d258"
+            ],
             "properties": {},
-            "shape": 1,
-            "slot_index": 1
+            "slot_index": 2
           }
         ],
-        "outputs": [],
-        "title": "Comfy.NotifyAction",
+        "title": "ControlNet",
         "properties": {
-          "tags": [],
-          "message": "Nya.",
-          "type": "success"
+          "enabled": true,
+          "tags": [
+            "gen",
+            "hr"
+          ]
         },
-        "saveUserState": true
+        "color": "#2a363b",
+        "bgColor": "#3f5159",
+        "subgraph": {
+          "last_node_id": 0,
+          "last_link_id": 0,
+          "nodes": [
+            {
+              "id": "14a8903c-4011-4f35-8e5e-2222eee6cc1e",
+              "type": "ui/combo",
+              "pos": [
+                576.8020629882812,
+                300
+              ],
+              "size": [
+                210,
+                78
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 0,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "value",
+                  "type": "string",
+                  "links": [
+                    "2e4084a3-e483-4ece-934d-e4b86778fd36"
+                  ],
+                  "properties": {}
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "title": "UI.Combo",
+              "properties": {
+                "tags": [
+                  "controlnet"
+                ],
+                "defaultValue": null,
+                "values": [],
+                "convertValueToLabelCode": ""
+              },
+              "widgets_values": [],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": null,
+              "shownOutputProperties": {},
+              "saveUserState": false
+            },
+            {
+              "id": "10cbb926-c5f9-4870-996d-0bd4cfdfd45f",
+              "type": "ui/number",
+              "pos": [
+                1000.8020629882812,
+                239
+              ],
+              "size": [
+                210,
+                158
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 1,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "value",
+                  "type": "number",
+                  "links": [
+                    "6c755243-7893-4ca3-ae10-329b69abc7ba"
+                  ],
+                  "properties": {}
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "@min",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "@max",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "@step",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "@precision",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                }
+              ],
+              "title": "UI.Number",
+              "properties": {
+                "tags": [
+                  "controlnet"
+                ],
+                "defaultValue": 1,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "precision": 0
+              },
+              "widgets_values": [
+                "1.000"
+              ],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": 1,
+              "shownOutputProperties": {
+                "min": {
+                  "type": "number",
+                  "outputName": "@min"
+                },
+                "max": {
+                  "type": "number",
+                  "outputName": "@max"
+                },
+                "step": {
+                  "type": "number",
+                  "outputName": "@step"
+                },
+                "precision": {
+                  "type": "number",
+                  "outputName": "@precision"
+                }
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "c9e61616-a12c-48ab-8be4-71a783908ff9",
+              "type": "ui/number",
+              "pos": [
+                1004,
+                420
+              ],
+              "size": [
+                210,
+                158
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 2,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "value",
+                  "type": "number",
+                  "links": [
+                    "f40eb893-53d2-42b1-bf75-8f4ddcbf5a64"
+                  ],
+                  "properties": {}
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "@min",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "@max",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "@step",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "@precision",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                }
+              ],
+              "title": "UI.Number",
+              "properties": {
+                "tags": [
+                  "controlnet"
+                ],
+                "defaultValue": 1,
+                "min": 0,
+                "max": 2,
+                "step": 0.01,
+                "precision": 0
+              },
+              "widgets_values": [
+                "1.000"
+              ],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": 1,
+              "shownOutputProperties": {
+                "min": {
+                  "type": "number",
+                  "outputName": "@min"
+                },
+                "max": {
+                  "type": "number",
+                  "outputName": "@max"
+                },
+                "step": {
+                  "type": "number",
+                  "outputName": "@step"
+                },
+                "precision": {
+                  "type": "number",
+                  "outputName": "@precision"
+                }
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "f587febd-0054-4ab2-9ffc-6306757927d7",
+              "type": "ControlNetApply",
+              "pos": [
+                1125,
+                95
+              ],
+              "size": [
+                211.6,
+                86
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 14,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "conditioning",
+                  "type": "CONDITIONING",
+                  "link": "75b89374-323e-4eea-af04-89416703c73e",
+                  "properties": {},
+                  "slot_index": 0,
+                  "config": {}
+                },
+                {
+                  "name": "control_net",
+                  "type": "CONTROL_NET",
+                  "link": "9c32c2af-37f3-4541-bb51-caa30930dd21",
+                  "properties": {},
+                  "config": {}
+                },
+                {
+                  "name": "image",
+                  "type": "IMAGE",
+                  "link": "a952a83c-3870-4ee5-aee2-3fb64568efed",
+                  "properties": {},
+                  "config": {}
+                },
+                {
+                  "name": "strength",
+                  "type": "number",
+                  "link": "6c755243-7893-4ca3-ae10-329b69abc7ba",
+                  "properties": {},
+                  "config": {},
+                  "defaultWidgetNode": null,
+                  "widgetNodeType": "ui/number",
+                  "serialize": true
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "CONDITIONING",
+                  "type": "CONDITIONING",
+                  "links": [
+                    "7ecf9141-3774-45bf-96bc-fc09d9284710"
+                  ],
+                  "properties": {},
+                  "shape": 3
+                }
+              ],
+              "title": "Apply ControlNet",
+              "properties": {
+                "tags": [
+                  "controlnet"
+                ]
+              },
+              "color": "#432",
+              "bgColor": "#653",
+              "saveUserState": true
+            },
+            {
+              "id": "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
+              "type": "ControlNetApply",
+              "pos": [
+                1134,
+                336
+              ],
+              "size": [
+                211.6,
+                86
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 13,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "conditioning",
+                  "type": "CONDITIONING",
+                  "link": "741db1cc-287d-4741-ad23-c4454e5bd3ea",
+                  "properties": {},
+                  "config": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "control_net",
+                  "type": "CONTROL_NET",
+                  "link": "d1a178eb-1e57-4ec0-b6d2-d457477bc024",
+                  "properties": {},
+                  "config": {}
+                },
+                {
+                  "name": "image",
+                  "type": "IMAGE",
+                  "link": "bfb7e39e-782d-42b4-a397-5796a263b78c",
+                  "properties": {},
+                  "config": {}
+                },
+                {
+                  "name": "strength",
+                  "type": "number",
+                  "link": "f40eb893-53d2-42b1-bf75-8f4ddcbf5a64",
+                  "properties": {},
+                  "config": {},
+                  "defaultWidgetNode": null,
+                  "widgetNodeType": "ui/number",
+                  "serialize": true
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "CONDITIONING",
+                  "type": "CONDITIONING",
+                  "links": [
+                    "7426925b-ae20-4aa1-8c2d-9447c4acf5ea"
+                  ],
+                  "properties": {},
+                  "shape": 3
+                }
+              ],
+              "title": "Apply ControlNet",
+              "properties": {
+                "tags": [
+                  "controlnet"
+                ]
+              },
+              "color": "#432",
+              "bgColor": "#653",
+              "saveUserState": true
+            },
+            {
+              "id": "f5e0644b-2ccd-4417-985e-3c400c61ae94",
+              "type": "DiffControlNetLoader",
+              "pos": [
+                707,
+                256
+              ],
+              "size": [
+                236.8,
+                46
+              ],
+              "flags": {},
+              "order": 10,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "model",
+                  "type": "MODEL",
+                  "link": "082b07f6-01f9-421d-b7c7-63484088f53f",
+                  "properties": {},
+                  "slot_index": 0,
+                  "config": {}
+                },
+                {
+                  "name": "control_net_name",
+                  "type": "string",
+                  "link": "2e4084a3-e483-4ece-934d-e4b86778fd36",
+                  "properties": {},
+                  "config": {},
+                  "defaultWidgetNode": null,
+                  "widgetNodeType": "ui/combo",
+                  "serialize": true
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "CONTROL_NET",
+                  "type": "CONTROL_NET",
+                  "links": [
+                    "9c32c2af-37f3-4541-bb51-caa30930dd21",
+                    "d1a178eb-1e57-4ec0-b6d2-d457477bc024"
+                  ],
+                  "properties": {},
+                  "shape": 3,
+                  "slot_index": 0
+                }
+              ],
+              "title": "Load ControlNet Model (diff)",
+              "properties": {
+                "tags": [
+                  "controlnet"
+                ]
+              },
+              "color": "#432",
+              "bgColor": "#653",
+              "saveUserState": true
+            },
+            {
+              "id": "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
+              "type": "LoadImage",
+              "pos": [
+                702,
+                374
+              ],
+              "size": [
+                140,
+                46
+              ],
+              "flags": {},
+              "order": 12,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "image",
+                  "type": "string",
+                  "link": "0d61a1e6-67b5-48a2-9c73-4c944bee9a83",
+                  "properties": {},
+                  "config": {},
+                  "defaultWidgetNode": null,
+                  "widgetNodeType": "ui/combo",
+                  "serialize": true,
+                  "slot_index": 0
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "IMAGE",
+                  "type": "IMAGE",
+                  "links": [
+                    "bfb7e39e-782d-42b4-a397-5796a263b78c",
+                    "a952a83c-3870-4ee5-aee2-3fb64568efed"
+                  ],
+                  "properties": {},
+                  "shape": 3,
+                  "slot_index": 0
+                },
+                {
+                  "name": "MASK",
+                  "type": "MASK",
+                  "links": [],
+                  "properties": {},
+                  "shape": 3
+                }
+              ],
+              "title": "Load Image",
+              "properties": {
+                "tags": [
+                  "controlnet"
+                ]
+              },
+              "color": "#432",
+              "bgColor": "#653",
+              "saveUserState": true
+            },
+            {
+              "id": "5609d422-1b11-4de7-a076-bffed63be521",
+              "type": "actions/set_node_mode",
+              "pos": [
+                995.2960000000002,
+                -111.97200000000004
+              ],
+              "size": [
+                210,
+                102
+              ],
+              "flags": {},
+              "order": 9,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "enabled",
+                  "type": "boolean",
+                  "link": "837e1074-9ccd-4026-8729-70eb916c9518",
+                  "properties": {}
+                },
+                {
+                  "name": "set",
+                  "type": -1,
+                  "link": "9ac235e8-33f1-4ae1-8928-2f728ddda7ae",
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [],
+              "title": "Comfy.SetNodeModeAction",
+              "properties": {
+                "targetTags": "controlnet",
+                "enable": false,
+                "tags": []
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
+              "type": "utils/pick_first",
+              "pos": [
+                1368,
+                91
+              ],
+              "size": [
+                210,
+                122
+              ],
+              "flags": {},
+              "order": 16,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "A",
+                  "type": "*",
+                  "link": "7ecf9141-3774-45bf-96bc-fc09d9284710",
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "B",
+                  "type": "*",
+                  "link": "ba0a0894-24c4-4093-9bfe-241d9d2d987a",
+                  "properties": {}
+                },
+                {
+                  "name": "C",
+                  "type": "*",
+                  "link": null,
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "number",
+                  "links": [
+                    "8433f10b-112a-488f-b34d-29156b692bde"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "Comfy.PickFirst",
+              "properties": {
+                "tags": [],
+                "mode": "anyActiveLink"
+              },
+              "color": "#232",
+              "bgColor": "#353",
+              "saveUserState": true
+            },
+            {
+              "id": "3e449b25-d413-460a-a394-356a1908febe",
+              "type": "graph/output",
+              "pos": [
+                1613,
+                117
+              ],
+              "size": [
+                210,
+                62
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 18,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "",
+                  "type": "CONDITIONING",
+                  "link": "8433f10b-112a-488f-b34d-29156b692bde",
+                  "properties": {}
+                }
+              ],
+              "outputs": [],
+              "title": "Output",
+              "properties": {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
+                "tags": []
+              }
+            },
+            {
+              "id": "cc4a59b6-fff0-43a1-a349-f25f6c004fe2",
+              "type": "ui/image_upload",
+              "pos": [
+                316,
+                401
+              ],
+              "size": [
+                210,
+                78
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 3,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "images",
+                  "type": "COMFYBOX_IMAGES",
+                  "links": [
+                    "42b27afc-9093-46dd-b612-863db283ef00"
+                  ],
+                  "properties": {}
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "title": "UI.ImageUpload",
+              "properties": {
+                "defaultValue": [],
+                "tags": [
+                  "controlnet"
+                ]
+              },
+              "widgets_values": [],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": [],
+              "shownOutputProperties": {},
+              "saveUserState": false
+            },
+            {
+              "id": "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
+              "type": "image/pick_image",
+              "pos": [
+                464,
+                376
+              ],
+              "size": [
+                210,
+                190
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 8,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "images",
+                  "type": "COMFYBOX_IMAGES,COMFYBOX_IMAGE",
+                  "link": "42b27afc-9093-46dd-b612-863db283ef00",
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "index",
+                  "type": "number",
+                  "link": null,
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "image",
+                  "type": "COMFYBOX_IMAGE",
+                  "links": [
+                    "84687a04-1bf3-4ffd-b9dc-dfe6fb3ec4b0"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "filename",
+                  "type": "string",
+                  "links": [
+                    "0d61a1e6-67b5-48a2-9c73-4c944bee9a83"
+                  ],
+                  "properties": {},
+                  "slot_index": 1
+                },
+                {
+                  "name": "width",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                },
+                {
+                  "name": "height",
+                  "type": "number",
+                  "links": [],
+                  "properties": {}
+                }
+              ],
+              "title": "Comfy.PickImage",
+              "properties": {
+                "tags": []
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "897e70d8-f807-45e4-9018-0b2138bf9b33",
+              "type": "actions/set_prompt_thumbnails",
+              "pos": [
+                810,
+                480
+              ],
+              "size": [
+                260.4,
+                26
+              ],
+              "flags": {},
+              "order": 11,
+              "mode": 2,
+              "inputs": [
+                {
+                  "name": "filenames",
+                  "type": "*",
+                  "link": "84687a04-1bf3-4ffd-b9dc-dfe6fb3ec4b0",
+                  "properties": {}
+                }
+              ],
+              "outputs": [],
+              "title": "Comfy.SetPromptThumbnailsAction",
+              "properties": {
+                "tags": [
+                  "controlnet"
+                ],
+                "defaultFolderType": "input"
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "280e84f4-49b0-43e3-93ef-3964800b4d2c",
+              "type": "ui/checkbox",
+              "pos": [
+                732,
+                -107
+              ],
+              "size": [
+                210,
+                78
+              ],
+              "flags": {},
+              "order": 4,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "value",
+                  "type": "boolean",
+                  "links": [
+                    "837e1074-9ccd-4026-8729-70eb916c9518"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [
+                    "9ac235e8-33f1-4ae1-8928-2f728ddda7ae"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 1
+                }
+              ],
+              "title": "UI.Checkbox",
+              "properties": {
+                "tags": [],
+                "defaultValue": false
+              },
+              "widgets_values": [
+                "false"
+              ],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": false,
+              "shownOutputProperties": {},
+              "saveUserState": true
+            },
+            {
+              "id": "8d960d27-859e-4fa9-98e5-a224b28ee16f",
+              "type": "graph/input",
+              "pos": [
+                998,
+                49
+              ],
+              "size": [
+                210,
+                86
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 5,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "CONDITIONING",
+                  "links": [
+                    "75b89374-323e-4eea-af04-89416703c73e",
+                    "ba0a0894-24c4-4093-9bfe-241d9d2d987a"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "Input",
+              "properties": {
+                "name": "positive",
+                "type": "CONDITIONING",
+                "value": null,
+                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
+                "tags": []
+              }
+            },
+            {
+              "id": "8836b415-101e-41b2-b048-82e7319909f6",
+              "type": "graph/input",
+              "pos": [
+                1024,
+                286
+              ],
+              "size": [
+                210,
+                86
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 6,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "CONDITIONING",
+                  "links": [
+                    "741db1cc-287d-4741-ad23-c4454e5bd3ea",
+                    "cb0c53cb-9ef2-4421-9341-631818541ad8"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "Input",
+              "properties": {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "value": null,
+                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
+                "tags": []
+              }
+            },
+            {
+              "id": "39db9118-34cf-406e-a2d5-1c06b18b637a",
+              "type": "graph/input",
+              "pos": [
+                584,
+                276
+              ],
+              "size": [
+                210,
+                86
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 7,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "MODEL",
+                  "links": [
+                    "082b07f6-01f9-421d-b7c7-63484088f53f"
+                  ],
+                  "properties": {}
+                }
+              ],
+              "title": "Input",
+              "properties": {
+                "name": "model",
+                "type": "MODEL",
+                "value": null,
+                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
+                "tags": []
+              }
+            },
+            {
+              "id": "b423640f-f39d-47ab-8e79-150b04f98ca9",
+              "type": "utils/pick_first",
+              "pos": [
+                1380,
+                331
+              ],
+              "size": [
+                210,
+                122
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 15,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "A",
+                  "type": "*",
+                  "link": "7426925b-ae20-4aa1-8c2d-9447c4acf5ea",
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "B",
+                  "type": "*",
+                  "link": "cb0c53cb-9ef2-4421-9341-631818541ad8",
+                  "properties": {}
+                },
+                {
+                  "name": "C",
+                  "type": "*",
+                  "link": null,
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": "CONDITIONING",
+                  "links": [
+                    "b72d7a78-1e85-423d-9332-0c2be7c6fd84"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "title": "Comfy.PickFirst",
+              "properties": {
+                "tags": [],
+                "mode": "anyActiveLink"
+              },
+              "color": "#232",
+              "bgColor": "#353",
+              "saveUserState": true
+            },
+            {
+              "id": "929ac2c4-63a7-4c87-97b3-01256b491ef5",
+              "type": "graph/output",
+              "pos": [
+                1612,
+                357
+              ],
+              "size": [
+                210,
+                62
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 17,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "",
+                  "type": "CONDITIONING",
+                  "link": "b72d7a78-1e85-423d-9332-0c2be7c6fd84",
+                  "properties": {},
+                  "slot_index": 0
+                }
+              ],
+              "outputs": [],
+              "title": "Output",
+              "properties": {
+                "name": "negative",
+                "type": "CONDITIONING",
+                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
+                "tags": []
+              }
+            }
+          ],
+          "links": [
+            [
+              "2e4084a3-e483-4ece-934d-e4b86778fd36",
+              "14a8903c-4011-4f35-8e5e-2222eee6cc1e",
+              0,
+              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
+              1,
+              "string"
+            ],
+            [
+              "082b07f6-01f9-421d-b7c7-63484088f53f",
+              "39db9118-34cf-406e-a2d5-1c06b18b637a",
+              0,
+              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
+              0,
+              "MODEL"
+            ],
+            [
+              "6c755243-7893-4ca3-ae10-329b69abc7ba",
+              "10cbb926-c5f9-4870-996d-0bd4cfdfd45f",
+              0,
+              "f587febd-0054-4ab2-9ffc-6306757927d7",
+              3,
+              "number"
+            ],
+            [
+              "f40eb893-53d2-42b1-bf75-8f4ddcbf5a64",
+              "c9e61616-a12c-48ab-8be4-71a783908ff9",
+              0,
+              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
+              3,
+              "number"
+            ],
+            [
+              "42b27afc-9093-46dd-b612-863db283ef00",
+              "cc4a59b6-fff0-43a1-a349-f25f6c004fe2",
+              0,
+              "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
+              0,
+              "COMFYBOX_IMAGES,COMFYBOX_IMAGE"
+            ],
+            [
+              "0d61a1e6-67b5-48a2-9c73-4c944bee9a83",
+              "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
+              1,
+              "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
+              0,
+              "string"
+            ],
+            [
+              "bfb7e39e-782d-42b4-a397-5796a263b78c",
+              "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
+              0,
+              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
+              2,
+              "IMAGE"
+            ],
+            [
+              "a952a83c-3870-4ee5-aee2-3fb64568efed",
+              "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
+              0,
+              "f587febd-0054-4ab2-9ffc-6306757927d7",
+              2,
+              "IMAGE"
+            ],
+            [
+              "9c32c2af-37f3-4541-bb51-caa30930dd21",
+              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
+              0,
+              "f587febd-0054-4ab2-9ffc-6306757927d7",
+              1,
+              "CONTROL_NET"
+            ],
+            [
+              "d1a178eb-1e57-4ec0-b6d2-d457477bc024",
+              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
+              0,
+              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
+              1,
+              "CONTROL_NET"
+            ],
+            [
+              "75b89374-323e-4eea-af04-89416703c73e",
+              "8d960d27-859e-4fa9-98e5-a224b28ee16f",
+              0,
+              "f587febd-0054-4ab2-9ffc-6306757927d7",
+              0,
+              "CONDITIONING"
+            ],
+            [
+              "741db1cc-287d-4741-ad23-c4454e5bd3ea",
+              "8836b415-101e-41b2-b048-82e7319909f6",
+              0,
+              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
+              0,
+              "CONDITIONING"
+            ],
+            [
+              "7426925b-ae20-4aa1-8c2d-9447c4acf5ea",
+              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
+              0,
+              "b423640f-f39d-47ab-8e79-150b04f98ca9",
+              0,
+              "*"
+            ],
+            [
+              "7ecf9141-3774-45bf-96bc-fc09d9284710",
+              "f587febd-0054-4ab2-9ffc-6306757927d7",
+              0,
+              "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
+              0,
+              "*"
+            ],
+            [
+              "ba0a0894-24c4-4093-9bfe-241d9d2d987a",
+              "8d960d27-859e-4fa9-98e5-a224b28ee16f",
+              0,
+              "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
+              1,
+              "CONDITIONING"
+            ],
+            [
+              "8433f10b-112a-488f-b34d-29156b692bde",
+              "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
+              0,
+              "3e449b25-d413-460a-a394-356a1908febe",
+              0,
+              "CONDITIONING"
+            ],
+            [
+              "837e1074-9ccd-4026-8729-70eb916c9518",
+              "280e84f4-49b0-43e3-93ef-3964800b4d2c",
+              0,
+              "5609d422-1b11-4de7-a076-bffed63be521",
+              0,
+              "boolean"
+            ],
+            [
+              "9ac235e8-33f1-4ae1-8928-2f728ddda7ae",
+              "280e84f4-49b0-43e3-93ef-3964800b4d2c",
+              1,
+              "5609d422-1b11-4de7-a076-bffed63be521",
+              1,
+              -1
+            ],
+            [
+              "84687a04-1bf3-4ffd-b9dc-dfe6fb3ec4b0",
+              "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
+              0,
+              "897e70d8-f807-45e4-9018-0b2138bf9b33",
+              0,
+              "*"
+            ],
+            [
+              "cb0c53cb-9ef2-4421-9341-631818541ad8",
+              "8836b415-101e-41b2-b048-82e7319909f6",
+              0,
+              "b423640f-f39d-47ab-8e79-150b04f98ca9",
+              1,
+              "*"
+            ],
+            [
+              "b72d7a78-1e85-423d-9332-0c2be7c6fd84",
+              "b423640f-f39d-47ab-8e79-150b04f98ca9",
+              0,
+              "929ac2c4-63a7-4c87-97b3-01256b491ef5",
+              0,
+              "CONDITIONING"
+            ]
+          ],
+          "groups": [],
+          "config": {},
+          "extra": {},
+          "version": 10
+        }
       },
       {
         "id": "f8051ab6-d9f7-44fe-898a-ad26cfde916e",
@@ -9721,8 +12059,8 @@
               "title": "Comfy.ValueControl",
               "properties": {
                 "tags": [],
-                "value": 582554067195160,
-                "action": "randomize",
+                "value": 0,
+                "action": "fixed",
                 "min": 0,
                 "max": 18446744073709552000,
                 "step": 4,
@@ -10447,8 +12785,7 @@
               "title": "Load Image",
               "properties": {
                 "tags": [
-                  "img2img",
-                  "gen"
+                  "img2img"
                 ]
               },
               "color": "#432",
@@ -11394,8 +13731,7 @@
               "title": "Upscale Latent",
               "properties": {
                 "tags": [
-                  "img2img",
-                  "gen"
+                  "img2img"
                 ]
               },
               "color": "#432",
@@ -11447,8 +13783,7 @@
               "title": "VAE Encode",
               "properties": {
                 "tags": [
-                  "img2img",
-                  "gen"
+                  "img2img"
                 ]
               },
               "color": "#432",
@@ -11576,9 +13911,7 @@
               ],
               "title": "KSampler",
               "properties": {
-                "tags": [
-                  "gen"
-                ]
+                "tags": []
               },
               "color": "#432",
               "bgColor": "#653",
@@ -11629,9 +13962,7 @@
               ],
               "title": "VAE Decode",
               "properties": {
-                "tags": [
-                  "gen"
-                ]
+                "tags": []
               },
               "color": "#432",
               "bgColor": "#653",
@@ -11771,14 +14102,14 @@
                 "tags": [
                   "img2img"
                 ],
-                "defaultValue": true
+                "defaultValue": false
               },
               "widgets_values": [
-                "true"
+                "false"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": true,
+              "comfyValue": false,
               "shownOutputProperties": {},
               "saveUserState": true
             },
@@ -11991,7 +14322,7 @@
                     ],
                     "flags": {},
                     "order": 4,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "",
@@ -12022,7 +14353,7 @@
                     ],
                     "flags": {},
                     "order": 1,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "",
@@ -12053,7 +14384,7 @@
                     ],
                     "flags": {},
                     "order": 3,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "A",
@@ -12506,7 +14837,7 @@
                     ],
                     "flags": {},
                     "order": 0,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [],
                     "outputs": [
                       {
@@ -12542,7 +14873,7 @@
                       "collapsed": true
                     },
                     "order": 4,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "A",
@@ -12592,7 +14923,7 @@
                       "collapsed": true
                     },
                     "order": 3,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "A",
@@ -12641,7 +14972,7 @@
                       "collapsed": true
                     },
                     "order": 6,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "in",
@@ -12683,7 +15014,7 @@
                       "collapsed": true
                     },
                     "order": 5,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "in",
@@ -12723,7 +15054,7 @@
                     ],
                     "flags": {},
                     "order": 10,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "",
@@ -12754,7 +15085,7 @@
                     ],
                     "flags": {},
                     "order": 8,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "",
@@ -12785,7 +15116,7 @@
                     ],
                     "flags": {},
                     "order": 1,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [],
                     "outputs": [
                       {
@@ -12927,7 +15258,7 @@
                       "collapsed": true
                     },
                     "order": 7,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "in",
@@ -12968,7 +15299,7 @@
                       "collapsed": true
                     },
                     "order": 9,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "in",
@@ -13009,7 +15340,7 @@
                       "collapsed": true
                     },
                     "order": 12,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "value",
@@ -13073,7 +15404,7 @@
                       "collapsed": true
                     },
                     "order": 11,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "value",
@@ -13840,8 +16171,7 @@
               "title": "Empty Latent Image",
               "properties": {
                 "tags": [
-                  "txt2img",
-                  "gen"
+                  "txt2img"
                 ]
               },
               "color": "#432",
@@ -13898,9 +16228,7 @@
               ],
               "title": "Comfy.PickFirst",
               "properties": {
-                "tags": [
-                  "gen"
-                ],
+                "tags": [],
                 "mode": "dataNonNull"
               },
               "color": "#232",
@@ -14170,9 +16498,7 @@
               ],
               "title": "Comfy.PickFirst",
               "properties": {
-                "tags": [
-                  "gen"
-                ],
+                "tags": [],
                 "mode": "dataNonNull"
               },
               "color": "#232",
@@ -14227,8 +16553,7 @@
               "title": "Repeat Latent Batch",
               "properties": {
                 "tags": [
-                  "img2img",
-                  "gen"
+                  "img2img"
                 ]
               },
               "color": "#432",
@@ -14647,8 +16972,7 @@
               "title": "Comfy.SetPromptThumbnailsAction",
               "properties": {
                 "tags": [
-                  "img2img",
-                  "gen"
+                  "img2img"
                 ],
                 "defaultFolderType": "input"
               },
@@ -15743,1670 +18067,194 @@
         }
       },
       {
-        "id": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
-        "type": "graph/subgraph",
+        "id": "d61b7ac0-b5f7-4a88-8226-28f9b017f3f4",
+        "type": "SaveImage",
         "pos": [
-          393,
-          318
+          1822,
+          303
         ],
         "size": [
-          200,
-          70
+          186.4,
+          46
         ],
         "flags": {},
-        "order": 37,
+        "order": 46,
         "mode": 0,
         "inputs": [
           {
-            "name": "model",
-            "type": "MODEL",
-            "link": "3130f01b-569e-41ee-8a0a-d91b374f21e7",
+            "name": "images",
+            "type": "IMAGE",
+            "link": "250486b4-7eae-4049-aa6f-1ff826687c9c",
+            "properties": {},
+            "config": {}
+          },
+          {
+            "name": "filename_prefix",
+            "type": "string",
+            "link": "8770aeee-7c02-418c-a925-36b57fa1d032",
+            "properties": {},
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/text",
+            "serialize": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "OUTPUT",
+            "type": -2,
+            "links": [
+              "eeb1dfa6-eaaa-4ba6-b2a6-b13ae69c3462",
+              "506fe533-e2dc-4eba-b814-0b6447950167",
+              "b6a0feb1-9333-472f-b025-4a187fc691b2"
+            ],
+            "properties": {},
+            "color_off": "rebeccapurple",
+            "color_on": "rebeccapurple",
+            "shape": 1,
+            "slot_index": 0
+          }
+        ],
+        "title": "Save Image",
+        "properties": {
+          "tags": [
+            "gen"
+          ]
+        },
+        "color": "#432",
+        "bgColor": "#653",
+        "saveUserState": true
+      },
+      {
+        "id": "a08c7fc7-79a3-49ed-abba-03fee5d35ce7",
+        "type": "image/pick_image",
+        "pos": [
+          2485,
+          323
+        ],
+        "size": [
+          210,
+          190
+        ],
+        "flags": {},
+        "order": 53,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "images",
+            "type": "COMFYBOX_IMAGES,COMFYBOX_IMAGE",
+            "link": "c4ff06f7-3f0a-475b-9d14-48d639bdfdda",
             "properties": {}
           },
           {
-            "name": "positive",
-            "type": "CONDITIONING",
-            "link": "a0072557-0d6b-470e-b93a-d58b5dbf1c4a",
-            "properties": {}
-          },
-          {
-            "name": "negative",
-            "type": "CONDITIONING",
-            "link": "482abd71-9f0c-4dcb-bfb6-6b5643145d89",
+            "name": "index",
+            "type": "number",
+            "link": "ca9c18cc-dfe1-4b64-bbaa-9666f11d6e6d",
             "properties": {}
           }
         ],
         "outputs": [
           {
-            "name": "positive",
-            "type": "CONDITIONING",
+            "name": "image",
+            "type": "COMFYBOX_IMAGE",
             "links": [
-              "7627d820-6bba-4263-b023-906c0752410a",
-              "e1a75b66-2558-41f5-b604-3d152d28d154"
+              "ba66d9be-19c3-4da8-84e0-823ef35f7f32",
+              "83af87c9-1177-4a6d-8412-f3ab9b3c3105"
+            ],
+            "properties": {},
+            "slot_index": 0
+          },
+          {
+            "name": "filename",
+            "type": "string",
+            "links": [
+              "02e201d5-1d1e-4340-abd9-85c512cd03e7"
             ],
             "properties": {},
             "slot_index": 1
           },
           {
-            "name": "negative",
-            "type": "CONDITIONING",
+            "name": "width",
+            "type": "number",
             "links": [
-              "2da0832c-5de3-4989-bf49-b5c3e7a0196d",
-              "65c3a5fd-0bfd-4162-ac80-5373a4a3d258"
+              "9eed80a4-a47d-48c6-9c8a-63b5fb8026f8"
             ],
             "properties": {},
             "slot_index": 2
+          },
+          {
+            "name": "height",
+            "type": "number",
+            "links": [
+              "3f5990c7-4b08-4d41-9a46-9a44073eb5e6"
+            ],
+            "properties": {},
+            "slot_index": 3
           }
         ],
-        "title": "ControlNet",
+        "title": "Comfy.PickImage",
         "properties": {
-          "enabled": true,
+          "tags": []
+        },
+        "saveUserState": true
+      },
+      {
+        "id": "4b86217c-eac6-4e44-88f1-fba72d182795",
+        "type": "SaveImage",
+        "pos": [
+          3168,
+          344
+        ],
+        "size": [
+          186.4,
+          46
+        ],
+        "flags": {},
+        "order": 57,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "images",
+            "type": "IMAGE",
+            "link": "b9634e37-b5f5-48cf-a5d9-a32896302548",
+            "properties": {},
+            "config": {}
+          },
+          {
+            "name": "filename_prefix",
+            "type": "string",
+            "link": "b8a7ec3a-979e-45ea-96bf-213a3f2e4b6c",
+            "properties": {},
+            "config": {},
+            "defaultWidgetNode": null,
+            "widgetNodeType": "ui/text",
+            "serialize": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "OUTPUT",
+            "type": -2,
+            "links": [
+              "cbdd2597-722d-4154-be91-0b46254dc141",
+              "f9a02de5-ef6d-4279-a801-dabd2c00fa9e",
+              "d6a150e9-d000-41d1-8460-bb4614e7527c"
+            ],
+            "properties": {},
+            "color_off": "rebeccapurple",
+            "color_on": "rebeccapurple",
+            "shape": 1,
+            "slot_index": 0
+          }
+        ],
+        "title": "Save Image",
+        "properties": {
           "tags": [
-            "gen",
             "hr"
           ]
         },
-        "color": "#2a363b",
-        "bgColor": "#3f5159",
-        "subgraph": {
-          "last_node_id": 0,
-          "last_link_id": 0,
-          "nodes": [
-            {
-              "id": "14a8903c-4011-4f35-8e5e-2222eee6cc1e",
-              "type": "ui/combo",
-              "pos": [
-                576.8020629882812,
-                300
-              ],
-              "size": [
-                210,
-                78
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 0,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "store",
-                  "type": -1,
-                  "link": null,
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "value",
-                  "type": "string",
-                  "links": [
-                    "2e4084a3-e483-4ece-934d-e4b86778fd36"
-                  ],
-                  "properties": {}
-                },
-                {
-                  "name": "changed",
-                  "type": -2,
-                  "links": [],
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "title": "UI.Combo",
-              "properties": {
-                "tags": [
-                  "controlnet"
-                ],
-                "defaultValue": null,
-                "values": [],
-                "convertValueToLabelCode": ""
-              },
-              "widgets_values": [],
-              "color": "#223",
-              "bgColor": "#335",
-              "comfyValue": null,
-              "shownOutputProperties": {},
-              "saveUserState": false
-            },
-            {
-              "id": "10cbb926-c5f9-4870-996d-0bd4cfdfd45f",
-              "type": "ui/number",
-              "pos": [
-                1000.8020629882812,
-                239
-              ],
-              "size": [
-                210,
-                158
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 1,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "store",
-                  "type": -1,
-                  "link": null,
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "value",
-                  "type": "number",
-                  "links": [
-                    "6c755243-7893-4ca3-ae10-329b69abc7ba"
-                  ],
-                  "properties": {}
-                },
-                {
-                  "name": "changed",
-                  "type": -2,
-                  "links": [],
-                  "properties": {},
-                  "shape": 1
-                },
-                {
-                  "name": "@min",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "@max",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "@step",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "@precision",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                }
-              ],
-              "title": "UI.Number",
-              "properties": {
-                "tags": [
-                  "controlnet"
-                ],
-                "defaultValue": 1,
-                "min": 0,
-                "max": 2,
-                "step": 0.01,
-                "precision": 0
-              },
-              "widgets_values": [
-                "1.000"
-              ],
-              "color": "#223",
-              "bgColor": "#335",
-              "comfyValue": 1,
-              "shownOutputProperties": {
-                "min": {
-                  "type": "number",
-                  "outputName": "@min"
-                },
-                "max": {
-                  "type": "number",
-                  "outputName": "@max"
-                },
-                "step": {
-                  "type": "number",
-                  "outputName": "@step"
-                },
-                "precision": {
-                  "type": "number",
-                  "outputName": "@precision"
-                }
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "c9e61616-a12c-48ab-8be4-71a783908ff9",
-              "type": "ui/number",
-              "pos": [
-                1004,
-                420
-              ],
-              "size": [
-                210,
-                158
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 2,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "store",
-                  "type": -1,
-                  "link": null,
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "value",
-                  "type": "number",
-                  "links": [
-                    "f40eb893-53d2-42b1-bf75-8f4ddcbf5a64"
-                  ],
-                  "properties": {}
-                },
-                {
-                  "name": "changed",
-                  "type": -2,
-                  "links": [],
-                  "properties": {},
-                  "shape": 1
-                },
-                {
-                  "name": "@min",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "@max",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "@step",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "@precision",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                }
-              ],
-              "title": "UI.Number",
-              "properties": {
-                "tags": [
-                  "controlnet"
-                ],
-                "defaultValue": 1,
-                "min": 0,
-                "max": 2,
-                "step": 0.01,
-                "precision": 0
-              },
-              "widgets_values": [
-                "1.000"
-              ],
-              "color": "#223",
-              "bgColor": "#335",
-              "comfyValue": 1,
-              "shownOutputProperties": {
-                "min": {
-                  "type": "number",
-                  "outputName": "@min"
-                },
-                "max": {
-                  "type": "number",
-                  "outputName": "@max"
-                },
-                "step": {
-                  "type": "number",
-                  "outputName": "@step"
-                },
-                "precision": {
-                  "type": "number",
-                  "outputName": "@precision"
-                }
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "f587febd-0054-4ab2-9ffc-6306757927d7",
-              "type": "ControlNetApply",
-              "pos": [
-                1125,
-                95
-              ],
-              "size": [
-                211.6,
-                86
-              ],
-              "flags": {
-                "collapsed": false
-              },
-              "order": 14,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "conditioning",
-                  "type": "CONDITIONING",
-                  "link": "75b89374-323e-4eea-af04-89416703c73e",
-                  "properties": {},
-                  "slot_index": 0,
-                  "config": {}
-                },
-                {
-                  "name": "control_net",
-                  "type": "CONTROL_NET",
-                  "link": "9c32c2af-37f3-4541-bb51-caa30930dd21",
-                  "properties": {},
-                  "config": {}
-                },
-                {
-                  "name": "image",
-                  "type": "IMAGE",
-                  "link": "a952a83c-3870-4ee5-aee2-3fb64568efed",
-                  "properties": {},
-                  "config": {}
-                },
-                {
-                  "name": "strength",
-                  "type": "number",
-                  "link": "6c755243-7893-4ca3-ae10-329b69abc7ba",
-                  "properties": {},
-                  "config": {},
-                  "defaultWidgetNode": null,
-                  "widgetNodeType": "ui/number",
-                  "serialize": true
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "CONDITIONING",
-                  "type": "CONDITIONING",
-                  "links": [
-                    "7ecf9141-3774-45bf-96bc-fc09d9284710"
-                  ],
-                  "properties": {},
-                  "shape": 3
-                }
-              ],
-              "title": "Apply ControlNet",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr",
-                  "controlnet"
-                ]
-              },
-              "color": "#432",
-              "bgColor": "#653",
-              "saveUserState": true
-            },
-            {
-              "id": "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
-              "type": "ControlNetApply",
-              "pos": [
-                1134,
-                336
-              ],
-              "size": [
-                211.6,
-                86
-              ],
-              "flags": {
-                "collapsed": false
-              },
-              "order": 13,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "conditioning",
-                  "type": "CONDITIONING",
-                  "link": "741db1cc-287d-4741-ad23-c4454e5bd3ea",
-                  "properties": {},
-                  "config": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "control_net",
-                  "type": "CONTROL_NET",
-                  "link": "d1a178eb-1e57-4ec0-b6d2-d457477bc024",
-                  "properties": {},
-                  "config": {}
-                },
-                {
-                  "name": "image",
-                  "type": "IMAGE",
-                  "link": "bfb7e39e-782d-42b4-a397-5796a263b78c",
-                  "properties": {},
-                  "config": {}
-                },
-                {
-                  "name": "strength",
-                  "type": "number",
-                  "link": "f40eb893-53d2-42b1-bf75-8f4ddcbf5a64",
-                  "properties": {},
-                  "config": {},
-                  "defaultWidgetNode": null,
-                  "widgetNodeType": "ui/number",
-                  "serialize": true
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "CONDITIONING",
-                  "type": "CONDITIONING",
-                  "links": [
-                    "7426925b-ae20-4aa1-8c2d-9447c4acf5ea"
-                  ],
-                  "properties": {},
-                  "shape": 3
-                }
-              ],
-              "title": "Apply ControlNet",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr",
-                  "controlnet"
-                ]
-              },
-              "color": "#432",
-              "bgColor": "#653",
-              "saveUserState": true
-            },
-            {
-              "id": "f5e0644b-2ccd-4417-985e-3c400c61ae94",
-              "type": "DiffControlNetLoader",
-              "pos": [
-                707,
-                256
-              ],
-              "size": [
-                236.8,
-                46
-              ],
-              "flags": {},
-              "order": 10,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "model",
-                  "type": "MODEL",
-                  "link": "082b07f6-01f9-421d-b7c7-63484088f53f",
-                  "properties": {},
-                  "slot_index": 0,
-                  "config": {}
-                },
-                {
-                  "name": "control_net_name",
-                  "type": "string",
-                  "link": "2e4084a3-e483-4ece-934d-e4b86778fd36",
-                  "properties": {},
-                  "config": {},
-                  "defaultWidgetNode": null,
-                  "widgetNodeType": "ui/combo",
-                  "serialize": true
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "CONTROL_NET",
-                  "type": "CONTROL_NET",
-                  "links": [
-                    "9c32c2af-37f3-4541-bb51-caa30930dd21",
-                    "d1a178eb-1e57-4ec0-b6d2-d457477bc024"
-                  ],
-                  "properties": {},
-                  "shape": 3,
-                  "slot_index": 0
-                }
-              ],
-              "title": "Load ControlNet Model (diff)",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr",
-                  "controlnet"
-                ]
-              },
-              "color": "#432",
-              "bgColor": "#653",
-              "saveUserState": true
-            },
-            {
-              "id": "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
-              "type": "LoadImage",
-              "pos": [
-                702,
-                374
-              ],
-              "size": [
-                140,
-                46
-              ],
-              "flags": {},
-              "order": 12,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "image",
-                  "type": "string",
-                  "link": "0d61a1e6-67b5-48a2-9c73-4c944bee9a83",
-                  "properties": {},
-                  "config": {},
-                  "defaultWidgetNode": null,
-                  "widgetNodeType": "ui/combo",
-                  "serialize": true,
-                  "slot_index": 0
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "IMAGE",
-                  "type": "IMAGE",
-                  "links": [
-                    "bfb7e39e-782d-42b4-a397-5796a263b78c",
-                    "a952a83c-3870-4ee5-aee2-3fb64568efed"
-                  ],
-                  "properties": {},
-                  "shape": 3,
-                  "slot_index": 0
-                },
-                {
-                  "name": "MASK",
-                  "type": "MASK",
-                  "links": [],
-                  "properties": {},
-                  "shape": 3
-                }
-              ],
-              "title": "Load Image",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr",
-                  "controlnet"
-                ]
-              },
-              "color": "#432",
-              "bgColor": "#653",
-              "saveUserState": true
-            },
-            {
-              "id": "5609d422-1b11-4de7-a076-bffed63be521",
-              "type": "actions/set_node_mode",
-              "pos": [
-                995.2960000000002,
-                -111.97200000000004
-              ],
-              "size": [
-                210,
-                102
-              ],
-              "flags": {},
-              "order": 9,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "enabled",
-                  "type": "boolean",
-                  "link": "837e1074-9ccd-4026-8729-70eb916c9518",
-                  "properties": {}
-                },
-                {
-                  "name": "set",
-                  "type": -1,
-                  "link": "9ac235e8-33f1-4ae1-8928-2f728ddda7ae",
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [],
-              "title": "Comfy.SetNodeModeAction",
-              "properties": {
-                "targetTags": "controlnet",
-                "enable": false,
-                "tags": []
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
-              "type": "utils/pick_first",
-              "pos": [
-                1368,
-                91
-              ],
-              "size": [
-                210,
-                122
-              ],
-              "flags": {},
-              "order": 16,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "A",
-                  "type": "*",
-                  "link": "7ecf9141-3774-45bf-96bc-fc09d9284710",
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "B",
-                  "type": "*",
-                  "link": "ba0a0894-24c4-4093-9bfe-241d9d2d987a",
-                  "properties": {}
-                },
-                {
-                  "name": "C",
-                  "type": "*",
-                  "link": null,
-                  "properties": {}
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "number",
-                  "links": [
-                    "8433f10b-112a-488f-b34d-29156b692bde"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "Comfy.PickFirst",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr"
-                ],
-                "mode": "anyActiveLink"
-              },
-              "color": "#232",
-              "bgColor": "#353",
-              "saveUserState": true
-            },
-            {
-              "id": "3e449b25-d413-460a-a394-356a1908febe",
-              "type": "graph/output",
-              "pos": [
-                1613,
-                117
-              ],
-              "size": [
-                210,
-                62
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 18,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "",
-                  "type": "CONDITIONING",
-                  "link": "8433f10b-112a-488f-b34d-29156b692bde",
-                  "properties": {}
-                }
-              ],
-              "outputs": [],
-              "title": "Output",
-              "properties": {
-                "name": "positive",
-                "type": "CONDITIONING",
-                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
-                "tags": []
-              }
-            },
-            {
-              "id": "cc4a59b6-fff0-43a1-a349-f25f6c004fe2",
-              "type": "ui/image_upload",
-              "pos": [
-                316,
-                401
-              ],
-              "size": [
-                210,
-                78
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 3,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "store",
-                  "type": -1,
-                  "link": null,
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "images",
-                  "type": "COMFYBOX_IMAGES",
-                  "links": [
-                    "42b27afc-9093-46dd-b612-863db283ef00"
-                  ],
-                  "properties": {}
-                },
-                {
-                  "name": "changed",
-                  "type": -2,
-                  "links": [],
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "title": "UI.ImageUpload",
-              "properties": {
-                "defaultValue": [],
-                "tags": [
-                  "controlnet"
-                ]
-              },
-              "widgets_values": [],
-              "color": "#223",
-              "bgColor": "#335",
-              "comfyValue": [],
-              "shownOutputProperties": {},
-              "saveUserState": false
-            },
-            {
-              "id": "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
-              "type": "image/pick_image",
-              "pos": [
-                464,
-                376
-              ],
-              "size": [
-                210,
-                190
-              ],
-              "flags": {
-                "collapsed": false
-              },
-              "order": 8,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "images",
-                  "type": "COMFYBOX_IMAGES,COMFYBOX_IMAGE",
-                  "link": "42b27afc-9093-46dd-b612-863db283ef00",
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "index",
-                  "type": "number",
-                  "link": null,
-                  "properties": {}
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "image",
-                  "type": "COMFYBOX_IMAGE",
-                  "links": [
-                    "84687a04-1bf3-4ffd-b9dc-dfe6fb3ec4b0"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "filename",
-                  "type": "string",
-                  "links": [
-                    "0d61a1e6-67b5-48a2-9c73-4c944bee9a83"
-                  ],
-                  "properties": {},
-                  "slot_index": 1
-                },
-                {
-                  "name": "width",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                },
-                {
-                  "name": "height",
-                  "type": "number",
-                  "links": [],
-                  "properties": {}
-                }
-              ],
-              "title": "Comfy.PickImage",
-              "properties": {
-                "tags": []
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "897e70d8-f807-45e4-9018-0b2138bf9b33",
-              "type": "actions/set_prompt_thumbnails",
-              "pos": [
-                810,
-                480
-              ],
-              "size": [
-                260.4,
-                26
-              ],
-              "flags": {},
-              "order": 11,
-              "mode": 2,
-              "inputs": [
-                {
-                  "name": "filenames",
-                  "type": "*",
-                  "link": "84687a04-1bf3-4ffd-b9dc-dfe6fb3ec4b0",
-                  "properties": {}
-                }
-              ],
-              "outputs": [],
-              "title": "Comfy.SetPromptThumbnailsAction",
-              "properties": {
-                "tags": [
-                  "controlnet",
-                  "gen",
-                  "hr"
-                ],
-                "defaultFolderType": "input"
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "280e84f4-49b0-43e3-93ef-3964800b4d2c",
-              "type": "ui/checkbox",
-              "pos": [
-                732,
-                -107
-              ],
-              "size": [
-                210,
-                78
-              ],
-              "flags": {},
-              "order": 4,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "store",
-                  "type": -1,
-                  "link": null,
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "value",
-                  "type": "boolean",
-                  "links": [
-                    "837e1074-9ccd-4026-8729-70eb916c9518"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "changed",
-                  "type": -2,
-                  "links": [
-                    "9ac235e8-33f1-4ae1-8928-2f728ddda7ae"
-                  ],
-                  "properties": {},
-                  "shape": 1,
-                  "slot_index": 1
-                }
-              ],
-              "title": "UI.Checkbox",
-              "properties": {
-                "tags": [],
-                "defaultValue": false
-              },
-              "widgets_values": [
-                "false"
-              ],
-              "color": "#223",
-              "bgColor": "#335",
-              "comfyValue": false,
-              "shownOutputProperties": {},
-              "saveUserState": true
-            },
-            {
-              "id": "8d960d27-859e-4fa9-98e5-a224b28ee16f",
-              "type": "graph/input",
-              "pos": [
-                998,
-                49
-              ],
-              "size": [
-                210,
-                86
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 5,
-              "mode": 0,
-              "inputs": [],
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "CONDITIONING",
-                  "links": [
-                    "75b89374-323e-4eea-af04-89416703c73e",
-                    "ba0a0894-24c4-4093-9bfe-241d9d2d987a"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "Input",
-              "properties": {
-                "name": "positive",
-                "type": "CONDITIONING",
-                "value": null,
-                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
-                "tags": []
-              }
-            },
-            {
-              "id": "8836b415-101e-41b2-b048-82e7319909f6",
-              "type": "graph/input",
-              "pos": [
-                1024,
-                286
-              ],
-              "size": [
-                210,
-                86
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 6,
-              "mode": 0,
-              "inputs": [],
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "CONDITIONING",
-                  "links": [
-                    "741db1cc-287d-4741-ad23-c4454e5bd3ea",
-                    "cb0c53cb-9ef2-4421-9341-631818541ad8"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "Input",
-              "properties": {
-                "name": "negative",
-                "type": "CONDITIONING",
-                "value": null,
-                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
-                "tags": []
-              }
-            },
-            {
-              "id": "39db9118-34cf-406e-a2d5-1c06b18b637a",
-              "type": "graph/input",
-              "pos": [
-                584,
-                276
-              ],
-              "size": [
-                210,
-                86
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 7,
-              "mode": 0,
-              "inputs": [],
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "MODEL",
-                  "links": [
-                    "082b07f6-01f9-421d-b7c7-63484088f53f"
-                  ],
-                  "properties": {}
-                }
-              ],
-              "title": "Input",
-              "properties": {
-                "name": "model",
-                "type": "MODEL",
-                "value": null,
-                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
-                "tags": []
-              }
-            },
-            {
-              "id": "b423640f-f39d-47ab-8e79-150b04f98ca9",
-              "type": "utils/pick_first",
-              "pos": [
-                1380,
-                331
-              ],
-              "size": [
-                210,
-                122
-              ],
-              "flags": {
-                "collapsed": false
-              },
-              "order": 15,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "A",
-                  "type": "*",
-                  "link": "7426925b-ae20-4aa1-8c2d-9447c4acf5ea",
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "B",
-                  "type": "*",
-                  "link": "cb0c53cb-9ef2-4421-9341-631818541ad8",
-                  "properties": {}
-                },
-                {
-                  "name": "C",
-                  "type": "*",
-                  "link": null,
-                  "properties": {}
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "CONDITIONING",
-                  "links": [
-                    "b72d7a78-1e85-423d-9332-0c2be7c6fd84"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "Comfy.PickFirst",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr"
-                ],
-                "mode": "anyActiveLink"
-              },
-              "color": "#232",
-              "bgColor": "#353",
-              "saveUserState": true
-            },
-            {
-              "id": "929ac2c4-63a7-4c87-97b3-01256b491ef5",
-              "type": "graph/output",
-              "pos": [
-                1612,
-                357
-              ],
-              "size": [
-                210,
-                62
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 17,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "",
-                  "type": "CONDITIONING",
-                  "link": "b72d7a78-1e85-423d-9332-0c2be7c6fd84",
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "outputs": [],
-              "title": "Output",
-              "properties": {
-                "name": "negative",
-                "type": "CONDITIONING",
-                "subgraphID": "55a269ee-5de4-45b7-833f-cbea5fc36e9a",
-                "tags": []
-              }
-            }
-          ],
-          "links": [
-            [
-              "2e4084a3-e483-4ece-934d-e4b86778fd36",
-              "14a8903c-4011-4f35-8e5e-2222eee6cc1e",
-              0,
-              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
-              1,
-              "string"
-            ],
-            [
-              "082b07f6-01f9-421d-b7c7-63484088f53f",
-              "39db9118-34cf-406e-a2d5-1c06b18b637a",
-              0,
-              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
-              0,
-              "MODEL"
-            ],
-            [
-              "6c755243-7893-4ca3-ae10-329b69abc7ba",
-              "10cbb926-c5f9-4870-996d-0bd4cfdfd45f",
-              0,
-              "f587febd-0054-4ab2-9ffc-6306757927d7",
-              3,
-              "number"
-            ],
-            [
-              "f40eb893-53d2-42b1-bf75-8f4ddcbf5a64",
-              "c9e61616-a12c-48ab-8be4-71a783908ff9",
-              0,
-              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
-              3,
-              "number"
-            ],
-            [
-              "42b27afc-9093-46dd-b612-863db283ef00",
-              "cc4a59b6-fff0-43a1-a349-f25f6c004fe2",
-              0,
-              "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
-              0,
-              "COMFYBOX_IMAGES,COMFYBOX_IMAGE"
-            ],
-            [
-              "0d61a1e6-67b5-48a2-9c73-4c944bee9a83",
-              "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
-              1,
-              "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
-              0,
-              "string"
-            ],
-            [
-              "bfb7e39e-782d-42b4-a397-5796a263b78c",
-              "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
-              0,
-              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
-              2,
-              "IMAGE"
-            ],
-            [
-              "a952a83c-3870-4ee5-aee2-3fb64568efed",
-              "6b664bf7-4bf6-4df5-a724-1e9dedde16b2",
-              0,
-              "f587febd-0054-4ab2-9ffc-6306757927d7",
-              2,
-              "IMAGE"
-            ],
-            [
-              "9c32c2af-37f3-4541-bb51-caa30930dd21",
-              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
-              0,
-              "f587febd-0054-4ab2-9ffc-6306757927d7",
-              1,
-              "CONTROL_NET"
-            ],
-            [
-              "d1a178eb-1e57-4ec0-b6d2-d457477bc024",
-              "f5e0644b-2ccd-4417-985e-3c400c61ae94",
-              0,
-              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
-              1,
-              "CONTROL_NET"
-            ],
-            [
-              "75b89374-323e-4eea-af04-89416703c73e",
-              "8d960d27-859e-4fa9-98e5-a224b28ee16f",
-              0,
-              "f587febd-0054-4ab2-9ffc-6306757927d7",
-              0,
-              "CONDITIONING"
-            ],
-            [
-              "741db1cc-287d-4741-ad23-c4454e5bd3ea",
-              "8836b415-101e-41b2-b048-82e7319909f6",
-              0,
-              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
-              0,
-              "CONDITIONING"
-            ],
-            [
-              "7426925b-ae20-4aa1-8c2d-9447c4acf5ea",
-              "cb6c2a74-efdc-4d12-8d18-619fa32c85ea",
-              0,
-              "b423640f-f39d-47ab-8e79-150b04f98ca9",
-              0,
-              "*"
-            ],
-            [
-              "7ecf9141-3774-45bf-96bc-fc09d9284710",
-              "f587febd-0054-4ab2-9ffc-6306757927d7",
-              0,
-              "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
-              0,
-              "*"
-            ],
-            [
-              "ba0a0894-24c4-4093-9bfe-241d9d2d987a",
-              "8d960d27-859e-4fa9-98e5-a224b28ee16f",
-              0,
-              "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
-              1,
-              "CONDITIONING"
-            ],
-            [
-              "8433f10b-112a-488f-b34d-29156b692bde",
-              "c66ce82f-ff3a-407c-a0d7-9eb034273ade",
-              0,
-              "3e449b25-d413-460a-a394-356a1908febe",
-              0,
-              "CONDITIONING"
-            ],
-            [
-              "837e1074-9ccd-4026-8729-70eb916c9518",
-              "280e84f4-49b0-43e3-93ef-3964800b4d2c",
-              0,
-              "5609d422-1b11-4de7-a076-bffed63be521",
-              0,
-              "boolean"
-            ],
-            [
-              "9ac235e8-33f1-4ae1-8928-2f728ddda7ae",
-              "280e84f4-49b0-43e3-93ef-3964800b4d2c",
-              1,
-              "5609d422-1b11-4de7-a076-bffed63be521",
-              1,
-              -1
-            ],
-            [
-              "84687a04-1bf3-4ffd-b9dc-dfe6fb3ec4b0",
-              "c7447417-a2a6-4dff-b79e-f2eaf5e3d1fa",
-              0,
-              "897e70d8-f807-45e4-9018-0b2138bf9b33",
-              0,
-              "*"
-            ],
-            [
-              "cb0c53cb-9ef2-4421-9341-631818541ad8",
-              "8836b415-101e-41b2-b048-82e7319909f6",
-              0,
-              "b423640f-f39d-47ab-8e79-150b04f98ca9",
-              1,
-              "*"
-            ],
-            [
-              "b72d7a78-1e85-423d-9332-0c2be7c6fd84",
-              "b423640f-f39d-47ab-8e79-150b04f98ca9",
-              0,
-              "929ac2c4-63a7-4c87-97b3-01256b491ef5",
-              0,
-              "CONDITIONING"
-            ]
-          ],
-          "groups": [],
-          "config": {},
-          "extra": {},
-          "version": 10
-        }
-      },
-      {
-        "id": "3162e077-a4cb-4672-b47c-da4a15eaed78",
-        "type": "events/receive_output",
-        "pos": [
-          1497,
-          486
-        ],
-        "size": [
-          210,
-          106
-        ],
-        "flags": {},
-        "order": 16,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "received",
-            "type": -2,
-            "links": [
-              "e4c06100-12af-4c17-9e9a-bd69c5a65832",
-              "d8483ae9-c9d6-4e96-83cb-49b07db5815a"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0,
-            "color_on": "fuchsia",
-            "color_off": "fuchsia"
-          }
-        ],
-        "title": "Comfy.ReceiveOutput",
-        "properties": {
-          "tags": [],
-          "name": "HR Fix",
-          "description": "Triggers HR fix for this image.",
-          "type": "COMFYBOX_IMAGE"
-        },
-        "saveUserState": true
-      },
-      {
-        "id": "928a13d8-cfc6-417e-9088-53503efb1cd3",
-        "type": "events/sequence",
-        "pos": [
-          2065,
-          368
-        ],
-        "size": [
-          140,
-          86
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 49,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "",
-            "type": -1,
-            "link": "eeb1dfa6-eaaa-4ba6-b2a6-b13ae69c3462",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "",
-            "type": -1,
-            "link": "27e9b2c9-72c5-48b0-aa80-2646590d8c2b",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "",
-            "type": -1,
-            "link": "a80e5f8c-ecc2-40c8-b5c6-232261f1a532",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "",
-            "type": -1,
-            "link": null,
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "",
-            "type": -2,
-            "links": [
-              "0f1bc87b-d1d6-4c04-be03-699eb7d1ab2a"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          },
-          {
-            "name": "",
-            "type": -2,
-            "links": [],
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "title": "Sequence",
-        "properties": {
-          "tags": []
-        }
-      },
-      {
-        "id": "9170d9a6-62e4-4aa3-8afa-0c61a36e8dd6",
-        "type": "events/frame_delay",
-        "pos": [
-          1765,
-          518
-        ],
-        "size": [
-          140,
-          26
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 23,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "event",
-            "type": -1,
-            "link": "e4c06100-12af-4c17-9e9a-bd69c5a65832",
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "on_time",
-            "type": -2,
-            "links": [
-              "84e724a1-9302-490f-b349-e1cc5062addf"
-            ],
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "title": "Frame Delay",
-        "properties": {
-          "timeInFrames": 60,
-          "tags": []
-        }
-      },
-      {
-        "id": "1073dce1-aa2e-474e-9015-7e3066a92b59",
-        "type": "actions/execute_subgraph",
-        "pos": [
-          1912,
-          520
-        ],
-        "size": [
-          226.79999999999998,
-          78
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 29,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "execute",
-            "type": -1,
-            "link": "84e724a1-9302-490f-b349-e1cc5062addf",
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          },
-          {
-            "name": "targetTag",
-            "type": "string",
-            "link": null,
-            "properties": {}
-          }
-        ],
-        "outputs": [],
-        "title": "Comfy.ExecuteSubgraphAction",
-        "properties": {
-          "tags": [],
-          "targetTag": "hr"
-        },
-        "saveUserState": true
-      },
-      {
-        "id": "b9b9158b-b79b-4408-a19d-85e4ccb29f6e",
-        "type": "string/template",
-        "pos": [
-          1845,
-          451
-        ],
-        "size": [
-          210,
-          98
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 24,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "",
-            "type": "string,array",
-            "link": null,
-            "properties": {}
-          },
-          {
-            "name": "",
-            "type": "string",
-            "link": null,
-            "properties": {}
-          },
-          {
-            "name": "update",
-            "type": -1,
-            "link": "d8483ae9-c9d6-4e96-83cb-49b07db5815a",
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "out",
-            "type": "*",
-            "links": [],
-            "properties": {},
-            "slot_index": 0
-          },
-          {
-            "name": "changed",
-            "type": -2,
-            "links": [
-              "a80e5f8c-ecc2-40c8-b5c6-232261f1a532"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 1
-          }
-        ],
-        "title": "Template",
-        "properties": {
-          "template": "{ \"galleryImages\": $1, \"selectedIndex\": 0, \"updateMode\": \"replace\" }",
-          "stringQuote": "",
-          "outputJSON": true,
-          "tags": []
-        },
-        "boxcolor": "red"
-      },
-      {
-        "id": "88ce296c-c21e-4929-90fe-b00310072880",
-        "type": "ui/button",
-        "pos": [
-          2853,
-          80
-        ],
-        "size": [
-          210,
-          58
-        ],
-        "flags": {},
-        "order": 17,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "clicked",
-            "type": -2,
-            "links": [
-              "8b9f4d46-6a55-4f1e-86bc-7c1dbd415e62"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          }
-        ],
-        "title": "UI.Button",
-        "properties": {
-          "tags": [],
-          "defaultValue": false,
-          "param": "bang"
-        },
-        "widgets_values": [
-          "false"
-        ],
-        "color": "#223",
-        "bgColor": "#335",
-        "comfyValue": false,
-        "shownOutputProperties": {},
-        "saveUserState": true
-      },
-      {
-        "id": "773743fa-5945-4708-b74d-f95b1cc48154",
-        "type": "ui/button",
-        "pos": [
-          2846,
-          181
-        ],
-        "size": [
-          210,
-          58
-        ],
-        "flags": {},
-        "order": 18,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "clicked",
-            "type": -2,
-            "links": [
-              "78d35af4-2984-41ce-ab37-48c0e4dc0d91"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          }
-        ],
-        "title": "UI.Button",
-        "properties": {
-          "tags": [],
-          "defaultValue": false,
-          "param": "bang"
-        },
-        "widgets_values": [
-          "false"
-        ],
-        "color": "#223",
-        "bgColor": "#335",
-        "comfyValue": false,
-        "shownOutputProperties": {},
+        "color": "#432",
+        "bgColor": "#653",
         "saveUserState": true
       },
       {
@@ -18049,9 +18897,7 @@
               ],
               "title": "Load Image",
               "properties": {
-                "tags": [
-                  "hr"
-                ]
+                "tags": []
               },
               "color": "#432",
               "bgColor": "#653",
@@ -18402,7 +19248,6 @@
               "properties": {
                 "enabled": true,
                 "tags": [
-                  "hr",
                   "hrPixelSize"
                 ]
               },
@@ -18608,7 +19453,6 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [
-                        "hr",
                         "hrPixelSize"
                       ],
                       "defaultValue": 512,
@@ -18714,7 +19558,6 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [
-                        "hr",
                         "hrPixelSize"
                       ],
                       "defaultValue": 512,
@@ -18781,7 +19624,6 @@
                     "title": "UI.Button",
                     "properties": {
                       "tags": [
-                        "hr",
                         "hrPixelSize"
                       ],
                       "defaultValue": false,
@@ -19237,7 +20079,7 @@
               ],
               "title": "GenericCompare",
               "properties": {
-                "A": null,
+                "A": "ComfyUI_06374_.png [output]",
                 "B": "",
                 "OP": "==",
                 "enabled": true,
@@ -19445,9 +20287,7 @@
               ],
               "title": "KSampler",
               "properties": {
-                "tags": [
-                  "hr"
-                ]
+                "tags": []
               },
               "color": "#432",
               "bgColor": "#653",
@@ -19502,9 +20342,7 @@
               ],
               "title": "Comfy.PickFirst",
               "properties": {
-                "tags": [
-                  "hr"
-                ],
+                "tags": [],
                 "mode": "dataNonNull"
               },
               "color": "#232",
@@ -19560,9 +20398,7 @@
               ],
               "title": "Comfy.PickFirst",
               "properties": {
-                "tags": [
-                  "hr"
-                ],
+                "tags": [],
                 "mode": "dataNonNull"
               },
               "color": "#232",
@@ -19639,9 +20475,7 @@
               ],
               "title": "Comfy.Reroute",
               "properties": {
-                "tags": [
-                  "hr"
-                ],
+                "tags": [],
                 "showOutputText": false,
                 "horizontal": false,
                 "ignoreTypes": false
@@ -19827,9 +20661,7 @@
               ],
               "title": "Upscale Latent",
               "properties": {
-                "tags": [
-                  "hr"
-                ]
+                "tags": []
               },
               "color": "#432",
               "bgColor": "#653",
@@ -19883,9 +20715,7 @@
               ],
               "title": "Repeat Latent Batch",
               "properties": {
-                "tags": [
-                  "hr"
-                ]
+                "tags": []
               },
               "color": "#432",
               "bgColor": "#653",
@@ -20298,9 +21128,7 @@
               ],
               "title": "VAE Encode",
               "properties": {
-                "tags": [
-                  "hr"
-                ]
+                "tags": []
               },
               "color": "#432",
               "bgColor": "#653",
@@ -20351,9 +21179,7 @@
               ],
               "title": "VAE Decode",
               "properties": {
-                "tags": [
-                  "hr"
-                ]
+                "tags": []
               },
               "color": "#432",
               "bgColor": "#653",
@@ -20451,7 +21277,6 @@
               "properties": {
                 "enabled": true,
                 "tags": [
-                  "hr",
                   "hrScaleSize"
                 ]
               },
@@ -20474,7 +21299,7 @@
                     ],
                     "flags": {},
                     "order": 0,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [],
                     "outputs": [
                       {
@@ -20510,7 +21335,7 @@
                       "collapsed": true
                     },
                     "order": 4,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "A",
@@ -20560,7 +21385,7 @@
                       "collapsed": true
                     },
                     "order": 3,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "A",
@@ -20609,7 +21434,7 @@
                       "collapsed": true
                     },
                     "order": 6,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "in",
@@ -20651,7 +21476,7 @@
                       "collapsed": true
                     },
                     "order": 5,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "in",
@@ -20691,7 +21516,7 @@
                     ],
                     "flags": {},
                     "order": 10,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "",
@@ -20722,7 +21547,7 @@
                     ],
                     "flags": {},
                     "order": 8,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "",
@@ -20753,7 +21578,7 @@
                     ],
                     "flags": {},
                     "order": 1,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [],
                     "outputs": [
                       {
@@ -20845,7 +21670,6 @@
                     "title": "UI.Number",
                     "properties": {
                       "tags": [
-                        "hr",
                         "hrScaleSize"
                       ],
                       "defaultValue": 1,
@@ -20895,7 +21719,7 @@
                       "collapsed": true
                     },
                     "order": 7,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "in",
@@ -20936,7 +21760,7 @@
                       "collapsed": true
                     },
                     "order": 9,
-                    "mode": 0,
+                    "mode": 2,
                     "inputs": [
                       {
                         "name": "in",
@@ -21012,7 +21836,6 @@
                     "title": "UI.Text",
                     "properties": {
                       "tags": [
-                        "hr",
                         "hrScaleSize"
                       ],
                       "defaultValue": "0",
@@ -21078,7 +21901,6 @@
                     "title": "UI.Text",
                     "properties": {
                       "tags": [
-                        "hr",
                         "hrScaleSize"
                       ],
                       "defaultValue": "0",
@@ -21665,953 +22487,6 @@
               "d1316cca-081d-4e6a-857e-958d796580e7",
               1,
               "VAE"
-            ]
-          ],
-          "groups": [],
-          "config": {},
-          "extra": {},
-          "version": 10
-        }
-      },
-      {
-        "id": "a08c7fc7-79a3-49ed-abba-03fee5d35ce7",
-        "type": "image/pick_image",
-        "pos": [
-          2485,
-          323
-        ],
-        "size": [
-          210,
-          190
-        ],
-        "flags": {},
-        "order": 53,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "images",
-            "type": "COMFYBOX_IMAGES,COMFYBOX_IMAGE",
-            "link": "c4ff06f7-3f0a-475b-9d14-48d639bdfdda",
-            "properties": {}
-          },
-          {
-            "name": "index",
-            "type": "number",
-            "link": "ca9c18cc-dfe1-4b64-bbaa-9666f11d6e6d",
-            "properties": {}
-          }
-        ],
-        "outputs": [
-          {
-            "name": "image",
-            "type": "COMFYBOX_IMAGE",
-            "links": [
-              "ba66d9be-19c3-4da8-84e0-823ef35f7f32",
-              "83af87c9-1177-4a6d-8412-f3ab9b3c3105"
-            ],
-            "properties": {},
-            "slot_index": 0
-          },
-          {
-            "name": "filename",
-            "type": "string",
-            "links": [
-              "02e201d5-1d1e-4340-abd9-85c512cd03e7"
-            ],
-            "properties": {},
-            "slot_index": 1
-          },
-          {
-            "name": "width",
-            "type": "number",
-            "links": [
-              "9eed80a4-a47d-48c6-9c8a-63b5fb8026f8"
-            ],
-            "properties": {},
-            "slot_index": 2
-          },
-          {
-            "name": "height",
-            "type": "number",
-            "links": [
-              "3f5990c7-4b08-4d41-9a46-9a44073eb5e6"
-            ],
-            "properties": {},
-            "slot_index": 3
-          }
-        ],
-        "title": "Comfy.PickImage",
-        "properties": {
-          "tags": [
-            "hr"
-          ]
-        },
-        "saveUserState": true
-      },
-      {
-        "id": "1ea393e8-e55a-4492-93fd-ce65a0b63084",
-        "type": "ui/gallery",
-        "pos": [
-          3559,
-          327
-        ],
-        "size": [
-          210,
-          126
-        ],
-        "flags": {},
-        "order": 61,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "images",
-            "type": "OUTPUT",
-            "link": null,
-            "properties": {}
-          },
-          {
-            "name": "store",
-            "type": -1,
-            "link": "7568e1d6-8f0c-491e-91a0-fc0b933ea0b0",
-            "properties": {},
-            "color_off": "rebeccapurple",
-            "color_on": "rebeccapurple",
-            "shape": 1,
-            "slot_index": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "images",
-            "type": "COMFYBOX_IMAGES",
-            "links": [
-              "e604281f-d167-47b2-9f70-23fdae9d0fdd"
-            ],
-            "properties": {},
-            "slot_index": 0
-          },
-          {
-            "name": "selected_index",
-            "type": "number",
-            "links": [
-              "de3596a7-6bf6-4146-8b28-4abb74c6a796"
-            ],
-            "properties": {},
-            "slot_index": 1
-          }
-        ],
-        "title": "UI.Gallery",
-        "properties": {
-          "tags": [],
-          "defaultValue": [],
-          "index": 0,
-          "updateMode": "append",
-          "autoSelectOnUpdate": true
-        },
-        "widgets_values": [],
-        "color": "#223",
-        "bgColor": "#335",
-        "comfyValue": [],
-        "shownOutputProperties": {},
-        "saveUserState": false
-      },
-      {
-        "id": "afd8abd6-b55f-46aa-b719-e6a5a9c180c0",
-        "type": "image/pick_image",
-        "pos": [
-          3834,
-          328
-        ],
-        "size": [
-          210,
-          190
-        ],
-        "flags": {},
-        "order": 62,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "images",
-            "type": "COMFYBOX_IMAGES,COMFYBOX_IMAGE",
-            "link": "e604281f-d167-47b2-9f70-23fdae9d0fdd",
-            "properties": {},
-            "slot_index": 0
-          },
-          {
-            "name": "index",
-            "type": "number",
-            "link": "de3596a7-6bf6-4146-8b28-4abb74c6a796",
-            "properties": {}
-          }
-        ],
-        "outputs": [
-          {
-            "name": "image",
-            "type": "COMFYBOX_IMAGE",
-            "links": [
-              "800aab7b-ac43-48e3-9047-446c827a5eea"
-            ],
-            "properties": {},
-            "slot_index": 0
-          },
-          {
-            "name": "filename",
-            "type": "string",
-            "links": [],
-            "properties": {}
-          },
-          {
-            "name": "width",
-            "type": "number",
-            "links": [],
-            "properties": {}
-          },
-          {
-            "name": "height",
-            "type": "number",
-            "links": [],
-            "properties": {}
-          }
-        ],
-        "title": "Comfy.PickImage",
-        "properties": {
-          "tags": []
-        },
-        "saveUserState": true
-      },
-      {
-        "id": "b089ede0-c788-4276-93df-3321a7ca3671",
-        "type": "actions/send_output",
-        "pos": [
-          3100,
-          189
-        ],
-        "size": [
-          184.79999999999998,
-          46
-        ],
-        "flags": {},
-        "order": 63,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "value",
-            "type": "*",
-            "link": "800aab7b-ac43-48e3-9047-446c827a5eea",
-            "properties": {}
-          },
-          {
-            "name": "trigger",
-            "type": -1,
-            "link": "78d35af4-2984-41ce-ab37-48c0e4dc0d91",
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "outputs": [],
-        "title": "Comfy.SendOutputAction",
-        "properties": {
-          "tags": []
-        },
-        "saveUserState": true
-      },
-      {
-        "id": "7999653f-9085-4387-b86f-49d3f0a5ac8b",
-        "type": "actions/send_output",
-        "pos": [
-          3091,
-          85
-        ],
-        "size": [
-          184.79999999999998,
-          46
-        ],
-        "flags": {},
-        "order": 55,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "value",
-            "type": "*",
-            "link": "83af87c9-1177-4a6d-8412-f3ab9b3c3105",
-            "properties": {}
-          },
-          {
-            "name": "trigger",
-            "type": -1,
-            "link": "8b9f4d46-6a55-4f1e-86bc-7c1dbd415e62",
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "outputs": [],
-        "title": "Comfy.SendOutputAction",
-        "properties": {
-          "tags": []
-        },
-        "saveUserState": true
-      },
-      {
-        "id": "438b9e76-5a39-4e3c-a1e0-0cd338d34518",
-        "type": "graph/subgraph",
-        "pos": [
-          167,
-          127
-        ],
-        "size": [
-          200,
-          70
-        ],
-        "flags": {},
-        "order": 19,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "MODEL",
-            "type": "MODEL",
-            "links": [
-              "857760be-9202-4c7f-84a2-465ee7e0ee21"
-            ],
-            "properties": {}
-          },
-          {
-            "name": "CLIP",
-            "type": "CLIP",
-            "links": [
-              "39f6a12b-1267-45b5-adce-9160d1378c6d"
-            ],
-            "properties": {},
-            "slot_index": 1
-          },
-          {
-            "name": "VAE",
-            "type": "VAE",
-            "links": [
-              "f26f80aa-abf3-403f-b83e-f2f92e99d0d8",
-              "49b7145b-029e-471d-860d-cd17ea3fc5d1"
-            ],
-            "properties": {},
-            "slot_index": 2
-          }
-        ],
-        "title": "Model Loader",
-        "properties": {
-          "enabled": true,
-          "tags": [
-            "gen",
-            "hr"
-          ]
-        },
-        "color": "#2a363b",
-        "bgColor": "#3f5159",
-        "subgraph": {
-          "last_node_id": 0,
-          "last_link_id": 0,
-          "nodes": [
-            {
-              "id": "56becd49-01fc-4cdd-9726-515db368471c",
-              "type": "ui/combo",
-              "pos": [
-                0,
-                24
-              ],
-              "size": [
-                210,
-                78
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 0,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "store",
-                  "type": -1,
-                  "link": null,
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "value",
-                  "type": "string",
-                  "links": [
-                    "05616b4c-366b-43ee-b328-06a4adf48a51"
-                  ],
-                  "properties": {}
-                },
-                {
-                  "name": "changed",
-                  "type": -2,
-                  "links": [],
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "title": "UI.Combo",
-              "properties": {
-                "tags": [],
-                "defaultValue": null,
-                "values": [],
-                "convertValueToLabelCode": ""
-              },
-              "widgets_values": [],
-              "color": "#223",
-              "bgColor": "#335",
-              "comfyValue": null,
-              "shownOutputProperties": {},
-              "saveUserState": false
-            },
-            {
-              "id": "ed3226fd-e572-4a07-8923-a610cc3dddae",
-              "type": "graph/output",
-              "pos": [
-                739.19,
-                -31
-              ],
-              "size": [
-                210,
-                62
-              ],
-              "flags": {},
-              "order": 6,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "",
-                  "type": "MODEL",
-                  "link": "49f2f7fa-4c17-475d-a642-556dd939acc0",
-                  "properties": {}
-                }
-              ],
-              "outputs": [],
-              "title": "Output",
-              "properties": {
-                "name": "MODEL",
-                "type": "MODEL",
-                "subgraphID": "438b9e76-5a39-4e3c-a1e0-0cd338d34518",
-                "tags": []
-              }
-            },
-            {
-              "id": "19f3dedf-e18d-4969-9810-f37e7f6a3e2e",
-              "type": "graph/output",
-              "pos": [
-                739.19,
-                51
-              ],
-              "size": [
-                210,
-                62
-              ],
-              "flags": {},
-              "order": 7,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "",
-                  "type": "CLIP",
-                  "link": "16db93f3-d0f4-4124-91aa-9d4c53126901",
-                  "properties": {}
-                }
-              ],
-              "outputs": [],
-              "title": "Output",
-              "properties": {
-                "name": "CLIP",
-                "type": "CLIP",
-                "subgraphID": "438b9e76-5a39-4e3c-a1e0-0cd338d34518",
-                "tags": []
-              }
-            },
-            {
-              "id": "3a7fb51e-6229-4db0-80f6-ebfc8bb880fa",
-              "type": "graph/output",
-              "pos": [
-                740,
-                138
-              ],
-              "size": [
-                210,
-                62
-              ],
-              "flags": {},
-              "order": 10,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "",
-                  "type": "VAE",
-                  "link": "3803fc4e-8e09-421c-a421-a080895a87b4",
-                  "properties": {}
-                }
-              ],
-              "outputs": [],
-              "title": "Output",
-              "properties": {
-                "name": "VAE",
-                "type": "VAE",
-                "subgraphID": "438b9e76-5a39-4e3c-a1e0-0cd338d34518",
-                "tags": []
-              }
-            },
-            {
-              "id": "4c3ba829-f067-4c75-b468-d8b1a0ad3f11",
-              "type": "ui/combo",
-              "pos": [
-                4,
-                -47
-              ],
-              "size": [
-                210,
-                78
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 1,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "store",
-                  "type": -1,
-                  "link": null,
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "value",
-                  "type": "string",
-                  "links": [
-                    "ddd49443-27df-4d25-8d80-52ad9e650021"
-                  ],
-                  "properties": {}
-                },
-                {
-                  "name": "changed",
-                  "type": -2,
-                  "links": [],
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "title": "UI.Combo",
-              "properties": {
-                "tags": [
-                  "useInternalVae"
-                ],
-                "defaultValue": null,
-                "values": [],
-                "convertValueToLabelCode": ""
-              },
-              "widgets_values": [],
-              "color": "#223",
-              "bgColor": "#335",
-              "comfyValue": null,
-              "shownOutputProperties": {},
-              "saveUserState": false
-            },
-            {
-              "id": "b9759212-cb72-4c03-b14b-5de6c0670a85",
-              "type": "ui/checkbox",
-              "pos": [
-                -301,
-                122
-              ],
-              "size": [
-                210,
-                78
-              ],
-              "flags": {
-                "collapsed": false
-              },
-              "order": 2,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "store",
-                  "type": -1,
-                  "link": null,
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "value",
-                  "type": "boolean",
-                  "links": [
-                    "3a2bc48e-7033-4df8-8f21-df0cc8bab379"
-                  ],
-                  "properties": {}
-                },
-                {
-                  "name": "changed",
-                  "type": -2,
-                  "links": [
-                    "45917191-be6a-437f-a4fd-ca62e3e70181"
-                  ],
-                  "properties": {},
-                  "shape": 1,
-                  "slot_index": 1
-                }
-              ],
-              "title": "UI.Checkbox",
-              "properties": {
-                "tags": [],
-                "defaultValue": false
-              },
-              "widgets_values": [
-                "false"
-              ],
-              "color": "#223",
-              "bgColor": "#335",
-              "comfyValue": false,
-              "shownOutputProperties": {},
-              "saveUserState": true
-            },
-            {
-              "id": "e6b7c473-7b9e-40fc-a0a0-b0430a2a1495",
-              "type": "actions/set_node_mode",
-              "pos": [
-                58,
-                122
-              ],
-              "size": [
-                210,
-                102
-              ],
-              "flags": {},
-              "order": 9,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "enabled",
-                  "type": "boolean",
-                  "link": "573590e3-de2b-419b-b600-3c7f29f8c537",
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "set",
-                  "type": -1,
-                  "link": "45917191-be6a-437f-a4fd-ca62e3e70181",
-                  "properties": {},
-                  "shape": 1
-                }
-              ],
-              "outputs": [],
-              "title": "Comfy.SetNodeModeAction",
-              "properties": {
-                "targetTags": "useInternalVae",
-                "enable": false,
-                "tags": []
-              },
-              "saveUserState": true
-            },
-            {
-              "id": "365f016d-d8fe-4191-823e-bb7f53ec12e0",
-              "type": "logic/NOT",
-              "pos": [
-                -52,
-                144
-              ],
-              "size": [
-                140,
-                26
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 5,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "in",
-                  "type": "boolean",
-                  "link": "3a2bc48e-7033-4df8-8f21-df0cc8bab379",
-                  "properties": {}
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "out",
-                  "type": "boolean",
-                  "links": [
-                    "573590e3-de2b-419b-b600-3c7f29f8c537"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "NOT",
-              "properties": {
-                "tags": []
-              }
-            },
-            {
-              "id": "99fb7916-2f46-4f4d-9444-879a0b844175",
-              "type": "utils/pick_first",
-              "pos": [
-                322,
-                -6
-              ],
-              "size": [
-                210,
-                122
-              ],
-              "flags": {},
-              "order": 8,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "A",
-                  "type": "*",
-                  "link": "4b6f85b0-1596-428b-84bc-e2d315bac9dc",
-                  "properties": {},
-                  "slot_index": 0
-                },
-                {
-                  "name": "B",
-                  "type": "*",
-                  "link": "8b1a3fa6-06d1-4073-95e8-1f74934947ff",
-                  "properties": {}
-                },
-                {
-                  "name": "C",
-                  "type": "*",
-                  "link": null,
-                  "properties": {}
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "",
-                  "type": "VAE",
-                  "links": [
-                    "3803fc4e-8e09-421c-a421-a080895a87b4"
-                  ],
-                  "properties": {},
-                  "slot_index": 0
-                }
-              ],
-              "title": "Comfy.PickFirst",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr"
-                ],
-                "mode": "dataNonNull"
-              },
-              "color": "#232",
-              "bgColor": "#353",
-              "saveUserState": true
-            },
-            {
-              "id": "4541b0ee-cef0-49a8-9207-3f930463f4e0",
-              "type": "CheckpointLoaderSimple",
-              "pos": [
-                130,
-                0
-              ],
-              "size": [
-                140,
-                66
-              ],
-              "flags": {},
-              "order": 3,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "ckpt_name",
-                  "type": "string",
-                  "link": "05616b4c-366b-43ee-b328-06a4adf48a51",
-                  "properties": {},
-                  "config": {},
-                  "defaultWidgetNode": null,
-                  "widgetNodeType": "ui/combo",
-                  "serialize": true
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "MODEL",
-                  "type": "MODEL",
-                  "links": [
-                    "49f2f7fa-4c17-475d-a642-556dd939acc0"
-                  ],
-                  "properties": {},
-                  "shape": 3,
-                  "slot_index": 0
-                },
-                {
-                  "name": "CLIP",
-                  "type": "CLIP",
-                  "links": [
-                    "16db93f3-d0f4-4124-91aa-9d4c53126901"
-                  ],
-                  "properties": {},
-                  "shape": 3,
-                  "slot_index": 1
-                },
-                {
-                  "name": "VAE",
-                  "type": "VAE",
-                  "links": [
-                    "8b1a3fa6-06d1-4073-95e8-1f74934947ff"
-                  ],
-                  "properties": {},
-                  "shape": 3,
-                  "slot_index": 2
-                }
-              ],
-              "title": "Load Checkpoint",
-              "properties": {
-                "tags": [
-                  "gen",
-                  "hr"
-                ]
-              },
-              "color": "#432",
-              "bgColor": "#653",
-              "saveUserState": true
-            },
-            {
-              "id": "366f81c8-9097-4257-90b8-c2422d222865",
-              "type": "VAELoader",
-              "pos": [
-                134,
-                -72
-              ],
-              "size": [
-                140,
-                26
-              ],
-              "flags": {},
-              "order": 4,
-              "mode": 0,
-              "inputs": [
-                {
-                  "name": "vae_name",
-                  "type": "string",
-                  "link": "ddd49443-27df-4d25-8d80-52ad9e650021",
-                  "properties": {},
-                  "config": {},
-                  "defaultWidgetNode": null,
-                  "widgetNodeType": "ui/combo",
-                  "serialize": true
-                }
-              ],
-              "outputs": [
-                {
-                  "name": "VAE",
-                  "type": "VAE",
-                  "links": [
-                    "4b6f85b0-1596-428b-84bc-e2d315bac9dc"
-                  ],
-                  "properties": {},
-                  "shape": 3,
-                  "slot_index": 0
-                }
-              ],
-              "title": "Load VAE",
-              "properties": {
-                "tags": [
-                  "useInternalVae",
-                  "gen",
-                  "hr"
-                ]
-              },
-              "color": "#432",
-              "bgColor": "#653",
-              "saveUserState": true
-            }
-          ],
-          "links": [
-            [
-              "49f2f7fa-4c17-475d-a642-556dd939acc0",
-              "4541b0ee-cef0-49a8-9207-3f930463f4e0",
-              0,
-              "ed3226fd-e572-4a07-8923-a610cc3dddae",
-              0,
-              "MODEL"
-            ],
-            [
-              "05616b4c-366b-43ee-b328-06a4adf48a51",
-              "56becd49-01fc-4cdd-9726-515db368471c",
-              0,
-              "4541b0ee-cef0-49a8-9207-3f930463f4e0",
-              0,
-              "string"
-            ],
-            [
-              "ddd49443-27df-4d25-8d80-52ad9e650021",
-              "4c3ba829-f067-4c75-b468-d8b1a0ad3f11",
-              0,
-              "366f81c8-9097-4257-90b8-c2422d222865",
-              0,
-              "string"
-            ],
-            [
-              "4b6f85b0-1596-428b-84bc-e2d315bac9dc",
-              "366f81c8-9097-4257-90b8-c2422d222865",
-              0,
-              "99fb7916-2f46-4f4d-9444-879a0b844175",
-              0,
-              "*"
-            ],
-            [
-              "8b1a3fa6-06d1-4073-95e8-1f74934947ff",
-              "4541b0ee-cef0-49a8-9207-3f930463f4e0",
-              2,
-              "99fb7916-2f46-4f4d-9444-879a0b844175",
-              1,
-              "*"
-            ],
-            [
-              "16db93f3-d0f4-4124-91aa-9d4c53126901",
-              "4541b0ee-cef0-49a8-9207-3f930463f4e0",
-              1,
-              "19f3dedf-e18d-4969-9810-f37e7f6a3e2e",
-              0,
-              "CLIP"
-            ],
-            [
-              "3803fc4e-8e09-421c-a421-a080895a87b4",
-              "99fb7916-2f46-4f4d-9444-879a0b844175",
-              0,
-              "3a7fb51e-6229-4db0-80f6-ebfc8bb880fa",
-              0,
-              "VAE"
-            ],
-            [
-              "45917191-be6a-437f-a4fd-ca62e3e70181",
-              "b9759212-cb72-4c03-b14b-5de6c0670a85",
-              1,
-              "e6b7c473-7b9e-40fc-a0a0-b0430a2a1495",
-              1,
-              -1
-            ],
-            [
-              "3a2bc48e-7033-4df8-8f21-df0cc8bab379",
-              "b9759212-cb72-4c03-b14b-5de6c0670a85",
-              0,
-              "365f016d-d8fe-4191-823e-bb7f53ec12e0",
-              0,
-              "boolean"
-            ],
-            [
-              "573590e3-de2b-419b-b600-3c7f29f8c537",
-              "365f016d-d8fe-4191-823e-bb7f53ec12e0",
-              0,
-              "e6b7c473-7b9e-40fc-a0a0-b0430a2a1495",
-              0,
-              "boolean"
             ]
           ],
           "groups": [],
@@ -26573,9 +26448,9 @@
   },
   "canvas": {
     "offset": [
-      0,
-      0
+      -1897.3841827724618,
+      -30.34465399999982
     ],
-    "scale": 1
+    "scale": 0.8264462809917358
   }
 }

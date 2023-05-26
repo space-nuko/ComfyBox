@@ -8,6 +8,8 @@ export type ModalButton = {
     name: string,
     variant: "primary" | "secondary",
     onClick: (state: ModalData) => boolean | void,
+    disabled?: boolean,
+    hidden?: boolean,
     closeOnClick?: boolean
 }
 export interface ModalData {

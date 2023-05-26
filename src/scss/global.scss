@@ -146,6 +146,23 @@ body {
     }
 }
 
+@mixin json-view {
+    --jsonPaddingLeft: 1rem;
+    --jsonBorderLeft: 1px dotted var(--neutral-600);
+    --jsonBracketColor: currentcolor;
+    --jsonBracketHoverBackground: var(--primary-200);
+    --jsonSeparatorColor: currentcolor;
+    --jsonKeyColor: var(--body-text-color);
+    --jsonValColor: var(--body-text-color-subdued);
+    --jsonValStringColor: var(--color-green-500);
+    --jsonValNumberColor: var(--color-blue-500);
+    --jsonValBooleanColor: var(--color-red-500);
+    --jsonCollapsedColor: var(--neutral-100);
+    --jsonCollapsedBackground: var(--primary-400);
+
+    font-family: monospace;
+}
+
 hr {
     color: var(--panel-border-color);
 }

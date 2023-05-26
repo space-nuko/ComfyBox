@@ -42,6 +42,7 @@ export type SerializedComfyBoxTemplate = {
     version: 1,
     id: UUID,
     commitHash: string,
+    isBuiltIn?: boolean,
 
     /*
      * Serialized metadata
@@ -356,35 +357,40 @@ export function serializeTemplate(canvas: ComfyGraphCanvas, template: ComfyBoxTe
     return serTemplate;
 }
 
-export function deserializeTemplateFromSVG(file: File): Promise<SerializedComfyBoxTemplate> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = async () => {
-            const svg = reader.result as string;
-            let template = null;
 
-            // Extract embedded workflow from desc tags
-            const descEnd = svg.lastIndexOf("</desc>");
-            if (descEnd !== -1) {
-                const descStart = svg.lastIndexOf("<desc>", descEnd);
-                if (descStart !== -1) {
-                    const json = svg.substring(descStart + 6, descEnd);
-                    template = JSON.parse(unescapeXml(json));
-                }
-            }
+/*
+ * Extract embedded workflow from desc tags
+ */
+export function extractTemplateJSONFromSVG(svg: string): string | null {
+    const descEnd = svg.lastIndexOf("</desc>");
+    if (descEnd !== -1) {
+        const descStart = svg.lastIndexOf("<desc>", descEnd);
+        if (descStart !== -1) {
+            const json = svg.substring(descStart + 6, descEnd);
+            return unescapeXml(json);
+        }
+    }
 
-            if (!isSerializedComfyBoxTemplate(template)) {
-                reject("Invalid template format!")
-            }
-            else {
-                template.svg = svg;
-                resolve(template)
-            }
-        };
-        reader.readAsText(file);
-    });
+    return null;
 }
 
+/*
+ * Credit goes to pythongosssss for this format
+ */
+export function deserializeTemplateFromSVG(svg: string): SerializedComfyBoxTemplate | null {
+    let template = null;
+    let templateJSON = extractTemplateJSONFromSVG(svg);
+    if (templateJSON)
+        template = JSON.parse(templateJSON);
+
+    if (!isSerializedComfyBoxTemplate(template)) {
+        return null;
+    }
+    else {
+        template.svg = svg;
+        return template;
+    }
+}
 
 export function createTemplate(nodes: LGraphNode[]): ComfyBoxTemplateResult {
     if (nodes.length === 0) {

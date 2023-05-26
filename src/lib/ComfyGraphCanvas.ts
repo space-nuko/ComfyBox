@@ -489,7 +489,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         const serialized = serializeTemplate(this, template);
 
         try {
-            if (templateState.add(serialized)) {
+            if (templateState.addTemplate(serialized)) {
                 notify("Template saved!", { type: "success" })
             }
             else {

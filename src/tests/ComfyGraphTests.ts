@@ -1,16 +1,11 @@
-import { LGraph, LiteGraph, Subgraph, type SlotLayout } from "@litegraph-ts/core"
-import { Watch } from "@litegraph-ts/nodes-basic"
-import { expect } from 'vitest'
-import UnitTest from "./UnitTest"
 import ComfyGraph from "$lib/ComfyGraph";
-import ComfyPromptSerializer from "$lib/components/ComfyPromptSerializer";
-import { ComfyBackendNode } from "$lib/nodes/ComfyBackendNode";
-import ComfyGraphNode from "$lib/nodes/ComfyGraphNode";
-import { graphToGraphVis } from "$lib/utils";
 import { ComfyNumberNode } from "$lib/nodes/widgets";
-import { get } from "svelte/store";
-import layoutStates from "$lib/stores/layoutStates";
 import { ComfyBoxWorkflow } from "$lib/stores/workflowState";
+import { LiteGraph, Subgraph } from "@litegraph-ts/core";
+import { get } from "svelte/store";
+import { expect } from 'vitest';
+import UnitTest from "./UnitTest";
+import { Watch } from "@litegraph-ts/nodes-basic";
 
 export default class ComfyGraphTests extends UnitTest {
     test__onNodeAdded__updatesLayoutState() {
@@ -91,5 +86,25 @@ export default class ComfyGraphTests extends UnitTest {
 
         expect(Object.keys(state.allItems)).toHaveLength(3)
         expect(Object.keys(state.allItemsByNode)).toHaveLength(0)
+    }
+
+    test__serialize__stripsLinkData() {
+        const [{ graph }, layoutState] = ComfyBoxWorkflow.create()
+        layoutState.initDefaultLayout()
+
+        const widget = LiteGraph.createNode(ComfyNumberNode);
+        const watch = LiteGraph.createNode(Watch);
+        graph.add(widget)
+        graph.add(watch)
+
+        widget.connect(0, watch, 0)
+        const link = widget.getOutputLinks(0)[0]
+        widget.setOutputData(0, 42);
+
+        const result = graph.serialize();
+
+        const serNode = result.nodes.find(n => n.id === widget.id);
+
+        expect(serNode.outputs[0]._data).toBeUndefined()
     }
 }

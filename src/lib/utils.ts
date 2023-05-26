@@ -75,7 +75,9 @@ export function download(filename: string, text: string, type: string = "text/pl
     }, 0);
 }
 
-export function getLocalStorageUsed(): number {
+export const MAX_LOCAL_STORAGE_MB = 5;
+
+export function getLocalStorageUsedMB(): number {
     var total = 0;
     for (const x in localStorage) {
         // Value is multiplied by 2 due to data being stored in `utf-16` format, which requires twice the space.
@@ -597,4 +599,14 @@ export function calcNodesBoundingBox(nodes: SerializedLGraphNode[]): Vector4 {
     }
 
     return [min_x, min_y, max_x, max_y];
+}
+
+export async function readFileToText(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async () => {
+            resolve(reader.result as string);
+        };
+        reader.readAsText(file);
+    })
 }

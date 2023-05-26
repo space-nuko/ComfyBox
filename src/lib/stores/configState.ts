@@ -17,6 +17,12 @@ export type ConfigState = {
 
     /** When closing the tab, open the confirmation window if there's unsaved changes */
     confirmWhenUnloadingUnsavedChanges: boolean,
+
+    /** Basenames of templates that can be loaded from public/templates. Saves LocalStorage space. */
+    builtInTemplates: string[],
+
+    /** Cache loading of built-in resources to save network use */
+    cacheBuiltInResources: boolean
 }
 
 type ConfigStateOps = {
@@ -30,7 +36,9 @@ const store: Writable<ConfigState> = writable(
         comfyUIPort: 8188,
         alwaysStripUserState: false,
         promptForWorkflowName: false,
-        confirmWhenUnloadingUnsavedChanges: true
+        confirmWhenUnloadingUnsavedChanges: true,
+        builtInTemplates: [],
+        cacheBuiltInResources: true,
     })
 
 function getBackendURL(): string {

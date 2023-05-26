@@ -1,8 +1,9 @@
 <script lang="ts">
  import { embedTemplateInSvg, type SerializedComfyBoxTemplate } from "$lib/ComfyBoxTemplate";
- import templateState from "$lib/stores/templateState";
+ import templateState, { type TemplateState, type WritableTemplateStateStore } from "$lib/stores/templateState";
+ import { BoxSeam, Hdd } from "svelte-bootstrap-icons";
  import uiState from "$lib/stores/uiState";
- import { download, truncateString } from "$lib/utils";
+ import { download, getLocalStorageUsedMB, MAX_LOCAL_STORAGE_MB, truncateString } from "$lib/utils";
  import type ComfyApp from "./ComfyApp";
  import { flip } from 'svelte/animate';
  import {fade} from 'svelte/transition';
@@ -26,12 +27,26 @@
      source?: string
  }
 
+ let storageUsedPercent = 0;
+ let storageUsedMB = 0;
+
+ $: {
+     if ($templateState) {
+         storageUsedMB = getLocalStorageUsedMB()
+         storageUsedPercent = (storageUsedMB / MAX_LOCAL_STORAGE_MB) * 100;
+     }
+     else {
+         storageUsedPercent = 0;
+         storageUsedMB = 0;
+     }
+ }
+
  let _sorted: TemplateLayout[] = []
 
- $: rebuildTemplates($templateState.templates);
+ $: $templateState && rebuildTemplates(templateState.getAllTemplates());
 
- function rebuildTemplates(templates: SerializedComfyBoxTemplate[]) {
-     _sorted = Array.from(templates).map(t => {
+ function rebuildTemplates(allTemplates: SerializedComfyBoxTemplate[]): void {
+     _sorted = Array.from(allTemplates).map(t => {
          return {
              type: "template", id: uuidv4(), template: t, attrs: {...defaultWidgetAttributes}, attrsChanged: writable(0)
          }
@@ -88,7 +103,7 @@
      const saveTemplate = (modal: ModalData) => {
          updateTemplate(modal);
          try {
-             templateState.update(layout.template);
+             templateState.updateTemplate(layout.template);
              notify("Saved template!", { type: "success" })
          }
          catch (error) {
@@ -101,7 +116,7 @@
              return false;
 
          try {
-             if (templateState.remove(layout.template.id)) {
+             if (templateState.removeTemplate(layout.template.id)) {
                  notify("Template deleted!", { type: "success" })
              }
              else {
@@ -131,7 +146,8 @@
              {
                  name: "Save",
                  variant: "primary",
-                 onClick: saveTemplate
+                 onClick: saveTemplate,
+                 hidden: layout.template.isBuiltIn
              },
              {
                  name: "Download",
@@ -142,13 +158,13 @@
              {
                  name: "Delete",
                  variant: "secondary",
-                 onClick: deleteTemplate
+                 onClick: deleteTemplate,
+                 hidden: layout.template.isBuiltIn
              },
              {
                  name: "Close",
                  variant: "secondary",
-                 onClick: () => {
-                 }
+                 onClick: () => {}
              },
          ]
      })
@@ -159,35 +175,52 @@
     <div class="template-entries">
         {#if _sorted.length > 0}
             {@const draggable = $uiState.uiUnlocked}
-            <div class="template-category-group">
-                <div class="template-category-header">
-                    General
+            <div class="template-list">
+                <div class="template-category-group">
+                    <div class="template-category-header">
+                        General
+                    </div>
+                    <div class="template-entries-wrapper"
+                         use:dndzone={{
+                                     type: "layout",
+                                     items: _sorted,
+                                     flipDurationMs,
+                                     dragDisabled: !draggable,
+                                     dropFromOthersDisabled: true
+                                     }}
+                         on:consider={handleDndConsider}
+                         on:finalize={handleDndFinalize}>
+                        {#each _sorted.filter(i => i.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
+                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                            <div class="template-entry" class:built-in={item.template.isBuiltIn} class:draggable on:click={() => handleClick(item)}>
+                                <div class="template-name">{item.template.metadata.title}</div>
+                                <div class="template-desc">{item.template.metadata.description}</div>
+                            </div>
+                            {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
+                                <div in:fade={{duration:200, easing: cubicIn}} class='template-drag-item-shadow'/>
+                            {/if}
+                        {/each}
+                    </div>
                 </div>
-                <div class="template-entries-wrapper"
-                     use:dndzone={{
-                                 type: "layout",
-                                 items: _sorted,
-                                 flipDurationMs,
-                                 dragDisabled: !draggable,
-                                 dropFromOthersDisabled: true
-                                 }}
-                     on:consider={handleDndConsider}
-                     on:finalize={handleDndFinalize}>
-                    {#each _sorted.filter(i => i.id !== SHADOW_PLACEHOLDER_ITEM_ID) as item(item.id)}
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <div class="template-entry" class:draggable on:click={() => handleClick(item)}>
-                            <div class="template-name">{item.template.metadata.title}</div>
-                            <div class="template-desc">{item.template.metadata.description}</div>
-                        </div>
-                        {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
-                            <div in:fade={{duration:200, easing: cubicIn}} class='template-drag-item-shadow'/>
-                        {/if}
-                    {/each}
+            </div>
+            <div class="storage-used">
+                <div class="storage-used-icon">
+                    <Hdd width="100%" height="2rem" />
+                </div>
+                <div class="storage-used-bar-wrapper">
+                    <div class="storage-used-bar" style="width: {storageUsedPercent}%;">
+                        <span class="storage-used-label">{storageUsedMB.toFixed(2)} / {MAX_LOCAL_STORAGE_MB} MB</span>
+                    </div>
                 </div>
             </div>
         {:else}
-            <div class="no-templates">
-                <span>(No templates)</span>
+            <div class="no-templates-container">
+                <div class="no-templates-icon">
+                    <BoxSeam width="100%" height="8rem" />
+                </div>
+                <div class="no-templates-message">
+                    (No templates)
+                </div>
             </div>
         {/if}
     </div>
@@ -200,9 +233,13 @@
 
  .template-entries {
      height: 100%;
-     overflow-y: auto;
      display: flex;
      flex-flow: column nowrap;
+     margin: auto;
+ }
+
+ .template-list {
+     overflow-y: auto;
  }
 
  .template-category-header {
@@ -214,6 +251,7 @@
  }
 
  .template-entry {
+     min-width: 12rem;
      padding: 1.0rem;
      display: flex;
      flex-direction: column;
@@ -226,6 +264,16 @@
      user-select: none;
      text-overflow: ellipsis;
      overflow: hidden;
+
+     &.built-in {
+         background: repeating-linear-gradient(
+             45deg,
+             var(--neutral-800),
+             var(--neutral-800) 15px,
+             #1f293780 15px,
+             #1f293780 30px,
+         );
+     }
 
      font-size: 13pt;
      .template-desc {
@@ -253,15 +301,19 @@
      }
  }
 
- .no-templates {
+ .no-templates-container {
      display: flex;
      color: var(--comfy-accent-soft);
-     flex-direction: row;
+     flex-direction: column;
      margin: auto;
-     height: 100%;
      color: var(--comfy-accent-soft);
 
-     span {
+     .no-templates-icon {
+         margin: auto;
+         margin-bottom: 1rem;
+     }
+
+     .no-templates-message {
          margin: auto;
          font-size: 32px;
          font-weight: bolder;
@@ -276,5 +328,46 @@
      background: lightblue;
      opacity: 0.5;
      margin: 0;
+ }
+
+ .storage-used {
+     height: 2.5rem;
+     margin: 5px;
+     text-align: center;
+     position: relative;
+     padding: 0.1rem 0.5rem;
+
+     display: flex;
+     flex-direction: row;
+     gap: var(--spacing-lg);
+
+     .storage-used-icon {
+         color: var(--neutral-500);
+         margin: auto;
+     }
+
+     .storage-used-bar-wrapper {
+         width: 100%;
+         background: var(--panel-background-fill);
+         border: 1px solid var(--neutral-700);
+         position: relative;
+
+         .storage-used-bar {
+             height: 100%;
+             background: var(--neutral-700);
+
+             .storage-used-label {
+                 width: 100%;
+                 color: var(--neutral-200);
+                 font-size: 12pt;
+                 position: absolute;
+                 margin: 0;
+                 left: 0;
+                 right: 0;
+                 top: 50%;
+                 transform: translateY(-50%);
+             }
+         }
+     }
  }
 </style>

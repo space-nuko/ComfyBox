@@ -2,7 +2,7 @@
  import type { A1111ParsedInfotext } from "$lib/parseA1111";
  import { Block, BlockTitle } from "@gradio/atoms";
  import { TextBox } from "@gradio/form";
- import { JsonView } from '@zerodevx/svelte-json-view'
+ import JsonView from '$lib/components/JsonView.svelte'
  import type { A1111PromptAndInfo } from "$lib/components/ComfyApp";
  import { StaticImage } from "$lib/components/gradio/image";
 
@@ -65,17 +65,6 @@
      height: 70vh;
      color: none;
 
-     --jsonPaddingLeft: 1rem;
-     --jsonBorderLeft: 1px dotted var(--neutral-600);
-     --jsonBracketColor: currentcolor;
-     --jsonBracketHoverBackground: var(--neutral-100);
-     --jsonSeparatorColor: currentcolor;
-     --jsonKeyColor: var(--body-text-color);
-     --jsonValColor: var(--body-text-color-subdued);
-     --jsonValStringColor: var(--color-green-500);
-     --jsonValNumberColor: var(--color-blue-500);
-     --jsonValBooleanColor: var(--color-red-500);
-
      display: flex;
      flex-wrap: nowrap;
      overflow-y: none;
@@ -87,7 +76,7 @@
          overflow: auto;
 
          .json {
-             font-family: monospace;
+             @include json-view;
          }
 
          .scroll-container {

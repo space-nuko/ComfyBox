@@ -1,5 +1,5 @@
 import { parseWhateverIntoImageMetadata, type ComfyBoxImageMetadata, type ComfyUploadImageType } from "$lib/utils";
-import { BuiltInSlotType, LiteGraph, type IComboWidget, type ITextWidget, type PropertyLayout, type SlotLayout, type INumberWidget, clamp } from "@litegraph-ts/core";
+import { BuiltInSlotType, LiteGraph, type IComboWidget, type ITextWidget, type PropertyLayout, type SlotLayout, type INumberWidget, clamp, type SerializedLGraphNode } from "@litegraph-ts/core";
 import { get, writable, type Writable } from "svelte/store";
 
 import GalleryWidget from "$lib/widgets/GalleryWidget.svelte";
@@ -58,6 +58,7 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
         this.selectedIndexWidget = this.addWidget("text", "Selected", String(get(this.selectedImage)))
         this.selectedIndexWidget.disabled = true;
         this.modeWidget = this.addWidget("combo", "Mode", this.properties.updateMode, null, { property: "updateMode", values: ["replace", "append"] })
+        this.defaultValue = []
     }
 
     override onPropertyChanged(property: any, value: any) {
@@ -102,6 +103,12 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
     }
 
     private _newSelectedIndex: number | null = null;
+
+    override stripUserState(o: SerializedLGraphNode) {
+        super.stripUserState(o);
+        o.properties.defaultValue = [];
+        (o as any).comfyValue = [];
+    }
 
     override parseValue(param: any): ComfyBoxImageMetadata[] {
         if (param == null)
