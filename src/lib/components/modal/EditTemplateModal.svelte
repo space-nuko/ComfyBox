@@ -27,6 +27,10 @@
  let showAllJSON: number = 0;
  let createdAt = "";
 
+ let isEditable = true;
+
+ $: isEditable = editable && templateAndSvg && !templateAndSvg.isBuiltIn;
+
  $: {
      rawTemplate = { ...templateAndSvg };
      rawTemplate.svg = undefined;
@@ -100,9 +104,9 @@
                 <Block>
                     <BlockTitle>Metadata</BlockTitle>
                     <div>
-                        <Textbox label="Name" disabled={!editable} bind:value={$state.name} lines={1} max_lines={1} />
-                        <Textbox label="Author" disabled={!editable} bind:value={$state.author} lines={1} max_lines={1} />
-                        <Textbox label="Description" disabled={!editable} bind:value={$state.description} lines={5} max_lines={5} />
+                        <Textbox label="Name" disabled={!isEditable} bind:value={$state.name} lines={1} max_lines={1} />
+                        <Textbox label="Author" disabled={!isEditable} bind:value={$state.author} lines={1} max_lines={1} />
+                        <Textbox label="Description" disabled={!isEditable} bind:value={$state.description} lines={5} max_lines={5} />
                         <Row>
                             <Textbox label="Created At" disabled={true} bind:value={createdAt} lines={1} max_lines={1} />
                             <Textbox label="Size" disabled={true} value="{(templateAndSvg.svg.length/1024).toFixed(2)} KB" lines={1} max_lines={1} />

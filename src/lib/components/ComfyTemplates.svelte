@@ -146,7 +146,8 @@
              {
                  name: "Save",
                  variant: "primary",
-                 onClick: saveTemplate
+                 onClick: saveTemplate,
+                 hidden: layout.template.isBuiltIn
              },
              {
                  name: "Download",
@@ -158,7 +159,7 @@
                  name: "Delete",
                  variant: "secondary",
                  onClick: deleteTemplate,
-                 disabled: layout.template.isBuiltIn
+                 hidden: layout.template.isBuiltIn
              },
              {
                  name: "Close",
@@ -250,6 +251,7 @@
  }
 
  .template-entry {
+     min-width: 12rem;
      padding: 1.0rem;
      display: flex;
      flex-direction: column;

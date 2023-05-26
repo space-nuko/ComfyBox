@@ -307,6 +307,8 @@ export default class ComfyApp {
             if (errors && errors.length > 0)
                 error = "Error(s) loading builtin templates:\n" + errors.join("\n");
 
+            console.log(`Loaded {templates.length} builtin templates.`);
+
             return [templates, error]
         })
 
@@ -651,10 +653,12 @@ export default class ComfyApp {
             // Queue prompt using ctrl or command + enter
             if ((e.ctrlKey || e.metaKey) && (e.key === "Enter" || e.code === "Enter" || e.keyCode === 10)) {
                 e.preventDefault();
+                e.stopImmediatePropagation();
                 this.runDefaultQueueAction();
             }
             else if ((e.ctrlKey) && (e.key === "s" || e.code === "KeyS")) {
                 e.preventDefault();
+                e.stopImmediatePropagation();
                 this.saveStateToLocalStorage();
             }
         });
