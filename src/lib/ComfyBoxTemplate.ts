@@ -285,6 +285,19 @@ function relocateNodes(nodes: SerializedLGraphNode[]): SerializedLGraphNode[] {
     return nodes;
 }
 
+/*
+ * Strips tags from top-level nodes
+ */
+function stripTags(nodes: SerializedLGraphNode[]): SerializedLGraphNode[] {
+    for (const node of nodes) {
+        if (Array.isArray(node.properties.tags)) {
+            node.properties.tags = []
+        }
+    }
+
+    return nodes;
+}
+
 function pruneDetachedLinks(nodes: SerializedLGraphNode[], links: SerializedTemplateLink[]): [SerializedLGraphNode[], SerializedTemplateLink[]] {
     const nodeIds = new Set(nodes.map(n => n.id));
 
@@ -338,6 +351,7 @@ export function serializeTemplate(canvas: ComfyGraphCanvas, template: ComfyBoxTe
     uiState.update(s => { s.forceSaveUserState = null; return s; });
 
     nodes = relocateNodes(nodes);
+    nodes = stripTags(nodes);
     [nodes, links] = pruneDetachedLinks(nodes, links);
 
     const svg = renderSvg(canvas, graph, TEMPLATE_SVG_PADDING);
