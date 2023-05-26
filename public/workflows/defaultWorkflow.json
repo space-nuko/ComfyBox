@@ -8,41 +8,6 @@
     "last_link_id": 0,
     "nodes": [
       {
-        "id": "23565dd5-d004-4010-bfa9-ffd9e4dc7cba",
-        "type": "basic/integer",
-        "pos": [
-          1462.247204585808,
-          855.228727338763
-        ],
-        "size": [
-          210,
-          38
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 0,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "value",
-            "type": "number",
-            "links": [
-              "422c4c43-7ae9-40d5-bb16-afc6c8017917"
-            ],
-            "properties": {},
-            "label": "0",
-            "slot_index": 0
-          }
-        ],
-        "title": "Const Integer",
-        "properties": {
-          "value": 0,
-          "tags": []
-        }
-      },
-      {
         "id": "c5dde6e2-d6a9-4c7e-b396-3083b11573f5",
         "type": "ui/gallery",
         "pos": [
@@ -54,7 +19,7 @@
           126
         ],
         "flags": {},
-        "order": 53,
+        "order": 39,
         "mode": 0,
         "inputs": [
           {
@@ -98,7 +63,7 @@
         "properties": {
           "tags": [],
           "defaultValue": [],
-          "index": 18,
+          "index": 0,
           "updateMode": "append",
           "autoSelectOnUpdate": true
         },
@@ -123,7 +88,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 1,
+        "order": 0,
         "mode": 0,
         "inputs": [],
         "outputs": [
@@ -144,113 +109,6 @@
         }
       },
       {
-        "id": "59d83912-13a7-4b7f-a353-e7e2a0ecf3b8",
-        "type": "events/filter",
-        "pos": [
-          1521.7189814453116,
-          809.9955605468764
-        ],
-        "size": [
-          210,
-          150
-        ],
-        "flags": {
-          "collapsed": false
-        },
-        "order": 20,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "event",
-            "type": -1,
-            "link": "bda9da8b-686f-4e8a-ae78-347f4cde9018",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "compare_value",
-            "type": "*",
-            "link": "422c4c43-7ae9-40d5-bb16-afc6c8017917",
-            "properties": {}
-          }
-        ],
-        "outputs": [
-          {
-            "name": "accept",
-            "type": -2,
-            "links": [
-              "75383097-6487-4344-9930-4814b5742aa1"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          },
-          {
-            "name": "reject",
-            "type": -2,
-            "links": [],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 1
-          }
-        ],
-        "title": "Filter Event",
-        "properties": {
-          "compareValue": 0,
-          "propertyName": "queueRemaining",
-          "mode": "property",
-          "operation": "==",
-          "tags": []
-        }
-      },
-      {
-        "id": "a16a0898-b754-4a3a-a118-31cb2c9e76d7",
-        "type": "events/queue_events",
-        "pos": [
-          1275.109848632813,
-          808.1699824218742
-        ],
-        "size": [
-          178,
-          66
-        ],
-        "flags": {},
-        "order": 2,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "beforeQueued",
-            "type": -2,
-            "links": [
-              "bda9da8b-686f-4e8a-ae78-347f4cde9018"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          },
-          {
-            "name": "afterQueued",
-            "type": -2,
-            "links": [],
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "onDefaultQueueAction",
-            "type": -2,
-            "links": [],
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "title": "Comfy.QueueEvents",
-        "properties": {
-          "tags": []
-        },
-        "saveUserState": true
-      },
-      {
         "id": "956ef877-9a36-40d4-9f86-e824ff6f6dd5",
         "type": "ui/number",
         "pos": [
@@ -264,7 +122,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 3,
+        "order": 1,
         "mode": 0,
         "inputs": [
           {
@@ -367,7 +225,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 22,
+        "order": 16,
         "mode": 0,
         "inputs": [
           {
@@ -425,7 +283,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 4,
+        "order": 2,
         "mode": 0,
         "inputs": [
           {
@@ -478,473 +336,6 @@
         "saveUserState": true
       },
       {
-        "id": "5e21407a-fb86-4694-8c1a-77cc4b3f3c39",
-        "type": "events/filter",
-        "pos": [
-          1513.66162109375,
-          996.294677734375
-        ],
-        "size": [
-          210,
-          150
-        ],
-        "flags": {},
-        "order": 27,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "event",
-            "type": -1,
-            "link": "75383097-6487-4344-9930-4814b5742aa1",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "compare_value",
-            "type": "*",
-            "link": null,
-            "properties": {}
-          }
-        ],
-        "outputs": [
-          {
-            "name": "accept",
-            "type": -2,
-            "links": [
-              "32fc2993-3360-4911-9965-184662fdd8f8"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          },
-          {
-            "name": "reject",
-            "type": -2,
-            "links": [
-              "1790c44e-0ab7-464f-9139-f2a64b39c996"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 1
-          }
-        ],
-        "title": "Filter Event",
-        "properties": {
-          "compareValue": "gen",
-          "propertyName": "subgraph",
-          "mode": "property",
-          "operation": "==",
-          "tags": []
-        }
-      },
-      {
-        "id": "e41be48f-eb22-4269-93dc-d56a40d57f2c",
-        "type": "events/wrap_as_event",
-        "pos": [
-          1911,
-          738
-        ],
-        "size": [
-          140,
-          46
-        ],
-        "flags": {
-          "collapsed": false
-        },
-        "order": 43,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "trigger",
-            "type": -1,
-            "link": "8d3265e3-4f5b-4124-b20f-51e14647a7f7",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "param",
-            "type": "",
-            "link": "ce514e38-b125-4803-a246-9a66e9f75235",
-            "properties": {},
-            "slot_index": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "event",
-            "type": -2,
-            "links": [
-              "27e9b2c9-72c5-48b0-aa80-2646590d8c2b"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          }
-        ],
-        "title": "Wrap As Event",
-        "properties": {
-          "tags": []
-        }
-      },
-      {
-        "id": "eb08f8f4-50d2-429f-b625-ea69f0e219f6",
-        "type": "basic/json",
-        "pos": [
-          1791,
-          788
-        ],
-        "size": [
-          210,
-          86
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 5,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "data",
-            "type": "object",
-            "links": [
-              "ce514e38-b125-4803-a246-9a66e9f75235"
-            ],
-            "properties": {},
-            "shape": 0,
-            "slot_index": 0
-          }
-        ],
-        "title": "Const JSON",
-        "properties": {
-          "json": "null",
-          "value": "null",
-          "type": "object",
-          "tags": []
-        },
-        "boxcolor": "#AEA"
-      },
-      {
-        "id": "17b390f3-8350-4516-914f-817c33037476",
-        "type": "basic/json",
-        "pos": [
-          2961.5223851562455,
-          739.362885546875
-        ],
-        "size": [
-          210,
-          86
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 6,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "data",
-            "type": "object",
-            "links": [
-              "21e19922-b1e8-4b65-a488-cfb746dec0d1"
-            ],
-            "properties": {},
-            "shape": 0,
-            "slot_index": 0
-          }
-        ],
-        "title": "Const JSON",
-        "properties": {
-          "json": "null",
-          "value": "null",
-          "type": "object",
-          "tags": []
-        },
-        "boxcolor": "#AEA"
-      },
-      {
-        "id": "62204d27-0c28-4901-8319-453605d911f0",
-        "type": "events/sequence",
-        "pos": [
-          1799,
-          761
-        ],
-        "size": [
-          140,
-          66
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 38,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "",
-            "type": -1,
-            "link": "794ce3c6-a8de-4f4d-ba55-5bb3d5092993",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "",
-            "type": -1,
-            "link": "8e8938d1-bba9-4ffc-a075-440aefbda06a",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "",
-            "type": -1,
-            "link": null,
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "",
-            "type": -2,
-            "links": [
-              "8d3265e3-4f5b-4124-b20f-51e14647a7f7"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          },
-          {
-            "name": "",
-            "type": -2,
-            "links": [],
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "title": "Sequence",
-        "properties": {
-          "tags": []
-        }
-      },
-      {
-        "id": "49b8f233-abf9-4604-ab0c-8179178d1731",
-        "type": "events/branch",
-        "pos": [
-          1919,
-          955
-        ],
-        "size": [
-          140,
-          46
-        ],
-        "flags": {
-          "collapsed": false
-        },
-        "order": 33,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "in",
-            "type": -1,
-            "link": "32fc2993-3360-4911-9965-184662fdd8f8",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "cond",
-            "type": "boolean",
-            "link": "edb164b9-1b4c-4de0-b653-0e750128730e",
-            "properties": {}
-          }
-        ],
-        "outputs": [
-          {
-            "name": "true",
-            "type": -2,
-            "links": [],
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "false",
-            "type": -2,
-            "links": [
-              "8e8938d1-bba9-4ffc-a075-440aefbda06a"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 1
-          }
-        ],
-        "title": "Branch",
-        "properties": {
-          "tags": []
-        }
-      },
-      {
-        "id": "63a83c93-647f-4882-84f0-606c4d070e43",
-        "type": "ui/checkbox",
-        "pos": [
-          1789,
-          1058
-        ],
-        "size": [
-          210,
-          78
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 7,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "store",
-            "type": -1,
-            "link": null,
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "value",
-            "type": "boolean",
-            "links": [
-              "edb164b9-1b4c-4de0-b653-0e750128730e",
-              "a1e177b5-ac2c-4241-b693-660b45c45a2f"
-            ],
-            "properties": {},
-            "slot_index": 0
-          },
-          {
-            "name": "changed",
-            "type": -2,
-            "links": [],
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "title": "UI.Checkbox",
-        "properties": {
-          "tags": [],
-          "defaultValue": true
-        },
-        "widgets_values": [
-          "true"
-        ],
-        "color": "#223",
-        "bgColor": "#335",
-        "comfyValue": true,
-        "shownOutputProperties": {},
-        "saveUserState": true
-      },
-      {
-        "id": "8247d831-788d-47b7-98d0-c1e0da4a7c62",
-        "type": "events/filter",
-        "pos": [
-          2676.452385156247,
-          1010.4468855468748
-        ],
-        "size": [
-          210,
-          150
-        ],
-        "flags": {},
-        "order": 34,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "event",
-            "type": -1,
-            "link": "1790c44e-0ab7-464f-9139-f2a64b39c996",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "compare_value",
-            "type": "*",
-            "link": null,
-            "properties": {}
-          }
-        ],
-        "outputs": [
-          {
-            "name": "accept",
-            "type": -2,
-            "links": [
-              "4a358214-97d1-4ac0-aed9-f6ad87459a01"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          },
-          {
-            "name": "reject",
-            "type": -2,
-            "links": [],
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "title": "Filter Event",
-        "properties": {
-          "compareValue": "hr",
-          "propertyName": "subgraph",
-          "mode": "property",
-          "operation": "==",
-          "tags": []
-        }
-      },
-      {
-        "id": "fa30235f-388d-4151-9a58-5d65f0ea1155",
-        "type": "events/wrap_as_event",
-        "pos": [
-          3082.251953125,
-          688.455078125
-        ],
-        "size": [
-          140,
-          46
-        ],
-        "flags": {
-          "collapsed": false
-        },
-        "order": 49,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "trigger",
-            "type": -1,
-            "link": "cc44ddcf-c257-4b72-99d8-4724a68bbdcd",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "param",
-            "type": "",
-            "link": "21e19922-b1e8-4b65-a488-cfb746dec0d1",
-            "properties": {},
-            "slot_index": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "event",
-            "type": -2,
-            "links": [
-              "76456142-ea56-4684-a6ca-f4fe91417ce7"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          }
-        ],
-        "title": "Wrap As Event",
-        "properties": {
-          "tags": []
-        }
-      },
-      {
         "id": "0b071e6c-f765-4e31-8125-8c057cddc865",
         "type": "events/sequence",
         "pos": [
@@ -958,7 +349,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 59,
+        "order": 45,
         "mode": 0,
         "inputs": [
           {
@@ -971,7 +362,7 @@
           {
             "name": "",
             "type": -1,
-            "link": "76456142-ea56-4684-a6ca-f4fe91417ce7",
+            "link": "fcbf2d5b-cc17-47f4-aea6-0649a7a7d665",
             "properties": {},
             "shape": 1
           },
@@ -1008,51 +399,6 @@
         }
       },
       {
-        "id": "5f099bc5-043a-4658-a6ac-83f01f72eefd",
-        "type": "ui/button",
-        "pos": [
-          1641,
-          720
-        ],
-        "size": [
-          210,
-          58
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 8,
-        "mode": 0,
-        "inputs": [],
-        "outputs": [
-          {
-            "name": "clicked",
-            "type": -2,
-            "links": [
-              "794ce3c6-a8de-4f4d-ba55-5bb3d5092993",
-              "62fc8617-059f-4f94-9d0c-cd769d1e4f1d"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          }
-        ],
-        "title": "UI.Button",
-        "properties": {
-          "tags": [],
-          "defaultValue": false,
-          "param": "bang"
-        },
-        "widgets_values": [
-          "false"
-        ],
-        "color": "#223",
-        "bgColor": "#335",
-        "comfyValue": false,
-        "shownOutputProperties": {},
-        "saveUserState": true
-      },
-      {
         "id": "f723f393-1b70-4056-887c-aeef1217969e",
         "type": "basic/reroute",
         "pos": [
@@ -1064,7 +410,7 @@
           30
         ],
         "flags": {},
-        "order": 45,
+        "order": 32,
         "mode": 0,
         "inputs": [
           {
@@ -1102,7 +448,7 @@
           30
         ],
         "flags": {},
-        "order": 28,
+        "order": 21,
         "mode": 0,
         "inputs": [
           {
@@ -1141,7 +487,7 @@
           30
         ],
         "flags": {},
-        "order": 35,
+        "order": 26,
         "mode": 0,
         "inputs": [
           {
@@ -1182,7 +528,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 9,
+        "order": 3,
         "mode": 0,
         "inputs": [
           {
@@ -1285,7 +631,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 10,
+        "order": 4,
         "mode": 0,
         "inputs": [
           {
@@ -1343,7 +689,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 11,
+        "order": 5,
         "mode": 0,
         "inputs": [
           {
@@ -1399,7 +745,7 @@
           30
         ],
         "flags": {},
-        "order": 48,
+        "order": 35,
         "mode": 0,
         "inputs": [
           {
@@ -1426,124 +772,6 @@
         }
       },
       {
-        "id": "d2b732b7-87b7-4c9e-8a8b-e0a269be4093",
-        "type": "events/branch",
-        "pos": [
-          2917.9443851562464,
-          1013.0458855468755
-        ],
-        "size": [
-          140,
-          46
-        ],
-        "flags": {},
-        "order": 39,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "in",
-            "type": -1,
-            "link": "4a358214-97d1-4ac0-aed9-f6ad87459a01",
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          },
-          {
-            "name": "cond",
-            "type": "boolean",
-            "link": "a1e177b5-ac2c-4241-b693-660b45c45a2f",
-            "properties": {}
-          }
-        ],
-        "outputs": [
-          {
-            "name": "true",
-            "type": -2,
-            "links": [],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          },
-          {
-            "name": "false",
-            "type": -2,
-            "links": [
-              "7a2ac556-fe0f-4c91-bd52-49c5e557b2f2"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 1
-          }
-        ],
-        "title": "Branch",
-        "properties": {
-          "tags": []
-        }
-      },
-      {
-        "id": "08d81d21-6bd4-4abf-b88f-96418ed394ca",
-        "type": "events/sequence",
-        "pos": [
-          2965,
-          711
-        ],
-        "size": [
-          140,
-          66
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 44,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "",
-            "type": -1,
-            "link": "7a2ac556-fe0f-4c91-bd52-49c5e557b2f2",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "",
-            "type": -1,
-            "link": "62fc8617-059f-4f94-9d0c-cd769d1e4f1d",
-            "properties": {},
-            "shape": 1
-          },
-          {
-            "name": "",
-            "type": -1,
-            "link": null,
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "outputs": [
-          {
-            "name": "",
-            "type": -2,
-            "links": [
-              "cc44ddcf-c257-4b72-99d8-4724a68bbdcd"
-            ],
-            "properties": {},
-            "shape": 1,
-            "slot_index": 0
-          },
-          {
-            "name": "",
-            "type": -2,
-            "links": [],
-            "properties": {},
-            "shape": 1
-          }
-        ],
-        "title": "Sequence",
-        "properties": {
-          "tags": []
-        }
-      },
-      {
         "id": "d5a2ba8b-f1bc-4830-b00f-ef2543d65d5e",
         "type": "basic/reroute",
         "pos": [
@@ -1555,7 +783,7 @@
           30
         ],
         "flags": {},
-        "order": 36,
+        "order": 27,
         "mode": 0,
         "inputs": [
           {
@@ -1583,39 +811,6 @@
         }
       },
       {
-        "id": "bbf920e2-f9ee-4778-aa0f-78eb203737e6",
-        "type": "actions/set_prompt_thumbnails",
-        "pos": [
-          2747,
-          288
-        ],
-        "size": [
-          260.4,
-          26
-        ],
-        "flags": {
-          "collapsed": true
-        },
-        "order": 55,
-        "mode": 0,
-        "inputs": [
-          {
-            "name": "filenames",
-            "type": "*",
-            "link": "ba66d9be-19c3-4da8-84e0-823ef35f7f32",
-            "properties": {},
-            "slot_index": 0
-          }
-        ],
-        "outputs": [],
-        "title": "Comfy.SetPromptThumbnailsAction",
-        "properties": {
-          "tags": ["hr"],
-          "defaultFolderType": "input"
-        },
-        "saveUserState": true
-      },
-      {
         "id": "cdeff152-cd59-4943-a002-8414626e8a1c",
         "type": "basic/reroute",
         "pos": [
@@ -1627,7 +822,7 @@
           30
         ],
         "flags": {},
-        "order": 32,
+        "order": 25,
         "mode": 0,
         "inputs": [
           {
@@ -1666,7 +861,7 @@
           30
         ],
         "flags": {},
-        "order": 26,
+        "order": 20,
         "mode": 0,
         "inputs": [
           {
@@ -1705,7 +900,7 @@
           30
         ],
         "flags": {},
-        "order": 40,
+        "order": 29,
         "mode": 0,
         "inputs": [
           {
@@ -1743,7 +938,7 @@
           30
         ],
         "flags": {},
-        "order": 42,
+        "order": 31,
         "mode": 0,
         "inputs": [
           {
@@ -1782,7 +977,7 @@
           30
         ],
         "flags": {},
-        "order": 30,
+        "order": 23,
         "mode": 0,
         "inputs": [
           {
@@ -1823,7 +1018,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 12,
+        "order": 6,
         "mode": 0,
         "inputs": [],
         "outputs": [
@@ -1856,7 +1051,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 51,
+        "order": 37,
         "mode": 0,
         "inputs": [
           {
@@ -1896,7 +1091,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 13,
+        "order": 7,
         "mode": 0,
         "inputs": [],
         "outputs": [
@@ -1929,7 +1124,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 52,
+        "order": 38,
         "mode": 0,
         "inputs": [
           {
@@ -1970,7 +1165,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 60,
+        "order": 46,
         "mode": 0,
         "inputs": [
           {
@@ -2011,7 +1206,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 14,
+        "order": 8,
         "mode": 0,
         "inputs": [],
         "outputs": [
@@ -2044,7 +1239,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 15,
+        "order": 9,
         "mode": 0,
         "inputs": [],
         "outputs": [
@@ -2077,7 +1272,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 61,
+        "order": 47,
         "mode": 0,
         "inputs": [
           {
@@ -2117,7 +1312,7 @@
           106
         ],
         "flags": {},
-        "order": 16,
+        "order": 10,
         "mode": 0,
         "inputs": [],
         "outputs": [
@@ -2158,7 +1353,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 50,
+        "order": 36,
         "mode": 0,
         "inputs": [
           {
@@ -2171,7 +1366,7 @@
           {
             "name": "",
             "type": -1,
-            "link": "27e9b2c9-72c5-48b0-aa80-2646590d8c2b",
+            "link": "d953f0b7-4853-40d8-9bdb-f660b5f9fe9d",
             "properties": {},
             "shape": 1
           },
@@ -2228,7 +1423,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 23,
+        "order": 17,
         "mode": 0,
         "inputs": [
           {
@@ -2270,7 +1465,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 29,
+        "order": 22,
         "mode": 0,
         "inputs": [
           {
@@ -2310,7 +1505,7 @@
         "flags": {
           "collapsed": true
         },
-        "order": 24,
+        "order": 18,
         "mode": 0,
         "inputs": [
           {
@@ -2373,7 +1568,7 @@
           58
         ],
         "flags": {},
-        "order": 17,
+        "order": 11,
         "mode": 0,
         "inputs": [],
         "outputs": [
@@ -2415,7 +1610,7 @@
           58
         ],
         "flags": {},
-        "order": 18,
+        "order": 12,
         "mode": 0,
         "inputs": [],
         "outputs": [
@@ -2457,7 +1652,7 @@
           126
         ],
         "flags": {},
-        "order": 62,
+        "order": 48,
         "mode": 0,
         "inputs": [
           {
@@ -2524,7 +1719,7 @@
           190
         ],
         "flags": {},
-        "order": 63,
+        "order": 49,
         "mode": 0,
         "inputs": [
           {
@@ -2588,7 +1783,7 @@
           46
         ],
         "flags": {},
-        "order": 64,
+        "order": 50,
         "mode": 0,
         "inputs": [
           {
@@ -2624,7 +1819,7 @@
           46
         ],
         "flags": {},
-        "order": 56,
+        "order": 42,
         "mode": 0,
         "inputs": [
           {
@@ -2660,7 +1855,7 @@
           70
         ],
         "flags": {},
-        "order": 19,
+        "order": 13,
         "mode": 0,
         "inputs": [],
         "outputs": [
@@ -3326,7 +2521,7 @@
         "flags": {
           "collapsed": false
         },
-        "order": 25,
+        "order": 19,
         "mode": 0,
         "inputs": [
           {
@@ -10197,7 +9392,7 @@
         "flags": {
           "collapsed": false
         },
-        "order": 31,
+        "order": 24,
         "mode": 0,
         "inputs": [
           {
@@ -10660,7 +9855,7 @@
           70
         ],
         "flags": {},
-        "order": 37,
+        "order": 28,
         "mode": 0,
         "inputs": [
           {
@@ -11978,7 +11173,7 @@
         "flags": {
           "collapsed": false
         },
-        "order": 21,
+        "order": 15,
         "mode": 0,
         "inputs": [
           {
@@ -12099,7 +11294,7 @@
               "title": "Comfy.ValueControl",
               "properties": {
                 "tags": [],
-                "value": 475772298912200,
+                "value": 922137301074348,
                 "action": "randomize",
                 "min": 0,
                 "max": 18446744073709552000,
@@ -12185,18 +11380,18 @@
               "title": "UI.Number",
               "properties": {
                 "tags": [],
-                "defaultValue": 0,
+                "defaultValue": 922137301074348,
                 "min": 0,
                 "max": 18446744073709552000,
                 "step": 1,
                 "precision": 0
               },
               "widgets_values": [
-                "0.000"
+                "922137301074348.000"
               ],
               "color": "#223",
               "bgColor": "#335",
-              "comfyValue": 0,
+              "comfyValue": 922137301074348,
               "shownOutputProperties": {
                 "min": {
                   "type": "number",
@@ -12480,7 +11675,7 @@
           46
         ],
         "flags": {},
-        "order": 46,
+        "order": 33,
         "mode": 0,
         "inputs": [
           {
@@ -12539,7 +11734,7 @@
           190
         ],
         "flags": {},
-        "order": 54,
+        "order": 40,
         "mode": 0,
         "inputs": [
           {
@@ -12612,7 +11807,7 @@
           46
         ],
         "flags": {},
-        "order": 58,
+        "order": 44,
         "mode": 0,
         "inputs": [
           {
@@ -12671,7 +11866,7 @@
           230
         ],
         "flags": {},
-        "order": 57,
+        "order": 43,
         "mode": 0,
         "inputs": [
           {
@@ -13691,7 +12886,7 @@
               "flags": {
                 "collapsed": true
               },
-              "order": 15,
+              "order": 14,
               "mode": 0,
               "inputs": [],
               "outputs": [
@@ -13821,7 +13016,7 @@
                 78
               ],
               "flags": {},
-              "order": 16,
+              "order": 15,
               "mode": 0,
               "inputs": [
                 {
@@ -13877,7 +13072,7 @@
               "flags": {
                 "collapsed": true
               },
-              "order": 17,
+              "order": 16,
               "mode": 0,
               "inputs": [],
               "outputs": [
@@ -13994,7 +13189,7 @@
               ],
               "title": "GenericCompare",
               "properties": {
-                "A": "ComfyUI_06410_.png [output]",
+                "A": "ComfyUI_06513_.png [output]",
                 "B": "",
                 "OP": "==",
                 "enabled": true,
@@ -14015,7 +13210,7 @@
               "flags": {
                 "collapsed": true
               },
-              "order": 18,
+              "order": 17,
               "mode": 0,
               "inputs": [],
               "outputs": [
@@ -14334,7 +13529,7 @@
               "flags": {
                 "collapsed": true
               },
-              "order": 19,
+              "order": 18,
               "mode": 0,
               "inputs": [],
               "outputs": [
@@ -14412,7 +13607,7 @@
               "flags": {
                 "collapsed": true
               },
-              "order": 20,
+              "order": 19,
               "mode": 0,
               "inputs": [
                 {
@@ -14939,7 +14134,7 @@
               "flags": {
                 "collapsed": true
               },
-              "order": 21,
+              "order": 20,
               "mode": 0,
               "inputs": [],
               "outputs": [
@@ -14973,7 +14168,7 @@
               "flags": {
                 "collapsed": true
               },
-              "order": 22,
+              "order": 21,
               "mode": 0,
               "inputs": [],
               "outputs": [
@@ -15116,7 +14311,7 @@
               "flags": {
                 "collapsed": true
               },
-              "order": 23,
+              "order": 22,
               "mode": 0,
               "inputs": [],
               "outputs": [
@@ -15998,7 +15193,7 @@
               "flags": {
                 "collapsed": true
               },
-              "order": 14,
+              "order": 23,
               "mode": 0,
               "inputs": [],
               "outputs": [
@@ -16927,7 +16122,7 @@
           30
         ],
         "flags": {},
-        "order": 47,
+        "order": 34,
         "mode": 0,
         "inputs": [
           {
@@ -17420,7 +16615,7 @@
           190
         ],
         "flags": {},
-        "order": 41,
+        "order": 30,
         "mode": 0,
         "inputs": [
           {
@@ -20635,7 +19830,7 @@
               "flags": {
                 "collapsed": true
               },
-              "order": 21,
+              "order": 20,
               "mode": 0,
               "inputs": [],
               "outputs": [
@@ -20844,6 +20039,506 @@
               "color": "#232",
               "bgColor": "#353",
               "saveUserState": true
+            },
+            {
+              "id": "5c624567-93f1-46d5-a105-91a4d746e0b2",
+              "type": "graph/subgraph",
+              "pos": [
+                -57,
+                705
+              ],
+              "size": [
+                200,
+                50
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 21,
+              "mode": 2,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "width_1",
+                  "type": "number",
+                  "links": [
+                    "2e83c712-977d-4b9e-8f17-a38faaed2e52"
+                  ],
+                  "properties": {}
+                },
+                {
+                  "name": "height",
+                  "type": "number",
+                  "links": [
+                    "c1a3ed6b-aced-418b-b46c-b8accae3a00d"
+                  ],
+                  "properties": {}
+                }
+              ],
+              "title": "Dim. Sliders",
+              "properties": {
+                "enabled": true,
+                "tags": [
+                  "img2img",
+                  "img2imgPixelSize"
+                ]
+              },
+              "color": "#2a363b",
+              "bgColor": "#3f5159",
+              "subgraph": {
+                "last_node_id": 0,
+                "last_link_id": 0,
+                "nodes": [
+                  {
+                    "id": "0c240656-de95-44c4-99ad-d071912e2669",
+                    "type": "graph/output",
+                    "pos": [
+                      410,
+                      51
+                    ],
+                    "size": [
+                      210,
+                      62
+                    ],
+                    "flags": {},
+                    "order": 1,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "",
+                        "type": "number",
+                        "link": "81c514f3-a476-401b-9236-cebf09af65c9",
+                        "properties": {},
+                        "shape": 0
+                      }
+                    ],
+                    "outputs": [],
+                    "title": "Output",
+                    "properties": {
+                      "name": "height",
+                      "type": "number",
+                      "subgraphID": "5c624567-93f1-46d5-a105-91a4d746e0b2",
+                      "tags": []
+                    }
+                  },
+                  {
+                    "id": "d8ea1bf0-1148-4d78-a797-7d57bf36786a",
+                    "type": "ui/number",
+                    "pos": [
+                      47,
+                      16
+                    ],
+                    "size": [
+                      210,
+                      158
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 5,
+                    "mode": 2,
+                    "inputs": [
+                      {
+                        "name": "store",
+                        "type": -1,
+                        "link": "98719918-3d33-48b2-9010-cc8e748146e6",
+                        "properties": {},
+                        "shape": 1
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "value",
+                        "type": "number",
+                        "links": [
+                          "18a3e2a4-4767-4bdc-aa1d-483b4e33efb2",
+                          "b3024d91-648c-4d81-9b3b-c3ad5c45cd87"
+                        ],
+                        "properties": {},
+                        "slot_index": 0
+                      },
+                      {
+                        "name": "changed",
+                        "type": -2,
+                        "links": [],
+                        "properties": {},
+                        "shape": 1
+                      },
+                      {
+                        "name": "@min",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@max",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@step",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@precision",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      }
+                    ],
+                    "title": "UI.Number",
+                    "properties": {
+                      "tags": [
+                        "img2img",
+                        "img2imgPixelSize"
+                      ],
+                      "defaultValue": 512,
+                      "min": 64,
+                      "max": 2048,
+                      "step": 64,
+                      "precision": 0
+                    },
+                    "widgets_values": [
+                      "512.000"
+                    ],
+                    "color": "#223",
+                    "bgColor": "#335",
+                    "comfyValue": 512,
+                    "shownOutputProperties": {
+                      "min": {
+                        "type": "number",
+                        "outputName": "@min"
+                      },
+                      "max": {
+                        "type": "number",
+                        "outputName": "@max"
+                      },
+                      "step": {
+                        "type": "number",
+                        "outputName": "@step"
+                      },
+                      "precision": {
+                        "type": "number",
+                        "outputName": "@precision"
+                      }
+                    },
+                    "saveUserState": true
+                  },
+                  {
+                    "id": "36315f44-7341-45d5-8927-4fbe39a7b3cc",
+                    "type": "ui/number",
+                    "pos": [
+                      45,
+                      49
+                    ],
+                    "size": [
+                      210,
+                      158
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 2,
+                    "mode": 2,
+                    "inputs": [
+                      {
+                        "name": "store",
+                        "type": -1,
+                        "link": "e927080f-9778-4f8c-987c-75b19a30c4af",
+                        "properties": {},
+                        "shape": 1
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "value",
+                        "type": "number",
+                        "links": [
+                          "25cedd82-9571-41f1-95a6-345c1012ec35",
+                          "81c514f3-a476-401b-9236-cebf09af65c9"
+                        ],
+                        "properties": {},
+                        "slot_index": 0
+                      },
+                      {
+                        "name": "changed",
+                        "type": -2,
+                        "links": [],
+                        "properties": {},
+                        "shape": 1
+                      },
+                      {
+                        "name": "@min",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@max",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@step",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      },
+                      {
+                        "name": "@precision",
+                        "type": "number",
+                        "links": [],
+                        "properties": {}
+                      }
+                    ],
+                    "title": "UI.Number",
+                    "properties": {
+                      "tags": [
+                        "img2img",
+                        "img2imgPixelSize"
+                      ],
+                      "defaultValue": 512,
+                      "min": 64,
+                      "max": 2048,
+                      "step": 64,
+                      "precision": 0
+                    },
+                    "widgets_values": [
+                      "512.000"
+                    ],
+                    "color": "#223",
+                    "bgColor": "#335",
+                    "comfyValue": 512,
+                    "shownOutputProperties": {
+                      "min": {
+                        "type": "number",
+                        "outputName": "@min"
+                      },
+                      "max": {
+                        "type": "number",
+                        "outputName": "@max"
+                      },
+                      "step": {
+                        "type": "number",
+                        "outputName": "@step"
+                      },
+                      "precision": {
+                        "type": "number",
+                        "outputName": "@precision"
+                      }
+                    },
+                    "saveUserState": true
+                  },
+                  {
+                    "id": "d36165ef-188c-4a4c-9bb1-971ce04cec6f",
+                    "type": "ui/button",
+                    "pos": [
+                      28,
+                      85
+                    ],
+                    "size": [
+                      210,
+                      58
+                    ],
+                    "flags": {
+                      "collapsed": true
+                    },
+                    "order": 0,
+                    "mode": 2,
+                    "inputs": [],
+                    "outputs": [
+                      {
+                        "name": "clicked",
+                        "type": -2,
+                        "links": [
+                          "3938ae23-64ef-45ce-885b-31185f76bfca"
+                        ],
+                        "properties": {},
+                        "shape": 1,
+                        "slot_index": 0
+                      }
+                    ],
+                    "title": "UI.Button",
+                    "properties": {
+                      "tags": [
+                        "img2img",
+                        "img2imgPixelSize"
+                      ],
+                      "defaultValue": false,
+                      "param": "bang"
+                    },
+                    "widgets_values": [
+                      "false"
+                    ],
+                    "color": "#223",
+                    "bgColor": "#335",
+                    "comfyValue": false,
+                    "shownOutputProperties": {},
+                    "saveUserState": true
+                  },
+                  {
+                    "id": "c9aec526-28b9-4f7c-b3f5-16679af8e329",
+                    "type": "graph/output",
+                    "pos": [
+                      410,
+                      -31
+                    ],
+                    "size": [
+                      210,
+                      62
+                    ],
+                    "flags": {},
+                    "order": 4,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "",
+                        "type": "number",
+                        "link": "b3024d91-648c-4d81-9b3b-c3ad5c45cd87",
+                        "properties": {},
+                        "shape": 0
+                      }
+                    ],
+                    "outputs": [],
+                    "title": "Output",
+                    "properties": {
+                      "name": "width_1",
+                      "type": "number",
+                      "subgraphID": "5c624567-93f1-46d5-a105-91a4d746e0b2",
+                      "tags": []
+                    }
+                  },
+                  {
+                    "id": "8425eb19-7e66-43e1-a8c7-f4d215ace5b8",
+                    "type": "actions/swap",
+                    "pos": [
+                      200,
+                      -3
+                    ],
+                    "size": [
+                      140,
+                      66
+                    ],
+                    "flags": {},
+                    "order": 3,
+                    "mode": 0,
+                    "inputs": [
+                      {
+                        "name": "A",
+                        "type": "*",
+                        "link": "18a3e2a4-4767-4bdc-aa1d-483b4e33efb2",
+                        "properties": {}
+                      },
+                      {
+                        "name": "B",
+                        "type": "*",
+                        "link": "25cedd82-9571-41f1-95a6-345c1012ec35",
+                        "properties": {}
+                      },
+                      {
+                        "name": "swap",
+                        "type": -1,
+                        "link": "3938ae23-64ef-45ce-885b-31185f76bfca",
+                        "properties": {},
+                        "shape": 1
+                      }
+                    ],
+                    "outputs": [
+                      {
+                        "name": "B",
+                        "type": -2,
+                        "links": [
+                          "98719918-3d33-48b2-9010-cc8e748146e6"
+                        ],
+                        "properties": {},
+                        "shape": 1,
+                        "slot_index": 0
+                      },
+                      {
+                        "name": "A",
+                        "type": -2,
+                        "links": [
+                          "e927080f-9778-4f8c-987c-75b19a30c4af"
+                        ],
+                        "properties": {},
+                        "shape": 1,
+                        "slot_index": 1
+                      }
+                    ],
+                    "title": "Comfy.SwapAction",
+                    "properties": {
+                      "tags": []
+                    },
+                    "saveUserState": true
+                  }
+                ],
+                "links": [
+                  [
+                    "18a3e2a4-4767-4bdc-aa1d-483b4e33efb2",
+                    "d8ea1bf0-1148-4d78-a797-7d57bf36786a",
+                    0,
+                    "8425eb19-7e66-43e1-a8c7-f4d215ace5b8",
+                    0,
+                    "*"
+                  ],
+                  [
+                    "25cedd82-9571-41f1-95a6-345c1012ec35",
+                    "36315f44-7341-45d5-8927-4fbe39a7b3cc",
+                    0,
+                    "8425eb19-7e66-43e1-a8c7-f4d215ace5b8",
+                    1,
+                    "*"
+                  ],
+                  [
+                    "3938ae23-64ef-45ce-885b-31185f76bfca",
+                    "d36165ef-188c-4a4c-9bb1-971ce04cec6f",
+                    0,
+                    "8425eb19-7e66-43e1-a8c7-f4d215ace5b8",
+                    2,
+                    -1
+                  ],
+                  [
+                    "e927080f-9778-4f8c-987c-75b19a30c4af",
+                    "8425eb19-7e66-43e1-a8c7-f4d215ace5b8",
+                    1,
+                    "36315f44-7341-45d5-8927-4fbe39a7b3cc",
+                    0,
+                    -1
+                  ],
+                  [
+                    "98719918-3d33-48b2-9010-cc8e748146e6",
+                    "8425eb19-7e66-43e1-a8c7-f4d215ace5b8",
+                    0,
+                    "d8ea1bf0-1148-4d78-a797-7d57bf36786a",
+                    0,
+                    -1
+                  ],
+                  [
+                    "b3024d91-648c-4d81-9b3b-c3ad5c45cd87",
+                    "d8ea1bf0-1148-4d78-a797-7d57bf36786a",
+                    0,
+                    "c9aec526-28b9-4f7c-b3f5-16679af8e329",
+                    0,
+                    "number"
+                  ],
+                  [
+                    "81c514f3-a476-401b-9236-cebf09af65c9",
+                    "36315f44-7341-45d5-8927-4fbe39a7b3cc",
+                    0,
+                    "0c240656-de95-44c4-99ad-d071912e2669",
+                    0,
+                    "number"
+                  ]
+                ],
+                "groups": [],
+                "config": {},
+                "extra": {},
+                "version": 10
+              }
             },
             {
               "id": "18428189-e387-4034-a8da-333e88da29f6",
@@ -21647,506 +21342,6 @@
                 "extra": {},
                 "version": 10
               }
-            },
-            {
-              "id": "5c624567-93f1-46d5-a105-91a4d746e0b2",
-              "type": "graph/subgraph",
-              "pos": [
-                -57,
-                705
-              ],
-              "size": [
-                200,
-                50
-              ],
-              "flags": {
-                "collapsed": true
-              },
-              "order": 20,
-              "mode": 2,
-              "inputs": [],
-              "outputs": [
-                {
-                  "name": "width_1",
-                  "type": "number",
-                  "links": [
-                    "2e83c712-977d-4b9e-8f17-a38faaed2e52"
-                  ],
-                  "properties": {}
-                },
-                {
-                  "name": "height",
-                  "type": "number",
-                  "links": [
-                    "c1a3ed6b-aced-418b-b46c-b8accae3a00d"
-                  ],
-                  "properties": {}
-                }
-              ],
-              "title": "Dim. Sliders",
-              "properties": {
-                "enabled": true,
-                "tags": [
-                  "img2img",
-                  "img2imgPixelSize"
-                ]
-              },
-              "color": "#2a363b",
-              "bgColor": "#3f5159",
-              "subgraph": {
-                "last_node_id": 0,
-                "last_link_id": 0,
-                "nodes": [
-                  {
-                    "id": "0c240656-de95-44c4-99ad-d071912e2669",
-                    "type": "graph/output",
-                    "pos": [
-                      410,
-                      51
-                    ],
-                    "size": [
-                      210,
-                      62
-                    ],
-                    "flags": {},
-                    "order": 1,
-                    "mode": 0,
-                    "inputs": [
-                      {
-                        "name": "",
-                        "type": "number",
-                        "link": "81c514f3-a476-401b-9236-cebf09af65c9",
-                        "properties": {},
-                        "shape": 0
-                      }
-                    ],
-                    "outputs": [],
-                    "title": "Output",
-                    "properties": {
-                      "name": "height",
-                      "type": "number",
-                      "subgraphID": "5c624567-93f1-46d5-a105-91a4d746e0b2",
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "d8ea1bf0-1148-4d78-a797-7d57bf36786a",
-                    "type": "ui/number",
-                    "pos": [
-                      47,
-                      16
-                    ],
-                    "size": [
-                      210,
-                      158
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 5,
-                    "mode": 2,
-                    "inputs": [
-                      {
-                        "name": "store",
-                        "type": -1,
-                        "link": "98719918-3d33-48b2-9010-cc8e748146e6",
-                        "properties": {},
-                        "shape": 1
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "value",
-                        "type": "number",
-                        "links": [
-                          "18a3e2a4-4767-4bdc-aa1d-483b4e33efb2",
-                          "b3024d91-648c-4d81-9b3b-c3ad5c45cd87"
-                        ],
-                        "properties": {},
-                        "slot_index": 0
-                      },
-                      {
-                        "name": "changed",
-                        "type": -2,
-                        "links": [],
-                        "properties": {},
-                        "shape": 1
-                      },
-                      {
-                        "name": "@min",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@max",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@step",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@precision",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      }
-                    ],
-                    "title": "UI.Number",
-                    "properties": {
-                      "tags": [
-                        "img2img",
-                        "img2imgPixelSize"
-                      ],
-                      "defaultValue": 512,
-                      "min": 64,
-                      "max": 2048,
-                      "step": 64,
-                      "precision": 0
-                    },
-                    "widgets_values": [
-                      "512.000"
-                    ],
-                    "color": "#223",
-                    "bgColor": "#335",
-                    "comfyValue": 512,
-                    "shownOutputProperties": {
-                      "min": {
-                        "type": "number",
-                        "outputName": "@min"
-                      },
-                      "max": {
-                        "type": "number",
-                        "outputName": "@max"
-                      },
-                      "step": {
-                        "type": "number",
-                        "outputName": "@step"
-                      },
-                      "precision": {
-                        "type": "number",
-                        "outputName": "@precision"
-                      }
-                    },
-                    "saveUserState": true
-                  },
-                  {
-                    "id": "36315f44-7341-45d5-8927-4fbe39a7b3cc",
-                    "type": "ui/number",
-                    "pos": [
-                      45,
-                      49
-                    ],
-                    "size": [
-                      210,
-                      158
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 2,
-                    "mode": 2,
-                    "inputs": [
-                      {
-                        "name": "store",
-                        "type": -1,
-                        "link": "e927080f-9778-4f8c-987c-75b19a30c4af",
-                        "properties": {},
-                        "shape": 1
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "value",
-                        "type": "number",
-                        "links": [
-                          "25cedd82-9571-41f1-95a6-345c1012ec35",
-                          "81c514f3-a476-401b-9236-cebf09af65c9"
-                        ],
-                        "properties": {},
-                        "slot_index": 0
-                      },
-                      {
-                        "name": "changed",
-                        "type": -2,
-                        "links": [],
-                        "properties": {},
-                        "shape": 1
-                      },
-                      {
-                        "name": "@min",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@max",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@step",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      },
-                      {
-                        "name": "@precision",
-                        "type": "number",
-                        "links": [],
-                        "properties": {}
-                      }
-                    ],
-                    "title": "UI.Number",
-                    "properties": {
-                      "tags": [
-                        "img2img",
-                        "img2imgPixelSize"
-                      ],
-                      "defaultValue": 512,
-                      "min": 64,
-                      "max": 2048,
-                      "step": 64,
-                      "precision": 0
-                    },
-                    "widgets_values": [
-                      "512.000"
-                    ],
-                    "color": "#223",
-                    "bgColor": "#335",
-                    "comfyValue": 512,
-                    "shownOutputProperties": {
-                      "min": {
-                        "type": "number",
-                        "outputName": "@min"
-                      },
-                      "max": {
-                        "type": "number",
-                        "outputName": "@max"
-                      },
-                      "step": {
-                        "type": "number",
-                        "outputName": "@step"
-                      },
-                      "precision": {
-                        "type": "number",
-                        "outputName": "@precision"
-                      }
-                    },
-                    "saveUserState": true
-                  },
-                  {
-                    "id": "d36165ef-188c-4a4c-9bb1-971ce04cec6f",
-                    "type": "ui/button",
-                    "pos": [
-                      28,
-                      85
-                    ],
-                    "size": [
-                      210,
-                      58
-                    ],
-                    "flags": {
-                      "collapsed": true
-                    },
-                    "order": 0,
-                    "mode": 2,
-                    "inputs": [],
-                    "outputs": [
-                      {
-                        "name": "clicked",
-                        "type": -2,
-                        "links": [
-                          "3938ae23-64ef-45ce-885b-31185f76bfca"
-                        ],
-                        "properties": {},
-                        "shape": 1,
-                        "slot_index": 0
-                      }
-                    ],
-                    "title": "UI.Button",
-                    "properties": {
-                      "tags": [
-                        "img2img",
-                        "img2imgPixelSize"
-                      ],
-                      "defaultValue": false,
-                      "param": "bang"
-                    },
-                    "widgets_values": [
-                      "false"
-                    ],
-                    "color": "#223",
-                    "bgColor": "#335",
-                    "comfyValue": false,
-                    "shownOutputProperties": {},
-                    "saveUserState": true
-                  },
-                  {
-                    "id": "c9aec526-28b9-4f7c-b3f5-16679af8e329",
-                    "type": "graph/output",
-                    "pos": [
-                      410,
-                      -31
-                    ],
-                    "size": [
-                      210,
-                      62
-                    ],
-                    "flags": {},
-                    "order": 4,
-                    "mode": 0,
-                    "inputs": [
-                      {
-                        "name": "",
-                        "type": "number",
-                        "link": "b3024d91-648c-4d81-9b3b-c3ad5c45cd87",
-                        "properties": {},
-                        "shape": 0
-                      }
-                    ],
-                    "outputs": [],
-                    "title": "Output",
-                    "properties": {
-                      "name": "width_1",
-                      "type": "number",
-                      "subgraphID": "5c624567-93f1-46d5-a105-91a4d746e0b2",
-                      "tags": []
-                    }
-                  },
-                  {
-                    "id": "8425eb19-7e66-43e1-a8c7-f4d215ace5b8",
-                    "type": "actions/swap",
-                    "pos": [
-                      200,
-                      -3
-                    ],
-                    "size": [
-                      140,
-                      66
-                    ],
-                    "flags": {},
-                    "order": 3,
-                    "mode": 0,
-                    "inputs": [
-                      {
-                        "name": "A",
-                        "type": "*",
-                        "link": "18a3e2a4-4767-4bdc-aa1d-483b4e33efb2",
-                        "properties": {}
-                      },
-                      {
-                        "name": "B",
-                        "type": "*",
-                        "link": "25cedd82-9571-41f1-95a6-345c1012ec35",
-                        "properties": {}
-                      },
-                      {
-                        "name": "swap",
-                        "type": -1,
-                        "link": "3938ae23-64ef-45ce-885b-31185f76bfca",
-                        "properties": {},
-                        "shape": 1
-                      }
-                    ],
-                    "outputs": [
-                      {
-                        "name": "B",
-                        "type": -2,
-                        "links": [
-                          "98719918-3d33-48b2-9010-cc8e748146e6"
-                        ],
-                        "properties": {},
-                        "shape": 1,
-                        "slot_index": 0
-                      },
-                      {
-                        "name": "A",
-                        "type": -2,
-                        "links": [
-                          "e927080f-9778-4f8c-987c-75b19a30c4af"
-                        ],
-                        "properties": {},
-                        "shape": 1,
-                        "slot_index": 1
-                      }
-                    ],
-                    "title": "Comfy.SwapAction",
-                    "properties": {
-                      "tags": []
-                    },
-                    "saveUserState": true
-                  }
-                ],
-                "links": [
-                  [
-                    "18a3e2a4-4767-4bdc-aa1d-483b4e33efb2",
-                    "d8ea1bf0-1148-4d78-a797-7d57bf36786a",
-                    0,
-                    "8425eb19-7e66-43e1-a8c7-f4d215ace5b8",
-                    0,
-                    "*"
-                  ],
-                  [
-                    "25cedd82-9571-41f1-95a6-345c1012ec35",
-                    "36315f44-7341-45d5-8927-4fbe39a7b3cc",
-                    0,
-                    "8425eb19-7e66-43e1-a8c7-f4d215ace5b8",
-                    1,
-                    "*"
-                  ],
-                  [
-                    "3938ae23-64ef-45ce-885b-31185f76bfca",
-                    "d36165ef-188c-4a4c-9bb1-971ce04cec6f",
-                    0,
-                    "8425eb19-7e66-43e1-a8c7-f4d215ace5b8",
-                    2,
-                    -1
-                  ],
-                  [
-                    "e927080f-9778-4f8c-987c-75b19a30c4af",
-                    "8425eb19-7e66-43e1-a8c7-f4d215ace5b8",
-                    1,
-                    "36315f44-7341-45d5-8927-4fbe39a7b3cc",
-                    0,
-                    -1
-                  ],
-                  [
-                    "98719918-3d33-48b2-9010-cc8e748146e6",
-                    "8425eb19-7e66-43e1-a8c7-f4d215ace5b8",
-                    0,
-                    "d8ea1bf0-1148-4d78-a797-7d57bf36786a",
-                    0,
-                    -1
-                  ],
-                  [
-                    "b3024d91-648c-4d81-9b3b-c3ad5c45cd87",
-                    "d8ea1bf0-1148-4d78-a797-7d57bf36786a",
-                    0,
-                    "c9aec526-28b9-4f7c-b3f5-16679af8e329",
-                    0,
-                    "number"
-                  ],
-                  [
-                    "81c514f3-a476-401b-9236-cebf09af65c9",
-                    "36315f44-7341-45d5-8927-4fbe39a7b3cc",
-                    0,
-                    "0c240656-de95-44c4-99ad-d071912e2669",
-                    0,
-                    "number"
-                  ]
-                ],
-                "groups": [],
-                "config": {},
-                "extra": {},
-                "version": 10
-              }
             }
           ],
           "links": [
@@ -22727,6 +21922,1076 @@
           "extra": {},
           "version": 10
         }
+      },
+      {
+        "id": "ff11d194-a986-408b-a0dc-d61e8d601e31",
+        "type": "graph/subgraph",
+        "pos": [
+          2090,
+          668
+        ],
+        "size": [
+          200,
+          50
+        ],
+        "flags": {},
+        "order": 14,
+        "mode": 0,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "Clear Gen",
+            "type": -2,
+            "links": [
+              "d953f0b7-4853-40d8-9bdb-f660b5f9fe9d"
+            ],
+            "properties": {},
+            "shape": 1
+          },
+          {
+            "name": "Clear HR",
+            "type": -2,
+            "links": [
+              "fcbf2d5b-cc17-47f4-aea6-0649a7a7d665"
+            ],
+            "properties": {},
+            "shape": 1
+          }
+        ],
+        "title": "Clear Outputs",
+        "properties": {
+          "enabled": true,
+          "tags": []
+        },
+        "color": "#2a363b",
+        "bgColor": "#3f5159",
+        "subgraph": {
+          "last_node_id": 0,
+          "last_link_id": 0,
+          "nodes": [
+            {
+              "id": "23565dd5-d004-4010-bfa9-ffd9e4dc7cba",
+              "type": "basic/integer",
+              "pos": [
+                187.137355952995,
+                166.77364921376295
+              ],
+              "size": [
+                210,
+                38
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 0,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "value",
+                  "type": "number",
+                  "links": [
+                    "2a62d4af-92aa-4329-93da-80b1444f69b9"
+                  ],
+                  "properties": {},
+                  "label": "0",
+                  "slot_index": 0
+                }
+              ],
+              "title": "Const Integer",
+              "properties": {
+                "value": 0,
+                "tags": []
+              }
+            },
+            {
+              "id": "59d83912-13a7-4b7f-a353-e7e2a0ecf3b8",
+              "type": "events/filter",
+              "pos": [
+                246.6091328124985,
+                121.54048242187639
+              ],
+              "size": [
+                210,
+                150
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 6,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "event",
+                  "type": -1,
+                  "link": "d254e1e9-1bda-45e4-804e-a54cea465f71",
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "compare_value",
+                  "type": "*",
+                  "link": "2a62d4af-92aa-4329-93da-80b1444f69b9",
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "accept",
+                  "type": -2,
+                  "links": [
+                    "974e07af-1a9c-49d6-bafd-ecc5be4be248"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 0
+                },
+                {
+                  "name": "reject",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 1
+                }
+              ],
+              "title": "Filter Event",
+              "properties": {
+                "compareValue": 0,
+                "propertyName": "queueRemaining",
+                "mode": "property",
+                "operation": "==",
+                "tags": []
+              }
+            },
+            {
+              "id": "a16a0898-b754-4a3a-a118-31cb2c9e76d7",
+              "type": "events/queue_events",
+              "pos": [
+                0,
+                119.71490429687424
+              ],
+              "size": [
+                178,
+                66
+              ],
+              "flags": {},
+              "order": 1,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "beforeQueued",
+                  "type": -2,
+                  "links": [
+                    "d254e1e9-1bda-45e4-804e-a54cea465f71"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 0
+                },
+                {
+                  "name": "afterQueued",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "onDefaultQueueAction",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "title": "Comfy.QueueEvents",
+              "properties": {
+                "tags": []
+              },
+              "saveUserState": true
+            },
+            {
+              "id": "5e21407a-fb86-4694-8c1a-77cc4b3f3c39",
+              "type": "events/filter",
+              "pos": [
+                238.55177246093695,
+                307.839599609375
+              ],
+              "size": [
+                210,
+                150
+              ],
+              "flags": {},
+              "order": 7,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "event",
+                  "type": -1,
+                  "link": "974e07af-1a9c-49d6-bafd-ecc5be4be248",
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "compare_value",
+                  "type": "*",
+                  "link": null,
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "accept",
+                  "type": -2,
+                  "links": [
+                    "72c8e8bc-b928-4ae8-8ebe-522db7ec0551"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 0
+                },
+                {
+                  "name": "reject",
+                  "type": -2,
+                  "links": [
+                    "7397ad2e-7c3d-4919-a34f-77ee3422b724"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 1
+                }
+              ],
+              "title": "Filter Event",
+              "properties": {
+                "compareValue": "gen",
+                "propertyName": "subgraph",
+                "mode": "property",
+                "operation": "==",
+                "tags": []
+              }
+            },
+            {
+              "id": "eb08f8f4-50d2-429f-b625-ea69f0e219f6",
+              "type": "basic/json",
+              "pos": [
+                845.0101513671872,
+                62.034921875000066
+              ],
+              "size": [
+                210,
+                86
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 2,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "data",
+                  "type": "object",
+                  "links": [
+                    "4b4b3ea7-77d7-433f-b5cb-2b36ad94b102"
+                  ],
+                  "properties": {},
+                  "shape": 0,
+                  "slot_index": 0
+                }
+              ],
+              "title": "Const JSON",
+              "properties": {
+                "json": "null",
+                "value": "null",
+                "type": "object",
+                "tags": []
+              },
+              "boxcolor": "#AEA"
+            },
+            {
+              "id": "17b390f3-8350-4516-914f-817c33037476",
+              "type": "basic/json",
+              "pos": [
+                1297.3573403234313,
+                351.825635621875
+              ],
+              "size": [
+                210,
+                86
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 3,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "data",
+                  "type": "object",
+                  "links": [
+                    "2d78c293-e1b0-43d8-9ef9-b75d7b4aaaea"
+                  ],
+                  "properties": {},
+                  "shape": 0,
+                  "slot_index": 0
+                }
+              ],
+              "title": "Const JSON",
+              "properties": {
+                "json": "null",
+                "value": "null",
+                "type": "object",
+                "tags": []
+              },
+              "boxcolor": "#AEA"
+            },
+            {
+              "id": "49b8f233-abf9-4604-ab0c-8179178d1731",
+              "type": "events/branch",
+              "pos": [
+                643.890151367187,
+                266.544921875
+              ],
+              "size": [
+                140,
+                46
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 8,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "in",
+                  "type": -1,
+                  "link": "72c8e8bc-b928-4ae8-8ebe-522db7ec0551",
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "cond",
+                  "type": "boolean",
+                  "link": "cb9d3362-a756-4bbf-94a8-0d6b04e72eef",
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "true",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "false",
+                  "type": -2,
+                  "links": [
+                    "25dbe323-a0a5-488b-95e8-bcb27187325b"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 1
+                }
+              ],
+              "title": "Branch",
+              "properties": {
+                "tags": []
+              }
+            },
+            {
+              "id": "63a83c93-647f-4882-84f0-606c4d070e43",
+              "type": "ui/checkbox",
+              "pos": [
+                513.890151367187,
+                369.544921875
+              ],
+              "size": [
+                210,
+                78
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 4,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "store",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "value",
+                  "type": "boolean",
+                  "links": [
+                    "cb9d3362-a756-4bbf-94a8-0d6b04e72eef",
+                    "d94f10f3-86ea-453d-b8eb-c3a6c492392f"
+                  ],
+                  "properties": {},
+                  "slot_index": 0
+                },
+                {
+                  "name": "changed",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "title": "UI.Checkbox",
+              "properties": {
+                "tags": [],
+                "defaultValue": false
+              },
+              "widgets_values": [
+                "false"
+              ],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": false,
+              "shownOutputProperties": {},
+              "saveUserState": true
+            },
+            {
+              "id": "d2b732b7-87b7-4c9e-8a8b-e0a269be4093",
+              "type": "events/branch",
+              "pos": [
+                1064.065557823434,
+                330.4369587218756
+              ],
+              "size": [
+                140,
+                46
+              ],
+              "flags": {},
+              "order": 11,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "in",
+                  "type": -1,
+                  "link": "3bd4f31a-f497-4211-9a03-5acd6a11c42b",
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 0
+                },
+                {
+                  "name": "cond",
+                  "type": "boolean",
+                  "link": "d94f10f3-86ea-453d-b8eb-c3a6c492392f",
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "true",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 0
+                },
+                {
+                  "name": "false",
+                  "type": -2,
+                  "links": [
+                    "de97c789-a9cc-495b-bbfd-4afc941f6073"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 1
+                }
+              ],
+              "title": "Branch",
+              "properties": {
+                "tags": []
+              }
+            },
+            {
+              "id": "e41be48f-eb22-4269-93dc-d56a40d57f2c",
+              "type": "events/wrap_as_event",
+              "pos": [
+                965.0101513671872,
+                12.034921875000023
+              ],
+              "size": [
+                140,
+                46
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 12,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "trigger",
+                  "type": -1,
+                  "link": "576e3986-5409-40e8-8995-a016311c7d6b",
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "param",
+                  "type": "",
+                  "link": "4b4b3ea7-77d7-433f-b5cb-2b36ad94b102",
+                  "properties": {},
+                  "slot_index": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "event",
+                  "type": -2,
+                  "links": [
+                    "df347bb3-617a-4a28-a841-2dae714659da"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 0
+                }
+              ],
+              "title": "Wrap As Event",
+              "properties": {
+                "tags": []
+              }
+            },
+            {
+              "id": "62204d27-0c28-4901-8319-453605d911f0",
+              "type": "events/sequence",
+              "pos": [
+                853.1200000000002,
+                35.489999999999995
+              ],
+              "size": [
+                140,
+                66
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 10,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "",
+                  "type": -1,
+                  "link": "c2db117d-ccce-411c-96c5-68438102405b",
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "",
+                  "type": -1,
+                  "link": "25dbe323-a0a5-488b-95e8-bcb27187325b",
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": -2,
+                  "links": [
+                    "576e3986-5409-40e8-8995-a016311c7d6b"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 0
+                },
+                {
+                  "name": "",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "title": "Sequence",
+              "properties": {
+                "tags": []
+              }
+            },
+            {
+              "id": "5f099bc5-043a-4658-a6ac-83f01f72eefd",
+              "type": "ui/button",
+              "pos": [
+                387.77999999999975,
+                33.21
+              ],
+              "size": [
+                210,
+                58
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 5,
+              "mode": 0,
+              "inputs": [],
+              "outputs": [
+                {
+                  "name": "clicked",
+                  "type": -2,
+                  "links": [
+                    "c2db117d-ccce-411c-96c5-68438102405b",
+                    "85a2d968-3d73-413d-b2bd-58198625638c"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 0
+                }
+              ],
+              "title": "UI.Button",
+              "properties": {
+                "tags": [],
+                "defaultValue": false,
+                "param": "bang"
+              },
+              "widgets_values": [
+                "false"
+              ],
+              "color": "#223",
+              "bgColor": "#335",
+              "comfyValue": false,
+              "shownOutputProperties": {},
+              "saveUserState": true
+            },
+            {
+              "id": "08d81d21-6bd4-4abf-b88f-96418ed394ca",
+              "type": "events/sequence",
+              "pos": [
+                1299.944803799999,
+                321.91782820000003
+              ],
+              "size": [
+                140,
+                66
+              ],
+              "flags": {
+                "collapsed": true
+              },
+              "order": 13,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "",
+                  "type": -1,
+                  "link": "de97c789-a9cc-495b-bbfd-4afc941f6073",
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "",
+                  "type": -1,
+                  "link": "85a2d968-3d73-413d-b2bd-58198625638c",
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "",
+                  "type": -1,
+                  "link": null,
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "",
+                  "type": -2,
+                  "links": [
+                    "27c2f516-6dec-43f7-854e-f3b58b3bb95a"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 0
+                },
+                {
+                  "name": "",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "title": "Sequence",
+              "properties": {
+                "tags": []
+              }
+            },
+            {
+              "id": "fa30235f-388d-4151-9a58-5d65f0ea1155",
+              "type": "events/wrap_as_event",
+              "pos": [
+                1417.7910212999989,
+                301.04615129999985
+              ],
+              "size": [
+                140,
+                46
+              ],
+              "flags": {
+                "collapsed": false
+              },
+              "order": 15,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "trigger",
+                  "type": -1,
+                  "link": "27c2f516-6dec-43f7-854e-f3b58b3bb95a",
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "param",
+                  "type": "",
+                  "link": "2d78c293-e1b0-43d8-9ef9-b75d7b4aaaea",
+                  "properties": {},
+                  "slot_index": 1
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "event",
+                  "type": -2,
+                  "links": [
+                    "627c851c-8682-4816-ac7a-a242c69fd358"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 0
+                }
+              ],
+              "title": "Wrap As Event",
+              "properties": {
+                "tags": []
+              }
+            },
+            {
+              "id": "8247d831-788d-47b7-98d0-c1e0da4a7c62",
+              "type": "events/filter",
+              "pos": [
+                823,
+                328
+              ],
+              "size": [
+                210,
+                150
+              ],
+              "flags": {},
+              "order": 9,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "event",
+                  "type": -1,
+                  "link": "7397ad2e-7c3d-4919-a34f-77ee3422b724",
+                  "properties": {},
+                  "shape": 1
+                },
+                {
+                  "name": "compare_value",
+                  "type": "*",
+                  "link": null,
+                  "properties": {}
+                }
+              ],
+              "outputs": [
+                {
+                  "name": "accept",
+                  "type": -2,
+                  "links": [
+                    "3bd4f31a-f497-4211-9a03-5acd6a11c42b"
+                  ],
+                  "properties": {},
+                  "shape": 1,
+                  "slot_index": 0
+                },
+                {
+                  "name": "reject",
+                  "type": -2,
+                  "links": [],
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "title": "Filter Event",
+              "properties": {
+                "compareValue": "hr",
+                "propertyName": "subgraph",
+                "mode": "property",
+                "operation": "==",
+                "tags": []
+              }
+            },
+            {
+              "id": "36cd99dc-d90e-4f7b-aa17-298d21d0a2c1",
+              "type": "graph/output",
+              "pos": [
+                1143,
+                9
+              ],
+              "size": [
+                210,
+                62
+              ],
+              "flags": {},
+              "order": 14,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "",
+                  "type": -1,
+                  "link": "df347bb3-617a-4a28-a841-2dae714659da",
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [],
+              "title": "Output",
+              "properties": {
+                "name": "Clear Gen",
+                "type": -1,
+                "subgraphID": "ff11d194-a986-408b-a0dc-d61e8d601e31",
+                "tags": []
+              }
+            },
+            {
+              "id": "a6f40f96-47ab-43f0-830d-fdacec03e9ff",
+              "type": "graph/output",
+              "pos": [
+                1599,
+                297
+              ],
+              "size": [
+                210,
+                62
+              ],
+              "flags": {},
+              "order": 16,
+              "mode": 0,
+              "inputs": [
+                {
+                  "name": "",
+                  "type": -1,
+                  "link": "627c851c-8682-4816-ac7a-a242c69fd358",
+                  "properties": {},
+                  "shape": 1
+                }
+              ],
+              "outputs": [],
+              "title": "Output",
+              "properties": {
+                "name": "Clear HR",
+                "type": -1,
+                "subgraphID": "ff11d194-a986-408b-a0dc-d61e8d601e31",
+                "tags": []
+              }
+            }
+          ],
+          "links": [
+            [
+              "627c851c-8682-4816-ac7a-a242c69fd358",
+              "fa30235f-388d-4151-9a58-5d65f0ea1155",
+              0,
+              "a6f40f96-47ab-43f0-830d-fdacec03e9ff",
+              0,
+              -1
+            ],
+            [
+              "df347bb3-617a-4a28-a841-2dae714659da",
+              "e41be48f-eb22-4269-93dc-d56a40d57f2c",
+              0,
+              "36cd99dc-d90e-4f7b-aa17-298d21d0a2c1",
+              0,
+              -1
+            ],
+            [
+              "2a62d4af-92aa-4329-93da-80b1444f69b9",
+              "23565dd5-d004-4010-bfa9-ffd9e4dc7cba",
+              0,
+              "59d83912-13a7-4b7f-a353-e7e2a0ecf3b8",
+              1,
+              "*"
+            ],
+            [
+              "d254e1e9-1bda-45e4-804e-a54cea465f71",
+              "a16a0898-b754-4a3a-a118-31cb2c9e76d7",
+              0,
+              "59d83912-13a7-4b7f-a353-e7e2a0ecf3b8",
+              0,
+              -1
+            ],
+            [
+              "974e07af-1a9c-49d6-bafd-ecc5be4be248",
+              "59d83912-13a7-4b7f-a353-e7e2a0ecf3b8",
+              0,
+              "5e21407a-fb86-4694-8c1a-77cc4b3f3c39",
+              0,
+              -1
+            ],
+            [
+              "72c8e8bc-b928-4ae8-8ebe-522db7ec0551",
+              "5e21407a-fb86-4694-8c1a-77cc4b3f3c39",
+              0,
+              "49b8f233-abf9-4604-ab0c-8179178d1731",
+              0,
+              -1
+            ],
+            [
+              "7397ad2e-7c3d-4919-a34f-77ee3422b724",
+              "5e21407a-fb86-4694-8c1a-77cc4b3f3c39",
+              1,
+              "8247d831-788d-47b7-98d0-c1e0da4a7c62",
+              0,
+              -1
+            ],
+            [
+              "576e3986-5409-40e8-8995-a016311c7d6b",
+              "62204d27-0c28-4901-8319-453605d911f0",
+              0,
+              "e41be48f-eb22-4269-93dc-d56a40d57f2c",
+              0,
+              -1
+            ],
+            [
+              "4b4b3ea7-77d7-433f-b5cb-2b36ad94b102",
+              "eb08f8f4-50d2-429f-b625-ea69f0e219f6",
+              0,
+              "e41be48f-eb22-4269-93dc-d56a40d57f2c",
+              1,
+              "object"
+            ],
+            [
+              "2d78c293-e1b0-43d8-9ef9-b75d7b4aaaea",
+              "17b390f3-8350-4516-914f-817c33037476",
+              0,
+              "fa30235f-388d-4151-9a58-5d65f0ea1155",
+              1,
+              "object"
+            ],
+            [
+              "c2db117d-ccce-411c-96c5-68438102405b",
+              "5f099bc5-043a-4658-a6ac-83f01f72eefd",
+              0,
+              "62204d27-0c28-4901-8319-453605d911f0",
+              0,
+              -1
+            ],
+            [
+              "25dbe323-a0a5-488b-95e8-bcb27187325b",
+              "49b8f233-abf9-4604-ab0c-8179178d1731",
+              1,
+              "62204d27-0c28-4901-8319-453605d911f0",
+              1,
+              -1
+            ],
+            [
+              "cb9d3362-a756-4bbf-94a8-0d6b04e72eef",
+              "63a83c93-647f-4882-84f0-606c4d070e43",
+              0,
+              "49b8f233-abf9-4604-ab0c-8179178d1731",
+              1,
+              "boolean"
+            ],
+            [
+              "d94f10f3-86ea-453d-b8eb-c3a6c492392f",
+              "63a83c93-647f-4882-84f0-606c4d070e43",
+              0,
+              "d2b732b7-87b7-4c9e-8a8b-e0a269be4093",
+              1,
+              "boolean"
+            ],
+            [
+              "3bd4f31a-f497-4211-9a03-5acd6a11c42b",
+              "8247d831-788d-47b7-98d0-c1e0da4a7c62",
+              0,
+              "d2b732b7-87b7-4c9e-8a8b-e0a269be4093",
+              0,
+              -1
+            ],
+            [
+              "27c2f516-6dec-43f7-854e-f3b58b3bb95a",
+              "08d81d21-6bd4-4abf-b88f-96418ed394ca",
+              0,
+              "fa30235f-388d-4151-9a58-5d65f0ea1155",
+              0,
+              -1
+            ],
+            [
+              "de97c789-a9cc-495b-bbfd-4afc941f6073",
+              "d2b732b7-87b7-4c9e-8a8b-e0a269be4093",
+              1,
+              "08d81d21-6bd4-4abf-b88f-96418ed394ca",
+              0,
+              -1
+            ],
+            [
+              "85a2d968-3d73-413d-b2bd-58198625638c",
+              "5f099bc5-043a-4658-a6ac-83f01f72eefd",
+              0,
+              "08d81d21-6bd4-4abf-b88f-96418ed394ca",
+              1,
+              -1
+            ]
+          ],
+          "groups": [],
+          "config": {},
+          "extra": {},
+          "version": 10
+        }
+      },
+      {
+        "id": "bbf920e2-f9ee-4778-aa0f-78eb203737e6",
+        "type": "actions/set_prompt_thumbnails",
+        "pos": [
+          2747,
+          288
+        ],
+        "size": [
+          260.4,
+          26
+        ],
+        "flags": {
+          "collapsed": true
+        },
+        "order": 41,
+        "mode": 0,
+        "inputs": [
+          {
+            "name": "filenames",
+            "type": "*",
+            "link": "ba66d9be-19c3-4da8-84e0-823ef35f7f32",
+            "properties": {},
+            "slot_index": 0
+          }
+        ],
+        "outputs": [],
+        "title": "Comfy.SetPromptThumbnailsAction",
+        "properties": {
+          "tags": [
+            "hr"
+          ],
+          "defaultFolderType": "input"
+        },
+        "saveUserState": true
       }
     ],
     "links": [
@@ -22785,86 +23050,6 @@
         "c5dde6e2-d6a9-4c7e-b396-3083b11573f5",
         1,
         -1
-      ],
-      [
-        "27e9b2c9-72c5-48b0-aa80-2646590d8c2b",
-        "e41be48f-eb22-4269-93dc-d56a40d57f2c",
-        0,
-        "928a13d8-cfc6-417e-9088-53503efb1cd3",
-        1,
-        -1
-      ],
-      [
-        "794ce3c6-a8de-4f4d-ba55-5bb3d5092993",
-        "5f099bc5-043a-4658-a6ac-83f01f72eefd",
-        0,
-        "62204d27-0c28-4901-8319-453605d911f0",
-        0,
-        -1
-      ],
-      [
-        "8d3265e3-4f5b-4124-b20f-51e14647a7f7",
-        "62204d27-0c28-4901-8319-453605d911f0",
-        0,
-        "e41be48f-eb22-4269-93dc-d56a40d57f2c",
-        0,
-        -1
-      ],
-      [
-        "bda9da8b-686f-4e8a-ae78-347f4cde9018",
-        "a16a0898-b754-4a3a-a118-31cb2c9e76d7",
-        0,
-        "59d83912-13a7-4b7f-a353-e7e2a0ecf3b8",
-        0,
-        -1
-      ],
-      [
-        "422c4c43-7ae9-40d5-bb16-afc6c8017917",
-        "23565dd5-d004-4010-bfa9-ffd9e4dc7cba",
-        0,
-        "59d83912-13a7-4b7f-a353-e7e2a0ecf3b8",
-        1,
-        "*"
-      ],
-      [
-        "75383097-6487-4344-9930-4814b5742aa1",
-        "59d83912-13a7-4b7f-a353-e7e2a0ecf3b8",
-        0,
-        "5e21407a-fb86-4694-8c1a-77cc4b3f3c39",
-        0,
-        -1
-      ],
-      [
-        "edb164b9-1b4c-4de0-b653-0e750128730e",
-        "63a83c93-647f-4882-84f0-606c4d070e43",
-        0,
-        "49b8f233-abf9-4604-ab0c-8179178d1731",
-        1,
-        "boolean"
-      ],
-      [
-        "8e8938d1-bba9-4ffc-a075-440aefbda06a",
-        "49b8f233-abf9-4604-ab0c-8179178d1731",
-        1,
-        "62204d27-0c28-4901-8319-453605d911f0",
-        1,
-        -1
-      ],
-      [
-        "32fc2993-3360-4911-9965-184662fdd8f8",
-        "5e21407a-fb86-4694-8c1a-77cc4b3f3c39",
-        0,
-        "49b8f233-abf9-4604-ab0c-8179178d1731",
-        0,
-        -1
-      ],
-      [
-        "ce514e38-b125-4803-a246-9a66e9f75235",
-        "eb08f8f4-50d2-429f-b625-ea69f0e219f6",
-        0,
-        "e41be48f-eb22-4269-93dc-d56a40d57f2c",
-        1,
-        "object"
       ],
       [
         "c4ff06f7-3f0a-475b-9d14-48d639bdfdda",
@@ -23019,62 +23204,6 @@
         -1
       ],
       [
-        "1790c44e-0ab7-464f-9139-f2a64b39c996",
-        "5e21407a-fb86-4694-8c1a-77cc4b3f3c39",
-        1,
-        "8247d831-788d-47b7-98d0-c1e0da4a7c62",
-        0,
-        -1
-      ],
-      [
-        "a1e177b5-ac2c-4241-b693-660b45c45a2f",
-        "63a83c93-647f-4882-84f0-606c4d070e43",
-        0,
-        "d2b732b7-87b7-4c9e-8a8b-e0a269be4093",
-        1,
-        "boolean"
-      ],
-      [
-        "4a358214-97d1-4ac0-aed9-f6ad87459a01",
-        "8247d831-788d-47b7-98d0-c1e0da4a7c62",
-        0,
-        "d2b732b7-87b7-4c9e-8a8b-e0a269be4093",
-        0,
-        -1
-      ],
-      [
-        "21e19922-b1e8-4b65-a488-cfb746dec0d1",
-        "17b390f3-8350-4516-914f-817c33037476",
-        0,
-        "fa30235f-388d-4151-9a58-5d65f0ea1155",
-        1,
-        "object"
-      ],
-      [
-        "76456142-ea56-4684-a6ca-f4fe91417ce7",
-        "fa30235f-388d-4151-9a58-5d65f0ea1155",
-        0,
-        "0b071e6c-f765-4e31-8125-8c057cddc865",
-        1,
-        -1
-      ],
-      [
-        "cc44ddcf-c257-4b72-99d8-4724a68bbdcd",
-        "08d81d21-6bd4-4abf-b88f-96418ed394ca",
-        0,
-        "fa30235f-388d-4151-9a58-5d65f0ea1155",
-        0,
-        -1
-      ],
-      [
-        "62fc8617-059f-4f94-9d0c-cd769d1e4f1d",
-        "5f099bc5-043a-4658-a6ac-83f01f72eefd",
-        0,
-        "08d81d21-6bd4-4abf-b88f-96418ed394ca",
-        1,
-        -1
-      ],
-      [
         "74b0ece4-a591-41b1-935d-ed02fa3cec52",
         "084703e8-986f-43ba-bead-fc339de8cce5",
         0,
@@ -23145,14 +23274,6 @@
         "de5f256a-91ab-42c2-86cd-645066b3c714",
         10,
         "number"
-      ],
-      [
-        "7a2ac556-fe0f-4c91-bd52-49c5e557b2f2",
-        "d2b732b7-87b7-4c9e-8a8b-e0a269be4093",
-        1,
-        "08d81d21-6bd4-4abf-b88f-96418ed394ca",
-        0,
-        -1
       ],
       [
         "857760be-9202-4c7f-84a2-465ee7e0ee21",
@@ -23425,30 +23546,25 @@
         "7191f2eb-f4ca-4884-8778-7f10bea6c07e",
         0,
         "string"
+      ],
+      [
+        "fcbf2d5b-cc17-47f4-aea6-0649a7a7d665",
+        "ff11d194-a986-408b-a0dc-d61e8d601e31",
+        1,
+        "0b071e6c-f765-4e31-8125-8c057cddc865",
+        1,
+        -1
+      ],
+      [
+        "d953f0b7-4853-40d8-9bdb-f660b5f9fe9d",
+        "ff11d194-a986-408b-a0dc-d61e8d601e31",
+        0,
+        "928a13d8-cfc6-417e-9088-53503efb1cd3",
+        1,
+        -1
       ]
     ],
-    "groups": [
-      {
-        "title": "Clear Outputs",
-        "bounding": [
-          1246,
-          658,
-          850,
-          516
-        ],
-        "color": "#88A"
-      },
-      {
-        "title": "Clear HR Fix Outputs",
-        "bounding": [
-          2644,
-          615,
-          633,
-          573
-        ],
-        "color": "#88A"
-      }
-    ],
+    "groups": [],
     "config": {},
     "extra": {},
     "version": 10
@@ -26689,9 +26805,9 @@
   },
   "canvas": {
     "offset": [
-      -1134.5299999999975,
-      -143.2984829989358
+      -1403.275822999999,
+      50.71766291353943
     ],
-    "scale": 1
+    "scale": 0.6209213230591552
   }
 }
