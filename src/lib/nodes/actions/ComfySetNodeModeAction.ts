@@ -53,7 +53,7 @@ export default class ComfySetNodeModeAction extends ComfyGraphNode {
         for (const node of this.graph._nodes) {
             if ("tags" in node.properties) {
                 const comfyNode = node as ComfyGraphNode;
-                const hasTag = tags.some(t => nodeHasTag(comfyNode, t));
+                const hasTag = tags.some(t => nodeHasTag(comfyNode, t, false));
                 if (hasTag) {
                     let newMode: NodeMode;
                     if (enabled) {

@@ -69,7 +69,7 @@ export default class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
         for (const node of this.graph.iterateNodesInOrderRecursive()) {
             if ("tags" in node.properties) {
                 const comfyNode = node as ComfyGraphNode;
-                const hasTag = nodeHasTag(comfyNode, action.tag);
+                const hasTag = nodeHasTag(comfyNode, action.tag, false);
 
                 if (hasTag) {
                     let newMode: NodeMode;
