@@ -15,16 +15,15 @@ function isGraphInputOutput(node: LGraphNode): boolean {
     return node.is(GraphInput) || node.is(GraphOutput)
 }
 
-export function nodeHasTag(node: LGraphNode, tag: string): boolean {
-    // Ignore tags on reroutes since they're just movable wires and it defeats
-    // the convenience gains to have to set tags for all them
-    if (isReroute(node))
-        return true;
-
+export function nodeHasTag(node: LGraphNode, tag: string, checkParents: boolean): boolean {
     while (node != null) {
         if ("tags" in node.properties) {
             if (node.properties.tags.indexOf(tag) !== -1)
                 return true;
+        }
+
+        if (!checkParents) {
+            return false;
         }
 
         // Count parent subgraphs having the tag also.
@@ -38,8 +37,10 @@ export function isActiveNode(node: LGraphNode, tag: string | null = null): boole
     if (!node)
         return false;
 
-    // Check tags but not on graph inputs/outputs
-    if (!isGraphInputOutput(node) && (tag && !nodeHasTag(node, tag))) {
+    // Ignore tags on reroutes since they're just movable wires and it defeats
+    // the convenience gains to have to set tags for all them
+    // Also ignore graph inputs/outputs
+    if (!isReroute(node) && !isGraphInputOutput(node) && (tag && !nodeHasTag(node, tag, true))) {
         console.debug("Skipping tagged node", tag, node.properties.tags, node)
         return false;
     }

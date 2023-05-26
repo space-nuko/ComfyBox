@@ -968,7 +968,7 @@ export default class ComfyApp {
 
                 const thumbnails = []
                 for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
-                    if (node.mode !== NodeMode.ALWAYS || (tag != null && !nodeHasTag(node, tag)))
+                    if (node.mode !== NodeMode.ALWAYS || (tag != null && !nodeHasTag(node, tag, true)))
                         continue;
 
                     if ("getPromptThumbnails" in node) {
