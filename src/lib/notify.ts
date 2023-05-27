@@ -42,7 +42,7 @@ function notifyf7(text: string, options: NotifyOptions) {
 function notifyToast(text: string, options: NotifyOptions) {
     const toastOptions: SvelteToastOptions = {
         dismissable: options.timeout !== null,
-        duration: options.timeout,
+        duration: options.timeout || 5000,
         theme: {},
     }
 

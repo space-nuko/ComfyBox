@@ -309,7 +309,7 @@ export default class ComfyApp {
             if (errors && errors.length > 0)
                 error = "Error(s) loading builtin templates:\n" + errors.join("\n");
 
-            console.log(`Loaded {templates.length} builtin templates.`);
+            console.log(`Loaded ${templates.length} builtin templates.`);
 
             return [templates, error]
         })

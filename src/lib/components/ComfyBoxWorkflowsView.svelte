@@ -240,6 +240,7 @@
      }
 
      workflowState.setActiveWorkflow(app.lCanvas, workflow.id);
+     $uiState.activeError = promptIDWithError;
 
      const jumpToError = () => {
          app.resizeCanvas();
@@ -271,6 +272,7 @@
  function hideError() {
      if (app?.lCanvas) {
          app.lCanvas.activeErrors = null;
+         app.lCanvas.blinkError = null;
      }
  }
 

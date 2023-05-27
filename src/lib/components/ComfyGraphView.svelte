@@ -5,13 +5,15 @@
  import interfaceState from "$lib/stores/interfaceState";
  import workflowState from "$lib/stores/workflowState";
  import uiState from '$lib/stores/uiState';
+ import ComfyGraphErrorList from "$lib/components/ComfyGraphErrorList.svelte"
 
  export let app: ComfyApp;
 
  let canvas: HTMLCanvasElement;
 
  onMount(async () => {
-     if (app?.lCanvas && canvas) {
+     if (app?.lCanvas) {
+         canvas = app.lCanvas.canvas;
          app.lCanvas?.setCanvas(canvas)
      }
  })
@@ -40,6 +42,9 @@
             </span>
         {/if}
     </div>
+    {#if $uiState.activeError && app?.lCanvas?.activeErrors != null}
+        <ComfyGraphErrorList {app} errors={app.lCanvas.activeErrors} />
+    {/if}
 </div>
 
 <style lang="scss">

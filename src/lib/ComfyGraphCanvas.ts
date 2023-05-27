@@ -22,6 +22,8 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     private _unsubscribe: Unsubscriber;
     isExportingSVG: boolean = false;
     activeErrors?: ComfyGraphErrors = null;
+    blinkError: ComfyGraphErrorLocation | null = null;
+    blinkErrorTime: number = 0;
 
     get comfyGraph(): ComfyGraph | null {
         return this.graph as ComfyGraph;
@@ -96,8 +98,13 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         const isRunningNode = node.id == state.runningNodeID
         const nodeErrors = this.activeErrors?.errorsByID[node.id];
 
+        if (this.blinkErrorTime > 0) {
+            this.blinkErrorTime -= this.graph.elapsed_time;
+        }
+
         let color = null;
         let thickness = 1;
+        let blink = false;
         // if (this._selectedNodes.has(node.id)) {
         //     color = "yellow";
         //     thickness = 5;
@@ -111,12 +118,21 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         else if (nodeErrors) {
             const hasExecutionError = nodeErrors.find(e => e.errorType === "execution");
             if (hasExecutionError) {
+                blink = true;
                 color = "#f0f";
             }
             else {
                 color = "red";
             }
             thickness = 2
+        }
+
+        if (blink) {
+            if (nodeErrors && nodeErrors.includes(this.blinkError) && this.blinkErrorTime > 0) {
+                if ((Math.floor(this.blinkErrorTime / 2)) % 2 === 0) {
+                    color = null;
+                }
+            }
         }
 
         if (color) {
@@ -139,6 +155,11 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         ctx.strokeStyle = "red";
         for (const errorLocation of errors) {
             if (errorLocation.input != null) {
+                if (errorLocation === this.blinkError && this.blinkErrorTime > 0) {
+                    if ((Math.floor(this.blinkErrorTime / 2)) % 2 === 0) {
+                        continue;
+                    }
+                }
                 const inputIndex = node.findInputSlotIndexByName(errorLocation.input.name)
                 if (inputIndex !== -1) {
                     let pos = node.getConnectionPos(true, inputIndex);
@@ -607,17 +628,29 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         this.jumpToError(0);
     }
 
-    jumpToError(index: number) {
+    jumpToError(index: number | ComfyGraphErrorLocation) {
         if (this.activeErrors == null) {
             return;
         }
 
-        const error = this.activeErrors.errors[index]
+        let error;
+        if (typeof index === "number") {
+            error = this.activeErrors.errors[index]
+        }
+        else {
+            error = index;
+        }
+
         if (error == null) {
             return;
         }
 
-        const node = this.graph.getNodeByIdRecursive(error.nodeID);
+        const rootGraph = this.graph.getRootGraph()
+        if (rootGraph == null) {
+            return
+        }
+
+        const node = rootGraph.getNodeByIdRecursive(error.nodeID);
         if (node == null) {
             notify(`Couldn't find node '${error.comfyNodeType}' (${error.nodeID})`, { type: "warning" })
             return
@@ -637,5 +670,8 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         }
 
         this.centerOnNode(node);
+
+        this.blinkError = error;
+        this.blinkErrorTime = 20;
     }
 }
