@@ -135,7 +135,7 @@ export type ComfyInterruptedError = {
 }
 
 export type ComfyExecutionError = ComfyInterruptedError & {
-    message: string,
+    exception_message: string,
     exception_type: string,
     traceback: string[],
     current_inputs: any[],
@@ -147,7 +147,7 @@ export function formatValidationError(error: ComfyAPIPromptErrorResponse) {
 }
 
 export function formatExecutionError(error: ComfyExecutionError) {
-    return `${error.message}`
+    return error.exception_message
 }
 
 export type ComfyGraphErrorInput = {
@@ -242,11 +242,11 @@ export function executionErrorToGraphErrors(workflowID: WorkflowInstID, executio
         nodeID: executionError.node_id,
         comfyNodeType: executionError.node_type,
         errorType: "execution",
-        message: executionError.message,
+        message: executionError.exception_message,
         dependentOutputs: [], // TODO
         queueEntry,
 
-        exceptionMessage: executionError.message,
+        exceptionMessage: executionError.exception_message,
         exceptionType: executionError.exception_type,
         traceback: executionError.traceback,
         inputValues: executionError.current_inputs,
@@ -254,7 +254,7 @@ export function executionErrorToGraphErrors(workflowID: WorkflowInstID, executio
     }]
 
     return {
-        message: executionError.message,
+        message: executionError.exception_message,
         errors: Object.values(errorsByID).flatMap(e => e),
         errorsByID
     }
