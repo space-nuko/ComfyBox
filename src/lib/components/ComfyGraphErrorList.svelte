@@ -4,8 +4,9 @@
  import Accordion from "./gradio/app/Accordion.svelte";
  import uiState from '$lib/stores/uiState';
  import type { ComfyNodeDefInputType } from "$lib/ComfyNodeDef";
-	import type { INodeInputSlot, LGraphNode, Subgraph } from "@litegraph-ts/core";
-	import { UpstreamNodeLocator } from "./ComfyPromptSerializer";
+ import type { INodeInputSlot, LGraphNode, Subgraph } from "@litegraph-ts/core";
+ import { UpstreamNodeLocator } from "./ComfyPromptSerializer";
+ import JsonView from "./JsonView.svelte";
 
  export let app: ComfyApp;
  export let errors: ComfyGraphErrors;
@@ -84,7 +85,7 @@
                         <div>
                             <div class="error-details">
                                 <button class="jump-to-error" class:execution-error={isExecutionError} on:click={() => jumpToError(error)}><span>⮎</span></button>
-                                <div>
+                                <div class="error-details-wrapper">
                                     <span class="error-message" class:execution-error={isExecutionError}>{error.message}</span>
                                     {#if error.exceptionType}
                                         <span>({error.exceptionType})</span>
@@ -94,7 +95,7 @@
                                     {/if}
                                     {#if error.input}
                                         <div class="error-input">
-                                            <span>Input: `{error.input.name}`</span>
+                                            <span>Input: <b>{error.input.name}</b></span>
                                             {#if error.input.config}
                                                 <span>({getInputTypeName(error.input.config[0])})</span>
                                             {/if}
@@ -103,6 +104,28 @@
                                             <div style:display="flex" style:flex-direction="row">
                                                 <button class="jump-to-error locate" on:click={() => jumpToDisconnectedInput(error)}><span>⮎</span></button>
                                                 <span>Find disconnected input</span>
+                                            </div>
+                                        {/if}
+
+                                        {#if error.input.receivedValue}
+                                            <div>
+                                                <span>Received value: <b>{error.input.receivedValue}</b></span>
+                                            </div>
+                                        {/if}
+                                        {#if error.input.receivedType}
+                                            <div>
+                                                <span>Received type: <b>{error.input.receivedType}</b></span>
+                                            </div>
+                                        {/if}
+                                        {#if error.input.config}
+                                            <div class="error-traceback-wrapper">
+                                                <Accordion label="Input Config" open={true}>
+                                                    <div class="error-traceback">
+                                                        <div class="error-traceback-contents">
+                                                            <JsonView json={error.input.config[1]} />
+                                                        </div>
+                                                    </div>
+                                                </Accordion>
                                             </div>
                                         {/if}
                                     {/if}
@@ -188,6 +211,7 @@
  }
 
  .error-details {
+     width: 100%;
      display: flex;
      flex-direction: row;
      gap: var(--spacing-md);
@@ -200,6 +224,10 @@
          flex-direction: column;
          justify-content: center;
      }
+ }
+
+ .error-details-wrapper {
+     flex: 5 1 0%;
  }
 
  .error-message {
@@ -246,19 +274,20 @@
  }
 
  .error-traceback-wrapper {
+     width: 100%;
      margin-top: 1.0rem;
      padding: 0.5rem;
      border: 1px solid #888;
 
      .error-traceback {
-         font-size: 11pt;
+         font-size: 10pt;
          overflow: auto;
          white-space: nowrap;
          background: #333;
 
          .error-traceback-contents {
              width: 100%;
-             font-family: monospace;
+             font-family: monospace !important;
              padding: 1.0rem;
 
              > div {
