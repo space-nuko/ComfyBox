@@ -89,7 +89,7 @@
                                     {#if error.exceptionType}
                                         <span>({error.exceptionType})</span>
                                     {/if}
-                                    {#if error.exceptionMessage}
+                                    {#if error.exceptionMessage && !isExecutionError}
                                         <div style:text-decoration="underline">{error.exceptionMessage}</div>
                                     {/if}
                                     {#if error.input}
