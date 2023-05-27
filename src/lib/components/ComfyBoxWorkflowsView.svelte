@@ -246,7 +246,7 @@
          app.resizeCanvas();
          app.lCanvas.draw(true, true);
 
-         app.lCanvas.activeErrors = workflowErrorToGraphErrors(workflow.id, completed.error);
+         app.lCanvas.activeErrors = workflowErrorToGraphErrors(workflow.id, completed.error, completed.entry);
          app.lCanvas.jumpToFirstError();
      }
 
@@ -271,8 +271,7 @@
 
  function hideError() {
      if (app?.lCanvas) {
-         app.lCanvas.activeErrors = null;
-         app.lCanvas.blinkError = null;
+         app.lCanvas.clearErrors();
      }
  }
 

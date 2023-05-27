@@ -148,8 +148,11 @@
      &.success {
          /* background: green; */
      }
-     &.error, &.validation_failed {
-         background: red;
+     &.validation_failed {
+         background: #551a1a;
+     }
+     &.error {
+         background: #401a40;
      }
      &.all_cached, &.interrupted {
          filter: brightness(80%);

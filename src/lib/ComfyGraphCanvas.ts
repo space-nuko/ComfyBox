@@ -1,4 +1,4 @@
-import { BuiltInSlotShape, ContextMenu, LGraphCanvas, LGraphNode, LLink, LiteGraph, NodeMode, Subgraph, TitleMode, type ContextMenuItem, type IContextMenuItem, type MouseEventExt, type NodeID, type Vector2, type Vector4, LGraph } from "@litegraph-ts/core";
+import { BuiltInSlotShape, ContextMenu, LGraphCanvas, LGraphNode, LLink, LiteGraph, NodeMode, Subgraph, TitleMode, type ContextMenuItem, type IContextMenuItem, type MouseEventExt, type NodeID, type Vector2, type Vector4, LGraph, type SlotIndex, type SlotNameOrIndex } from "@litegraph-ts/core";
 import { get, type Unsubscriber } from "svelte/store";
 import { createTemplate, serializeTemplate, type ComfyBoxTemplate, type SerializedComfyBoxTemplate } from "./ComfyBoxTemplate";
 import type ComfyGraph from "./ComfyGraph";
@@ -24,9 +24,17 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     activeErrors?: ComfyGraphErrors = null;
     blinkError: ComfyGraphErrorLocation | null = null;
     blinkErrorTime: number = 0;
+    highlightNodeAndInput: [LGraphNode, number] | null = null;
 
     get comfyGraph(): ComfyGraph | null {
         return this.graph as ComfyGraph;
+    }
+
+    clearErrors() {
+        this.activeErrors = null;
+        this.blinkError = null;
+        this.blinkErrorTime = 0;
+        this.highlightNodeAndInput = null;
     }
 
     constructor(
@@ -97,6 +105,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
 
         const isRunningNode = node.id == state.runningNodeID
         const nodeErrors = this.activeErrors?.errorsByID[node.id];
+        const isHighlightedNode = this.highlightNodeAndInput && this.highlightNodeAndInput[0].id === node.id;
 
         if (this.blinkErrorTime > 0) {
             this.blinkErrorTime -= this.graph.elapsed_time;
@@ -126,6 +135,10 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
             }
             thickness = 2
         }
+        else if (isHighlightedNode) {
+            color = "cyan";
+            thickness = 2
+        }
 
         if (blink) {
             if (nodeErrors && nodeErrors.includes(this.blinkError) && this.blinkErrorTime > 0) {
@@ -146,13 +159,28 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         }
 
         if (nodeErrors) {
-            this.drawFailedValidationInputs(node, nodeErrors, ctx);
+            this.drawFailedValidationInputs(node, nodeErrors, color, ctx);
+        }
+
+        if (isHighlightedNode) {
+            let draw = true;
+            if (this.blinkErrorTime > 0) {
+                if ((Math.floor(this.blinkErrorTime / 2)) % 2 === 0) {
+                    draw = false;
+                }
+            }
+            if (draw) {
+                const [node, inputSlot] = this.highlightNodeAndInput;
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = color;
+                this.highlightNodeInput(node, inputSlot, ctx);
+            }
         }
     }
 
-    private drawFailedValidationInputs(node: LGraphNode, errors: ComfyGraphErrorLocation[], ctx: CanvasRenderingContext2D) {
+    private drawFailedValidationInputs(node: LGraphNode, errors: ComfyGraphErrorLocation[], color: string, ctx: CanvasRenderingContext2D) {
         ctx.lineWidth = 2;
-        ctx.strokeStyle = "red";
+        ctx.strokeStyle = color || "red";
         for (const errorLocation of errors) {
             if (errorLocation.input != null) {
                 if (errorLocation === this.blinkError && this.blinkErrorTime > 0) {
@@ -160,14 +188,22 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
                         continue;
                     }
                 }
-                const inputIndex = node.findInputSlotIndexByName(errorLocation.input.name)
-                if (inputIndex !== -1) {
-                    let pos = node.getConnectionPos(true, inputIndex);
-                    ctx.beginPath();
-                    ctx.arc(pos[0] - node.pos[0], pos[1] - node.pos[1], 12, 0, 2 * Math.PI, false)
-                    ctx.stroke();
-                }
+                this.highlightNodeInput(node, errorLocation.input.name, ctx);
             }
+        }
+    }
+
+    private highlightNodeInput(node: LGraphNode, inputSlot: SlotNameOrIndex, ctx: CanvasRenderingContext2D) {
+        let inputIndex: number;
+        if (typeof inputSlot === "number")
+            inputIndex = inputSlot
+        else
+            inputIndex = node.findInputSlotIndexByName(inputSlot)
+        if (inputIndex !== -1) {
+            let pos = node.getConnectionPos(true, inputIndex);
+            ctx.beginPath();
+            ctx.arc(pos[0] - node.pos[0], pos[1] - node.pos[1], 12, 0, 2 * Math.PI, false)
+            ctx.stroke();
         }
     }
 
@@ -656,22 +692,28 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
             return
         }
 
+        this.jumpToNode(node)
+
+        this.highlightNodeAndInput = null;
+        this.blinkError = error;
+        this.blinkErrorTime = 20;
+    }
+
+    jumpToNode(node: LGraphNode) {
         this.closeAllSubgraphs();
 
-        const subgraphs: LGraph[] = []
-        let node_ = node;
-        while (node_.graph._is_subgraph) {
-            subgraphs.push(node.graph);
-            node_ = node.graph._subgraph_node
-        }
+        const subgraphs = Array.from(node.iterateParentSubgraphNodes()).reverse();
 
         for (const subgraph of subgraphs) {
-            this.openSubgraph(subgraph)
+            this.openSubgraph(subgraph.subgraph)
         }
 
         this.centerOnNode(node);
+    }
 
-        this.blinkError = error;
+    jumpToNodeAndInput(node: LGraphNode, slotIndex: number) {
+        this.jumpToNode(node);
+        this.highlightNodeAndInput = [node, slotIndex];
         this.blinkErrorTime = 20;
     }
 }

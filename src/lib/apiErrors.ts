@@ -5,6 +5,7 @@ import type { SerializedPromptInputLink } from "./components/ComfyApp"
 import type { WorkflowError, WorkflowInstID } from "./stores/workflowState"
 import { exclude_internal_props } from "svelte/internal"
 import type ComfyGraphCanvas from "./ComfyGraphCanvas"
+import type { QueueEntry } from "./stores/queueState"
 
 enum ComfyPromptErrorType {
     NoOutputs = "prompt_no_outputs",
@@ -165,6 +166,7 @@ export type ComfyGraphErrorLocation = {
     errorType: ComfyNodeErrorType | "execution",
     message: string,
     dependentOutputs: NodeID[],
+    queueEntry: QueueEntry,
 
     input?: ComfyGraphErrorInput,
 
@@ -182,7 +184,7 @@ export type ComfyGraphErrors = {
     errorsByID: Record<NodeID, ComfyGraphErrorLocation[]>
 }
 
-export function validationErrorToGraphErrors(workflowID: WorkflowInstID, validationError: ComfyAPIPromptErrorResponse): ComfyGraphErrors {
+export function validationErrorToGraphErrors(workflowID: WorkflowInstID, validationError: ComfyAPIPromptErrorResponse, queueEntry: QueueEntry): ComfyGraphErrors {
     const errorsByID: Record<NodeID, ComfyGraphErrorLocation[]> = {}
 
     for (const [nodeID, nodeErrors] of Object.entries(validationError.node_errors)) {
@@ -194,6 +196,7 @@ export function validationErrorToGraphErrors(workflowID: WorkflowInstID, validat
                 errorType: e.type,
                 message: e.message,
                 dependentOutputs: nodeErrors.dependent_outputs,
+                queueEntry
             }
 
             if (isInputWithValue(e.extra_info)) {
@@ -231,7 +234,7 @@ export function validationErrorToGraphErrors(workflowID: WorkflowInstID, validat
     }
 }
 
-export function executionErrorToGraphErrors(workflowID: WorkflowInstID, executionError: ComfyExecutionError): ComfyGraphErrors {
+export function executionErrorToGraphErrors(workflowID: WorkflowInstID, executionError: ComfyExecutionError, queueEntry: QueueEntry): ComfyGraphErrors {
     const errorsByID: Record<NodeID, ComfyGraphErrorLocation[]> = {}
 
     errorsByID[executionError.node_id] = [{
@@ -241,6 +244,7 @@ export function executionErrorToGraphErrors(workflowID: WorkflowInstID, executio
         errorType: "execution",
         message: executionError.message,
         dependentOutputs: [], // TODO
+        queueEntry,
 
         exceptionMessage: executionError.message,
         exceptionType: executionError.exception_type,
@@ -256,11 +260,11 @@ export function executionErrorToGraphErrors(workflowID: WorkflowInstID, executio
     }
 }
 
-export function workflowErrorToGraphErrors(workflowID: WorkflowInstID, workflowError: WorkflowError): ComfyGraphErrors {
+export function workflowErrorToGraphErrors(workflowID: WorkflowInstID, workflowError: WorkflowError, queueEntry: QueueEntry): ComfyGraphErrors {
     if (workflowError.type === "validation") {
-        return validationErrorToGraphErrors(workflowID, workflowError.error)
+        return validationErrorToGraphErrors(workflowID, workflowError.error, queueEntry)
     }
     else {
-        return executionErrorToGraphErrors(workflowID, workflowError.error)
+        return executionErrorToGraphErrors(workflowID, workflowError.error, queueEntry)
     }
 }

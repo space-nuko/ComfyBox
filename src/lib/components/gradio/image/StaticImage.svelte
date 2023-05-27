@@ -2,7 +2,7 @@
 	import { createEventDispatcher } from "svelte";
 	import type { SelectData } from "@gradio/utils";
 	import { BlockLabel, Empty, IconButton } from "@gradio/atoms";
-	import { Download } from "@gradio/icons";
+	import { Download, Clear } from "@gradio/icons";
 	import { get_coordinates_of_clicked_image } from "./utils";
 
 	import { Image } from "@gradio/icons";
@@ -33,13 +33,17 @@
 			dispatch("select", { index: coordinates, value: null });
 		}
 	};
+
+ function remove() {
+     value = null;
+ }
 </script>
 
 <BlockLabel {show_label} Icon={Image} label={label || "Image"} />
 {#if value === null}
 	<Empty size="large" unpadded_box={true}><Image /></Empty>
 {:else}
-	<div class="download">
+	<div class="buttons">
 		<a
 			href={value}
 			target={window.__is_colab__ ? "_blank" : null}
@@ -47,6 +51,7 @@
 		>
 			<IconButton Icon={Download} label="Download" />
 		</a>
+        <IconButton Icon={Clear} label="Remove" on:click={remove} />
 	</div>
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<img src={value} alt="" class:selectable on:click={handle_click} bind:naturalWidth={imageWidth} bind:naturalHeight={imageHeight} />
@@ -63,9 +68,13 @@
 		cursor: crosshair;
 	}
 
-	.download {
+	.buttons {
+		display: flex;
 		position: absolute;
-		top: 6px;
-		right: 6px;
+		top: var(--size-2);
+		right: var(--size-2);
+		justify-content: flex-end;
+		gap: var(--spacing-sm);
+		z-index: var(--layer-5);
 	}
 </style>

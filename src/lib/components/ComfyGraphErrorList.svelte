@@ -1,16 +1,17 @@
 <script lang="ts">
- import type { ComfyGraphErrorLocation, ComfyGraphErrors } from "$lib/apiErrors";
+ import { ComfyNodeErrorType, type ComfyGraphErrorLocation, type ComfyGraphErrors } from "$lib/apiErrors";
  import type ComfyApp from "./ComfyApp";
  import Accordion from "./gradio/app/Accordion.svelte";
  import uiState from '$lib/stores/uiState';
  import type { ComfyNodeDefInputType } from "$lib/ComfyNodeDef";
+	import type { INodeInputSlot, LGraphNode, Subgraph } from "@litegraph-ts/core";
+	import { UpstreamNodeLocator } from "./ComfyPromptSerializer";
 
  export let app: ComfyApp;
  export let errors: ComfyGraphErrors;
 
  function closeList() {
-     app.lCanvas.activeErrors = null;
-     app.lCanvas.blinkError = null;
+     app.lCanvas.clearErrors();
      $uiState.activeError = null;
  }
 
@@ -20,6 +21,34 @@
          return null;
 
      return node.graph._subgraph_node
+ }
+
+ function canJumpToDisconnectedInput(error: ComfyGraphErrorLocation): boolean {
+     return error.errorType === ComfyNodeErrorType.RequiredInputMissing && error.input != null;
+ }
+
+ function jumpToDisconnectedInput(error: ComfyGraphErrorLocation) {
+     if (error.errorType !== ComfyNodeErrorType.RequiredInputMissing || error.input == null) {
+         return
+     }
+
+     const node = app.lCanvas.graph.getNodeByIdRecursive(error.nodeID);
+
+     const inputIndex =node.findInputSlotIndexByName(error.input.name);
+     if (inputIndex === -1) {
+         return
+     }
+
+     // TODO multiple tags?
+     const tag: string | null = error.queueEntry.extraData.extra_pnginfo.comfyBoxPrompt.subgraphs[0];
+
+     const test = (node: LGraphNode) => (node as any).isBackendNode
+     const nodeLocator = new UpstreamNodeLocator(test)
+     const [_, foundLink, foundInputSlot, foundPrevNode] = nodeLocator.locateUpstream(node, inputIndex, tag);
+
+     if (foundInputSlot != null && foundPrevNode != null) {
+         app.lCanvas.jumpToNodeAndInput(foundPrevNode, foundInputSlot);
+     }
  }
 
  function jumpToError(error: ComfyGraphErrorLocation) {
@@ -66,6 +95,12 @@
                                                 <span>Type: {getInputTypeName(error.input.config[0])}</span>
                                             {/if}
                                         </div>
+                                        {#if canJumpToDisconnectedInput(error)}
+                                            <div style:display="flex" style:flex-direction="row">
+                                                <button class="jump-to-error" on:click={() => jumpToDisconnectedInput(error)}><span>⮎</span></button>
+                                                <span>Find disconnected input</span>
+                                            </div>
+                                        {/if}
                                     {/if}
                                 </div>
                             </div>
