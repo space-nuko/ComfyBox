@@ -218,10 +218,6 @@
          }
          lastError = $uiState.activeError;
      }
-     else if (activeError == null) {
-         hideError();
-         lastError = null
-     }
  }
 
  async function showError(promptIDWithError: PromptID) {
@@ -241,6 +237,7 @@
 
      workflowState.setActiveWorkflow(app.lCanvas, workflow.id);
      $uiState.activeError = promptIDWithError;
+     lastError = $uiState.activeError;
 
      const jumpToError = () => {
          app.resizeCanvas();
@@ -257,7 +254,7 @@
      if (willOpenPane) {
          const graphPane = getGraphPane();
          if (graphPane) {
-             graphPane.addEventListener("transitionend", jumpToError)
+             graphPane.addEventListener("transitionend", jumpToError, { once: true })
              await tick()
          }
          else {

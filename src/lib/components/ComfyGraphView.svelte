@@ -33,14 +33,12 @@
         <DropZone {app} />
     </div>
     <div class="bar">
-        {#if !$interfaceState.graphTransitioning}
-            <span class="left">
-                <button on:click={doRecenter}>Recenter</button>
-                {#if $uiState.activeError != null}
-                    <button on:click={clearErrors}>Clear Errors</button>
-                {/if}
-            </span>
-        {/if}
+        <span class="left">
+            <button disabled={$interfaceState.graphTransitioning} on:click={doRecenter}>Recenter</button>
+            {#if $uiState.activeError != null}
+                <button disabled={$interfaceState.graphTransitioning} on:click={clearErrors}>Clear Errors</button>
+            {/if}
+        </span>
     </div>
     {#if $uiState.activeError && app?.lCanvas?.activeErrors != null}
         <ComfyGraphErrorList {app} errors={app.lCanvas.activeErrors} />
@@ -94,6 +92,9 @@
          &:active {
              background-color: #555;
              border-color: #777;
+         }
+         &:disabled {
+             opacity: 50%;
          }
      }
  }

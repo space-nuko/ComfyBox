@@ -97,7 +97,7 @@
                                         </div>
                                         {#if canJumpToDisconnectedInput(error)}
                                             <div style:display="flex" style:flex-direction="row">
-                                                <button class="jump-to-error" on:click={() => jumpToDisconnectedInput(error)}><span>⮎</span></button>
+                                                <button class="jump-to-error locate" on:click={() => jumpToDisconnectedInput(error)}><span>⮎</span></button>
                                                 <span>Find disconnected input</span>
                                             </div>
                                         {/if}
@@ -215,6 +215,9 @@
      background: #844;
      &.execution-error {
          background: #848;
+     }
+     &.locate {
+         background: #488;
      }
      width: 32px;
      height: 32px;
