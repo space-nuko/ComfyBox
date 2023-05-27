@@ -88,11 +88,15 @@
                                     <span class="error-message" class:execution-error={isExecutionError}>{error.message}</span>
                                     {#if error.exceptionType}
                                         <span>({error.exceptionType})</span>
-                                    {:else if error.input}
+                                    {/if}
+                                    {#if error.exceptionMessage}
+                                        <div style:text-decoration="underline">{error.exceptionMessage}</div>
+                                    {/if}
+                                    {#if error.input}
                                         <div class="error-input">
-                                            <span>Input Name: {error.input.name}</span>
+                                            <span>Input: `{error.input.name}`</span>
                                             {#if error.input.config}
-                                                <span>Type: {getInputTypeName(error.input.config[0])}</span>
+                                                <span>({getInputTypeName(error.input.config[0])})</span>
                                             {/if}
                                         </div>
                                         {#if canJumpToDisconnectedInput(error)}
