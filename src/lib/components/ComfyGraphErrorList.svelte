@@ -115,7 +115,7 @@
                                     <div class="error-traceback">
                                         <div class="error-traceback-contents">
                                             {#each error.traceback as line}
-                                                <div>{line}</div>
+                                                <pre>{line}</pre>
                                             {/each}
                                         </div>
                                     </div>
