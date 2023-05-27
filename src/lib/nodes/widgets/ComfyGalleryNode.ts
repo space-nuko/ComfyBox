@@ -99,6 +99,12 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
         if (newIndex != null) {
             this.selectedImage.set(newIndex)
             this.forceSelectImage.set(true)
+
+            const image = this.getValue()[newIndex]
+            if (image) {
+                this.imageWidth.set(image.width || 0)
+                this.imageHeight.set(image.height || 0)
+            }
         }
     }
 
