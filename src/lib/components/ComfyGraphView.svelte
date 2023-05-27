@@ -1,25 +1,42 @@
 <script lang="ts">
- import { Button } from "@gradio/button";
+ import { onMount } from "svelte";
  import type ComfyApp from "./ComfyApp";
  import DropZone from "./DropZone.svelte";
  import interfaceState from "$lib/stores/interfaceState";
+ import workflowState from "$lib/stores/workflowState";
+ import uiState from '$lib/stores/uiState';
 
  export let app: ComfyApp;
 
+ let canvas: HTMLCanvasElement;
+
+ onMount(async () => {
+     if (app?.lCanvas && canvas) {
+         app.lCanvas?.setCanvas(canvas)
+     }
+ })
+
  function doRecenter(): void {
      app?.lCanvas?.recenter();
+ }
+
+ function clearErrors(): void {
+     $uiState.activeError = null;
  }
 </script>
 
 <div class="wrapper litegraph">
     <div class="canvas-wrapper pane-wrapper">
-        <canvas id="graph-canvas" />
+        <canvas bind:this={canvas} id="graph-canvas" />
         <DropZone {app} />
     </div>
     <div class="bar">
         {#if !$interfaceState.graphTransitioning}
             <span class="left">
                 <button on:click={doRecenter}>Recenter</button>
+                {#if $uiState.activeError != null}
+                    <button on:click={clearErrors}>Clear Errors</button>
+                {/if}
             </span>
         {/if}
     </div>

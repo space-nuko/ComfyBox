@@ -148,7 +148,7 @@
      &.success {
          /* background: green; */
      }
-     &.error {
+     &.error, &.validation_failed {
          background: red;
      }
      &.all_cached, &.interrupted {

@@ -1,3 +1,7 @@
+<script context="module" lang="ts">
+ export const WORKFLOWS_VIEW: any = {}
+</script>
+
 <script lang="ts">
  import { Pane, Splitpanes } from 'svelte-splitpanes';
  import { PlusSquareDotted } from 'svelte-bootstrap-icons';
@@ -12,12 +16,15 @@
  import workflowState, { ComfyBoxWorkflow, type WorkflowInstID } from "$lib/stores/workflowState";
  import selectionState from "$lib/stores/selectionState";
  import type ComfyApp from './ComfyApp';
- import { onMount } from "svelte";
+ import { onMount, setContext, tick } from "svelte";
  import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
  import { fade } from 'svelte/transition';
  import { cubicIn } from 'svelte/easing';
  import { truncateString } from '$lib/utils';
  import ComfyPaneView from './ComfyPaneView.svelte';
+ import type { PromptID } from '$lib/api';
+ import queueState, { type CompletedQueueEntry } from '$lib/stores/queueState';
+ import { workflowErrorToGraphErrors } from '$lib/apiErrors';
 
  export let app: ComfyApp;
  export let uiTheme: string = "gradio-dark" // TODO config
@@ -44,6 +51,8 @@
      }
      );
      refreshView();
+
+     lastError = null;
  })
 
  async function doRefreshCombos() {
@@ -70,18 +79,22 @@
 
  let graphSize = 0;
 
- $: if (containerElem) {
+ function getGraphPane(): HTMLDivElement | null {
      const canvas = containerElem.querySelector<HTMLDivElement>("#graph-canvas")
-     if (canvas) {
-         const paneNode = canvas.closest(".splitpanes__pane")
-         if (paneNode) {
-             (paneNode as HTMLElement).ontransitionstart = () => {
-                 $interfaceState.graphTransitioning = true
-             }
-             (paneNode as HTMLElement).ontransitionend = () => {
-                 $interfaceState.graphTransitioning = false
-                 app.resizeCanvas()
-             }
+     if (!canvas)
+         return null;
+     return canvas.closest(".splitpanes__pane")
+ }
+
+ $: if (containerElem) {
+     const paneNode = getGraphPane();
+     if (paneNode) {
+         (paneNode as HTMLElement).ontransitionstart = () => {
+             $interfaceState.graphTransitioning = true
+         }
+         (paneNode as HTMLElement).ontransitionend = () => {
+             $interfaceState.graphTransitioning = false
+             app.resizeCanvas()
          }
      }
  }
@@ -191,6 +204,79 @@
          return s;
      })
  };
+
+ let lastError: PromptID | null = null;
+
+ $: {
+     const activeError = $uiState.activeError
+     if (activeError != lastError) {
+         if (activeError != null) {
+             showError(activeError)
+         }
+         else {
+             hideError();
+         }
+         lastError = $uiState.activeError;
+     }
+     else if (activeError == null) {
+         hideError();
+         lastError = null
+     }
+ }
+
+ async function showError(promptIDWithError: PromptID) {
+     hideError();
+
+     const completed: CompletedQueueEntry = get($queueState.queueCompleted).find(e => e.entry.promptID === promptIDWithError);
+     if (!completed || !completed.error) {
+         console.error("Prompt with error not found!", promptIDWithError);
+         return
+     }
+
+     const workflow = workflowState.getWorkflow(completed.entry.extraData.workflowID)
+     if (workflow == null) {
+         console.error("Workflow with error not found!", promptIDWithError, completed);
+         return
+     }
+
+     workflowState.setActiveWorkflow(app.lCanvas, workflow.id);
+
+     const jumpToError = () => {
+         app.resizeCanvas();
+         app.lCanvas.draw(true, true);
+
+         app.lCanvas.activeErrors = workflowErrorToGraphErrors(workflow.id, completed.error);
+         app.lCanvas.jumpToFirstError();
+     }
+
+     const newGraphSize = Math.max(50, graphSize);
+     const willOpenPane = newGraphSize != graphSize
+     graphSize = newGraphSize
+
+     if (willOpenPane) {
+         const graphPane = getGraphPane();
+         if (graphPane) {
+             graphPane.addEventListener("transitionend", jumpToError)
+             await tick()
+         }
+         else {
+             jumpToError()
+         }
+     }
+     else {
+         jumpToError()
+     }
+ }
+
+ function hideError() {
+     if (app?.lCanvas) {
+         app.lCanvas.activeErrors = null;
+     }
+ }
+
+ setContext(WORKFLOWS_VIEW, {
+     showError
+ });
 </script>
 
 <div id="comfy-content" bind:this={containerElem} class:loading>

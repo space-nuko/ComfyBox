@@ -8,8 +8,10 @@ import layoutStates from './layoutStates';
 import { v4 as uuidv4 } from "uuid";
 import type ComfyGraphCanvas from '$lib/ComfyGraphCanvas';
 import { blankGraph } from '$lib/defaultGraph';
-import type { SerializedAppState } from '$lib/components/ComfyApp';
+import type { SerializedAppState, SerializedPrompt } from '$lib/components/ComfyApp';
 import type ComfyReceiveOutputNode from '$lib/nodes/actions/ComfyReceiveOutputNode';
+import type { ComfyBoxPromptExtraData, PromptID } from '$lib/api';
+import type { ComfyAPIPromptErrorResponse, ComfyExecutionError } from '$lib/apiErrors';
 
 type ActiveCanvas = {
     canvas: LGraphCanvas | null;
@@ -63,6 +65,21 @@ export type WorkflowAttributes = {
     showDefaultNotifications: boolean,
 }
 
+export type WorkflowValidationError = {
+    type: "validation"
+    workflowID: WorkflowInstID,
+    error: ComfyAPIPromptErrorResponse,
+    prompt: SerializedPrompt,
+    extraData: ComfyBoxPromptExtraData
+}
+
+export type WorkflowExecutionError = {
+    type: "execution"
+    error: ComfyExecutionError,
+}
+
+export type WorkflowError = WorkflowValidationError | WorkflowExecutionError;
+
 export class ComfyBoxWorkflow {
     /*
      * Used for uniquely identifying the instance of the opened workflow in the frontend.
@@ -88,6 +105,11 @@ export class ComfyBoxWorkflow {
      * Missing node types encountered when deserializing the graph
      */
     missingNodeTypes: Set<string> = new Set();
+
+    /*
+     * Completed queue entry ID that holds the last validation/execution error.
+     */
+    lastError?: PromptID
 
     get layout(): WritableLayoutStateStore | null {
         return layoutStates.getLayout(this.id)
@@ -257,7 +279,10 @@ type WorkflowStateOps = {
     closeWorkflow: (canvas: ComfyGraphCanvas, index: number) => void,
     closeAllWorkflows: (canvas: ComfyGraphCanvas) => void,
     setActiveWorkflow: (canvas: ComfyGraphCanvas, index: number | WorkflowInstID) => ComfyBoxWorkflow | null,
-    findReceiveOutputTargets: (type: SlotType | SlotType[]) => WorkflowReceiveOutputTargets[]
+    findReceiveOutputTargets: (type: SlotType | SlotType[]) => WorkflowReceiveOutputTargets[],
+    afterQueued: (id: WorkflowInstID, promptID: PromptID) => void
+    promptError: (id: WorkflowInstID, promptID: PromptID) => void
+    executionError: (id: WorkflowInstID, promptID: PromptID) => void
 }
 
 export type WritableWorkflowStateStore = Writable<WorkflowState> & WorkflowStateOps;
@@ -420,6 +445,36 @@ function findReceiveOutputTargets(type: SlotType | SlotType[]): WorkflowReceiveO
     return result;
 }
 
+function afterQueued(id: WorkflowInstID, promptID: PromptID) {
+    const workflow = getWorkflow(id);
+    if (workflow == null) {
+        console.warn("[workflowState] afterQueued: workflow not found", id, promptID)
+        return
+    }
+
+    workflow.lastError = null;
+}
+
+function promptError(id: WorkflowInstID, promptID: PromptID) {
+    const workflow = getWorkflow(id);
+    if (workflow == null) {
+        console.warn("[workflowState] promptError: workflow not found", id, promptID)
+        return
+    }
+
+    workflow.lastError = promptID;
+}
+
+function executionError(id: WorkflowInstID, promptID: PromptID) {
+    const workflow = getWorkflow(id);
+    if (workflow == null) {
+        console.warn("[workflowState] executionError: workflow not found", id, promptID)
+        return
+    }
+
+    workflow.lastError = promptID;
+}
+
 const workflowStateStore: WritableWorkflowStateStore =
 {
     ...store,
@@ -434,6 +489,9 @@ const workflowStateStore: WritableWorkflowStateStore =
     closeWorkflow,
     closeAllWorkflows,
     setActiveWorkflow,
-    findReceiveOutputTargets
+    findReceiveOutputTargets,
+    afterQueued,
+    promptError,
+    executionError,
 }
 export default workflowStateStore;

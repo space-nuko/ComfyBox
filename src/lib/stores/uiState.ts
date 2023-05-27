@@ -1,3 +1,4 @@
+import type { PromptID } from '$lib/api';
 import { writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
 
@@ -11,7 +12,9 @@ export type UIState = {
     uiEditMode: UIEditMode,
 
     reconnecting: boolean,
-    forceSaveUserState: boolean | null
+    forceSaveUserState: boolean | null,
+
+    activeError: PromptID | null
 }
 
 type UIStateOps = {
@@ -30,6 +33,8 @@ const store: Writable<UIState> = writable(
 
         reconnecting: false,
         forceSaveUserState: null,
+
+        activeError: null
     })
 
 function reconnecting() {

@@ -1,14 +1,15 @@
-import { BuiltInSlotShape, LGraphCanvas, LGraphNode, LLink, LiteGraph, NodeMode, Subgraph, TitleMode, type ContextMenuItem, type IContextMenuItem, type NodeID, type Vector2, type Vector4, type MouseEventExt, ContextMenu, type SerializedLGraphNode } from "@litegraph-ts/core";
+import { BuiltInSlotShape, ContextMenu, LGraphCanvas, LGraphNode, LLink, LiteGraph, NodeMode, Subgraph, TitleMode, type ContextMenuItem, type IContextMenuItem, type MouseEventExt, type NodeID, type Vector2, type Vector4, LGraph } from "@litegraph-ts/core";
 import { get, type Unsubscriber } from "svelte/store";
+import { createTemplate, serializeTemplate, type ComfyBoxTemplate, type SerializedComfyBoxTemplate } from "./ComfyBoxTemplate";
 import type ComfyGraph from "./ComfyGraph";
+import type { ComfyGraphErrorLocation, ComfyGraphErrors, ComfyNodeErrors } from "./apiErrors";
 import type ComfyApp from "./components/ComfyApp";
 import { ComfyReroute } from "./nodes";
+import notify from "./notify";
 import layoutStates, { type ContainerLayout } from "./stores/layoutStates";
 import queueState from "./stores/queueState";
 import selectionState from "./stores/selectionState";
 import templateState from "./stores/templateState";
-import { createTemplate, type ComfyBoxTemplate, serializeTemplate, type SerializedComfyBoxTemplate } from "./ComfyBoxTemplate";
-import notify from "./notify";
 import { calcNodesBoundingBox } from "./utils";
 
 export type SerializedGraphCanvasState = {
@@ -20,6 +21,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     app: ComfyApp | null;
     private _unsubscribe: Unsubscriber;
     isExportingSVG: boolean = false;
+    activeErrors?: ComfyGraphErrors = null;
 
     get comfyGraph(): ComfyGraph | null {
         return this.graph as ComfyGraph;
@@ -90,7 +92,9 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
 
         let state = get(queueState);
         let ss = get(selectionState);
-        const isRunningNode = node.id === state.runningNodeID
+
+        const isRunningNode = node.id == state.runningNodeID
+        const nodeErrors = this.activeErrors?.errorsByID[node.id];
 
         let color = null;
         let thickness = 1;
@@ -104,6 +108,16 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         else if (isRunningNode) {
             color = "#0f0";
         }
+        else if (nodeErrors) {
+            const hasExecutionError = nodeErrors.find(e => e.errorType === "execution");
+            if (hasExecutionError) {
+                color = "#f0f";
+            }
+            else {
+                color = "red";
+            }
+            thickness = 2
+        }
 
         if (color) {
             this.drawNodeOutline(node, ctx, size, mouseOver, fgColor, bgColor, color, thickness)
@@ -113,6 +127,26 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
             ctx.fillStyle = "green";
             ctx.fillRect(0, 0, size[0] * (state.progress.value / state.progress.max), 6);
             ctx.fillStyle = bgColor;
+        }
+
+        if (nodeErrors) {
+            this.drawFailedValidationInputs(node, nodeErrors, ctx);
+        }
+    }
+
+    private drawFailedValidationInputs(node: LGraphNode, errors: ComfyGraphErrorLocation[], ctx: CanvasRenderingContext2D) {
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "red";
+        for (const errorLocation of errors) {
+            if (errorLocation.input != null) {
+                const inputIndex = node.findInputSlotIndexByName(errorLocation.input.name)
+                if (inputIndex !== -1) {
+                    let pos = node.getConnectionPos(true, inputIndex);
+                    ctx.beginPath();
+                    ctx.arc(pos[0] - node.pos[0], pos[1] - node.pos[1], 12, 0, 2 * Math.PI, false)
+                    ctx.stroke();
+                }
+            }
         }
     }
 
@@ -567,5 +601,41 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
             return true;
         }
         return false;
+    }
+
+    jumpToFirstError() {
+        this.jumpToError(0);
+    }
+
+    jumpToError(index: number) {
+        if (this.activeErrors == null) {
+            return;
+        }
+
+        const error = this.activeErrors.errors[index]
+        if (error == null) {
+            return;
+        }
+
+        const node = this.graph.getNodeByIdRecursive(error.nodeID);
+        if (node == null) {
+            notify(`Couldn't find node '${error.comfyNodeType}' (${error.nodeID})`, { type: "warning" })
+            return
+        }
+
+        this.closeAllSubgraphs();
+
+        const subgraphs: LGraph[] = []
+        let node_ = node;
+        while (node_.graph._is_subgraph) {
+            subgraphs.push(node.graph);
+            node_ = node.graph._subgraph_node
+        }
+
+        for (const subgraph of subgraphs) {
+            this.openSubgraph(subgraph)
+        }
+
+        this.centerOnNode(node);
     }
 }

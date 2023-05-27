@@ -1,4 +1,4 @@
-import ComfyAPI, { type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyNodeID, type ComfyPromptRequest, type PromptID, type QueueItemType } from "$lib/api";
+import ComfyAPI, { type iomfyAPIPromptResponse, type ComfyAPIStatusResponse, type ComfyBoxPromptExtraData, type ComfyNodeID, type ComfyPromptRequest, type PromptID, type QueueItemType } from "$lib/api";
 import { parsePNGMetadata } from "$lib/pnginfo";
 import { BuiltInSlotType, LGraphCanvas, LGraphNode, LiteGraph, NodeMode, type INodeInputSlot, type LGraphNodeConstructor, type NodeID, type NodeTypeOpts, type SerializedLGraph, type SlotIndex } from "@litegraph-ts/core";
 import A1111PromptModal from "./modal/A1111PromptModal.svelte";
@@ -38,6 +38,7 @@ import ComfyPromptSerializer, { isActiveBackendNode, nodeHasTag, UpstreamNodeLoc
 import DanbooruTags from "$lib/DanbooruTags";
 import { deserializeTemplateFromSVG, type SerializedComfyBoxTemplate } from "$lib/ComfyBoxTemplate";
 import templateState from "$lib/stores/templateState";
+import { formatValidationError, type ComfyAPIPromptErrorResponse, formatExecutionError, type ComfyExecutionError } from "$lib/apiErrors";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -91,7 +92,8 @@ export type SerializedAppState = {
 }
 
 /** [link_origin, link_slot_index] | input_value */
-export type SerializedPromptInput = [ComfyNodeID, number] | any
+export type SerializedPromptInputLink = [ComfyNodeID, number]
+export type SerializedPromptInput = SerializedPromptInputLink | any
 
 export type SerializedPromptInputs = Record<string, SerializedPromptInput>;
 
@@ -597,9 +599,33 @@ export default class ComfyApp {
             queueState.executionCached(promptID, nodes)
         });
 
-        this.api.addEventListener("execution_error", (promptID: PromptID, message: string) => {
-            queueState.executionError(promptID, message)
-            notify(`Execution error: ${message}`, { type: "error", timeout: 10000 })
+        this.api.addEventListener("execution_error", (error: ComfyExecutionError) => {
+            const completedEntry = queueState.executionError(error)
+            let workflow: ComfyBoxWorkflow | null;
+            if (completedEntry) {
+                const workflowID = completedEntry.entry.extraData.workflowID;
+                if (workflowID) {
+                    workflow = workflowState.getWorkflow(workflowID)
+                }
+            }
+
+            if (workflow) {
+                workflowState.executionError(workflow.id, error.prompt_id)
+                notify(
+                    `Execution error in workflow "${workflow.attrs.title}".\nClick for details.`,
+                    {
+                        type: "error",
+                        showBar: true,
+                        timeout: 15 * 1000,
+                        onClick: () => {
+                            uiState.update(s => { s.activeError = error.prompt_id; return s })
+                        }
+                    })
+            }
+            else {
+                const message = formatExecutionError(error);
+                notify(`Execution error: ${message}`, { type: "error", timeout: 10000 })
+            }
         });
 
         this.api.init();
@@ -1006,8 +1032,9 @@ export default class ComfyApp {
                         thumbnails
                     }
 
-                    let error: string | null = null;
-                    let promptID: PromptID | null = null;
+                    let error: ComfyAPIPromptErrorResponse | null = null;
+                    let errorMes: string | null = null;
+                    let errorPromptID: PromptID | null = null;
 
                     const request: ComfyPromptRequest = {
                         number: num,
@@ -1017,22 +1044,36 @@ export default class ComfyApp {
 
                     try {
                         const response = await this.api.queuePrompt(request);
-                        if (response.error != null) {
+                        if ("error" in response) {
                             error = response;
+                            errorMes = formatValidationError(error)
+                            errorPromptID = queueState.promptError(workflow.id, response, p, extraData)
+                            workflowState.promptError(workflow.id, errorPromptID)
                         }
                         else {
                             queueState.afterQueued(workflow.id, response.promptID, num, p.output, extraData)
+                            workflowState.afterQueued(workflow.id, response.promptID, p, extraData)
                         }
                     } catch (err) {
-                        error = err?.toString();
+                        errorMes = err?.toString();
                     }
 
                     if (error != null) {
-                        const mes: any = error;
-                        notify(`Error queuing prompt: \n${mes} `, { type: "error" })
+                        notify(
+                            `Prompt validation failed.\nClick for details.`,
+                            {
+                                type: "error",
+                                showBar: true,
+                                timeout: 1000 * 15,
+                                onClick: () => {
+                                    uiState.update(s => { s.activeError = errorPromptID; return s })
+                                }
+                            })
                         console.error(graphToGraphVis(workflow.graph))
                         console.error(promptToGraphVis(p))
                         console.error("Error queuing prompt", error, num, p)
+                    }
+                    else if (errorMes != null) {
                         break;
                     }
 
@@ -1254,7 +1295,7 @@ export default class ComfyApp {
             let defaultValue = null;
             if (foundInput != null) {
                 const comfyInput = foundInput as IComfyInputSlot;
-                console.warn("[refreshComboInNodes] found frontend config:", node.title, node.type, comfyInput.config.values)
+                console.warn("[refreshComboInNodes] found frontend config:", node.title, node.type, comfyInput.config.values.length)
                 values = comfyInput.config.values;
                 defaultValue = comfyInput.config.defaultValue;
             }

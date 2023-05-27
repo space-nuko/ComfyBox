@@ -1,11 +1,12 @@
-import type { Progress, SerializedPrompt, SerializedPromptInputsForNode, SerializedPromptInputsAll, SerializedPromptOutputs, SerializedAppState } from "./components/ComfyApp";
+import type { Progress, SerializedPrompt, SerializedPromptInputsForNode, SerializedPromptInputsAll, SerializedPromptOutputs, SerializedAppState, SerializedPromptInput, SerializedPromptInputLink } from "./components/ComfyApp";
 import type TypedEmitter from "typed-emitter";
 import EventEmitter from "events";
 import type { ComfyImageLocation } from "$lib/utils";
 import type { SerializedLGraph, UUID } from "@litegraph-ts/core";
 import type { SerializedLayoutState } from "./stores/layoutStates";
-import type { ComfyNodeDef } from "./ComfyNodeDef";
+import type { ComfyNodeDef, ComfyNodeDefInput } from "./ComfyNodeDef";
 import type { WorkflowInstID } from "./stores/workflowState";
+import type { ComfyAPIPromptErrorResponse } from "./apiErrors";
 
 export type ComfyPromptRequest = {
     client_id?: string,
@@ -43,10 +44,11 @@ export type ComfyAPIHistoryItem = [
     ComfyNodeID[]  // good outputs
 ]
 
-export type ComfyAPIPromptResponse = {
-    promptID?: PromptID,
-    error?: string
+export type ComfyAPIPromptSuccessResponse = {
+    promptID: PromptID
 }
+
+export type ComfyAPIPromptResponse = ComfyAPIPromptSuccessResponse | ComfyAPIPromptErrorResponse
 
 export type ComfyAPIHistoryEntry = {
     prompt: ComfyAPIHistoryItem,
@@ -92,7 +94,8 @@ type ComfyAPIEvents = {
     executed: (promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutputs) => void,
     execution_start: (promptID: PromptID) => void,
     execution_cached: (promptID: PromptID, nodes: ComfyNodeID[]) => void,
-    execution_error: (promptID: PromptID, message: string) => void,
+    execution_interrupted: (error: ComfyInterruptedError) => void,
+    execution_error: (error: ComfyExecutionError) => void,
 }
 
 export default class ComfyAPI {
@@ -201,8 +204,11 @@ export default class ComfyAPI {
                     case "execution_cached":
                         this.eventBus.emit("execution_cached", msg.data.prompt_id, msg.data.nodes);
                         break;
+                    case "execution_interrupted":
+                        this.eventBus.emit("execution_interrupted", msg.data);
+                        break;
                     case "execution_error":
-                        this.eventBus.emit("execution_error", msg.data.prompt_id, msg.data.message);
+                        this.eventBus.emit("execution_error", msg.data);
                         break;
                     default:
                         console.warn("Unhandled message:", event.data);
