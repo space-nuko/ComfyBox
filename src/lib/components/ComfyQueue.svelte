@@ -144,9 +144,11 @@
      if (entry.extraData?.workflowTitle != null) {
          message = `${entry.extraData.workflowTitle}`
      }
-     const subgraphsString = subgraphs.join(', ')
-     if (subgraphsString.length > 0)
-         message += ` (${subgraphsString})`
+     if (subgraphs) {
+         const subgraphsString = subgraphs.join(', ')
+         if (subgraphsString.length > 0)
+             message += ` (${subgraphsString})`
+     }
 
      let submessage = `Nodes: ${Object.keys(entry.prompt).length}`
 
