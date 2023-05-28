@@ -6,7 +6,7 @@
  import { get, writable, type Writable } from "svelte/store";
  import Modal from "$lib/components/Modal.svelte";
  import { Button } from "@gradio/button";
- import { Embed as Klecks } from "klecks";
+ import { type Embed as Klecks } from "klecks";
 
  import "klecks/style/style.scss";
  import ImageUpload from "$lib/components/ImageUpload.svelte";
@@ -97,6 +97,8 @@
  let blankImageWidth = 512;
  let blankImageHeight = 512;
 
+ let klecks: typeof import("klecks") | null = null;
+
  async function openImageEditor() {
      if (!editorRoot)
          return;
@@ -105,7 +107,9 @@
 
      const url = configState.getBackendURL();
 
-     kl = new Klecks({
+     klecks ||= await import("klecks");
+
+     kl = new klecks.Embed({
          embedUrl: url,
          onSubmit: submitKlecksToComfyUI,
          targetEl: editorRoot,

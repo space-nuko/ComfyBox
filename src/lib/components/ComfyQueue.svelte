@@ -8,7 +8,8 @@
      date?: string,
      status: QueueUIEntryStatus,
      images?: string[], // URLs
-     details?: string // shown in a tooltip on hover
+     details?: string, // shown in a tooltip on hover
+     error?: WorkflowError
  }
 </script>
 
@@ -21,15 +22,14 @@
  import { convertComfyOutputToComfyURL, convertFilenameToComfyURL, getNodeInfo, truncateString } from "$lib/utils"
  import type { Writable } from "svelte/store";
  import type { QueueItemType } from "$lib/api";
- import { ImageViewer } from "$lib/ImageViewer";
  import { Button } from "@gradio/button";
  import type ComfyApp from "./ComfyApp";
- import { tick } from "svelte";
+ import { getContext, tick } from "svelte";
  import Modal from "./Modal.svelte";
- import DropZone from "./DropZone.svelte";
-	import workflowState from "$lib/stores/workflowState";
+ import { type WorkflowError } from "$lib/stores/workflowState";
  import ComfyQueueListDisplay from "./ComfyQueueListDisplay.svelte";
  import ComfyQueueGridDisplay from "./ComfyQueueGridDisplay.svelte";
+	import { WORKFLOWS_VIEW } from "./ComfyBoxWorkflowsView.svelte";
 
  export let app: ComfyApp;
 
@@ -37,6 +37,8 @@
  let queueRunning: Writable<QueueEntry[]> | null = null;
  let queueCompleted: Writable<CompletedQueueEntry[]> | null = null;
  let queueList: HTMLDivElement | null = null;
+
+ const { showError } = getContext(WORKFLOWS_VIEW) as any;
 
  $: if ($queueState) {
      queuePending = $queueState.queuePending
@@ -144,9 +146,11 @@
      if (entry.extraData?.workflowTitle != null) {
          message = `${entry.extraData.workflowTitle}`
      }
-     const subgraphsString = subgraphs.join(', ')
-     if (subgraphsString.length > 0)
-         message += ` (${subgraphsString})`
+     if (subgraphs) {
+         const subgraphsString = subgraphs.join(', ')
+         if (subgraphsString.length > 0)
+             message += ` (${subgraphsString})`
+     }
 
      let submessage = `Nodes: ${Object.keys(entry.prompt).length}`
 
@@ -198,7 +202,7 @@
      else if (entry.status === "interrupted" || entry.status === "all_cached")
          result.submessage = "Prompt was interrupted."
      if (entry.error)
-         result.details = entry.error
+         result.error = entry.error
 
      return result;
  }
@@ -232,10 +236,20 @@
  let selectedPrompt = null;
  let selectedImages = [];
  function showPrompt(entry: QueueUIEntry) {
-     selectedPrompt = entry.entry.prompt;
-     selectedImages = entry.images;
-     showModal = true;
-     expandAll = false
+     if (entry.error != null) {
+         showModal = false;
+         expandAll = false;
+         selectedPrompt = null;
+         selectedImages = [];
+
+         showError(entry.entry.promptID);
+     }
+     else {
+         selectedPrompt = entry.entry.prompt;
+         selectedImages = entry.images;
+         showModal = true;
+         expandAll = false
+     }
  }
 
  function closeModal() {
