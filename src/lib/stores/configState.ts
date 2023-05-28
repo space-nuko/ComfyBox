@@ -1,96 +1,9 @@
 import { debounce } from '$lib/utils';
 import { get, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
+import { z, type ZodTypeAny } from "zod"
 
 type ConfigDefType = "boolean" | "number" | "string" | "string[]";
-
-// A simple parameter description interface
-interface ConfigDef<IdType, TypeType extends ConfigDefType, ValueType> {
-    // The `IdType` is necessary to get a stricter type
-    // parameter instead of a generic `id: string;`. This will be needed
-    // later when we infer the type of the `config` object.
-    name: IdType;
-
-    type: TypeType,
-
-    description?: string,
-
-    defaultValue: ValueType,
-}
-
-type ConfigDefBoolean<IdType> = ConfigDef<IdType, "boolean", boolean>;
-type ConfigDefNumber<IdType> = ConfigDef<IdType, "number", number>;
-type ConfigDefString<IdType> = ConfigDef<IdType, "string", string>;
-type ConfigDefStringArray<IdType> = ConfigDef<IdType, "string[]", string[]>;
-
-// Configuration parameters ------------------------------------
-
-const defComfyUIHostname: ConfigDefString<"comfyUIHostname"> = {
-    name: "comfyUIHostname",
-    type: "string",
-    defaultValue: "localhost",
-    description: "Backend domain for ComfyUI",
-};
-
-const defComfyUIPort: ConfigDefNumber<"comfyUIPort"> = {
-    name: "comfyUIPort",
-    type: "number",
-    defaultValue: 8188,
-    description: "Backend port for ComfyUI",
-};
-
-const defAlwaysStripUserState: ConfigDefBoolean<"alwaysStripUserState"> = {
-    name: "alwaysStripUserState",
-    type: "boolean",
-    defaultValue: false,
-    description: "Strip user state even if saving to local storage"
-};
-
-const defPromptForWorkflowName: ConfigDefBoolean<"promptForWorkflowName"> = {
-    name: "promptForWorkflowName",
-    type: "boolean",
-    defaultValue: false,
-    description: "When saving, always prompt for a name to save the workflow as",
-};
-
-const defConfirmWhenUnloadingUnsavedChanges: ConfigDefBoolean<"confirmWhenUnloadingUnsavedChanges"> = {
-    name: "confirmWhenUnloadingUnsavedChanges",
-    type: "boolean",
-    defaultValue: true,
-    description: "When closing the tab, open the confirmation window if there's unsaved changes"
-};
-
-const defBuiltInTemplates: ConfigDefStringArray<"builtInTemplates"> = {
-    name: "builtInTemplates",
-    type: "string[]",
-    defaultValue: [],
-    description: "Basenames of templates that can be loaded from public/templates. Saves LocalStorage space.",
-};
-
-const defCacheBuiltInResources: ConfigDefBoolean<"cacheBuiltInResources"> = {
-    name: "cacheBuiltInResources",
-    type: "boolean",
-    defaultValue: true,
-    description: "Cache loading of built-in resources to save network use"
-};
-
-export const CONFIG_DEFS = [
-    defComfyUIHostname,
-    defComfyUIPort,
-    defAlwaysStripUserState,
-    defPromptForWorkflowName,
-    defConfirmWhenUnloadingUnsavedChanges,
-    defBuiltInTemplates,
-    defCacheBuiltInResources,
-] as const;
-
-type Config<T extends ReadonlyArray<Readonly<ConfigDef<string, ConfigDefType, any>>>> = {
-    [K in T[number]["name"]]: Extract<T[number], { name: K }>["defaultValue"]
-} extends infer O
-    ? { [P in keyof O]: O[P] }
-    : never;
-
-type ConfigState = Config<typeof CONFIG_DEFS>
 
 type ConfigStateOps = {
     getBackendURL: () => string,
@@ -109,6 +22,90 @@ const store: Writable<ConfigState> = writable(
         builtInTemplates: [],
         cacheBuiltInResources: true,
     })
+
+type Conf2 = {
+    name: string;
+    type: ZodTypeAny;
+    defaultValue: any;
+    description: string;
+};
+
+const def2ComfyUIHostname: Conf2 = {
+    name: 'backend.comfyUIHostname',
+    type: z.string(),
+    defaultValue: 'localhost',
+    description: 'Backend domain for ComfyUI',
+};
+
+const def2ComfyUIPort: Conf2 = {
+    name: 'backend.comfyUIPort',
+    type: z.number(),
+    defaultValue: 8188,
+    description: 'Backend port for ComfyUI',
+};
+
+const def2AlwaysStripUserState: Conf2 = {
+    name: 'behavior.alwaysStripUserState',
+    type: z.boolean(),
+    defaultValue: false,
+    description: 'Strip user state even if saving to local storage',
+};
+
+export const allconfs: ReadonlyArray<Conf2> = [
+    def2ComfyUIHostname,
+    def2ComfyUIPort,
+    def2AlwaysStripUserState,
+] as const;
+
+const confItems: any = {};
+const confDefaults: any = {}
+
+for (const item of allconfs) {
+    const trail = item.name.split('.');
+    let theI = confItems;
+    let theDef = confDefaults;
+    for (const category of trail.slice(0, -1)) {
+        theI[category] ||= { __category__: true };
+        theI = theI[category];
+
+        theDef[category] ||= {};
+        theDef = theDef[category];
+    }
+    const optionName = trail[trail.length - 1];
+    theI[optionName] = item;
+    theDef[optionName] = item.defaultValue;
+}
+
+function recurse(item: Record<string, any>, trail: string[] = []): ZodTypeAny {
+    let defaultValue = confDefaults
+    for (const name of trail) {
+        defaultValue = defaultValue[name];
+    }
+
+    for (const [key, value] of Object.entries(item)) {
+        if (value.__category__) {
+            delete value['__category__'];
+            item[key] = recurse(value, trail.concat(key));
+        } else {
+            const result = value.type.safeParse(value.defaultValue);
+            if (!result.success) {
+                throw new Error(
+                    `Default value for config item ${value.name} did not pass type matcher: ${result.error}`
+                );
+            }
+            item[key] = value.type.catch(value.defaultValue);
+        }
+    }
+    return z.object(item).catch({ ...defaultValue });
+}
+
+export const Config2 = recurse(confItems);
+export type ConfigStore = z.infer<typeof Config2>;
+
+const stor: ConfigStore = {
+    backend: {},
+    a: "foo"
+}
 
 function getBackendURL(): string {
     const state = get(store);
