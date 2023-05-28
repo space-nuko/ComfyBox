@@ -129,10 +129,25 @@
      };
  }
 
+ let title: ""
+
+ $: nodeValue && $nodeValue && (title = getTitle($nodeValue))
+
+ function getTitle(value?: string) {
+     if (value == null) {
+         if (!nodeValue)
+             return ""
+         value = $nodeValue
+     }
+
+     if (value && value.length > 80)
+         return String(value)
+     return ""
+ }
 </script>
 
 <div class="wrapper comfy-combo" class:mobile={isMobile} class:updated={$lightUp}>
-    <label>
+    <label title={title}>
         {#if widget.attrs.title !== ""}
             <BlockTitle show_label={true}>
                 {widget.attrs.title}
@@ -158,7 +173,7 @@
             on:select={(e) => handleSelect(e.detail.index)}
             on:blur
             on:filter={onFilter}>
-            <div class="comfy-select-list" slot="list" let:filteredItems>
+            <div class="comfy-select-list" slot="list" let:filteredItems style:--maxLabelWidth={node.maxLabelWidthChars || 100}>
                 {#if filteredItems.length > 0}
                     {@const itemSize = isMobile ? 50 : 25}
                     {@const itemsToShow = isMobile ? 10 : 30}
@@ -175,6 +190,7 @@
                                 class:mobile={isMobile}
                                 let:index={i}
                                 let:style
+                                title={getTitle(filteredItems[i].label)}
                                 {style}
                                 class:active={activeIndex === filteredItems[i].index}
                                 class:hover={hoverItemIndex === i}
@@ -274,7 +290,9 @@
  }
 
  .comfy-select-list {
-     width: 30rem;
+     --maxLabelWidth: 100;
+     font-size: 14px;
+     width: min(calc((var(--maxLabelWidth) + 10) * 1ch), 50vw);
      color: var(--item-color);
 
      > :global(.virtual-list-wrapper) {

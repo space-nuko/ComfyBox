@@ -616,6 +616,19 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: true
             },
 
+            // ImageUpload
+            {
+                name: "maskCount",
+                type: "number",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/image_upload"],
+                defaultValue: 0,
+                min: 0,
+                max: 8,
+                step: 1
+            },
+
             // Radio
             {
                 name: "defaultValue",
