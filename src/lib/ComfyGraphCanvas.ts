@@ -11,6 +11,7 @@ import queueState from "./stores/queueState";
 import selectionState from "./stores/selectionState";
 import templateState from "./stores/templateState";
 import { calcNodesBoundingBox } from "./utils";
+import interfaceState from "./stores/interfaceState";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
@@ -118,13 +119,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         //     color = "yellow";
         //     thickness = 5;
         // }
-        if (ss.currentHoveredNodes.has(node.id)) {
-            color = "lightblue";
-        }
-        else if (isRunningNode) {
-            color = "#0f0";
-        }
-        else if (nodeErrors) {
+        if (nodeErrors) {
             const hasExecutionError = nodeErrors.find(e => e.errorType === "execution");
             if (hasExecutionError) {
                 blink = true;
@@ -138,6 +133,12 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         else if (isHighlightedNode) {
             color = "cyan";
             thickness = 2
+        }
+        else if (ss.currentHoveredNodes.has(node.id)) {
+            color = "lightblue";
+        }
+        else if (isRunningNode) {
+            color = "#0f0";
         }
 
         if (blink) {
@@ -700,6 +701,8 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     }
 
     jumpToNode(node: LGraphNode) {
+        interfaceState.update(s => { s.isJumpingToNode = true; return s; })
+
         this.closeAllSubgraphs();
 
         const subgraphs = Array.from(node.iterateParentSubgraphNodes()).reverse();
@@ -709,6 +712,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         }
 
         this.centerOnNode(node);
+        this.selectNode(node);
     }
 
     jumpToNodeAndInput(node: LGraphNode, slotIndex: number) {

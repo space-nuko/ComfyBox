@@ -1,5 +1,5 @@
 import LGraphCanvas from "@litegraph-ts/core/src/LGraphCanvas";
-import ComfyGraphNode from "./ComfyGraphNode";
+import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode";
 import ComfyWidgets from "$lib/widgets"
 import type { ComfyWidgetNode } from "$lib/nodes/widgets";
 import { BuiltInSlotShape, BuiltInSlotType, LiteGraph, type SerializedLGraphNode } from "@litegraph-ts/core";
@@ -8,10 +8,19 @@ import type { ComfyInputConfig } from "$lib/IComfyInputSlot";
 import { iterateNodeDefOutputs, type ComfyNodeDef, iterateNodeDefInputs } from "$lib/ComfyNodeDef";
 import type { SerializedPromptOutput } from "$lib/utils";
 
+export interface ComfyBackendNodeProperties extends ComfyGraphNodeProperties {
+    noOutputDisplay: boolean
+}
+
 /*
  * Base class for any node with configuration sent by the backend.
  */
 export class ComfyBackendNode extends ComfyGraphNode {
+    override properties: ComfyBackendNodeProperties = {
+        tags: [],
+        noOutputDisplay: false
+    }
+
     comfyClass: string;
     comfyNodeDef: ComfyNodeDef;
     displayName: string | null;
@@ -35,6 +44,10 @@ export class ComfyBackendNode extends ComfyGraphNode {
         if (nodeDef.output_node) {
             this.addOutput("OUTPUT", BuiltInSlotType.EVENT, { color_off: "rebeccapurple", color_on: "rebeccapurple" });
         }
+    }
+
+    get isOutputNode(): boolean {
+        return this.comfyNodeDef.output_node;
     }
 
     // comfy class -> input name -> input config

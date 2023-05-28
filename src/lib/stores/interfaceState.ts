@@ -11,6 +11,7 @@ export type InterfaceState = {
     indicatorValue: any,
 
     graphTransitioning: boolean
+    isJumpingToNode: boolean
 }
 
 type InterfaceStateOps = {
@@ -25,7 +26,8 @@ const store: Writable<InterfaceState> = writable(
         showIndicator: false,
         indicatorValue: null,
 
-        graphTransitioning: false
+        graphTransitioning: false,
+        isJumpingToNode: false,
     })
 
 const debounceDrag = debounce(() => { store.update(s => { s.showIndicator = false; return s }) }, 1000)

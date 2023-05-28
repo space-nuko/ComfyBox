@@ -15,7 +15,8 @@
  import ComfyProperties from "./ComfyProperties.svelte";
  import ComfyQueue from "./ComfyQueue.svelte";
  import ComfyTemplates from "./ComfyTemplates.svelte";
-	import { SvelteComponent } from "svelte";
+ import { SvelteComponent } from "svelte";
+	import { capitalize } from "$lib/utils";
 
  export let app: ComfyApp
  export let mode: ComfyPaneMode = "none";
@@ -40,7 +41,7 @@
         {:else if mode === "graph"}
             <ComfyGraphView {app} />
         {:else if mode === "properties"}
-            <ComfyProperties workflow={$workflowState.activeWorkflow} />
+            <ComfyProperties {app} workflow={$workflowState.activeWorkflow} />
         {:else if mode === "templates"}
             <ComfyTemplates {app} />
         {:else if mode === "queue"}
@@ -55,6 +56,7 @@
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <button class="mode-button ternary"
                         disabled={mode === theMode}
+                        title={capitalize(theMode)}
                         class:selected={mode === theMode}
                         on:click={() => switchMode(theMode)}>
                     <svelte:component this={icon} width="100%" height="100%" />

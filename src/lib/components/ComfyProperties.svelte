@@ -4,6 +4,7 @@
  import { LGraphNode } from "@litegraph-ts/core"
  import { type IDragItem, type WidgetLayout, ALL_ATTRIBUTES, type AttributesSpec, type WritableLayoutStateStore } from "$lib/stores/layoutStates"
  import uiState from "$lib/stores/uiState"
+ import interfaceState from "$lib/stores/interfaceState"
  import workflowState from "$lib/stores/workflowState"
  import layoutStates from "$lib/stores/layoutStates"
  import selectionState from "$lib/stores/selectionState"
@@ -11,8 +12,12 @@
  import ComfyNumberProperty from "./ComfyNumberProperty.svelte";
  import ComfyComboProperty from "./ComfyComboProperty.svelte";
  import type { ComfyWidgetNode } from "$lib/nodes/widgets";
-	import type { ComfyBoxWorkflow } from "$lib/stores/workflowState";
+ import type { ComfyBoxWorkflow } from "$lib/stores/workflowState";
+ import { Diagram3 } from "svelte-bootstrap-icons";
+	import { getContext } from "svelte";
+	import { WORKFLOWS_VIEW } from "./ComfyBoxWorkflowsView.svelte";
 
+ export let app: ComfyApp
  export let workflow: ComfyBoxWorkflow | null;
 
  let layoutState: WritableLayoutStateStore | null = null
@@ -22,30 +27,44 @@
  let target: IDragItem | null = null;
  let node: LGraphNode | null = null;
 
- $: if (layoutState) {
-     if ($selectionState.currentSelection.length > 0) {
-         node = null;
-         const targetId = $selectionState.currentSelection.slice(-1)[0]
-         const entry = $layoutState.allItems[targetId]
-         if (entry != null) {
-             target = entry.dragItem
-             if (target.type === "widget") {
-                 node = (target as WidgetLayout).node
+ $: {
+     if ($interfaceState.isJumpingToNode) {
+         $interfaceState.isJumpingToNode = false;
+     }
+     {
+         if (layoutState) {
+             if ($selectionState.currentSelection.length > 0) {
+                 node = null;
+                 const targetId = $selectionState.currentSelection.slice(-1)[0]
+                 const entry = $layoutState.allItems[targetId]
+                 if (entry != null) {
+                     target = entry.dragItem
+                     if (target.type === "widget") {
+                         node = (target as WidgetLayout).node
+                     }
+                 }
+             }
+             else if ($selectionState.currentSelectionNodes.length > 0) {
+                 target = null;
+                 node = $selectionState.currentSelectionNodes[0]
+
+                 if (node != null && layoutState != null) {
+                     const dragItem = layoutState.findLayoutForNode(node.id);
+                     if (dragItem != null) {
+                         target = dragItem;
+                     }
+                 }
+             }
+             else {
+                 target = null
+                 node = null;
              }
          }
+         else {
+             target = null;
+             node = null;
+         }
      }
-     else if ($selectionState.currentSelectionNodes.length > 0) {
-         target = null;
-         node = $selectionState.currentSelectionNodes[0]
-     }
-     else {
-         target = null
-         node = null;
-     }
- }
- else {
-     target = null;
-     node = null;
  }
 
  $: if (target) {
@@ -291,195 +310,244 @@
      console.warn("[ComfyProperties] doRefreshPanel")
      $layoutStates.refreshPropsPanel += 1;
  }
+
+ const workflowsViewContext = getContext(WORKFLOWS_VIEW) as any;
+
+ async function jumpToNode() {
+     if (!workflowsViewContext) {
+         // strange svelte bug caused by HMR
+         // https://github.com/sveltejs/svelte/issues/8655
+         console.error("[ComfyProperties] No workflows view context!")
+         return;
+     }
+
+     if (app?.lCanvas == null || workflow == null || node == null)
+         return;
+
+     const activeWorkflow = workflowState.setActiveWorkflow(app.lCanvas, workflow.id);
+
+     if (activeWorkflow == null || !activeWorkflow.graph.getNodeByIdRecursive(node.id))
+         return;
+
+     await workflowsViewContext.openGraph(() => {
+         app.lCanvas.jumpToNode(node);
+     })
+ }
 </script>
 
 <div class="props">
-    <div class="top">
-        <div class="target-name">
-            <span>
-                <span class="title">{target?.attrs?.title || node?.title || "Workflow"}<span>
+    <div class="props-scroller">
+        <div class="top">
+            <div class="target-name">
+                <div class="target-title-wrapper">
+                    <span class="title">{target?.attrs?.title || node?.title || "Workflow"}</span>
                     {#if targetType !== ""}
                         <span class="type">({targetType})</span>
                     {/if}
-                </span>
-                </span>
+                </div>
+                {#if node != null}
+                    <div class="target-name-button">
+                        <button class="mode-button ternary"
+                                disabled={node == null}
+                                title="View in Graph"
+                                on:click={jumpToNode}
+                        >
+                            <Diagram3 width="100%" height="100%" />
+                        </button>
+                    </div>
+                {/if}
+            </div>
         </div>
-    </div>
-    <div class="props-entries">
-        {#if workflow != null && layoutState != null}
-            {#key workflow.id}
-                {#key $layoutStates.refreshPropsPanel}
-                    {#each ALL_ATTRIBUTES as category(category.categoryName)}
-                        <div class="category-name">
-                            <span>
-                                <span class="title">{category.categoryName}</span>
-                            </span>
-                        </div>
-                        {#each category.specs as spec(spec.id)}
-                            {#if validWidgetAttribute(spec, target)}
-                                <div class="props-entry">
-                                    {#if spec.type === "string"}
-                                        <TextBox
-                                            value={getAttribute(target, spec)}
-                                            on:change={(e) => updateAttribute(spec, target, e.detail)}
-                                            on:input={(e) => updateAttribute(spec, target, e.detail)}
-                                            disabled={!$uiState.uiUnlocked || !spec.editable}
-                                            label={spec.name}
-                                            max_lines={spec.multiline ? 5 : 1}
-                                            />
-                                    {:else if spec.type === "boolean"}
-                                            <Checkbox
+        <div class="props-entries">
+            {#if workflow != null && layoutState != null}
+                {#key workflow.id}
+                    {#key $layoutStates.refreshPropsPanel}
+                        {#each ALL_ATTRIBUTES as category(category.categoryName)}
+                            <div class="category-name">
+                                <span>
+                                    <span class="title">{category.categoryName}</span>
+                                </span>
+                            </div>
+                            {#each category.specs as spec(spec.id)}
+                                {#if validWidgetAttribute(spec, target)}
+                                    <div class="props-entry">
+                                        {#if spec.type === "string"}
+                                            <TextBox
                                                 value={getAttribute(target, spec)}
                                                 on:change={(e) => updateAttribute(spec, target, e.detail)}
+                                                on:input={(e) => updateAttribute(spec, target, e.detail)}
                                                 disabled={!$uiState.uiUnlocked || !spec.editable}
                                                 label={spec.name}
+                                                max_lines={spec.multiline ? 5 : 1}
                                                 />
-                                    {:else if spec.type === "number"}
-                                                <ComfyNumberProperty
-                                                    name={spec.name}
+                                        {:else if spec.type === "boolean"}
+                                                <Checkbox
                                                     value={getAttribute(target, spec)}
-                                                    step={spec.step || 1}
-                                                    min={spec.min || -1024}
-                                                    max={spec.max || 1024}
-                                                    disabled={!$uiState.uiUnlocked || !spec.editable}
                                                     on:change={(e) => updateAttribute(spec, target, e.detail)}
+                                                    disabled={!$uiState.uiUnlocked || !spec.editable}
+                                                    label={spec.name}
                                                     />
-                                    {:else if spec.type === "enum"}
-                                                    <ComfyComboProperty
+                                        {:else if spec.type === "number"}
+                                                    <ComfyNumberProperty
                                                         name={spec.name}
                                                         value={getAttribute(target, spec)}
-                                                        values={spec.values}
+                                                        step={spec.step || 1}
+                                                        min={spec.min || -1024}
+                                                        max={spec.max || 1024}
                                                         disabled={!$uiState.uiUnlocked || !spec.editable}
                                                         on:change={(e) => updateAttribute(spec, target, e.detail)}
                                                         />
-                                    {/if}
-                                </div>
-                            {:else if node}
-                                {#if validNodeProperty(spec, node)}
-                                    <div class="props-entry">
-                                        {#if spec.type === "string"}
-                                            <TextBox
-                                                value={getProperty(node, spec)}
-                                                on:change={(e) => updateProperty(spec, e.detail)}
-                                                on:input={(e) => updateProperty(spec, e.detail)}
-                                                label={spec.name}
-                                                disabled={!$uiState.uiUnlocked || !spec.editable}
-                                                max_lines={spec.multiline ? 5 : 1}
-                                                />
-                                        {:else if spec.type === "boolean"}
-                                                <Checkbox
-                                                    value={getProperty(node, spec)}
-                                                    label={spec.name}
-                                                    disabled={!$uiState.uiUnlocked || !spec.editable}
-                                                    on:change={(e) => updateProperty(spec, e.detail)}
-                                                    />
-                                        {:else if spec.type === "number"}
-                                                    <ComfyNumberProperty
-                                                        name={spec.name}
-                                                        value={getProperty(node, spec)}
-                                                        step={spec.step || 1}
-                                                        min={spec.min || -1024}
-                                                        max={spec.max || 1024}
-                                                        disabled={!$uiState.uiUnlocked || !spec.editable}
-                                                        on:change={(e) => updateProperty(spec, e.detail)}
-                                                        />
                                         {:else if spec.type === "enum"}
                                                         <ComfyComboProperty
                                                             name={spec.name}
-                                                            value={getProperty(node, spec)}
+                                                            value={getAttribute(target, spec)}
                                                             values={spec.values}
                                                             disabled={!$uiState.uiUnlocked || !spec.editable}
-                                                            on:change={(e) => updateProperty(spec, e.detail)}
+                                                            on:change={(e) => updateAttribute(spec, target, e.detail)}
                                                             />
                                         {/if}
                                     </div>
-                                {:else if validNodeVar(spec, node)}
+                                {:else if node}
+                                    {#if validNodeProperty(spec, node)}
+                                        <div class="props-entry">
+                                            {#if spec.type === "string"}
+                                                <TextBox
+                                                    value={getProperty(node, spec)}
+                                                    on:change={(e) => updateProperty(spec, e.detail)}
+                                                    on:input={(e) => updateProperty(spec, e.detail)}
+                                                    label={spec.name}
+                                                    disabled={!$uiState.uiUnlocked || !spec.editable}
+                                                    max_lines={spec.multiline ? 5 : 1}
+                                                    />
+                                            {:else if spec.type === "boolean"}
+                                                    <Checkbox
+                                                        value={getProperty(node, spec)}
+                                                        label={spec.name}
+                                                        disabled={!$uiState.uiUnlocked || !spec.editable}
+                                                        on:change={(e) => updateProperty(spec, e.detail)}
+                                                        />
+                                            {:else if spec.type === "number"}
+                                                        <ComfyNumberProperty
+                                                            name={spec.name}
+                                                            value={getProperty(node, spec)}
+                                                            step={spec.step || 1}
+                                                            min={spec.min || -1024}
+                                                            max={spec.max || 1024}
+                                                            disabled={!$uiState.uiUnlocked || !spec.editable}
+                                                            on:change={(e) => updateProperty(spec, e.detail)}
+                                                            />
+                                            {:else if spec.type === "enum"}
+                                                            <ComfyComboProperty
+                                                                name={spec.name}
+                                                                value={getProperty(node, spec)}
+                                                                values={spec.values}
+                                                                disabled={!$uiState.uiUnlocked || !spec.editable}
+                                                                on:change={(e) => updateProperty(spec, e.detail)}
+                                                                />
+                                            {/if}
+                                        </div>
+                                    {:else if validNodeVar(spec, node)}
+                                        <div class="props-entry">
+                                            {#if spec.type === "string"}
+                                                <TextBox
+                                                    value={getVar(node, spec)}
+                                                    on:change={(e) => updateVar(spec, e.detail)}
+                                                    on:input={(e) => updateVar(spec, e.detail)}
+                                                    label={spec.name}
+                                                    disabled={!$uiState.uiUnlocked || !spec.editable}
+                                                    max_lines={spec.multiline ? 5 : 1}
+                                                    />
+                                            {:else if spec.type === "boolean"}
+                                                    <Checkbox
+                                                        value={getVar(node, spec)}
+                                                        on:change={(e) => updateVar(spec, e.detail)}
+                                                        disabled={!$uiState.uiUnlocked || !spec.editable}
+                                                        label={spec.name}
+                                                        />
+                                            {:else if spec.type === "number"}
+                                                        <ComfyNumberProperty
+                                                            name={spec.name}
+                                                            value={getVar(node, spec)}
+                                                            step={spec.step || 1}
+                                                            min={spec.min || -1024}
+                                                            max={spec.max || 1024}
+                                                            disabled={!$uiState.uiUnlocked || !spec.editable}
+                                                            on:change={(e) => updateVar(spec, e.detail)}
+                                                            />
+                                            {:else if spec.type === "enum"}
+                                                            <ComfyComboProperty
+                                                                name={spec.name}
+                                                                value={getVar(node, spec)}
+                                                                values={spec.values}
+                                                                disabled={!$uiState.uiUnlocked || !spec.editable}
+                                                                on:change={(e) => updateVar(spec, e.detail)}
+                                                                />
+                                            {/if}
+                                        </div>
+                                    {/if}
+                                {:else if !node && !target && validWorkflowAttribute(spec)}
                                     <div class="props-entry">
                                         {#if spec.type === "string"}
                                             <TextBox
-                                                value={getVar(node, spec)}
-                                                on:change={(e) => updateVar(spec, e.detail)}
-                                                on:input={(e) => updateVar(spec, e.detail)}
+                                                value={getWorkflowAttribute(spec)}
+                                                on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
+                                                on:input={(e) => updateWorkflowAttribute(spec, e.detail)}
                                                 label={spec.name}
                                                 disabled={!$uiState.uiUnlocked || !spec.editable}
                                                 max_lines={spec.multiline ? 5 : 1}
                                                 />
                                         {:else if spec.type === "boolean"}
                                                 <Checkbox
-                                                    value={getVar(node, spec)}
-                                                    on:change={(e) => updateVar(spec, e.detail)}
+                                                    value={getWorkflowAttribute(spec)}
+                                                    on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
                                                     disabled={!$uiState.uiUnlocked || !spec.editable}
                                                     label={spec.name}
                                                     />
                                         {:else if spec.type === "number"}
                                                     <ComfyNumberProperty
                                                         name={spec.name}
-                                                        value={getVar(node, spec)}
+                                                        value={getWorkflowAttribute(spec)}
                                                         step={spec.step || 1}
                                                         min={spec.min || -1024}
                                                         max={spec.max || 1024}
                                                         disabled={!$uiState.uiUnlocked || !spec.editable}
-                                                        on:change={(e) => updateVar(spec, e.detail)}
+                                                        on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
                                                         />
                                         {:else if spec.type === "enum"}
                                                         <ComfyComboProperty
                                                             name={spec.name}
-                                                            value={getVar(node, spec)}
+                                                            value={getWorkflowAttribute(spec)}
                                                             values={spec.values}
                                                             disabled={!$uiState.uiUnlocked || !spec.editable}
-                                                            on:change={(e) => updateVar(spec, e.detail)}
+                                                            on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
                                                             />
                                         {/if}
                                     </div>
                                 {/if}
-                            {:else if !node && !target && validWorkflowAttribute(spec)}
-                                <div class="props-entry">
-                                    {#if spec.type === "string"}
-                                        <TextBox
-                                            value={getWorkflowAttribute(spec)}
-                                            on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
-                                            on:input={(e) => updateWorkflowAttribute(spec, e.detail)}
-                                            label={spec.name}
-                                            disabled={!$uiState.uiUnlocked || !spec.editable}
-                                            max_lines={spec.multiline ? 5 : 1}
-                                            />
-                                    {:else if spec.type === "boolean"}
-                                            <Checkbox
-                                                value={getWorkflowAttribute(spec)}
-                                                on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
-                                                disabled={!$uiState.uiUnlocked || !spec.editable}
-                                                label={spec.name}
-                                                />
-                                    {:else if spec.type === "number"}
-                                                <ComfyNumberProperty
-                                                    name={spec.name}
-                                                    value={getWorkflowAttribute(spec)}
-                                                    step={spec.step || 1}
-                                                    min={spec.min || -1024}
-                                                    max={spec.max || 1024}
-                                                    disabled={!$uiState.uiUnlocked || !spec.editable}
-                                                    on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
-                                                    />
-                                    {:else if spec.type === "enum"}
-                                                    <ComfyComboProperty
-                                                        name={spec.name}
-                                                        value={getWorkflowAttribute(spec)}
-                                                        values={spec.values}
-                                                        disabled={!$uiState.uiUnlocked || !spec.editable}
-                                                        on:change={(e) => updateWorkflowAttribute(spec, e.detail)}
-                                                        />
-                                    {/if}
-                                </div>
-                            {/if}
+                            {/each}
                         {/each}
-                    {/each}
+                    {/key}
                 {/key}
-            {/key}
-        {/if}
+            {/if}
+        </div>
     </div>
 </div>
 
 <style lang="scss">
+ $bottom-bar-height: 2.5rem;
+
+ .props {
+     width: 100%;
+     height: 100%;
+ }
+
+ .props-scroller {
+     width: 100%;
+     height: calc(100% - $bottom-bar-height);
+     overflow-x: hidden;
+     overflow-y: auto;
+ }
+
  .props-entry {
      padding-bottom: 0.5rem;
      padding-left: 0.5rem;
@@ -491,7 +559,6 @@
  .target-name {
      background: var(--input-background-fill);
      border-color: var(--input-border-color);
-     padding: 0.8rem 1.0rem;
 
      .title {
          font-weight: bold;
@@ -499,6 +566,48 @@
          .type {
              padding-left: 0.25rem;
              font-weight: normal;
+         }
+     }
+
+     width: 100%;
+     display: flex;
+     flex-direction: row;
+
+     > .target-title-wrapper {
+         padding: 0.8rem 0 0.8rem 1.0rem;
+         display: flex;
+         flex-direction: row;
+         width: 100%;
+         text-align: center;
+
+         > span {
+             display: flex;
+             flex-direction: column;
+             justify-content: center;
+         }
+     }
+
+     > .target-name-button {
+         padding: 0.5rem;
+         .mode-button {
+             color: var(--comfy-accent-soft);
+             height: $bottom-bar-height;
+             width: 2.5rem;
+             height: 2.5rem;
+             margin: 1.0rem;
+             padding: 0.5rem;
+             margin-left: auto;
+
+             @include square-button;
+
+             color: var(--neutral-300);
+
+             &:hover:not(:disabled) {
+                 filter: brightness(120%) !important;
+             }
+             &:active:not(:disabled) {
+                 filter: brightness(50%) !important;
+             }
          }
      }
  }
@@ -516,14 +625,6 @@
      .type {
          color: var(--neutral-500);
      }
- }
-
- .bottom {
-     /* width: 100%;
-        height: auto;
-        position: absolute;
-        bottom: 0;
-        padding: 0.5em; */
  }
 
  @include disable-inputs;

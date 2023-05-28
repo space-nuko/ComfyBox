@@ -812,8 +812,8 @@ type LayoutStateOps = {
     moveItem: (target: IDragItem, to: ContainerLayout, index?: number) => void,
     groupItems: (dragItemIDs: DragItemID[], attrs?: Partial<Attributes>) => ContainerLayout,
     ungroup: (container: ContainerLayout) => void,
-    findLayoutEntryForNode: (nodeId: ComfyNodeID) => DragItemEntry | null,
-    findLayoutForNode: (nodeId: ComfyNodeID) => IDragItem | null,
+    findLayoutEntryForNode: (nodeId: NodeID) => DragItemEntry | null,
+    findLayoutForNode: (nodeId: NodeID) => IDragItem | null,
     iterateBreadthFirst: (id?: DragItemID | null) => Iterable<DragItemEntry>,
     serialize: () => SerializedLayoutState,
     serializeAtRoot: (rootID: DragItemID) => SerializedLayoutState,
@@ -1216,7 +1216,7 @@ function createRaw(workflow: ComfyBoxWorkflow | null = null): WritableLayoutStat
         store.set(state)
     }
 
-    function findLayoutEntryForNode(nodeId: ComfyNodeID): DragItemEntry | null {
+    function findLayoutEntryForNode(nodeId: NodeID): DragItemEntry | null {
         const state = get(store)
         const found = Object.entries(state.allItems).find(pair =>
             pair[1].dragItem.type === "widget"
@@ -1226,7 +1226,7 @@ function createRaw(workflow: ComfyBoxWorkflow | null = null): WritableLayoutStat
         return null;
     }
 
-    function findLayoutForNode(nodeId: ComfyNodeID): WidgetLayout | null {
+    function findLayoutForNode(nodeId: NodeID): WidgetLayout | null {
         const found = findLayoutEntryForNode(nodeId);
         if (!found)
             return null;
@@ -1511,16 +1511,12 @@ function getLayoutByDragItemID(dragItemID: DragItemID): WritableLayoutStateStore
     return Object.values(get(layoutStates).all).find(l => get(l).allItems[dragItemID] != null)
 }
 
-function getDragItemByNode(node: LGraphNode): WidgetLayout | null {
+function getDragItemByNode(node: LGraphNode): IDragItem | null {
     const layout = getLayoutByNode(node);
     if (layout == null)
         return null;
 
-    const entry = get(layout).allItemsByNode[node.id]
-    if (entry && entry.dragItem.type === "widget")
-        return entry.dragItem as WidgetLayout;
-
-    return null;
+    return layout.findLayoutForNode(node.id);
 }
 
 export type LayoutStateStores = {
@@ -1543,7 +1539,7 @@ export type LayoutStateStoresOps = {
     getLayoutByGraph: (graph: LGraph) => WritableLayoutStateStore | null,
     getLayoutByNode: (node: LGraphNode) => WritableLayoutStateStore | null,
     getLayoutByDragItemID: (dragItemID: DragItemID) => WritableLayoutStateStore | null,
-    getDragItemByNode: (node: LGraphNode) => WidgetLayout | null,
+    getDragItemByNode: (node: LGraphNode) => IDragItem | null,
 }
 
 export type WritableLayoutStateStores = Writable<LayoutStateStores> & LayoutStateStoresOps;
