@@ -41,6 +41,7 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
     firstLoad: Writable<boolean>;
     lightUp: Writable<boolean>;
     valuesForCombo: Writable<any[]>; // Changed when the combo box has values.
+    maxLabelWidthChars: number = 0;
 
     constructor(name?: string) {
         super(name, "A")
@@ -77,13 +78,17 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
         else
             formatter = (value: any) => `${value}`;
 
+        this.maxLabelWidthChars = 0;
+
         let valuesForCombo = []
 
         try {
             valuesForCombo = this.properties.values.map((value, index) => {
+                const label = formatter(value);
+                this.maxLabelWidthChars = Math.max(this.maxLabelWidthChars, label.length)
                 return {
                     value,
-                    label: formatter(value),
+                    label,
                     index
                 }
             })
@@ -91,9 +96,11 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
         catch (err) {
             console.error("Failed formatting!", err)
             valuesForCombo = this.properties.values.map((value, index) => {
+                const label = `${value}`
+                this.maxLabelWidthChars = Math.max(this.maxLabelWidthChars, label.length)
                 return {
                     value,
-                    label: `${value}`,
+                    label,
                     index
                 }
             })

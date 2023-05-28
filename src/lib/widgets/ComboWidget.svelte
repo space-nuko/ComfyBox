@@ -169,7 +169,7 @@
             on:select={(e) => handleSelect(e.detail.index)}
             on:blur
             on:filter={onFilter}>
-            <div class="comfy-select-list" slot="list" let:filteredItems>
+            <div class="comfy-select-list" slot="list" let:filteredItems style:--maxLabelWidth={node.maxLabelWidthChars || 100}>
                 {#if filteredItems.length > 0}
                     {@const itemSize = isMobile ? 50 : 25}
                     {@const itemsToShow = isMobile ? 10 : 30}
@@ -286,7 +286,9 @@
  }
 
  .comfy-select-list {
-     width: 30rem;
+     --maxLabelWidth: 100;
+     font-size: 14px;
+     width: min(calc((var(--maxLabelWidth) + 10) * 1ch), 50vw);
      color: var(--item-color);
 
      > :global(.virtual-list-wrapper) {
