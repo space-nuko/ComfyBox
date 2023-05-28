@@ -6,6 +6,7 @@ import ImageUploadWidget from "$lib/widgets/ImageUploadWidget.svelte";
 import type { ComfyWidgetProperties } from "./ComfyWidgetNode";
 import ComfyWidgetNode from "./ComfyWidgetNode";
 import { get, writable, type Writable } from "svelte/store";
+import { type LineGroup } from "$lib/components/MaskCanvas.svelte"
 
 export interface ComfyImageUploadNodeProperties extends ComfyWidgetProperties {
     maskCount: number

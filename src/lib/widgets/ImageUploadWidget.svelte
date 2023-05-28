@@ -5,8 +5,6 @@
  import Row from "$lib/components/gradio/app/Row.svelte";
  import { writable, type Writable } from "svelte/store";
  import { Button } from "@gradio/button";
-
- import ImageUpload from "$lib/components/ImageUpload.svelte";
  import {
      type ComfyBoxImageMetadata,
      comfyFileToComfyBoxMetadata,
@@ -16,13 +14,12 @@
      convertComfyOutputToComfyURL,
      batchUploadBlobsToComfyUI,
      canvasToBlob,
-
 	 basename
-
  } from "$lib/utils";
+ import ImageUpload from "$lib/components/ImageUpload.svelte";
  import notify from "$lib/notify";
  import { ImageViewer } from "$lib/ImageViewer";
- import MaskCanvas, { type MaskCanvasData } from "$lib/components/MaskCanvas.svelte";
+ import MaskCanvas, { type LineGroup, type MaskCanvasData } from "$lib/components/MaskCanvas.svelte";
  import type { ComfyImageUploadNode } from "$lib/nodes/widgets";
 	import { tick } from "svelte";
 
@@ -65,7 +62,7 @@
 
  async function onMaskReleased(e: CustomEvent<MaskCanvasData>) {
      const data = e.detail;
-     if (data.maskCanvas && data.hasMask) {
+     if (data.maskCanvas != null && data.hasMask) {
          await saveMask(data.maskCanvas)
      }
  }
@@ -203,7 +200,6 @@
 
  $: canEdit = status === "empty" || status === "uploaded";
 
-
  function onChange(e: CustomEvent<ComfyImageLocation[]>) {
  }
 </script>
@@ -229,7 +225,7 @@
             {#if _value && canMask}
                 {@const comfyURL = convertComfyOutputToComfyURL(_value[0])}
                 <div class="mask-canvas-wrapper" style:display={editMask ? "block" : "none"}>
-                    <MaskCanvas bind:this={maskCanvasComp} fileURL={comfyURL} on:release={onMaskReleased} />
+                    <MaskCanvas bind:this={maskCanvasComp} fileURL={comfyURL} on:release={onMaskReleased} on:loaded={onMaskReleased} />
                 </div>
             {/if}
             <div style:display={(canMask && editMask) ? "none" : "block"}>

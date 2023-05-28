@@ -99,9 +99,9 @@ export default class ComfyPickImageNode extends ComfyGraphNode {
     override onExecute() {
         const data = this.getInputData(0)
         let index = this.getInputData(1);
-        if (this.properties.imageTagFilter && Array.isArray(data))
+        if (this.properties.imageTagFilter != "" && Array.isArray(data))
             index = data.findIndex(i => i.tags?.includes(this.properties.imageTagFilter))
-        else
+        else if (index == null)
             index = 0;
         this.setValue(data, index);
 

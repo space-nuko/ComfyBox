@@ -2,7 +2,19 @@
  export type MaskCanvasData = {
      hasMask: boolean,
      maskCanvas: HTMLCanvasElement | null,
+     curLineGroup: LineGroup,
+     redoCurLines: LineGroup,
  }
+ export type LinePoint = {
+     x: number,
+     y: number
+ }
+ export interface Line {
+     size?: number,
+     points: LinePoint[]
+ }
+ export type LineGroup = Line[];
+
 </script>
 
 <script lang="ts">
@@ -16,6 +28,7 @@
  const dispatch = createEventDispatcher<{
      change: MaskCanvasData;
      release: MaskCanvasData;
+     loaded: MaskCanvasData
  }>();
 
  let canvasCursor: string | undefined = undefined;
@@ -87,8 +100,8 @@
      isImageLoaded = false;
      original = null;
      renders = []
-     curLineGroup = [];
-     redoCurLines = []
+     // curLineGroup = [];
+     // redoCurLines = []
      imageWidth = 512;
      imageHeight = 512;
      scale = 1.0;
@@ -96,12 +109,14 @@
  }
 
  let loadedFileURL: string | null = null
+ let dispatchLoaded: boolean = false;
  $: if (fileURL !== loadedFileURL) {
      clearState();
      if (fileURL) {
          loadImage(fileURL).then(i => {
              original = i;
              isImageLoaded = true;
+             dispatchLoaded = true;
          })
                            .catch(i => {
                                isImageLoaded = false;
@@ -119,6 +134,28 @@
      [imageWidth, imageHeight] = getCurrentWidthAndHeight(isImageLoaded, original)
      scale = initScale(imageWidth, imageHeight)
      initImagePos()
+
+     // in case mask strokes were preserved after new image load
+     // (use case: sending an inpainted image back while reusing the same mask)
+     tick().then(() => {
+         loaded();
+     })
+ }
+
+ function loaded() {
+     if (!dispatchLoaded)
+         return;
+
+     dispatchLoaded = false;
+     redrawCurLines()
+     hasMask = curLineGroup.length > 0;
+     console.warn("[MaskCanvas] LOADED", maskCanvas, hasMask)
+     dispatch("loaded", {
+         hasMask,
+         maskCanvas,
+         curLineGroup,
+         redoCurLines
+     })
  }
 
  $: hasMask = curLineGroup.length > 0;
@@ -143,21 +180,13 @@
      minScale = scale;
  }
 
- type LinePoint = {
-     x: number,
-     y: number
- }
- interface Line {
-     size?: number,
-     points: LinePoint[]
- }
- type LineGroup = Line[];
-
  function drawOnCurrentRender(lineGroup: LineGroup) {
      draw(lineGroup)
      dispatch("change", {
          hasMask,
-         maskCanvas
+         maskCanvas,
+         curLineGroup,
+         redoCurLines
      })
  }
 
@@ -214,6 +243,10 @@
      })
  }
 
+ function redrawCurLines() {
+     drawOnCurrentRender(curLineGroup || [])
+ }
+
  $: if (canvas && original) {
      console.warn("INITCANVAS", imageWidth, imageHeight, original.src)
      maskCanvas = document.createElement("canvas");
@@ -222,7 +255,7 @@
      maskCanvas.height = imageHeight;
      canvas.width = imageWidth;
      canvas.height = imageHeight;
-     drawOnCurrentRender([])
+     redrawCurLines() // no react on curLineGroup
  }
 
  function getCurrentWidthAndHeight(isImageLoaded: boolean, original: HTMLImageElement | null) {
@@ -421,11 +454,12 @@
          return;
 
      isDrawing = false;
-     dispatch("release", { hasMask, maskCanvas })
+     dispatch("release", { hasMask, maskCanvas, curLineGroup, redoCurLines })
  }
 
  function dispatchRelease() {
-     dispatch("release", { hasMask, maskCanvas })
+     updateMaskImage()
+     dispatch("release", { hasMask, maskCanvas, curLineGroup, redoCurLines })
  }
 </script>
 
