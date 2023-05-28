@@ -129,6 +129,10 @@
      };
  }
 
+ let title: ""
+
+ $: nodeValue && $nodeValue && (title = getTitle($nodeValue))
+
  function getTitle(value?: string) {
      if (value == null) {
          if (!nodeValue)
@@ -143,7 +147,7 @@
 </script>
 
 <div class="wrapper comfy-combo" class:mobile={isMobile} class:updated={$lightUp}>
-    <label title={getTitle()}>
+    <label title={title}>
         {#if widget.attrs.title !== ""}
             <BlockTitle show_label={true}>
                 {widget.attrs.title}
