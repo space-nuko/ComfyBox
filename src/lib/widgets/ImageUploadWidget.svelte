@@ -3,46 +3,143 @@
  import { Block } from "@gradio/atoms";
  import { TextBox } from "@gradio/form";
  import Row from "$lib/components/gradio/app/Row.svelte";
- import { get, writable, type Writable } from "svelte/store";
- import Modal from "$lib/components/Modal.svelte";
+ import { writable, type Writable } from "svelte/store";
  import { Button } from "@gradio/button";
- import { type Embed as Klecks } from "klecks";
 
- import "klecks/style/style.scss";
  import ImageUpload from "$lib/components/ImageUpload.svelte";
- import { uploadImageToComfyUI, type ComfyBoxImageMetadata, comfyFileToComfyBoxMetadata, comfyBoxImageToComfyURL, comfyBoxImageToComfyFile, type ComfyUploadImageType, type ComfyImageLocation } from "$lib/utils";
- import configState from "$lib/stores/configState";
+ import {
+     type ComfyBoxImageMetadata,
+     comfyFileToComfyBoxMetadata,
+     comfyBoxImageToComfyFile,
+     type ComfyImageLocation,
+     comfyBoxImageToComfyURL,
+     convertComfyOutputToComfyURL,
+     batchUploadBlobsToComfyUI,
+     canvasToBlob,
+
+	 basename
+
+ } from "$lib/utils";
  import notify from "$lib/notify";
- import NumberInput from "$lib/components/NumberInput.svelte";
-	import type { ComfyImageEditorNode } from "$lib/nodes/widgets";
-	import { ImageViewer } from "$lib/ImageViewer";
-	import { generateBlankCanvas, generateImageCanvas } from "./utils";
+ import { ImageViewer } from "$lib/ImageViewer";
+ import MaskCanvas, { type MaskCanvasData } from "$lib/components/MaskCanvas.svelte";
+ import type { ComfyImageUploadNode } from "$lib/nodes/widgets";
+	import { tick } from "svelte";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
- let node: ComfyImageEditorNode | null = null;
+ let node: ComfyImageUploadNode | null = null;
  let nodeValue: Writable<ComfyBoxImageMetadata[]> | null = null;
- let attrsChanged: Writable<number> | null = null;
 
  let imgWidth: Writable<number> = writable(0);
  let imgHeight: Writable<number> = writable(0);
 
+ let maskCanvasComp: MaskCanvas | null = null;
+ let editMask: boolean = false;
+
  $: widget && setNodeValue(widget);
+
+ let canMask = false;
+ $: canMask = (node?.properties?.maskCount || 0) > 0;
+ $: if (!canMask) clearMask();
+
 
  function setNodeValue(widget: WidgetLayout) {
      if (widget) {
-         node = widget.node as ComfyImageEditorNode
+         node = widget.node as ComfyImageUploadNode
          nodeValue = node.value;
-         attrsChanged = widget.attrsChanged;
          imgWidth = node.imgWidth
          imgHeight = node.imgHeight
          status = $nodeValue && $nodeValue.length > 0 ? "uploaded" : "empty"
      }
  };
 
+ let hasImage = false;
+
+ $: hasImage = $nodeValue && $nodeValue.length > 0;
+ $: if (!hasImage) {
+     editMask = false;
+ }
+
+ const MASK_FILENAME: string = "ComfyBoxMask.png"
+
+ async function onMaskReleased(e: CustomEvent<MaskCanvasData>) {
+     const data = e.detail;
+     if (data.maskCanvas && data.hasMask) {
+         await saveMask(data.maskCanvas)
+     }
+ }
+
+ async function saveMask(maskCanvas: HTMLCanvasElement) {
+     if (!canMask) {
+         notify("Mask editing is disabled for this widget.", { type: "warning" })
+         return;
+     }
+     if (!maskCanvas) {
+         notify("No mask canvas!", { type: "warning" })
+         return
+     }
+     if (!$nodeValue || $nodeValue.length === 0) {
+         notify("No image uploaded to apply mask to.", { type: "warning" })
+         return
+     }
+
+     const hadNoMask = $nodeValue[0].children.findIndex(i => i.tags?.includes("mask")) === -1;
+     const existFilename = $nodeValue[0].comfyUIFile.filename
+     const filename = existFilename ? `${basename(existFilename)}_mask.png` : MASK_FILENAME
+
+     console.warn("[ImageUpload] UPLOAD MASK", filename)
+
+     await canvasToBlob(maskCanvas)
+         .then(blob => batchUploadBlobsToComfyUI([{
+             blob,
+             filename,
+             overwrite: true
+         }]))
+         .then(result => {
+             const meta = result.files.map(f => {
+                 const m = comfyFileToComfyBoxMetadata(f)
+                 m.tags = ["mask"]
+                 m.width = maskCanvas.width;
+                 m.height = maskCanvas.height;
+                 return m;
+             });
+             if ($nodeValue.length > 0) {
+                 // TODO support multiple images?
+                 $nodeValue[0].children = meta;
+                 if (hadNoMask) {
+                     notify("Uploaded mask successfully!", { type: "success" })
+                 }
+             }
+             else {
+                 throw new Error("No image was uploaded yet.")
+             }
+         })
+         .catch(error => {
+             notify(`Failed to upload mask to ComfyUI: ${error}`, { type: "error", timeout: 10000 })
+         })
+ }
+
+ function clearMask() {
+     for (const image of $nodeValue) {
+         // TODO other child image types preserved here?
+         image.children = [];
+     }
+     if (maskCanvasComp) {
+         maskCanvasComp.clearStrokes();
+     }
+ }
+
+ async function toggleEditMask() {
+     editMask = !editMask;
+     await tick();
+     if (maskCanvasComp) {
+         maskCanvasComp.recenterImage();
+     }
+ }
+
  let editorRoot: HTMLDivElement | null = null;
  let showModal = false;
- let kl: Klecks | null = null;
 
  function disposeEditor() {
      console.warn("[ImageEditorWidget] CLOSING", widget, $nodeValue)
@@ -53,98 +150,7 @@
          }
      }
 
-     kl = null;
      showModal = false;
- }
-
- const FILENAME: string = "ComfyUITemp.png";
- const SUBFOLDER: string = "ComfyBox_Editor";
- const DIRECTORY: ComfyUploadImageType = "input";
-
- async function submitKlecksToComfyUI(onSuccess: () => void, onError: () => void) {
-     const blob = kl.getPNG();
-
-     status = "uploading"
-
-     await uploadImageToComfyUI(blob, FILENAME, DIRECTORY, SUBFOLDER)
-         .then((entry: ComfyImageLocation) => {
-             const meta: ComfyBoxImageMetadata = comfyFileToComfyBoxMetadata(entry);
-             $nodeValue = [meta] // TODO more than one image
-             status = "uploaded"
-             notify("Saved image to ComfyUI!", { type: "success" })
-             onSuccess();
-         })
-         .catch(err => {
-             notify(`Failed to upload image from editor: ${err}`, { type: "error", timeout: 10000 })
-             status = "error"
-             uploadError = err;
-             $nodeValue = []
-             onError();
-         })
- }
-
- let closeDialog = null;
-
- async function saveAndClose() {
-     console.log(closeDialog, kl)
-     if (!closeDialog || !kl)
-         return;
-
-     submitKlecksToComfyUI(() => {}, () => {});
-     closeDialog()
- }
-
- let blankImageWidth = 512;
- let blankImageHeight = 512;
-
- let klecks: typeof import("klecks") | null = null;
-
- async function openImageEditor() {
-     if (!editorRoot)
-         return;
-
-     showModal = true;
-
-     const url = configState.getBackendURL();
-
-     klecks ||= await import("klecks");
-
-     kl = new klecks.Embed({
-         embedUrl: url,
-         onSubmit: submitKlecksToComfyUI,
-         targetEl: editorRoot,
-         warnOnPageClose: false
-     });
-
-     console.warn("[ImageEditorWidget] OPENING", widget, $nodeValue)
-
-     let canvas = null;
-     let width = blankImageWidth;
-     let height = blankImageHeight;
-
-     if ($nodeValue && $nodeValue.length > 0) {
-         const comfyImage = $nodeValue[0];
-         const comfyURL = comfyBoxImageToComfyURL(comfyImage);
-         [canvas, width, height] = await generateImageCanvas(comfyURL);
-     }
-     else {
-         canvas = generateBlankCanvas(width, height);
-     }
-
-     kl.openProject({
-         width: width,
-         height: height,
-         layers: [{
-             name: 'Image',
-             opacity: 1,
-             mixModeStr: 'source-over',
-             image: canvas
-         }]
-     });
-
-     setTimeout(function () {
-         kl?.klApp?.out("yo");
-     }, 1000);
  }
 
  function openLightbox() {
@@ -189,9 +195,6 @@
      notify(`Failed to upload image to ComfyUI: ${uploadError}`, { type: "error", timeout: 10000 })
  }
 
- function onChange(e: CustomEvent<ComfyImageLocation[]>) {
- }
-
  let _value: ComfyImageLocation[] = []
  $: if ($nodeValue)
      _value = $nodeValue.map(comfyBoxImageToComfyFile)
@@ -199,6 +202,10 @@
      _value = []
 
  $: canEdit = status === "empty" || status === "uploaded";
+
+
+ function onChange(e: CustomEvent<ComfyImageLocation[]>) {
+ }
 </script>
 
 <div class="wrapper comfy-image-editor">
@@ -219,64 +226,50 @@
         />
     {:else}
         <div class="comfy-image-editor-panel">
-            <ImageUpload value={_value}
-                         bind:imgWidth={$imgWidth}
-                         bind:imgHeight={$imgHeight}
-                         fileCount={"single"}
-                         elem_classes={[]}
-                         style={""}
-                         label={widget.attrs.title}
-                         on:uploading={onUploading}
-                         on:uploaded={onUploaded}
-                         on:upload_error={onUploadError}
-                         on:clear={onClear}
-                         on:change={onChange}
-                         on:image_clicked={openLightbox}
-            />
-            <Modal bind:showModal closeOnClick={false} on:close={disposeEditor} bind:closeDialog>
-                <div>
-                    <div id="klecks-loading-screen">
-                        <span id="klecks-loading-screen-text"></span>
-                    </div>
-                    <div class="image-editor-root" bind:this={editorRoot} />
+            {#if _value && canMask}
+                {@const comfyURL = convertComfyOutputToComfyURL(_value[0])}
+                <div class="mask-canvas-wrapper" style:display={editMask ? "block" : "none"}>
+                    <MaskCanvas bind:this={maskCanvasComp} fileURL={comfyURL} on:release={onMaskReleased} />
                 </div>
-                <div slot="buttons">
-                    <Button variant="primary" on:click={saveAndClose}>
-                        Save and Close
-                    </Button>
-                    <Button variant="secondary" on:click={closeDialog}>
-                        Discard Edits
-                    </Button>
-                </div>
-            </Modal>
+            {/if}
+            <div style:display={(canMask && editMask) ? "none" : "block"}>
+                <ImageUpload value={_value}
+                             bind:imgWidth={$imgWidth}
+                             bind:imgHeight={$imgHeight}
+                             fileCount={"single"}
+                             elem_classes={[]}
+                             style={""}
+                             label={widget.attrs.title}
+                             on:uploading={onUploading}
+                             on:uploaded={onUploaded}
+                             on:upload_error={onUploadError}
+                             on:clear={onClear}
+                             on:change={onChange}
+                             on:image_clicked={openLightbox}
+                />
+            </div>
             <Block>
-                {#if !$nodeValue || $nodeValue.length === 0}
+                {#if hasImage}
+                    {@const maskCount = $nodeValue[0] ? $nodeValue[0].children.filter(f => f.tags?.includes("mask")).length : 0}
                     <Row>
-                        <Row>
-                            <Button variant="secondary" disabled={!canEdit} on:click={openImageEditor}>
-                                Create Image
-                            </Button>
+                        {#if canMask}
                             <div>
-                                <TextBox show_label={false} disabled={true} value="Status: {status}"/>
+                                {#if editMask}
+                                    <Button variant="secondary" on:click={() => { clearMask(); notify("Mask cleared."); }}>
+                                        Clear Mask
+                                    </Button>
+                                {/if}
+                                <Button disabled={!_value} on:click={toggleEditMask}>
+                                    {#if editMask}
+                                        Show Image
+                                    {:else}
+                                        Edit Mask
+                                    {/if}
+                                </Button>
                             </div>
-                            {#if uploadError}
-                                <div>
-                                    Upload error: {uploadError}
-                                </div>
-                            {/if}
-                        </Row>
-                        <Row>
-                            <NumberInput label={"Width"} min={64} max={2048} step={64} bind:value={blankImageWidth} />
-                            <NumberInput label={"Height"} min={64} max={2048} step={64} bind:value={blankImageHeight} />
-                        </Row>
-                    </Row>
-                {:else}
-                    <Row>
-                        <Button variant="secondary" disabled={!canEdit} on:click={openImageEditor}>
-                            Edit Image
-                        </Button>
+                        {/if}
                         <div>
-                            <TextBox label={""} show_label={false} disabled={true} lines={1} max_lines={1} value="Status: {status}"/>
+                            <TextBox label={""} show_label={false} disabled={true} lines={1} max_lines={1} value="Images: {$nodeValue.length}, masks: {maskCount}"/>
                         </div>
                         {#if uploadError}
                             <div>
@@ -291,25 +284,13 @@
 </div>
 
 <style lang="scss">
- .image-editor-root {
-     width: 75vw;
-     height: 75vh;
-     overflow: hidden;
-
-     color: black;
-
-     :global(> .g-root) {
-         height: calc(100% - 59px);
-     }
- }
-
  .comfy-image-editor {
      :global(> dialog) {
          overflow: hidden;
      }
  }
 
- :global(.kl-popup) {
-     z-index: 999999999999;
+ .mask-canvas-wrapper {
+     height: calc(var(--size-96) * 1.5);
  }
 </style>

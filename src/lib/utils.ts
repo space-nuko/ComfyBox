@@ -75,6 +75,13 @@ export function download(filename: string, text: string, type: string = "text/pl
     }, 0);
 }
 
+export function downloadCanvas(canvas: HTMLCanvasElement, filename: string, type: string = "image/png") {
+    var link = document.createElement('a');
+    link.download = filename;
+    link.href = canvas.toDataURL(type);
+    link.click();
+}
+
 export const MAX_LOCAL_STORAGE_MB = 5;
 
 export function getLocalStorageUsedMB(): number {
@@ -434,6 +441,8 @@ export type ComfyBoxImageMetadata = {
     width?: number,
     /* Image height. */
     height?: number,
+    /* Child images associated with this image, like masks. */
+    children: ComfyBoxImageMetadata[]
 }
 
 export function isComfyBoxImageMetadata(value: any): value is ComfyBoxImageMetadata {
@@ -458,6 +467,7 @@ export function filenameToComfyBoxMetadata(filename: string, type: ComfyUploadIm
         },
         name: "Filename",
         tags: [],
+        children: []
     }
 }
 
@@ -467,6 +477,7 @@ export function comfyFileToComfyBoxMetadata(comfyUIFile: ComfyImageLocation): Co
         comfyUIFile,
         name: "File",
         tags: [],
+        children: []
     }
 }
 
@@ -627,4 +638,71 @@ export function playSound(sound: string) {
     const url = `${location.origin}/sound/${sound}`;
     const audio = new Audio(url);
     audio.play();
+}
+
+export interface ComfyBatchUploadResult {
+    error?: string;
+    files: Array<ComfyImageLocation>;
+}
+
+export type ComfyBatchBlob = {
+    blob: Blob,
+    filename: string,
+    overwrite?: boolean
+}
+
+export async function batchUploadFilesToComfyUI(files: Array<File>): Promise<ComfyBatchUploadResult> {
+    const blobs = files.map(f => { return { blob: f, filename: f.name } })
+    return batchUploadBlobsToComfyUI(blobs)
+}
+
+export async function batchUploadBlobsToComfyUI(blobs: ComfyBatchBlob[]): Promise<ComfyBatchUploadResult> {
+    const url = configState.getBackendURL();
+
+    const requests = blobs.map(async (blob) => {
+        const formData = new FormData();
+        formData.append("image", blob.blob, blob.filename);
+        if (blob.overwrite) {
+            formData.append("overwrite", "true")
+        }
+        return fetch(new Request(url + "/upload/image", {
+            body: formData,
+            method: 'POST'
+        }))
+            .then(r => r.json())
+            .catch(error => error);
+    });
+
+    return Promise.all(requests)
+        .then((results) => {
+            const errors = []
+            const files = []
+
+            for (const r of results) {
+                if (r instanceof Error) {
+                    errors.push(r.toString())
+                }
+                else {
+                    // bare filename of image
+                    const resp = r as ComfyUploadImageAPIResponse;
+                    files.push({
+                        filename: resp.name,
+                        subfolder: "",
+                        type: "input"
+                    })
+                }
+            }
+
+            let error = null;
+            if (errors && errors.length > 0)
+                error = "Upload error(s):\n" + errors.join("\n");
+
+            return { error, files }
+        })
+}
+
+export function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+    return new Promise(function(resolve) {
+        canvas.toBlob(resolve);
+    });
 }

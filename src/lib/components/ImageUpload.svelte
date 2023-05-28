@@ -3,7 +3,7 @@
  import type { ComfyImageLocation } from "$lib/nodes/ComfyWidgetNodes";
  import notify from "$lib/notify";
  import configState from "$lib/stores/configState";
- import { convertComfyOutputEntryToGradio, convertComfyOutputToComfyURL, type ComfyUploadImageAPIResponse } from "$lib/utils";
+ import { batchUploadFilesToComfyUI, convertComfyOutputToComfyURL, type ComfyBatchUploadResult } from "$lib/utils";
  import { Block, BlockLabel } from "@gradio/atoms";
  import { File as FileIcon } from "@gradio/icons";
  import type { FileData as GradioFileData } from "@gradio/upload";
@@ -59,55 +59,10 @@
      dispatch("image_clicked")
  }
 
- interface GradioUploadResponse {
-     error?: string;
-     files?: Array<ComfyImageLocation>;
- }
-
- async function upload_files(root: string, files: Array<File>): Promise<GradioUploadResponse> {
-     console.debug("UPLOADILFES", root, files);
-
+ async function upload_files(files: Array<File>): Promise<ComfyBatchUploadResult> {
+     console.debug("UPLOADFILES", files);
      dispatch("uploading")
-
-     const url = configState.getBackendURL();
-
-     const requests = files.map(async (file) => {
-         const formData = new FormData();
-         formData.append("image", file, file.name);
-         return fetch(new Request(url + "/upload/image", {
-             body: formData,
-             method: 'POST'
-         }))
-         .then(r => r.json())
-         .catch(error => error);
-     });
-
-     return Promise.all(requests)
-                   .then( (results) => {
-                       const errors = []
-                       const files = []
-
-                       for (const r of results) {
-                           if (r instanceof Error) {
-                               errors.push(r.toString())
-                           }
-                           else {
-                               // bare filename of image
-                               const resp = r as ComfyUploadImageAPIResponse;
-                               files.push({
-                                   filename: resp.name,
-                                   subfolder: "",
-                                   type: "input"
-                               })
-                           }
-                       }
-
-                       let error = null;
-                       if (errors && errors.length > 0)
-                           error = "Upload error(s):\n" + errors.join("\n");
-
-                       return { error, files }
-                   })
+     return batchUploadFilesToComfyUI(files);
  }
 
  $: {
@@ -144,7 +99,7 @@
              );
              let upload_value = _value;
              pending_upload = true;
-             upload_files(root, files).then((response) => {
+             upload_files(files).then((response) => {
                  if (JSON.stringify(upload_value) !== JSON.stringify(_value)) {
                      // value has changed since upload started
                      console.error("[ImageUpload] value has changed since upload started", upload_value, _value)

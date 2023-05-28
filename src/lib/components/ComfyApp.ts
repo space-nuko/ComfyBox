@@ -997,6 +997,7 @@ export default class ComfyApp {
 
                     if ("getPromptThumbnails" in node) {
                         const thumbsToAdd = (node as ComfyGraphNode).getPromptThumbnails();
+                        console.warn("THUMBNAILS", thumbsToAdd)
                         if (thumbsToAdd)
                             thumbnails.push(...thumbsToAdd)
                     }
