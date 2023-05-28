@@ -559,6 +559,7 @@
  .target-name {
      background: var(--input-background-fill);
      border-color: var(--input-border-color);
+     white-space: nowrap;
 
      .title {
          font-weight: bold;

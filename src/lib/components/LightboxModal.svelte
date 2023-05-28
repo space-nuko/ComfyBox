@@ -41,7 +41,7 @@
  #lightboxModal{
      display: none;
      position: fixed;
-     z-index: 1001;
+     z-index: var(--layer-top);
      left: 0;
      top: 0;
      width: 100%;

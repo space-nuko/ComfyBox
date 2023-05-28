@@ -261,17 +261,18 @@ export default class ComfyApp {
         return Promise.resolve();
     }
 
-    /*
-     * TODO
-     */
     async loadConfig() {
         try {
-            const config = await fetch(`/config.json`, { cache: "no-store" });
-            const newConfig = await config.json() as ConfigState;
-            configState.set({ ...get(configState), ...newConfig });
+            console.log("Loading config.json...")
+            const config = localStorage.getItem("config")
+            if (config == null)
+                configState.loadDefault();
+            else
+                configState.load(JSON.parse(config));
         }
         catch (error) {
-            console.error(`Failed to load config`, error)
+            console.error(`Failed to load config, falling back to defaults`, error)
+            configState.loadDefault();
         }
     }
 

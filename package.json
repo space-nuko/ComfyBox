@@ -14,7 +14,7 @@
     "lint": "prettier --plugin-search-dir . --check . && eslint .",
     "format": "prettier --plugin-search-dir . --write .",
     "svelte-check": "svelte-check",
-    "prebuild": "pnpm run build:css && pnpm --filter=klecks lang:build",
+    "prebuild": "pnpm run build:css",
     "build:css": "pollen -c gradio/js/theme/src/pollen.config.cjs && mv src/pollen.css node_modules/@gradio/theme/src"
   },
   "devDependencies": {
@@ -85,7 +85,6 @@
     "framework7": "^8.0.3",
     "framework7-svelte": "^8.0.3",
     "img-comparison-slider": "^8.0.0",
-    "klecks": "workspace:*",
     "pollen-css": "^4.6.2",
     "radix-icons-svelte": "^1.2.1",
     "style-mod": "^4.0.3",

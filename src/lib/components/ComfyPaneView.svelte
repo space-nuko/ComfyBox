@@ -101,7 +101,6 @@
                  color: var(--body-text-color);
              }
              &.selected {
-                 color: var(--body-text-color);
                  background-color: var(--panel-background-fill);
              }
          }

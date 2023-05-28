@@ -690,7 +690,7 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
             }
         ]
     }
-];
+] as const;
 
 // This is needed so the specs can be iterated with svelte's keyed #each.
 let i = 0;

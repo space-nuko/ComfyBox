@@ -109,6 +109,9 @@ body {
          &:hover:not(:disabled) {
              background: var(--block-background-fill);
          }
+         &.selected {
+             background: var(--panel-background-fill);
+         }
      }
 
      &:hover:not(:disabled) {
@@ -117,11 +120,12 @@ body {
      &:active:not(:disabled) {
          filter: brightness(50%)
      }
-     &.selected:not(:disabled) {
-         filter: brightness(80%)
+     &.selected {
+         color: var(--body-text-color);
+         filter: none;
      }
 
-     &:disabled {
+     &:disabled:not(.selected) {
          background: var(--neutral-700);
          color: var(--neutral-400);
          opacity: 50%;
