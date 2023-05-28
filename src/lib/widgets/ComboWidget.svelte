@@ -129,10 +129,21 @@
      };
  }
 
+ function getTitle(value?: string) {
+     if (value == null) {
+         if (!nodeValue)
+             return ""
+         value = $nodeValue
+     }
+
+     if (value && value.length > 80)
+         return String(value)
+     return ""
+ }
 </script>
 
 <div class="wrapper comfy-combo" class:mobile={isMobile} class:updated={$lightUp}>
-    <label>
+    <label title={getTitle()}>
         {#if widget.attrs.title !== ""}
             <BlockTitle show_label={true}>
                 {widget.attrs.title}
@@ -175,6 +186,7 @@
                                 class:mobile={isMobile}
                                 let:index={i}
                                 let:style
+                                title={getTitle(filteredItems[i].label)}
                                 {style}
                                 class:active={activeIndex === filteredItems[i].index}
                                 class:hover={hoverItemIndex === i}

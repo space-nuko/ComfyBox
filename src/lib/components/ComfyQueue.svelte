@@ -147,7 +147,7 @@
          message = `${entry.extraData.workflowTitle}`
      }
 
-     if (subgraphs) {
+     if (subgraphs && subgraphs.length > 0) {
          const subgraphsString = subgraphs.join(', ')
          message += ` (${subgraphsString})`
      }
