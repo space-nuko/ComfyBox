@@ -16,3 +16,9 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div on:click={onClick}>{message}</div>
+
+<style lang="scss">
+ div {
+     cursor: pointer;
+ }
+</style>
