@@ -220,6 +220,26 @@
      }
  }
 
+ async function openGraph(cb: () => void) {
+     const newGraphSize = Math.max(50, graphSize);
+     const willOpenPane = newGraphSize != graphSize
+     graphSize = newGraphSize
+
+     if (willOpenPane) {
+         const graphPane = getGraphPane();
+         if (graphPane) {
+             graphPane.addEventListener("transitionend", cb, { once: true })
+             await tick()
+         }
+         else {
+             cb()
+         }
+     }
+     else {
+         cb()
+     }
+ }
+
  async function showError(promptIDWithError: PromptID) {
      hideError();
 
@@ -247,23 +267,7 @@
          app.lCanvas.jumpToFirstError();
      }
 
-     const newGraphSize = Math.max(50, graphSize);
-     const willOpenPane = newGraphSize != graphSize
-     graphSize = newGraphSize
-
-     if (willOpenPane) {
-         const graphPane = getGraphPane();
-         if (graphPane) {
-             graphPane.addEventListener("transitionend", jumpToError, { once: true })
-             await tick()
-         }
-         else {
-             jumpToError()
-         }
-     }
-     else {
-         jumpToError()
-     }
+     await openGraph(jumpToError)
  }
 
  function hideError() {
@@ -273,7 +277,8 @@
  }
 
  setContext(WORKFLOWS_VIEW, {
-     showError
+     showError,
+     openGraph
  });
 </script>
 

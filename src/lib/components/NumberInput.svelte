@@ -4,8 +4,8 @@
 	import { createEventDispatcher } from "svelte";
 
  export let value: number = 0;
- export let min: number = -1024
- export let max: number = 1024
+ export let min: number | null = null
+ export let max: number | null = null
  export let step: number = 1;
  export let label: string = "";
  export let disabled: boolean = false;
@@ -41,9 +41,11 @@
 
 <div class="wrap">
     <div class="head">
-        <label>
-            <BlockTitle>{label}</BlockTitle>
-        </label>
+        {#if label}
+            <label>
+                <BlockTitle>{label}</BlockTitle>
+            </label>
+        {/if}
         <input
             data-testid="number-input"
             type="number"
@@ -83,11 +85,11 @@
      border: var(--input-border-width) solid var(--input-border-color);
      border-radius: var(--input-radius);
      background: var(--input-background-fill);
-     padding: var(--size-2) var(--size-2);
+     padding: var(--input-padding);
      color: var(--body-text-color);
      font-size: var(--input-text-size);
      line-height: var(--line-sm);
-     text-align: center;
+     // text-align: center;
  }
  input:disabled {
      -webkit-text-fill-color: var(--body-text-color);
@@ -95,9 +97,16 @@
      opacity: 1;
  }
 
- input[type="number"]:focus {
-     box-shadow: var(--input-shadow-focus);
-     border-color: var(--input-border-color-focus);
+ input[type="number"] {
+     &:focus {
+         box-shadow: var(--input-shadow-focus);
+         border-color: var(--input-border-color-focus);
+     }
+
+     &::-webkit-inner-spin-button,
+     &::-webkit-outer-spin-button {
+         opacity: 100%;
+     }
  }
 
  input::placeholder {
@@ -107,4 +116,5 @@
  input[disabled] {
      cursor: not-allowed;
  }
+
 </style>

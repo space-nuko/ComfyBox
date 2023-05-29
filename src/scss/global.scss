@@ -92,33 +92,43 @@ body {
 
      &.primary {
          background: var(--button-primary-background-fill);
-         &:hover {
+         &:hover:not(:disabled) {
              background: var(--button-primary-background-fill-hover);
          }
      }
 
      &.secondary {
          background: var(--button-secondary-background-fill);
-         &:hover {
+         &:hover:not(:disabled) {
              background: var(--button-secondary-background-fill-hover);
          }
      }
 
      &.ternary {
          background: var(--panel-background-fill);
-         &:hover {
+         &:hover:not(:disabled) {
              background: var(--block-background-fill);
+         }
+         &.selected {
+             background: var(--panel-background-fill);
          }
      }
 
-     &:hover {
+     &:hover:not(:disabled) {
          filter: brightness(85%);
      }
-     &:active {
+     &:active:not(:disabled) {
          filter: brightness(50%)
      }
      &.selected {
-         filter: brightness(80%)
+         color: var(--body-text-color);
+         filter: none;
+     }
+
+     &:disabled:not(.selected) {
+         background: var(--neutral-700);
+         color: var(--neutral-400);
+         opacity: 50%;
      }
 }
 

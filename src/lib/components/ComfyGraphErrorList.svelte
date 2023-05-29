@@ -68,88 +68,91 @@
     <div class="error-list-header">
         <button class="error-list-close" on:click={closeList}>✕</button>
     </div>
-    {#each Object.entries(errors.errorsByID) as [nodeID, nodeErrors]}
-        {@const first = nodeErrors[0]}
-        {@const parent = getParentNode(first)}
-        <div class="error-group">
-            <div class="error-node-details">
-                <span class="error-node-type">{first.comfyNodeType}</span>
-                {#if parent}
-                    <span class="error-node-parent">({parent.title})</span>
-                {/if}
-            </div>
-            <div class="error-entries">
-                {#each nodeErrors as error}
-                    {@const isExecutionError = error.errorType === "execution"}
-                    <div class="error-entry">
-                        <div>
-                            <div class="error-details">
-                                <button class="jump-to-error" class:execution-error={isExecutionError} on:click={() => jumpToError(error)}><span>⮎</span></button>
-                                <div class="error-details-wrapper">
-                                    <span class="error-message" class:execution-error={isExecutionError}>{error.message}</span>
-                                    {#if error.exceptionType}
-                                        <span>({error.exceptionType})</span>
-                                    {/if}
-                                    {#if error.exceptionMessage && !isExecutionError}
-                                        <div style:text-decoration="underline">{error.exceptionMessage}</div>
-                                    {/if}
-                                    {#if error.input}
-                                        <div class="error-input">
-                                            <span>Input: <b>{error.input.name}</b></span>
-                                            {#if error.input.config}
-                                                <span>({getInputTypeName(error.input.config[0])})</span>
+    <div class="error-list-scroll-container">
+        {#each Object.entries(errors.errorsByID) as [nodeID, nodeErrors], i}
+            {@const first = nodeErrors[0]}
+            {@const parent = getParentNode(first)}
+            {@const last = i === Object.keys(errors.errorsByID).length - 1}
+            <div class="error-group">
+                <div class="error-node-details">
+                    <span class="error-node-type">{first.comfyNodeType}</span>
+                    {#if parent}
+                        <span class="error-node-parent">({parent.title})</span>
+                    {/if}
+                </div>
+                <div class="error-entries" class:last>
+                    {#each nodeErrors as error}
+                        {@const isExecutionError = error.errorType === "execution"}
+                        <div class="error-entry">
+                            <div>
+                                <div class="error-details">
+                                    <button class="jump-to-error" class:execution-error={isExecutionError} on:click={() => jumpToError(error)}><span>⮎</span></button>
+                                    <div class="error-details-wrapper">
+                                        <span class="error-message" class:execution-error={isExecutionError}>{error.message}</span>
+                                        {#if error.exceptionType}
+                                            <span>({error.exceptionType})</span>
+                                        {/if}
+                                        {#if error.exceptionMessage && !isExecutionError}
+                                            <div style:text-decoration="underline">{error.exceptionMessage}</div>
+                                        {/if}
+                                        {#if error.input}
+                                            <div class="error-input">
+                                                <span>Input: <b>{error.input.name}</b></span>
+                                                {#if error.input.config}
+                                                    <span>({getInputTypeName(error.input.config[0])})</span>
+                                                {/if}
+                                            </div>
+                                            {#if canJumpToDisconnectedInput(error)}
+                                                <div style:display="flex" style:flex-direction="row">
+                                                    <button class="jump-to-error locate" on:click={() => jumpToDisconnectedInput(error)}><span>⮎</span></button>
+                                                    <span>Find disconnected input</span>
+                                                </div>
                                             {/if}
-                                        </div>
-                                        {#if canJumpToDisconnectedInput(error)}
-                                            <div style:display="flex" style:flex-direction="row">
-                                                <button class="jump-to-error locate" on:click={() => jumpToDisconnectedInput(error)}><span>⮎</span></button>
-                                                <span>Find disconnected input</span>
-                                            </div>
-                                        {/if}
 
-                                        {#if error.input.receivedValue}
-                                            <div>
-                                                <span>Received value: <b>{error.input.receivedValue}</b></span>
-                                            </div>
-                                        {/if}
-                                        {#if error.input.receivedType}
-                                            <div>
-                                                <span>Received type: <b>{error.input.receivedType}</b></span>
-                                            </div>
-                                        {/if}
-                                        {#if error.input.config}
-                                            <div class="error-traceback-wrapper">
-                                                <Accordion label="Input Config" open={true}>
-                                                    <div class="error-traceback">
-                                                        <div class="error-traceback-contents">
-                                                            <JsonView json={error.input.config[1]} />
+                                            {#if error.input.receivedValue}
+                                                <div>
+                                                    <span>Received value: <b>{error.input.receivedValue}</b></span>
+                                                </div>
+                                            {/if}
+                                            {#if error.input.receivedType}
+                                                <div>
+                                                    <span>Received type: <b>{error.input.receivedType}</b></span>
+                                                </div>
+                                            {/if}
+                                            {#if error.input.config}
+                                                <div class="error-traceback-wrapper">
+                                                    <Accordion label="Input Config" open={true}>
+                                                        <div class="error-traceback">
+                                                            <div class="error-traceback-contents">
+                                                                <JsonView json={error.input.config[1]} />
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </Accordion>
-                                            </div>
+                                                    </Accordion>
+                                                </div>
+                                            {/if}
                                         {/if}
-                                    {/if}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        {#if error.traceback}
-                            <div class="error-traceback-wrapper">
-                                <Accordion label="Traceback" open={false}>
-                                    <div class="error-traceback">
-                                        <div class="error-traceback-contents">
-                                            {#each error.traceback as line}
-                                                <pre>{line}</pre>
-                                            {/each}
+                            {#if error.traceback}
+                                <div class="error-traceback-wrapper">
+                                    <Accordion label="Traceback" open={false}>
+                                        <div class="error-traceback">
+                                            <div class="error-traceback-contents">
+                                                {#each error.traceback as line}
+                                                    <pre>{line}</pre>
+                                                {/each}
+                                            </div>
                                         </div>
-                                    </div>
-                                </Accordion>
-                            </div>
-                        {/if}
-                    </div>
-                {/each}
+                                    </Accordion>
+                                </div>
+                            {/if}
+                        </div>
+                    {/each}
+                </div>
             </div>
-        </div>
-    {/each}
+        {/each}
+    </div>
 </div>
 
 <style lang="scss">
@@ -158,7 +161,6 @@
      width: 30%;
      height: 70%;
      margin: 1.0rem;
-     overflow-y: auto;
      position: absolute;
      right: 0;
      bottom: 0;
@@ -186,6 +188,11 @@
      }
  }
 
+ .error-list-scroll-container {
+     height: calc(100% - 24px);
+     overflow-y: auto;
+ }
+
  .error-node-details {
      font-size: 14pt;
      color: #ddd;
@@ -200,7 +207,7 @@
      font-weight: initial;
  }
 
- .error-entries:last-child {
+ .error-entries:not(.last):last-child {
      border-bottom: 1px solid #ccc;
  }
 

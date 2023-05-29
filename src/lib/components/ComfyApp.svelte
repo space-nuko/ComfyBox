@@ -12,6 +12,7 @@
  import notify from "$lib/notify";
  import ComfyBoxWorkflowsView from "./ComfyBoxWorkflowsView.svelte";
  import GlobalModal from "./GlobalModal.svelte";
+	import ComfySettingsView from "./ComfySettingsView.svelte";
 
  export let app: ComfyApp = undefined;
  let hasShownUIHelpToast: boolean = false;
@@ -63,6 +64,7 @@
                 <ComfyBoxWorkflowsView {app} {uiTheme} />
             </SidebarItem>
             <SidebarItem id="settings" name="Settings" icon={Gear}>
+                <ComfySettingsView {app} />
             </SidebarItem>
         </Sidebar>
     </div>

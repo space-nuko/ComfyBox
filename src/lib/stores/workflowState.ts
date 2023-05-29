@@ -404,7 +404,7 @@ function setActiveWorkflow(canvas: ComfyGraphCanvas, index: number | WorkflowIns
 
     const workflow = state.openedWorkflows[index]
     if (workflow.id === state.activeWorkflowID)
-        return;
+        return state.activeWorkflow;
 
     if (state.activeWorkflow != null)
         state.activeWorkflow.stop("app")

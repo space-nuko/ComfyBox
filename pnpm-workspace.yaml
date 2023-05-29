@@ -2,4 +2,3 @@ packages:
   - 'gradio/js/*'
   - 'gradio/client/js'
   - 'litegraph/packages/*'
-  - 'klecks'

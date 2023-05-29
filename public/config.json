@@ -1,9 +1,0 @@
-{
-	"comfyUIHostname": "localhost",
-	"comfyUIPort": 8188,
-	"alwaysStripUserState": false,
-	"promptForWorkflowName": false,
-	"confirmWhenUnloadingUnsavedChanges": false,
-	"builtInTemplates": ["ControlNet", "LoRA x5", "Model Loader", "Positive_Negative", "Seed Randomizer"],
-	"cacheBuiltInResources": true
-}

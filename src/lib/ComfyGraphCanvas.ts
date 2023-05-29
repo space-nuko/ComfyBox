@@ -11,6 +11,7 @@ import queueState from "./stores/queueState";
 import selectionState from "./stores/selectionState";
 import templateState from "./stores/templateState";
 import { calcNodesBoundingBox } from "./utils";
+import interfaceState from "./stores/interfaceState";
 
 export type SerializedGraphCanvasState = {
     offset: Vector2,
@@ -118,13 +119,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         //     color = "yellow";
         //     thickness = 5;
         // }
-        if (ss.currentHoveredNodes.has(node.id)) {
-            color = "lightblue";
-        }
-        else if (isRunningNode) {
-            color = "#0f0";
-        }
-        else if (nodeErrors) {
+        if (nodeErrors) {
             const hasExecutionError = nodeErrors.find(e => e.errorType === "execution");
             if (hasExecutionError) {
                 blink = true;
@@ -138,6 +133,12 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         else if (isHighlightedNode) {
             color = "cyan";
             thickness = 2
+        }
+        else if (ss.currentHoveredNodes.has(node.id)) {
+            color = "lightblue";
+        }
+        else if (isRunningNode) {
+            color = "#0f0";
         }
 
         if (blink) {
@@ -193,6 +194,8 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         }
     }
 
+    private static CONNECTION_POS: Vector2 = [0, 0];
+
     private highlightNodeInput(node: LGraphNode, inputSlot: SlotNameOrIndex, ctx: CanvasRenderingContext2D) {
         let inputIndex: number;
         if (typeof inputSlot === "number")
@@ -200,7 +203,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         else
             inputIndex = node.findInputSlotIndexByName(inputSlot)
         if (inputIndex !== -1) {
-            let pos = node.getConnectionPos(true, inputIndex);
+            let pos = node.getConnectionPos(true, inputIndex, ComfyGraphCanvas.CONNECTION_POS);
             ctx.beginPath();
             ctx.arc(pos[0] - node.pos[0], pos[1] - node.pos[1], 12, 0, 2 * Math.PI, false)
             ctx.stroke();
@@ -700,6 +703,8 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     }
 
     jumpToNode(node: LGraphNode) {
+        interfaceState.update(s => { s.isJumpingToNode = true; return s; })
+
         this.closeAllSubgraphs();
 
         const subgraphs = Array.from(node.iterateParentSubgraphNodes()).reverse();
@@ -709,6 +714,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         }
 
         this.centerOnNode(node);
+        this.selectNode(node);
     }
 
     jumpToNodeAndInput(node: LGraphNode, slotIndex: number) {
