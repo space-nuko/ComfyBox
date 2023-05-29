@@ -84,6 +84,41 @@ const defComfyUIPort: ConfigDefNumber<"comfyUIPort"> = {
     }
 };
 
+export enum NotificationState {
+    MessageAndSound,
+    MessageOnly,
+    SoundOnly,
+    None
+}
+
+const defNotifications: ConfigDefEnum<"notifications", NotificationState> = {
+    name: "notifications",
+    type: "enum",
+    defaultValue: NotificationState.MessageAndSound,
+    category: "ui",
+    description: "Controls how notifications are shown",
+    options: {
+        values: [
+            {
+                value: NotificationState.MessageAndSound,
+                label: "Message & sound"
+            },
+            {
+                value: NotificationState.MessageOnly,
+                label: "Message only"
+            },
+            {
+                value: NotificationState.SoundOnly,
+                label: "Sound only"
+            },
+            {
+                value: NotificationState.None,
+                label: "None"
+            },
+        ]
+    }
+};
+
 const defAlwaysStripUserState: ConfigDefBoolean<"alwaysStripUserState"> = {
     name: "alwaysStripUserState",
     type: "boolean",
@@ -158,6 +193,7 @@ const defBuiltInTemplates: ConfigDefStringArray<"builtInTemplates"> = {
 export const CONFIG_DEFS = [
     defComfyUIHostname,
     defComfyUIPort,
+    defNotifications,
     defAlwaysStripUserState,
     defPromptForWorkflowName,
     defConfirmWhenUnloadingUnsavedChanges,

@@ -1,6 +1,7 @@
 import { BuiltInSlotType, LiteGraph, type SlotLayout } from "@litegraph-ts/core";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "../ComfyGraphNode";
 import { playSound } from "$lib/utils";
+import configState from "$lib/stores/configState";
 
 export interface ComfyPlaySoundActionProperties extends ComfyGraphNodeProperties {
     sound: string,
@@ -20,6 +21,9 @@ export default class ComfyPlaySoundAction extends ComfyGraphNode {
     }
 
     override onAction(action: any, param: any) {
+        if (!configState.canPlayNotificationSound())
+            return;
+
         const sound = this.getInputData(0) || this.properties.sound;
         if (sound) {
             playSound(sound)

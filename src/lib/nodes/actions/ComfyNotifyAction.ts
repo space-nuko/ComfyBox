@@ -3,17 +3,20 @@ import notify from "$lib/notify";
 import { convertComfyOutputToGradio, type SerializedPromptOutput } from "$lib/utils";
 import { BuiltInSlotType, LiteGraph, type SlotLayout } from "@litegraph-ts/core";
 import ComfyGraphNode, { type ComfyGraphNodeProperties } from "../ComfyGraphNode";
+import configState from "$lib/stores/configState";
 
 export interface ComfyNotifyActionProperties extends ComfyGraphNodeProperties {
     message: string,
-    type: string
+    type: string,
+    alwaysShow: boolean
 }
 
 export default class ComfyNotifyAction extends ComfyGraphNode {
     override properties: ComfyNotifyActionProperties = {
         tags: [],
         message: "Nya.",
-        type: "info"
+        type: "info",
+        alwaysShow: false
     }
 
     static slotLayout: SlotLayout = {
@@ -24,6 +27,9 @@ export default class ComfyNotifyAction extends ComfyGraphNode {
     }
 
     override onAction(action: any, param: any) {
+        if (!configState.canShowNotificationText() && !this.properties.alwaysShow)
+            return;
+
         const message = this.getInputData(0) || this.properties.message;
         if (!message)
             return;

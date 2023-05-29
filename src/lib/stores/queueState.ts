@@ -7,6 +7,7 @@ import { playSound } from "$lib/utils";
 import { get, writable, type Writable } from "svelte/store";
 import { v4 as uuidv4 } from "uuid";
 import workflowState, { type WorkflowError, type WorkflowExecutionError, type WorkflowInstID, type WorkflowValidationError } from "./workflowState";
+import configState from "./configState";
 
 export type QueueEntryStatus = "success" | "validation_failed" | "error" | "interrupted" | "all_cached" | "unknown";
 
@@ -283,14 +284,18 @@ function executingUpdated(promptID: PromptID, runningNodeID: ComfyNodeID | null)
             if (entry != null) {
                 const totalNodesInPrompt = Object.keys(entry.prompt).length
                 if (entry.cachedNodes.size >= Object.keys(entry.prompt).length) {
-                    notify("Prompt was cached, nothing to run.", { type: "warning" })
+                    notify("Prompt was cached, nothing to run.", { type: "warning", showOn: "web" })
                     moveToCompleted(index, queue, "all_cached", "(Execution was cached)");
                 }
                 else if (entry.nodesRan.size >= totalNodesInPrompt) {
                     const workflow = workflowState.getWorkflow(entry.extraData.workflowID);
                     if (workflow?.attrs.showDefaultNotifications) {
-                        notify("Prompt finished!", { type: "success" });
-                        playSound("notification.mp3")
+                        if (configState.canShowNotificationText()) {
+                            notify("Prompt finished!", { type: "success" });
+                        }
+                        if (configState.canPlayNotificationSound()) {
+                            playSound("notification.mp3")
+                        }
                     }
                     moveToCompleted(index, queue, "success")
                 }

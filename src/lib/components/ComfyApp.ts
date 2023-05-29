@@ -990,7 +990,7 @@ export default class ComfyApp {
             tag = null;
 
         if (targetWorkflow.attrs.showDefaultNotifications) {
-            notify("Prompt queued.", { type: "info" });
+            notify("Prompt queued.", { type: "info", showOn: "web" });
         }
 
         this.processingQueue = true;
