@@ -194,6 +194,8 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         }
     }
 
+    private static CONNECTION_POS: Vector2 = [0, 0];
+
     private highlightNodeInput(node: LGraphNode, inputSlot: SlotNameOrIndex, ctx: CanvasRenderingContext2D) {
         let inputIndex: number;
         if (typeof inputSlot === "number")
@@ -201,7 +203,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         else
             inputIndex = node.findInputSlotIndexByName(inputSlot)
         if (inputIndex !== -1) {
-            let pos = node.getConnectionPos(true, inputIndex);
+            let pos = node.getConnectionPos(true, inputIndex, ComfyGraphCanvas.CONNECTION_POS);
             ctx.beginPath();
             ctx.arc(pos[0] - node.pos[0], pos[1] - node.pos[1], 12, 0, 2 * Math.PI, false)
             ctx.stroke();

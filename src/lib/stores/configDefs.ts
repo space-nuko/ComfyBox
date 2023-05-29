@@ -1,7 +1,9 @@
+import { LinkRenderMode } from "@litegraph-ts/core";
+
 /*
  * Supported config option types.
  */
-type ConfigDefType = "boolean" | "number" | "string" | "string[]";
+type ConfigDefType = "boolean" | "number" | "string" | "string[]" | "enum";
 
 // A simple parameter description interface
 export interface ConfigDef<IdType extends string, TypeType extends ConfigDefType, ValueType, OptionsType = any> {
@@ -17,21 +19,46 @@ export interface ConfigDef<IdType extends string, TypeType extends ConfigDefType
 
     defaultValue: ValueType,
 
-    options: OptionsType
+    options: OptionsType,
 }
 
 export type ConfigDefAny = ConfigDef<string, any, any>
-type ConfigDefBoolean<IdType extends string> = ConfigDef<IdType, "boolean", boolean>;
+export type ConfigDefBoolean<IdType extends string> = ConfigDef<IdType, "boolean", boolean>;
 
-type NumberOptions = {
+export type NumberOptions = {
     min?: number,
     max?: number,
     step: number
 }
-type ConfigDefNumber<IdType extends string> = ConfigDef<IdType, "number", number, NumberOptions>;
+export type ConfigDefNumber<IdType extends string> = ConfigDef<IdType, "number", number, NumberOptions>;
 
-type ConfigDefString<IdType extends string> = ConfigDef<IdType, "string", string>;
-type ConfigDefStringArray<IdType extends string> = ConfigDef<IdType, "string[]", string[]>;
+export type ConfigDefString<IdType extends string> = ConfigDef<IdType, "string", string>;
+export type ConfigDefStringArray<IdType extends string> = ConfigDef<IdType, "string[]", string[]>;
+
+export interface EnumValue<T> {
+    label: string,
+    value: T
+}
+export interface EnumOptions<T> {
+    values: EnumValue<T>[]
+}
+export type ConfigDefEnum<IdType extends string, T> = ConfigDef<IdType, "enum", T, EnumOptions<T>>;
+
+export function validateConfigOption(def: ConfigDefAny, v: any): boolean {
+    switch (def.type) {
+        case "boolean":
+            return typeof v === "boolean";
+        case "number":
+            return typeof v === "number";
+        case "string":
+            return typeof v === "string";
+        case "string[]":
+            return Array.isArray(v) && v.every(vs => typeof vs === "string");
+        case "enum":
+            return Boolean(def.options.values.find((o: EnumValue<any>) => o.value === v));
+    }
+    return false;
+}
 
 // Configuration parameters ------------------------------------
 
@@ -102,6 +129,30 @@ const defBuiltInTemplates: ConfigDefStringArray<"builtInTemplates"> = {
     options: {}
 };
 
+// const defLinkDisplayType: ConfigDefEnum<"linkDisplayType", LinkRenderMode> = {
+//     name: "linkDisplayType",
+//     type: "enum",
+//     defaultValue: LinkRenderMode.SPLINE_LINK,
+//     category: "graph",
+//     description: "How to display links in the graph",
+//     options: {
+//         values: [
+//             {
+//                 value: LinkRenderMode.STRAIGHT_LINK,
+//                 label: "Straight"
+//             },
+//             {
+//                 value: LinkRenderMode.LINEAR_LINK,
+//                 label: "Linear"
+//             },
+//             {
+//                 value: LinkRenderMode.SPLINE_LINK,
+//                 label: "Spline"
+//             }
+//         ]
+//     },
+// };
+
 // Configuration exports ------------------------------------
 
 export const CONFIG_DEFS = [
@@ -112,6 +163,7 @@ export const CONFIG_DEFS = [
     defConfirmWhenUnloadingUnsavedChanges,
     defCacheBuiltInResources,
     defBuiltInTemplates,
+    // defLinkDisplayType
 ] as const;
 
 export const CONFIG_DEFS_BY_NAME: Record<string, ConfigDefAny>

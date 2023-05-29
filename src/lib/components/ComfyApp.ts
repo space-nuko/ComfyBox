@@ -274,6 +274,16 @@ export default class ComfyApp {
             console.error(`Failed to load config, falling back to defaults`, error)
             configState.loadDefault();
         }
+
+        // configState.onChange("linkDisplayType", (newValue) => {
+        //     if (!this.lCanvas)
+        //         return;
+
+        //     this.lCanvas.links_render_mode = newValue;
+        //     this.lCanvas.setDirty(true, true);
+        // })
+
+        configState.runOnChangedEvents();
     }
 
     async loadBuiltInTemplates(): Promise<SerializedComfyBoxTemplate[]> {

@@ -1,5 +1,5 @@
 <script lang="ts">
- import { CONFIG_CATEGORIES, CONFIG_DEFS_BY_CATEGORY, type ConfigDefAny } from "$lib/stores/configDefs";
+ import { CONFIG_CATEGORIES, CONFIG_DEFS_BY_CATEGORY, CONFIG_DEFS_BY_NAME, type ConfigDefAny, type ConfigDefEnum, type ConfigState } from "$lib/stores/configDefs";
  import { capitalize } from "$lib/utils";
  import { Checkbox } from "@gradio/form";
  import configState from "$lib/stores/configState";
@@ -13,7 +13,7 @@
  export let app: ComfyApp
 
  let selectedCategory = CONFIG_CATEGORIES[0];
- let changes = {}
+ let changes: Partial<Record<keyof ConfigState, any>> = {}
 
  const toastOptions = {
      intro: { duration: 200 },
@@ -28,14 +28,23 @@
 
  function setOption(def: ConfigDefAny, value: any) {
      if (!configState.validateConfigOption(def, value)) {
-         console.warn(`[configState] Invalid value for option ${def.name} (${v}), setting to default (${def.defaultValue})`);
+         console.warn(`[configState] Invalid value for option ${def.name} (${value}), setting to default (${def.defaultValue})`);
          value = def.defaultValue
      }
      changes[def.name] = value;
  }
 
+ function setEnumOption(def: ConfigDefEnum<any, any>, e: Event): void {
+     const select = e.target as HTMLSelectElement;
+     const index = select.selectedIndex
+     setOption(def, def.options.values[index].value)
+ }
+
  function doSave() {
-     $configState = { ...$configState, ...changes };
+     for (const [k, v] of Object.entries(changes)) {
+         const def = CONFIG_DEFS_BY_NAME[k]
+         configState.setConfigOption(def, v, true);
+     }
      changes = {};
      const json = JSON.stringify($configState);
      localStorage.setItem("config", json);
@@ -46,7 +55,7 @@
      if (!confirm("Are you sure you want to reset the config to the defaults?"))
          return;
 
-     configState.loadDefault();
+     configState.loadDefault(true);
      notify("Config reset!")
  }
 </script>
@@ -87,6 +96,16 @@
                                 <div class="description">{def.description}</div>
                                 <span class="ctrl string-array">
                                     {value.join(",")}
+                                </span>
+                            {:else if def.type === "enum"}
+                                <div class="description">{def.description}</div>
+                                <span class="ctrl enum">
+                                    <select id="ui-theme" name="ui-theme" on:change={(e) => setEnumOption(def, e)}>
+                                        {#each def.options.values as option, i}
+                                            {@const selected = def.options.values[i].value === value}
+                                            <option value={option.value} {selected}>{option.label}</option>
+                                        {/each}
+                                    </select>
                                 </span>
                             {:else}
                                 (Unknown config type {def.type})
@@ -193,6 +212,17 @@
              :global(label) {
                  color: var(--neutral-400);
                  font-size: 11pt;
+             }
+         }
+
+         &.enum {
+             select {
+                 -webkit-appearance: none;
+                 -moz-appearance: none;
+                 background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+                 background-repeat: no-repeat;
+                 background-position-x: 100%;
+                 background-position-y: 8px;
              }
          }
      }
