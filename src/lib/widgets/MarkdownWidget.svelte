@@ -4,6 +4,8 @@
  import { Block } from "@gradio/atoms";
  import type { ComfyMarkdownNode } from "$lib/nodes/widgets";
  import SvelteMarkdown from "svelte-markdown"
+ import NullMarkdownRenderer from "./markdown/NullMarkdownRenderer.svelte"
+	import { SvelteComponentDev } from "svelte/internal";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -11,6 +13,10 @@
  let node: ComfyMarkdownNode | null = null;
  let nodeValue: Writable<string> = writable("");
  let attrsChanged: Writable<number> = writable(0);
+
+ let renderers: Record<string, typeof SvelteComponentDev> = {
+     "html": NullMarkdownRenderer
+ }
 
  $: widget && setNodeValue(widget);
 
@@ -27,7 +33,7 @@
     {#key $attrsChanged}
         {#if widget !== null && node !== null}
             <Block>
-                <SvelteMarkdown source={$nodeValue} />
+                <SvelteMarkdown source={$nodeValue} {renderers} />
             </Block>
         {/if}
     {/key}
