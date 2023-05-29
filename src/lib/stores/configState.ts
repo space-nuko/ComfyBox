@@ -2,10 +2,12 @@ import { debounce } from '$lib/utils';
 import { toHashMap } from '@litegraph-ts/core';
 import { get, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
-import { defaultConfig, type ConfigState, type ConfigDefAny, CONFIG_DEFS_BY_NAME, validateConfigOption } from './configDefs';
+import { defaultConfig, type ConfigState, type ConfigDefAny, CONFIG_DEFS_BY_NAME, validateConfigOption, NotificationState } from './configDefs';
 
 type ConfigStateOps = {
     getBackendURL: () => string,
+    canShowNotificationText: () => boolean,
+    canPlayNotificationSound: () => boolean,
 
     load: (data: any, runOnChanged?: boolean) => ConfigState
     loadDefault: (runOnChanged?: boolean) => ConfigState
@@ -24,6 +26,17 @@ function getBackendURL(): string {
     const state = get(store);
     return `${window.location.protocol}//${state.comfyUIHostname}:${state.comfyUIPort}`
 }
+
+function canShowNotificationText(): boolean {
+    const state = get(store).notifications;
+    return state === NotificationState.MessageAndSound || state === NotificationState.MessageOnly;
+}
+
+function canPlayNotificationSound(): boolean {
+    const state = get(store).notifications;
+    return state === NotificationState.MessageAndSound || state === NotificationState.SoundOnly;
+}
+
 
 function setConfigOption(def: ConfigDefAny, v: any, runOnChanged: boolean): boolean {
     let valid = false;
@@ -112,6 +125,9 @@ const configStateStore: WritableConfigStateStore =
 {
     ...store,
     getBackendURL,
+    canShowNotificationText,
+    canPlayNotificationSound,
+
     validateConfigOption,
     setConfigOption,
     load,
