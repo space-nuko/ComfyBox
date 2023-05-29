@@ -151,9 +151,6 @@ importers:
       svelte-floating-ui:
         specifier: ^1.5.2
         version: 1.5.2
-      svelte-markdown:
-        specifier: ^0.2.3
-        version: 0.2.3(svelte@3.58.0)
       svelte-preprocess:
         specifier: ^5.0.3
         version: 5.0.3(sass@1.61.0)(svelte@3.58.0)(typescript@5.0.3)
@@ -1363,6 +1360,7 @@ packages:
       '@codemirror/language': ^6.0.0
       '@codemirror/state': ^6.0.0
       '@codemirror/view': ^6.0.0
+      '@lezer/common': ^1.0.0
     dependencies:
       '@codemirror/language': 6.6.0
       '@codemirror/state': 6.2.0
@@ -3117,6 +3115,8 @@ packages:
       '@codemirror/search': 6.4.0
       '@codemirror/state': 6.2.0
       '@codemirror/view': 6.11.0
+    transitivePeerDependencies:
+      - '@lezer/common'
     dev: false
 
   /codemirror@6.0.1(@lezer/common@1.0.2):
@@ -6712,16 +6712,6 @@ packages:
       svelte: '>=3.19.0'
     dependencies:
       svelte: 3.58.0
-
-  /svelte-markdown@0.2.3(svelte@3.58.0):
-    resolution: {integrity: sha512-2h680NzTXnAD0CXhxe3GeHl6W+ayG4iKQRl+BIDRw+R0mUE0OiNxP1Vt8Rn+aWevB/LBiBIPCAwvL+0BkG057A==}
-    peerDependencies:
-      svelte: ^3.0.0
-    dependencies:
-      '@types/marked': 4.3.1
-      marked: 4.3.0
-      svelte: 3.58.0
-    dev: false
 
   /svelte-preprocess@4.10.1(postcss-load-config@3.1.4)(postcss@8.4.21)(svelte@3.58.0)(typescript@4.5.4):
     resolution: {integrity: sha512-NSNloaylf+o9UeyUR2KvpdxrAyMdHl3U7rMnoP06/sG0iwJvlUM4TpMno13RaNqovh4AAoGsx1jeYcIyuGUXMw==}
