@@ -133,6 +133,9 @@ importers:
       img-comparison-slider:
         specifier: ^8.0.0
         version: 8.0.0
+      marked:
+        specifier: ^5.0.3
+        version: 5.0.3
       pollen-css:
         specifier: ^4.6.2
         version: 4.6.2
@@ -1360,7 +1363,6 @@ packages:
       '@codemirror/language': ^6.0.0
       '@codemirror/state': ^6.0.0
       '@codemirror/view': ^6.0.0
-      '@lezer/common': ^1.0.0
     dependencies:
       '@codemirror/language': 6.6.0
       '@codemirror/state': 6.2.0
@@ -3115,8 +3117,6 @@ packages:
       '@codemirror/search': 6.4.0
       '@codemirror/state': 6.2.0
       '@codemirror/view': 6.11.0
-    transitivePeerDependencies:
-      - '@lezer/common'
     dev: false
 
   /codemirror@6.0.1(@lezer/common@1.0.2):
@@ -5501,6 +5501,12 @@ packages:
   /marked@4.3.0:
     resolution: {integrity: sha512-PRsaiG84bK+AMvxziE/lCFss8juXjNaWzVbN5tXAm4XjeaS9NAHhop+PjQxz2A9h8Q4M/xGmzP8vqNwy6JeK0A==}
     engines: {node: '>= 12'}
+    hasBin: true
+    dev: false
+
+  /marked@5.0.3:
+    resolution: {integrity: sha512-KUONa43Uk74uUNWMxh6lfaNYmSAsRMiDAaX8QBCCRVXzEufR0zX6T33vrGbvTnQLL02ungDM3KSzZtO+chJaHg==}
+    engines: {node: '>= 18'}
     hasBin: true
     dev: false
 
