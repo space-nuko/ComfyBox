@@ -3,7 +3,7 @@
  import { get, type Writable, writable } from "svelte/store";
  import { Block } from "@gradio/atoms";
  import type { ComfyMarkdownNode } from "$lib/nodes/widgets";
- import SvelteMarkdown from "svelte-markdown"
+ import SvelteMarkdown from "@dogagenc/svelte-markdown"
  import NullMarkdownRenderer from "./markdown/NullMarkdownRenderer.svelte"
 	import { SvelteComponentDev } from "svelte/internal";
 
