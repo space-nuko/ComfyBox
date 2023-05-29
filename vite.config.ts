@@ -12,7 +12,7 @@ import { visualizer } from "rollup-plugin-visualizer";
 const isProduction = process.env.NODE_ENV === "production";
 console.log("Production build: " + isProduction)
 
-const commitHash = execSync('git rev-parse HEAD').toString();
+const commitHash = execSync('git rev-parse HEAD').toString().trim();
 console.log("Commit: " + commitHash)
 
 export default defineConfig({

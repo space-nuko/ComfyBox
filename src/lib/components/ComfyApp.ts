@@ -1064,9 +1064,6 @@ export default class ComfyApp {
                     // console.debug(graphToGraphVis(workflow.graph))
                     // console.debug(promptToGraphVis(p))
 
-                    const stdPrompt = this.stdPromptSerializer.serialize(p);
-                    // console.warn("STD", stdPrompt);
-
                     const extraData: ComfyBoxPromptExtraData = {
                         extra_pnginfo: {
                             comfyBoxWorkflow: wf,

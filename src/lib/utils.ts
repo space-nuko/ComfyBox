@@ -4,8 +4,8 @@ import type { FileData as GradioFileData } from "@gradio/upload";
 import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, type NodeID, type SlotType, type Vector4, type SerializedLGraphNode } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import type { ComfyNodeID } from "./api";
-import ComfyApp, { type SerializedPrompt } from "./components/ComfyApp";
 import workflowState, { type WorkflowReceiveOutputTargets } from "./stores/workflowState";
+import ComfyApp, { type SerializedPrompt, type SerializedPromptInput, type SerializedPromptInputLink } from "./components/ComfyApp";
 import { ImageViewer } from "./ImageViewer";
 import configState from "$lib/stores/configState";
 import SendOutputModal, { type SendOutputModalResult } from "$lib/components/modal/SendOutputModal.svelte";
@@ -143,6 +143,10 @@ export function stopDrag(evt: MouseEvent, layoutState: WritableLayoutStateStore)
     layoutState.notifyWorkflowModified();
 };
 
+export function isSerializedPromptInputLink(inputValue: SerializedPromptInput): inputValue is SerializedPromptInputLink {
+    return Array.isArray(inputValue) && inputValue.length === 2 && typeof inputValue[0] === "string" && typeof inputValue[1] === "number"
+}
+
 export function graphToGraphVis(graph: LGraph): string {
     let links: string[] = []
     let seenLinks = new Set()
@@ -247,7 +251,7 @@ export function promptToGraphVis(prompt: SerializedPrompt): string {
             for (const pair2 of Object.entries(o.inputs)) {
                 const [inpName, i] = pair2;
 
-                if (Array.isArray(i) && i.length === 2 && typeof i[0] === "string" && typeof i[1] === "number") {
+                if (isSerializedPromptInputLink(i)) {
                     // Link
                     const [inpID, inpSlot] = i;
                     if (ids[inpID] == null)

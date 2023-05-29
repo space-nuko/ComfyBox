@@ -224,13 +224,13 @@ const Metadata = z.object({
     extra_data: ExtraData
 })
 
-const ComfyBoxStdPrompt = z.object({
+const StdPrompt = z.object({
     version: z.number(),
     metadata: Metadata,
     parameters: Parameters
 })
 
-export default ComfyBoxStdPrompt
+export default StdPrompt
 
 /*
  * A standardized Stable Diffusion parameter format that should be used with an
@@ -260,4 +260,4 @@ export default ComfyBoxStdPrompt
  * "see" width 1024 and height 1024, even though the only parameter exposed from
  * the frontend was the scale of 2.)
  */
-export type ComfyBoxStdPrompt = z.infer<typeof ComfyBoxStdPrompt>
+export type ComfyBoxStdPrompt = z.infer<typeof StdPrompt>
