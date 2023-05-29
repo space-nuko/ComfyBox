@@ -68,7 +68,7 @@ function getConnectionPos(node: SerializedLGraphNode, is_input: boolean, slotNum
     return out;
 }
 
-function createSerializedWidgetNode(vanillaWorkflow: ComfyVanillaWorkflow, node: SerializedLGraphNode, slotIndex: number, isInput: boolean, widgetNodeType: string, value: any): [ComfyWidgetNode, SerializedComfyWidgetNode] {
+function createSerializedWidgetNode(vanillaWorkflow: ComfyVanillaWorkflow, widgetNodeType: string, value: any, node?: SerializedLGraphNode, slotIndex?: number, isInput?: boolean): [ComfyWidgetNode, SerializedComfyWidgetNode] {
     const comfyWidgetNode = LiteGraph.createNode<ComfyWidgetNode>(widgetNodeType);
     comfyWidgetNode.flags.collapsed = true;
     const size: Vector2 = [0, 0];
@@ -85,12 +85,15 @@ function createSerializedWidgetNode(vanillaWorkflow: ComfyVanillaWorkflow, node:
     const serWidgetNode = comfyWidgetNode.serialize() as SerializedComfyWidgetNode;
     serWidgetNode.comfyValue = value;
     serWidgetNode.shownOutputProperties = {};
-    getConnectionPos(node, isInput, slotIndex, serWidgetNode.pos);
-    if (isInput)
-        serWidgetNode.pos[0] -= size[0] - 20;
-    else
-        serWidgetNode.pos[0] += 20;
-    serWidgetNode.pos[1] += LiteGraph.NODE_TITLE_HEIGHT / 2;
+
+    if (node != null) {
+        getConnectionPos(node, isInput, slotIndex, serWidgetNode.pos);
+        if (isInput)
+            serWidgetNode.pos[0] -= size[0] - 20;
+        else
+            serWidgetNode.pos[0] += 20;
+        serWidgetNode.pos[1] += LiteGraph.NODE_TITLE_HEIGHT / 2;
+    }
 
     if (widgetNodeType === "ui/text" && typeof value === "string" && value.indexOf("\n") != -1) {
         const lineCount = countNewLines(value);
@@ -260,11 +263,12 @@ function convertPrimitiveNode(vanillaWorkflow: ComfyVanillaWorkflow, node: Seria
 
     const [comfyWidgetNode, serWidgetNode] = createSerializedWidgetNode(
         vanillaWorkflow,
+        widgetNodeType,
+        value,
         node,
         0, // first output on the PrimitiveNode
-        false, // this is an output slot index
-        widgetNodeType,
-        value);
+        false // this is an output slot index
+    );
 
     // Set the UI node's min/max/step from the node def
     configureWidgetNodeProperties(serWidgetNode, widgetOpts)
@@ -381,6 +385,20 @@ export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWork
             removeSerializedNode(vanillaWorkflow, node);
             continue
         }
+        else if (node.type === "Note") {
+            const [comfyWidgetNode, serWidgetNode] = createSerializedWidgetNode(
+                vanillaWorkflow,
+                "ui/markdown",
+                node.widgets_values[0]
+            );
+            serWidgetNode.pos = [node.pos[0], node.pos[1]]
+
+            const group = layoutState.addContainer(left, { title: "" })
+            layoutState.addWidget(group, comfyWidgetNode)
+
+            removeSerializedNode(vanillaWorkflow, node);
+            continue
+        }
 
         const def = ComfyApp.knownBackendNodes[node.type];
         if (def == null) {
@@ -449,11 +467,12 @@ export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWork
 
                 const [comfyWidgetNode, serWidgetNode] = createSerializedWidgetNode(
                     vanillaWorkflow,
+                    widgetNodeType,
+                    value,
                     node,
                     connInputIndex,
-                    true,
-                    widgetNodeType,
-                    value);
+                    true
+                );
 
                 configureWidgetNodeProperties(serWidgetNode, inputOpts)
 
@@ -492,11 +511,12 @@ export default function convertVanillaWorkflow(vanillaWorkflow: ComfyVanillaWork
             // Let's create a gallery for this output node and hook it up
             const [comfyGalleryNode, serGalleryNode] = createSerializedWidgetNode(
                 vanillaWorkflow,
+                "ui/gallery",
+                [],
                 node,
                 connOutputIndex,
                 false,
-                "ui/gallery",
-                []);
+            );
 
             if (group == null)
                 group = layoutState.addContainer(isOutputNode ? right : left, { title: node.title || node.type })

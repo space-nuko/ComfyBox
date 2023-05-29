@@ -50,6 +50,7 @@
     "@codemirror/search": "^6.2.2",
     "@codemirror/state": "^6.1.2",
     "@codemirror/view": "^6.4.1",
+    "@dogagenc/svelte-markdown": "^0.2.4",
     "@gradio/accordion": "workspace:*",
     "@gradio/atoms": "workspace:*",
     "@gradio/button": "workspace:*",
