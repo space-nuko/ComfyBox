@@ -18,6 +18,7 @@
  export let elem_classes: string[] = []
  export let style: string = ""
  export let label: string = ""
+ export let mask: ComfyImageLocation | null;
  // let propsChanged: Writable<number> | null = null;
  let dragging = false;
  let pending_upload = false;
@@ -172,6 +173,15 @@
                      bind:naturalWidth={imgWidth}
                      bind:naturalHeight={imgHeight}
                 />
+                {#key mask}
+                    {#if mask}
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <img src={convertComfyOutputToComfyURL(mask)}
+                            alt={firstImage.filename}
+                            on:click={onImgClicked}
+                        />
+                    {/if}
+                {/key}
             {:else}
                 <Upload
                     file_count={fileCount}
@@ -201,6 +211,9 @@
      }
 
      img {
+         position: absolute;
+         top: 0;
+         left: 0;
          width: 100%;
          height: 100%;
          max-width: 100%;
