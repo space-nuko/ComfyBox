@@ -23,7 +23,7 @@
                        () => { app.closeWorkflow(workflow.id); })}
 
  function onPageBeforeIn() {
-     $interfaceState.selectedWorkflowID = null;
+     $interfaceState.selectedWorkflowIndex = null;
  }
 </script>
 

@@ -13,9 +13,8 @@
  import GenToolbar from './mobile/GenToolbar.svelte'
 
  import WorkflowsPage from './mobile/routes/workflows.svelte';
- import AboutPage from './mobile/routes/about.svelte';
- import LoginPage from './mobile/routes/login.svelte';
- import GraphPage from './mobile/routes/graph.svelte';
+ import QueuePage from './mobile/routes/queue.svelte';
+ import GalleryPage from './mobile/routes/gallery.svelte';
  import WorkflowPage from './mobile/routes/workflow.svelte';
  import type { Framework7Parameters, Modal } from "framework7/types";
  import interfaceState from "$lib/stores/interfaceState";
@@ -106,12 +105,12 @@
              }
          },
          {
-             path: '/about/',
-             component: AboutPage,
+             path: '/queue/',
+             component: QueuePage,
          },
          {
-             path: '/login/',
-             component: LoginPage,
+             path: '/gallery/',
+             component: GalleryPage,
          },
          // {
          //     path: '/graph/',
@@ -179,7 +178,7 @@
                 browserHistoryRoot="/mobile/"
             >
                 <MainToolbar {app} />
-                {#if $interfaceState.selectedWorkflowID && $interfaceState.showingWorkflow}
+                {#if $interfaceState.selectedWorkflowIndex && $interfaceState.showingWorkflow}
                     <GenToolbar {app} />
                 {/if}
             </View>

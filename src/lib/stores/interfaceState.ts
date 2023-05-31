@@ -14,7 +14,7 @@ export type InterfaceState = {
     graphTransitioning: boolean,
     isJumpingToNode: boolean,
 
-    selectedWorkflowID: WorkflowInstID | null
+    selectedWorkflowIndex: number | null
     showingWorkflow: boolean
 
     isDarkMode: boolean
@@ -35,7 +35,7 @@ const store: Writable<InterfaceState> = writable(
         graphTransitioning: false,
         isJumpingToNode: false,
 
-        selectedWorkflowID: null,
+        selectedWorkflowIndex: null,
         showingWorkflow: false,
 
         isDarkMode: false,

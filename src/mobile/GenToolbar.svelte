@@ -74,15 +74,6 @@
      progressPercent = 0
      progressText = "??.?%"
  }
-
- let centerHref = "/workflows/"
- $: if ($interfaceState.selectedWorkflowID) {
-     centerHref = `/workflows/${$interfaceState.selectedWorkflowID}/`
- }
- else {
-     centerHref = "/workflows/";
- }
-
 </script>
 
 <Toolbar bottom color="red" style="bottom: calc(var(--f7-toolbar-height))">

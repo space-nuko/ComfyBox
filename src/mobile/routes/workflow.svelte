@@ -18,12 +18,7 @@
 
  function onPageBeforeIn() {
      workflow = $workflowState.openedWorkflows[workflowIndex-1]
-     if (workflow) {
-         $interfaceState.selectedWorkflowID = workflow.id;
-     }
-     else {
-         $interfaceState.selectedWorkflowID = null;
-     }
+     $interfaceState.selectedWorkflowIndex = workflowIndex
      $interfaceState.showingWorkflow = true;
  }
 

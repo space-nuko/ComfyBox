@@ -76,8 +76,8 @@
  }
 
  let centerHref = "/workflows/"
- $: if ($interfaceState.selectedWorkflowID) {
-     centerHref = `/workflows/${$interfaceState.selectedWorkflowID}/`
+ $: if ($interfaceState.selectedWorkflowIndex) {
+     centerHref = `/workflows/${$interfaceState.selectedWorkflowIndex}/`
  }
  else {
      centerHref = "/workflows/";
@@ -108,13 +108,13 @@
     </div>
 </div>
 <Toolbar bottom tabbar color="blue" class={toolbarCount > 1 ? "hasGenToolbar" : ""}>
-    <Link transition="f7-dive" href="/about/">
+    <Link transition="f7-dive" href="/queue/">
         <LayoutTextSidebarReverse width={ICON_SIZE} height={ICON_SIZE} />
     </Link>
     <Link transition="f7-dive" href={centerHref} tabLinkActive>
         <Image width={ICON_SIZE} height={ICON_SIZE} />
     </Link>
-    <Link transition="f7-dive" href="/login/">
+    <Link transition="f7-dive" href="/gallery/">
         <Grid width={ICON_SIZE} height={ICON_SIZE} />
     </Link>
 </Toolbar>
