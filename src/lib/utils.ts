@@ -618,6 +618,9 @@ export async function readFileToText(file: File): Promise<string> {
         reader.onload = async () => {
             resolve(reader.result as string);
         };
+        reader.onerror = async () => {
+            reject(reader.error);
+        }
         reader.readAsText(file);
     })
 }
@@ -708,4 +711,13 @@ export function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
     return new Promise(function(resolve) {
         canvas.toBlob(resolve);
     });
+}
+
+export type SafetensorsMetadata = Record<string, string>
+
+export async function getSafetensorsMetadata(folder: string, filename: string): Promise<SafetensorsMetadata> {
+    const url = configState.getBackendURL();
+    const params = new URLSearchParams({ filename })
+
+    return fetch(new Request(url + `/view_metadata/${folder}?` + params)).then(r => r.json())
 }

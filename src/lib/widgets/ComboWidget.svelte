@@ -8,6 +8,7 @@
  import { type WidgetLayout } from "$lib/stores/layoutStates";
  import { get, writable, type Writable } from "svelte/store";
  import { isDisabled } from "./utils"
+	import { getSafetensorsMetadata } from '$lib/utils';
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfyComboNode | null = null;

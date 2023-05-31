@@ -4,12 +4,12 @@
  import "@litegraph-ts/core/css/litegraph.css";
  import "./scss/global.scss";
 
- import { onMount } from 'svelte';
-
  export let app: ComfyAppState;
+ export let isMobile: boolean
 </script>
 
-<ComfyApp {app}/>
-
-<style>
-</style>
+{#if isMobile}
+    <div>Redirecting...</div>
+{:else}
+    <ComfyApp {app}/>
+{/if}

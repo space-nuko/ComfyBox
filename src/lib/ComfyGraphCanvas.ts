@@ -333,7 +333,8 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     /**
      * Handle keypress
      *
-     * Ctrl + M mute/unmute selected nodes
+     * Ctrl + M      mute/unmute selected nodes
+     * Ctrl + Space  open node searchbox
      */
     override processKey(e: KeyboardEvent): boolean | undefined {
         const res = super.processKey(e);
@@ -353,7 +354,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         }
 
         if (e.type == "keydown") {
-            // Ctrl + M mute/unmute
+            // Ctrl + M - mute/unmute
             if (e.keyCode == 77 && e.ctrlKey) {
                 if (this.selected_nodes) {
                     for (var i in this.selected_nodes) {
@@ -364,6 +365,21 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
                         }
                     }
                 }
+                block_default = true;
+            }
+            // Ctrl + Space - open node searchbox
+            else if (e.keyCode == 32 && e.ctrlKey) {
+                const event = new MouseEvent("click");
+                const searchBox = this.showSearchBox(event);
+                const rect = this.canvas.getBoundingClientRect();
+                const sbRect = searchBox.getBoundingClientRect();
+                const clientX = rect.left + rect.width / 2 - sbRect.width / 2;
+                const clientY = rect.top + rect.height / 2 - sbRect.height / 2
+                searchBox.style.left = `${clientX}px`;
+                searchBox.style.top = `${clientY}px`;
+                // TODO better API
+                event.initMouseEvent("click", true, true, window, 1, clientX, clientY, clientX, clientY, false, false, false, false, 0, null);
+                this.adjustMouseEvent(event);
                 block_default = true;
             }
         }

@@ -7,17 +7,6 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="theme-color" content="#2196f3">
     </head>
-    <script>
-     if(!window.location.search.substring(1) == "desktop=true") {
-         if (navigator.userAgent.match(/iPhone/i)
-             || navigator.userAgent.match(/iPad/i)
-             || navigator.userAgent.match(/Android/i)
-             || navigator.userAgent.match(/Blackberry/i)
-             || navigator.userAgent.match(/WebOs/i)) {
-             window.location.href = "/mobile/"
-         }
-     }
-    </script>
     <body>
         <div id="app-root"/>
         <script type="module" src='/src/main-desktop.ts'></script>

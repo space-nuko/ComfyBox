@@ -24,7 +24,12 @@ let changedOptions: Partial<Record<keyof ConfigState, [any, any]>> = {}
 
 function getBackendURL(): string {
     const state = get(store);
-    return `${window.location.protocol}//${state.comfyUIHostname}:${state.comfyUIPort}`
+    let hostname = state.comfyUIHostname
+    if (hostname === "localhost") {
+        // For dev use, assume same hostname as connected server
+        hostname = location.hostname;
+    }
+    return `${window.location.protocol}//${hostname}:${state.comfyUIPort}`
 }
 
 function canShowNotificationText(): boolean {

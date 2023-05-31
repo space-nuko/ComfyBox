@@ -211,7 +211,13 @@ export default class ComfyApp {
         this.lCanvas.allow_interaction = uiUnlocked;
 
         // await this.#invokeExtensionsAsync("init");
-        const defs = await this.api.getNodeDefs();
+        let defs;
+        try {
+            defs = await this.api.getNodeDefs();
+        }
+        catch (error) {
+            throw new Error(`Could not reach ComfyUI at ${this.api.getBackendUrl()}`);
+        }
         await this.registerNodes(defs);
 
         // Load previous workflow

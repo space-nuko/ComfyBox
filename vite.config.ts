@@ -55,6 +55,7 @@ export default defineConfig({
         },
     },
     build: {
+        minify: isProduction,
         sourcemap: true,
         rollupOptions: {
             input: {
