@@ -32,8 +32,8 @@
 
     {#if $workflowState.openedWorkflows}
         <List strong inset dividersIos class="components-list searchbar-found">
-            {#each $workflowState.openedWorkflows as workflow}
-                <ListItem link="/workflows/{workflow.id}/" transition="f7-cover" title={workflow.attrs.title || `Workflow: ${workflow.id}`}>
+            {#each $workflowState.openedWorkflows as workflow, i}
+                <ListItem link="/workflows/{i+1}/" transition="f7-cover" title={workflow.attrs.title || `Workflow: ${workflow.id}`}>
                     <svelte:fragment slot="media">
                         <div on:pointerdown={(e) => onClickDelete(workflow, e)}>
                             <XCircle width="1.5em" height="1.5em" />

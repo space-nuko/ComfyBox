@@ -34,7 +34,8 @@ function notifyf7(text: string, options: NotifyOptions) {
         text: text,
         closeOnClick: true,
         closeTimeout,
-        on
+        on,
+        icon: options.imageUrl
     });
     notification.open();
 }

@@ -9,7 +9,7 @@
  import { onMount } from "svelte";
  import GenToolbar from '../GenToolbar.svelte'
 
- export let workflowID: WorkflowInstID;
+ export let workflowIndex: number;
  export let app: ComfyApp
 
  let workflow: ComfyBoxWorkflow;
@@ -17,7 +17,13 @@
  let title = ""
 
  function onPageBeforeIn() {
-     $interfaceState.selectedWorkflowID = workflowID;
+     workflow = $workflowState.openedWorkflows[workflowIndex-1]
+     if (workflow) {
+         $interfaceState.selectedWorkflowID = workflow.id;
+     }
+     else {
+         $interfaceState.selectedWorkflowID = null;
+     }
      $interfaceState.showingWorkflow = true;
  }
 
@@ -25,14 +31,8 @@
      $interfaceState.showingWorkflow = false;
  }
 
- $: {
-     workflow = workflowState.getWorkflow(workflowID);
-     if (workflow) {
-         workflowState.setActiveWorkflow(app.lCanvas, workflow.id);
-     }
- }
  $: layoutState = workflow?.layout;
- $: title = workflow?.attrs?.title || `Workflow: ${workflowID}`;
+ $: title = workflow?.attrs?.title || `Workflow: ${workflow?.id || workflowIndex}`;
 
  $: if (layoutState && $layoutState.root) {
      root = $layoutState.root

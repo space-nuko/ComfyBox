@@ -16,6 +16,8 @@ export type InterfaceState = {
 
     selectedWorkflowID: WorkflowInstID | null
     showingWorkflow: boolean
+
+    isDarkMode: boolean
 }
 
 type InterfaceStateOps = {
@@ -34,7 +36,9 @@ const store: Writable<InterfaceState> = writable(
         isJumpingToNode: false,
 
         selectedWorkflowID: null,
-        showingWorkflow: false
+        showingWorkflow: false,
+
+        isDarkMode: false,
     })
 
 const debounceDrag = debounce(() => { store.update(s => { s.showIndicator = false; return s }) }, 1000)

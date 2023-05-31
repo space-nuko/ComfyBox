@@ -3,7 +3,7 @@
  import queueState from "$lib/stores/queueState";
  import workflowState, { ComfyBoxWorkflow } from "$lib/stores/workflowState";
  import { getNodeInfo } from "$lib/utils"
- import { Image, LayoutTextSidebarReverse } from "svelte-bootstrap-icons";
+ import { LayoutTextSidebarReverse, Image, Grid } from "svelte-bootstrap-icons";
 
  import { Link, Toolbar } from "framework7-svelte"
  import ProgressBar from "$lib/components/ProgressBar.svelte";
@@ -86,6 +86,7 @@
  let toolbarCount = 0;
  $: toolbarCount = $interfaceState.showingWorkflow ? 2 : 1;
 
+ const ICON_SIZE = "1.5rem";
 </script>
 
 <div class="bottom" style:--toolbarCount={toolbarCount}>
@@ -106,10 +107,16 @@
         {/if}
     </div>
 </div>
-<Toolbar bottom>
-    <Link transition="f7-dive" href="/about/">Tab 1</Link>
-    <Link transition="f7-dive" href={centerHref} tabLinkActive><Image /></Link>
-    <Link transition="f7-dive" href="/login/"><LayoutTextSidebarReverse /></Link>
+<Toolbar bottom tabbar color="blue" class={toolbarCount > 1 ? "hasGenToolbar" : ""}>
+    <Link transition="f7-dive" href="/about/">
+        <LayoutTextSidebarReverse width={ICON_SIZE} height={ICON_SIZE} />
+    </Link>
+    <Link transition="f7-dive" href={centerHref} tabLinkActive>
+        <Image width={ICON_SIZE} height={ICON_SIZE} />
+    </Link>
+    <Link transition="f7-dive" href="/login/">
+        <Grid width={ICON_SIZE} height={ICON_SIZE} />
+    </Link>
 </Toolbar>
 {#if $interfaceState.showIndicator}
     <Indicator value={$interfaceState.indicatorValue} />
@@ -118,6 +125,22 @@
 <style lang="scss">
  #comfy-file-input {
      display: none;
+ }
+
+ :global(.progressbar.color-blue) {
+     background: var(--neutral-400) !important;
+ }
+
+ :global(.dark .progressbar.color-blue) {
+     background: var(--neutral-500) !important;
+ }
+
+ :global(.dark .toolbar.color-blue) {
+     background: var(--neutral-800) !important;
+ }
+
+ :global(.dark .toolbar.color-blue.hasGenToolbar) {
+     border-top: 2px solid var(--neutral-600);
  }
 
  .bottom {
@@ -141,7 +164,8 @@
 
      .node-name {
          flex-grow: 1;
-         background-color: var(--secondary-300);
+         background-color: var(--comfy-node-name-background);
+         color: var(--comfy-node-name-foreground);
          padding: 0.2em;
          display: flex;
          justify-content: center;

@@ -77,11 +77,9 @@ body {
     --comfy-node-name-foreground: var(--body-text-color);
     --comfy-spinner-main-color: var(--neutral-600);
     --comfy-spinner-accent-color: var(--secondary-600);
-}
 
-.mobile {
-    --comfy-progress-bar-background: lightgrey;
-    --comfy-progress-bar-foreground: #B3D8A9
+    --f7-navbar-color: var(--body-text-color);
+    --f7-navbar-bg-color: var(--neutral-800);
 }
 
 @mixin square-button {

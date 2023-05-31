@@ -56,7 +56,16 @@
  let loading = true;
  let lastSize = Number.POSITIVE_INFINITY;
 
+ $: f7 && f7.setDarkMode($interfaceState.isDarkMode)
+
  onMount(async () => {
+     let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+     $interfaceState.isDarkMode = isDarkMode;
+
+     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+         $interfaceState.isDarkMode = event.matches;
+     });
+
      appSetupPromise = app.setup().then(() => {
          loading = false
      });
@@ -75,12 +84,12 @@
      })
  })
 
-     /*
-        Now we need to map components to routes.
-        We need to pass them along with the F7 app parameters to <App> component
-      */
+ /*
+    Now we need to map components to routes.
+    We need to pass them along with the F7 app parameters to <App> component
+  */
 
-     let f7params: Framework7Parameters = {
+ let f7params: Framework7Parameters = {
      routes: [
          {
              path: '/',
@@ -112,7 +121,7 @@
          //     }
          // },
          {
-             path: '/workflows/:workflowID/',
+             path: '/workflows/:workflowIndex/',
              component: WorkflowPage,
              options: {
                  props: { app }
@@ -135,7 +144,22 @@
          tapHold: true
      }
  }
+
+ let body;
+ const bindBody = (node) => (body = node);
+ function setDarkClass(isDark: boolean) {
+     if (!body)
+         return;
+     if (isDark) {
+         body.classList.add("dark");
+     } else {
+         body.classList.remove("dark");
+     }
+ };
+ $: setDarkClass($interfaceState.isDarkMode);
 </script>
+
+<svelte:body use:bindBody />
 
 <App theme="auto" name="ComfyBox" {...f7params}>
     {#if appSetupPromise}
@@ -159,7 +183,7 @@
                     <GenToolbar {app} />
                 {/if}
             </View>
-        {:catch error}
+    {:catch error}
             <div class="comfy-loading-error">
                 <div>
                     Error loading app

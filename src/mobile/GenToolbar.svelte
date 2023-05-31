@@ -102,4 +102,8 @@
  #comfy-file-input {
      display: none;
  }
+
+ :global(.dark .toolbar.color-red) {
+     background: var(--neutral-700) !important;
+ }
 </style>
