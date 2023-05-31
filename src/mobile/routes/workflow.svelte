@@ -4,25 +4,38 @@
  import type ComfyApp from "$lib/components/ComfyApp";
  import { writable, type Writable } from "svelte/store";
  import type { WritableLayoutStateStore } from "$lib/stores/layoutStates";
- import workflowState, { type ComfyBoxWorkflow } from "$lib/stores/workflowState";
+ import workflowState, { type ComfyBoxWorkflow, type WorkflowInstID } from "$lib/stores/workflowState";
 
- export let subworkflowID: number = -1;
+ export let workflowID: WorkflowInstID;
  export let app: ComfyApp
 
- // TODO move
- let workflow: ComfyBoxWorkflow | null = null
- let layoutState: WritableLayoutStateStore | null = null;
+ let workflow: ComfyBoxWorkflow;
+ let root: IDragItem | null;
+ let title = ""
 
- $: workflow = $workflowState.activeWorkflow;
- $: layoutState = workflow ? workflow.layout : null;
+ $: workflow = workflowState.getWorkflow(workflowID);
+ $: layoutState = workflow?.layout;
+ $: title = workflow?.attrs?.title || `Workflow: ${workflowID}`;
+
+ $: if (layoutState && $layoutState.root) {
+     root = $layoutState.root
+ } else {
+     root = null;
+ }
 </script>
 
-<Page name="subworkflow">
-    <Navbar title="Workflow {subworkflowID}" backLink="Back" />
+<Page name="workflow">
+    <Navbar title="{title}" backLink="Back" />
 
-    {#if layoutState}
-        <div class="container">
-            <WidgetContainer bind:dragItem={$layoutState.root} {layoutState} isMobile={true} classes={["root-container", "mobile"]} />
+    {#if workflow}
+        {#if root}
+            <div class="container">
+                <WidgetContainer bind:dragItem={root} isMobile={true} classes={["root-container"]} {layoutState} />
+            </div>
+        {/if}
+    {:else}
+        <div>
+            Workflow not found.
         </div>
     {/if}
 </Page>

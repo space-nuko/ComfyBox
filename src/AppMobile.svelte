@@ -2,7 +2,7 @@
  import { onMount } from "svelte";
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
 
- import { App, View } from "framework7-svelte"
+ import { App, View, Preloader } from "framework7-svelte"
 
  import { f7, f7ready } from 'framework7-svelte';
 
@@ -15,8 +15,7 @@
  import AboutPage from './mobile/routes/about.svelte';
  import LoginPage from './mobile/routes/login.svelte';
  import GraphPage from './mobile/routes/graph.svelte';
- import ListSubWorkflowsPage from './mobile/routes/list-subworkflows.svelte';
- import SubWorkflowPage from './mobile/routes/subworkflow.svelte';
+ import WorkflowPage from './mobile/routes/workflow.svelte';
  import type { Framework7Parameters, Modal } from "framework7/types";
 
  export let app: ComfyApp;
@@ -51,18 +50,35 @@
      }
  }
 
+ let appSetupPromise: Promise<void> = null;
+ let loading = true;
+ let lastSize = Number.POSITIVE_INFINITY;
+
  onMount(async () => {
-     await app.setup();
+     appSetupPromise = app.setup().then(() => {
+         loading = false
+     });
      window.addEventListener("backbutton", onBackKeyDown, false);
      window.addEventListener("popstate", onBackKeyDown, false);
- });
 
- /*
-    Now we need to map components to routes.
-    We need to pass them along with the F7 app parameters to <App> component
-  */
+     // Blur any input elements when the virtual keyboard closes
+     // Otherwise tapping on other input events can refocus the input from way
+     // off the screen
+     window.visualViewport.addEventListener("resize", function(e) {
+         if (e.target.height > lastSize) {
+             // Assume keyboard was hidden
+             (document.activeElement as HTMLElement)?.blur();
+         }
+         lastSize = e.target.height
+     })
+ })
 
- let f7params: Framework7Parameters = {
+     /*
+        Now we need to map components to routes.
+        We need to pass them along with the F7 app parameters to <App> component
+      */
+
+     let f7params: Framework7Parameters = {
      routes: [
          {
              path: '/',
@@ -79,23 +95,16 @@
              path: '/login/',
              component: LoginPage,
          },
+         // {
+         //     path: '/graph/',
+         //     component: GraphPage,
+         //     options: {
+         //         props: { app }
+         //     }
+         // },
          {
-             path: '/graph/',
-             component: GraphPage,
-             options: {
-                 props: { app }
-             }
-         },
-         {
-             path: '/subworkflows/',
-             component: ListSubWorkflowsPage,
-             options: {
-                 props: { app }
-             }
-         },
-         {
-             path: '/subworkflows/:subworkflowID/',
-             component: SubWorkflowPage,
+             path: '/workflows/:workflowID/',
+             component: WorkflowPage,
              options: {
                  props: { app }
              }
@@ -113,23 +122,72 @@
      actions: {
          closeOnEscape: true,
      },
+     touch: {
+         tapHold: true
+     }
  }
 </script>
 
-{#if app}
-    <App theme="auto" name="ComfyBox" {...f7params}>
-        <View
-            url="/"
-            main={true}
-            class="safe-areas"
-            masterDetailBreakpoint={768},
-            browserHistory=true,
-            browserHistoryRoot="/mobile/"
-        >
-            <GenToolbar {app} />
-        </View>
-    </App>
-    <div class="canvas-wrapper pane-wrapper" style="display: none">
-        <canvas id="graph-canvas" />
-    </div>
-{/if}
+<App theme="auto" name="ComfyBox" {...f7params}>
+    {#if appSetupPromise}
+        {#await appSetupPromise}
+            <div class="comfy-app-loading">
+                <div>
+                    <Preloader color="blue" size={100} />
+                </div>
+            </div>
+        {:then}
+            <View
+                url="/"
+                main={true}
+                class="safe-areas"
+                masterDetailBreakpoint={768},
+                browserHistory=true,
+                browserHistoryRoot="/mobile/"
+            >
+                <GenToolbar {app} />
+            </View>
+        {:catch error}
+            <div class="comfy-loading-error">
+                <div>
+                    Error loading app
+                </div>
+                <div>{error}</div>
+                {#if error != null && error.stack}
+                    {@const lines = error.stack.split("\n")}
+                    {#each lines as line}
+                        <div style:font-size="16px">{line}</div>
+                    {/each}
+                {/if}
+            </div>
+        {/await}
+    {/if}
+</App>
+<div class="canvas-wrapper pane-wrapper" style="display: none">
+    <canvas id="graph-canvas" />
+</div>
+
+<style lang="scss">
+ .comfy-app-loading, .comfy-loading-error {
+     font-size: 40px;
+     color: var(--body-text-color);
+     justify-content: center;
+     margin: auto;
+     width: 100%;
+     height: 100%;
+     text-align: center;
+     flex-direction: column;
+     display: flex;
+     position: absolute;
+     z-index: 100000000;
+     pointer-events: none;
+     user-select: none;
+     top: 0px;
+ }
+
+ .comfy-app-loading > span {
+     display: flex;
+     flex-direction: row;
+     justify-content: center;
+ }
+</style>

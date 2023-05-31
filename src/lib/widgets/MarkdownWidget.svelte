@@ -5,7 +5,7 @@
  import type { ComfyMarkdownNode } from "$lib/nodes/widgets";
  import SvelteMarkdown from "@dogagenc/svelte-markdown"
  import NullMarkdownRenderer from "./markdown/NullMarkdownRenderer.svelte"
-	import { SvelteComponentDev } from "svelte/internal";
+ import { SvelteComponentDev } from "svelte/internal";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -69,7 +69,7 @@
  }
 
  /* headings
- –––––––––––––––––––––––––––––––––––––––––––––––––– */
+    –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
  .prose h1,
  .prose h2,
@@ -107,7 +107,7 @@
  }
 
  /* lists
- –––––––––––––––––––––––––––––––––––––––––––––––––– */
+    –––––––––––––––––––––––––––––––––––––––––––––––––– */
  .prose ul {
      list-style: circle inside;
  }
@@ -136,7 +136,7 @@
  }
 
  /* code
- –––––––––––––––––––––––––––––––––––––––––––––––––– */
+    –––––––––––––––––––––––––––––––––––––––––––––––––– */
  .prose code {
      border: 1px solid var(--border-color-primary);
      border-radius: var(--radius-sm);
@@ -153,7 +153,7 @@
  }
 
  /* tables
- –––––––––––––––––––––––––––––––––––––––––––––––––– */
+    –––––––––––––––––––––––––––––––––––––––––––––––––– */
  .prose th,
  .prose td {
      border-bottom: 1px solid #e1e1e1;
@@ -170,7 +170,7 @@
  }
 
  /* spacing
- –––––––––––––––––––––––––––––––––––––––––––––––––– */
+    –––––––––––––––––––––––––––––––––––––––––––––––––– */
  .prose button,
  .prose .button {
      margin-bottom: var(--spacing-sm);
@@ -194,7 +194,7 @@
  }
 
  /* links
- –––––––––––––––––––––––––––––––––––––––––––––––––– */
+    –––––––––––––––––––––––––––––––––––––––––––––––––– */
  .prose a {
      color: var(--link-text-color);
      text-decoration: underline;
@@ -212,7 +212,7 @@
  }
 
  /* misc
- –––––––––––––––––––––––––––––––––––––––––––––––––– */
+    –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
  .prose hr {
      margin-top: 3em;

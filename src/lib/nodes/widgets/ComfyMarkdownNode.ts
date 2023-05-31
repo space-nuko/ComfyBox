@@ -42,6 +42,7 @@ export default class ComfyMarkdownNode extends ComfyWidgetNode<string> {
             },
             {
                 multiline: true,
+
                 inputStyle: { fontFamily: "monospace" }
             }
         )

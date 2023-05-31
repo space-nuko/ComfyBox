@@ -6,6 +6,7 @@
 
  import { Link, Toolbar } from "framework7-svelte"
  import ProgressBar from "$lib/components/ProgressBar.svelte";
+ import Progressbar from "$lib/components/f7/progressbar.svelte";
 	import Indicator from "./Indicator.svelte";
 	import interfaceState from "$lib/stores/interfaceState";
 	import type { WritableLayoutStateStore } from "$lib/stores/layoutStates";
@@ -53,29 +54,50 @@
      navigator.vibrate(20)
      app.saveStateToLocalStorage();
  }
+
+ let queued: false;
+ $: queued = Boolean($queueState.runningNodeID || $queueState.progress)
+
+ let running = false;
+ $: running = typeof $queueState.queueRemaining === "number" && $queueState.queueRemaining > 0;
+
+ let progress;
+ $: progress = $queueState.progress
+
+ let progressPercent = 0
+ let progressText = ""
+ $: if (progress) {
+     progressPercent = (progress.value / progress.max) * 100;
+     progressText = progressPercent.toFixed(1) + "%";
+ } else {
+     progressPercent = 0
+     progressText = "??.?%"
+ }
+
 </script>
 
 <div class="bottom">
-    {#if $queueState.runningNodeID || $queueState.progress}
-        <div class="node-name">
-            <span>Node: {getNodeInfo($queueState.runningNodeID)}</span>
-        </div>
-        <div class="progress-bar">
-            <ProgressBar value={$queueState.progress?.value} max={$queueState.progress?.max} />
-        </div>
-    {/if}
-    {#if typeof $queueState.queueRemaining === "number" && $queueState.queueRemaining > 0}
-        <div class="queue-remaining in-progress">
-            <div>
-                Queued prompts: {$queueState.queueRemaining}.
+    <div class="bars">
+        {#if queued}
+            <div class="node-name">
+                <span>Node: {getNodeInfo($queueState.runningNodeID)} ({progressText})</span>
             </div>
-        </div>
-    {/if}
+        {/if}
+    </div>
+    <div class="wrapper">
+        {#if queued}
+            {#if progress}
+                <Progressbar color="blue" progress={progressPercent} />
+            {:else if running}
+                <Progressbar color="blue" infinite />
+            {/if}
+        {/if}
+    </div>
 </div>
 <Toolbar bottom>
     {#if workflow != null && workflow.attrs.queuePromptButtonName != ""}
         <Link on:click={queuePrompt}>
-            {workflow.attrs.queuePromptButtonName}
+        {workflow.attrs.queuePromptButtonName}
         </Link>
     {/if}
     <Link on:click={refreshCombos}>🔄</Link>
@@ -94,19 +116,26 @@
  }
 
  .bottom {
-     display: flex;
-     flex-direction: row;
      position: absolute;
      text-align: center;
      width: 100%;
-     height: 2rem;
-     bottom: calc(var(--f7-toolbar-height) + var(--f7-safe-area-bottom));
+     font-size: 13pt;
+     bottom: calc(var(--f7-toolbar-height));
      z-index: var(--layer-top);
-     background-color: grey;
+ }
+
+ .bars {
+     display: flex;
+     flex-direction: row;
+
+     .bars {
+         display: flex;
+         flex-direction: row;
+     }
 
      .node-name {
          flex-grow: 1;
-         background-color: var(--color-red-300);
+         background-color: var(--secondary-300);
          padding: 0.2em;
          display: flex;
          justify-content: center;
