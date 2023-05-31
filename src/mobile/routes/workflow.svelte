@@ -1,10 +1,13 @@
 <script lang="ts">
- import { Page, Navbar, Link, BlockTitle, Block, List, ListItem, Toolbar } from "framework7-svelte"
+ import { Page, Navbar, Tabs, Tab, NavLeft, NavTitle, NavRight, Link } from "framework7-svelte"
  import WidgetContainer from "$lib/components/WidgetContainer.svelte";
  import type ComfyApp from "$lib/components/ComfyApp";
  import { writable, type Writable } from "svelte/store";
- import type { WritableLayoutStateStore } from "$lib/stores/layoutStates";
+ import type { IDragItem, WritableLayoutStateStore } from "$lib/stores/layoutStates";
  import workflowState, { type ComfyBoxWorkflow, type WorkflowInstID } from "$lib/stores/workflowState";
+ import interfaceState from "$lib/stores/interfaceState";
+ import { onMount } from "svelte";
+ import GenToolbar from '../GenToolbar.svelte'
 
  export let workflowID: WorkflowInstID;
  export let app: ComfyApp
@@ -13,7 +16,21 @@
  let root: IDragItem | null;
  let title = ""
 
- $: workflow = workflowState.getWorkflow(workflowID);
+ function onPageBeforeIn() {
+     $interfaceState.selectedWorkflowID = workflowID;
+     $interfaceState.showingWorkflow = true;
+ }
+
+ function onPageBeforeOut() {
+     $interfaceState.showingWorkflow = false;
+ }
+
+ $: {
+     workflow = workflowState.getWorkflow(workflowID);
+     if (workflow) {
+         workflowState.setActiveWorkflow(app.lCanvas, workflow.id);
+     }
+ }
  $: layoutState = workflow?.layout;
  $: title = workflow?.attrs?.title || `Workflow: ${workflowID}`;
 
@@ -24,8 +41,17 @@
  }
 </script>
 
-<Page name="workflow">
-    <Navbar title="{title}" backLink="Back" />
+<Page name="workflow" style="--f7-page-toolbar-bottom-offset: calc(var(--f7-toolbar-height) * 2)"
+      on:pageBeforeIn={onPageBeforeIn}
+      on:pageBeforeOut={onPageBeforeOut}
+>
+    <Navbar>
+        <NavLeft backLink="Back" backLinkUrl="/workflows/" backLinkForce={true}></NavLeft>
+        <NavTitle>{title}</NavTitle>
+        <NavRight>
+            <Link icon="icon-bars" panelOpen="right"></Link>
+        </NavRight>
+    </Navbar>
 
     {#if workflow}
         {#if root}

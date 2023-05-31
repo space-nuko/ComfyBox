@@ -83,23 +83,85 @@
      centerHref = "/workflows/";
  }
 
+ let toolbarCount = 0;
+ $: toolbarCount = $interfaceState.showingWorkflow ? 2 : 1;
+
 </script>
 
-<Toolbar bottom color="red" style="bottom: calc(var(--f7-toolbar-height))">
-    {#if workflow != null && workflow.attrs.queuePromptButtonName != ""}
-        <Link on:click={queuePrompt}>
-        {workflow.attrs.queuePromptButtonName}
-    </Link>
-    {/if}
-    <Link on:click={refreshCombos}>🔄</Link>
-    <Link on:click={doSave}>Save</Link>
-    <Link on:click={doSaveLocal}>Save Local</Link>
-    <Link on:click={doLoad}>Load</Link>
-    <input bind:this={fileInput} id="comfy-file-input" type="file" accept=".json" on:change={loadWorkflow} />
+<div class="bottom" style:--toolbarCount={toolbarCount}>
+    <div class="bars">
+        {#if queued}
+            <div class="node-name">
+                <span>Node: {getNodeInfo($queueState.runningNodeID)} ({progressText})</span>
+            </div>
+        {/if}
+    </div>
+    <div class="wrapper">
+        {#if queued}
+            {#if progress}
+                <Progressbar color="blue" progress={progressPercent} />
+            {:else if running}
+                <Progressbar color="blue" infinite />
+            {/if}
+        {/if}
+    </div>
+</div>
+<Toolbar bottom>
+    <Link transition="f7-dive" href="/about/">Tab 1</Link>
+    <Link transition="f7-dive" href={centerHref} tabLinkActive><Image /></Link>
+    <Link transition="f7-dive" href="/login/"><LayoutTextSidebarReverse /></Link>
 </Toolbar>
+{#if $interfaceState.showIndicator}
+    <Indicator value={$interfaceState.indicatorValue} />
+{/if}
 
 <style lang="scss">
  #comfy-file-input {
      display: none;
+ }
+
+ .bottom {
+     --toolbarCount: 1;
+     position: absolute;
+     text-align: center;
+     width: 100%;
+     font-size: 13pt;
+     bottom: calc(var(--f7-toolbar-height) * var(--toolbarCount));
+     z-index: var(--layer-top);
+ }
+
+ .bars {
+     display: flex;
+     flex-direction: row;
+
+     .bars {
+         display: flex;
+         flex-direction: row;
+     }
+
+     .node-name {
+         flex-grow: 1;
+         background-color: var(--secondary-300);
+         padding: 0.2em;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+     }
+
+     .progress-bar {
+         flex-grow: 10;
+         background-color: var(--color-red-300);
+         display: flex;
+         justify-content: center;
+         align-items: center;
+     }
+
+     .queue-remaining {
+         flex-grow: 1;
+         padding: 0.2em;
+         &.in-progress {
+             background-color: var(--secondary-300);
+         }
+     }
  }
 </style>

@@ -1,6 +1,7 @@
 import { debounce } from '$lib/utils';
 import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
+import type { WorkflowInstID } from './workflowState';
 
 export type InterfaceState = {
     // Show a large indicator of the currently editing number value for mobile
@@ -10,8 +11,11 @@ export type InterfaceState = {
     showIndicator: boolean,
     indicatorValue: any,
 
-    graphTransitioning: boolean
-    isJumpingToNode: boolean
+    graphTransitioning: boolean,
+    isJumpingToNode: boolean,
+
+    selectedWorkflowID: WorkflowInstID | null
+    showingWorkflow: boolean
 }
 
 type InterfaceStateOps = {
@@ -28,6 +32,9 @@ const store: Writable<InterfaceState> = writable(
 
         graphTransitioning: false,
         isJumpingToNode: false,
+
+        selectedWorkflowID: null,
+        showingWorkflow: false
     })
 
 const debounceDrag = debounce(() => { store.update(s => { s.showIndicator = false; return s }) }, 1000)

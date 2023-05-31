@@ -9,14 +9,16 @@
  import "framework7/css/bundle"
  import "./scss/global.scss";
 
+ import MainToolbar from './mobile/MainToolbar.svelte'
  import GenToolbar from './mobile/GenToolbar.svelte'
 
- import HomePage from './mobile/routes/home.svelte';
+ import WorkflowsPage from './mobile/routes/workflows.svelte';
  import AboutPage from './mobile/routes/about.svelte';
  import LoginPage from './mobile/routes/login.svelte';
  import GraphPage from './mobile/routes/graph.svelte';
  import WorkflowPage from './mobile/routes/workflow.svelte';
  import type { Framework7Parameters, Modal } from "framework7/types";
+ import interfaceState from "$lib/stores/interfaceState";
 
  export let app: ComfyApp;
 
@@ -82,7 +84,14 @@
      routes: [
          {
              path: '/',
-             component: HomePage,
+             component: WorkflowsPage,
+             options: {
+                 props: { app }
+             }
+         },
+         {
+             path: '/workflows',
+             component: WorkflowsPage,
              options: {
                  props: { app }
              }
@@ -138,14 +147,17 @@
             </div>
         {:then}
             <View
-                url="/"
+                url="/workflows/"
                 main={true}
                 class="safe-areas"
                 masterDetailBreakpoint={768},
                 browserHistory=true,
                 browserHistoryRoot="/mobile/"
             >
-                <GenToolbar {app} />
+                <MainToolbar {app} />
+                {#if $interfaceState.selectedWorkflowID && $interfaceState.showingWorkflow}
+                    <GenToolbar {app} />
+                {/if}
             </View>
         {:catch error}
             <div class="comfy-loading-error">
