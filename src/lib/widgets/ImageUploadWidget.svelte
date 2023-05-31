@@ -52,10 +52,17 @@
  };
 
  let hasImage = false;
-
  $: hasImage = $nodeValue && $nodeValue.length > 0;
  $: if (!hasImage) {
      editMask = false;
+ }
+
+ let mask: ComfyImageLocation | null;
+ $: if (hasImage && canMask) {
+     mask = $nodeValue[0].children?.find(i => i.tags.includes("mask"))?.comfyUIFile;
+ }
+ else {
+     mask = null;
  }
 
  const MASK_FILENAME: string = "ComfyBoxMask.png"
@@ -122,6 +129,7 @@
          // TODO other child image types preserved here?
          image.children = [];
      }
+     mask = null;
      if (maskCanvasComp) {
          maskCanvasComp.clearStrokes();
      }
@@ -232,6 +240,7 @@
                 <ImageUpload value={_value}
                              bind:imgWidth={$imgWidth}
                              bind:imgHeight={$imgHeight}
+                             {mask}
                              fileCount={"single"}
                              elem_classes={[]}
                              style={""}

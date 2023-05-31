@@ -106,13 +106,18 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         this.value = writable(value)
         this.color ||= color.color
         this.bgColor ||= color.bgColor
-        this.displayWidget = this.addWidget<ITextWidget>(
+        this.displayWidget = this.createDisplayWidget();
+        this.unsubscribe = this.value.subscribe(this.onValueUpdated.bind(this))
+    }
+
+    protected createDisplayWidget(): ITextWidget {
+        const widget = this.addWidget<ITextWidget>(
             "text",
             "Value",
             ""
-        );
-        this.displayWidget.disabled = true; // prevent editing
-        this.unsubscribe = this.value.subscribe(this.onValueUpdated.bind(this))
+        )
+        widget.disabled = true; // prevent editing
+        return widget;
     }
 
     addPropertyAsOutput(propertyName: string, type: string) {
