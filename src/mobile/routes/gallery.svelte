@@ -1,5 +1,5 @@
 <script lang="ts">
- import { Page, Navbar, Tabs, Tab, NavLeft, NavTitle, NavRight, Link } from "framework7-svelte"
+ import { Page, Navbar, Block, Tabs, Tab, NavLeft, NavTitle, NavRight, Link } from "framework7-svelte"
  import WidgetContainer from "$lib/components/WidgetContainer.svelte";
  import type ComfyApp from "$lib/components/ComfyApp";
  import { writable, type Writable } from "svelte/store";
@@ -12,6 +12,34 @@
 
 <Page name="gallery">
     <Navbar title="Gallery" />
+
+    <Block>
+        <div class="grid grid-cols-3 grid-gap">
+            <div>3 cols</div>
+            <div>3 cols</div>
+            <div>3 cols</div>
+        </div>
+        <div class="grid grid-cols-3 grid-gap">
+            <div>3 cols</div>
+            <div>3 cols</div>
+            <div>3 cols</div>
+        </div>
+        <div class="grid grid-cols-3 grid-gap">
+            <div>3 cols</div>
+            <div>3 cols</div>
+            <div>3 cols</div>
+        </div>
+        <div class="grid grid-cols-3 grid-gap">
+            <div>3 cols</div>
+            <div>3 cols</div>
+            <div>3 cols</div>
+        </div>
+        <div class="grid grid-cols-3 grid-gap">
+            <div>3 cols</div>
+            <div>3 cols</div>
+            <div>3 cols</div>
+        </div>
+    </Block>
 </Page>
 
 <style lang="scss">

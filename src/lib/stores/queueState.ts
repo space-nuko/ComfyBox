@@ -8,6 +8,7 @@ import { get, writable, type Writable } from "svelte/store";
 import { v4 as uuidv4 } from "uuid";
 import workflowState, { type WorkflowError, type WorkflowExecutionError, type WorkflowInstID, type WorkflowValidationError } from "./workflowState";
 import configState from "./configState";
+import uiQueueState from "./uiQueueState";
 
 export type QueueEntryStatus = "success" | "validation_failed" | "error" | "interrupted" | "all_cached" | "unknown";
 
