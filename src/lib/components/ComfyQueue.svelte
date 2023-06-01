@@ -30,6 +30,7 @@
  import ComfyQueueListDisplay from "./ComfyQueueListDisplay.svelte";
  import ComfyQueueGridDisplay from "./ComfyQueueGridDisplay.svelte";
 	import { WORKFLOWS_VIEW } from "./ComfyBoxWorkflowsView.svelte";
+	import uiQueueState from "$lib/stores/uiQueueState";
 
  export let app: ComfyApp;
 
@@ -52,46 +53,34 @@
  let displayMode: DisplayModeType = "list";
  let imageSize: number = 40;
  let gridColumns: number = 3;
- let changed = true;
 
  function switchMode(newMode: QueueItemType) {
-     changed = mode !== newMode
+     const changed = mode !== newMode
      mode = newMode
      if (changed) {
-         _queuedEntries = []
-         _runningEntries = []
-         _entries = []
+         uiQueueState.updateEntries();
      }
  }
 
  function switchDisplayMode(newDisplayMode: DisplayModeType) {
-     // changed = displayMode !== newDisplayMode
      displayMode = newDisplayMode
-     // if (changed) {
-     //     _queuedEntries = []
-     //     _runningEntries = []
-     //     _entries = []
-     // }
  }
 
- let _queuedEntries: QueueUIEntry[] = []
- let _runningEntries: QueueUIEntry[] = []
- let _entries: QueueUIEntry[] = []
-
- $: if (mode === "queue" && (changed || $queuePending.length != _queuedEntries.length || $queueRunning.length != _runningEntries.length)) {
+ let _entries: ReadonlyArray<QueueUIEntry> = []
+ $: if(mode === "queue") {
+     _entries = $uiQueueState.queueUIEntries
      updateFromQueue();
-     changed = false;
  }
- else if (mode === "history" && (changed || $queueCompleted.length != _entries.length)) {
+ else {
+     _entries = $uiQueueState.historyUIEntries;
      updateFromHistory();
-     changed = false;
  }
 
  $: if (mode === "queue" && !$queuePending && !$queueRunning) {
-     _queuedEntries = []
-     _runningEntries = []
-     _entries = [];
-     changed = true
+     uiQueueState.clearQueue();
+ }
+ else if (mode === "history" && !$queueCompleted) {
+     uiQueueState.clearHistory();
  }
 
  async function deleteEntry(entry: QueueUIEntry, event: MouseEvent) {
@@ -106,125 +95,26 @@
          await app.deleteQueueItem(mode, entry.entry.promptID);
      }
 
-     if (mode === "queue") {
-         _queuedEntries = []
-         _runningEntries = []
-     }
-
-     _entries = [];
-     changed = true;
+     uiQueueState.updateEntries(true)
  }
 
  async function clearQueue() {
      await app.clearQueue(mode);
-
-     if (mode === "queue") {
-         _queuedEntries = []
-         _runningEntries = []
-     }
-
-     _entries = [];
-     changed = true;
- }
-
- function formatDate(date: Date): string {
-     const time = date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-     const day = date.toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(',', '');
-     return [time, day].join(", ")
- }
-
- function convertEntry(entry: QueueEntry, status: QueueUIEntryStatus): QueueUIEntry {
-     let date = entry.finishedAt || entry.queuedAt;
-     let dateStr = null;
-     if (date) {
-         dateStr = formatDate(date);
-     }
-
-     const subgraphs: string[] | null = entry.extraData?.extra_pnginfo?.comfyBoxPrompt?.subgraphs;
-
-     let message = "Prompt";
-     if (entry.extraData?.workflowTitle != null) {
-         message = `${entry.extraData.workflowTitle}`
-     }
-
-     if (subgraphs && subgraphs.length > 0) {
-         const subgraphsString = subgraphs.join(', ')
-         message += ` (${subgraphsString})`
-     }
-
-     let submessage = `Nodes: ${Object.keys(entry.prompt).length}`
-
-     if (Object.keys(entry.outputs).length > 0) {
-         const imageCount = Object.values(entry.outputs).filter(o => o.images).flatMap(o => o.images).length
-         submessage = `Images: ${imageCount}`
-     }
-
-     return {
-         entry,
-         message,
-         submessage,
-         date: dateStr,
-         status,
-         images: []
-     }
- }
-
- function convertPendingEntry(entry: QueueEntry, status: QueueUIEntryStatus): QueueUIEntry {
-     const result = convertEntry(entry, status);
-
-     const thumbnails = entry.extraData?.thumbnails
-     if (thumbnails) {
-         result.images = thumbnails.map(convertComfyOutputToComfyURL);
-     }
-
-     const outputs = Object.values(entry.outputs)
-                           .filter(o => o.images)
-                           .flatMap(o => o.images)
-                           .map(convertComfyOutputToComfyURL);
-     if (outputs) {
-         result.images = result.images.concat(outputs)
-     }
-
-     return result;
- }
-
- function convertCompletedEntry(entry: CompletedQueueEntry): QueueUIEntry {
-     const result = convertEntry(entry.entry, entry.status);
-
-     const images = Object.values(entry.entry.outputs)
-                          .filter(o => o.images)
-                          .flatMap(o => o.images)
-                          .map(convertComfyOutputToComfyURL);
-     result.images = images
-
-     if (entry.message)
-         result.submessage = entry.message
-     else if (entry.status === "interrupted" || entry.status === "all_cached")
-         result.submessage = "Prompt was interrupted."
-     if (entry.error)
-         result.error = entry.error
-
-     return result;
+     uiQueueState.updateEntries(true)
  }
 
  async function updateFromQueue() {
-     // newest entries appear at the top
-     _queuedEntries = $queuePending.map((e) => convertPendingEntry(e, "pending")).reverse();
-     _runningEntries = $queueRunning.map((e) => convertPendingEntry(e, "running")).reverse();
-     _entries = [..._queuedEntries, ..._runningEntries]
      if (queueList) {
          await tick(); // Wait for list size to be recalculated
          queueList.scroll({ top: queueList.scrollHeight })
      }
-     console.warn("[ComfyQueue] BUILDQUEUE", _entries.length, $queuePending.length, $queueRunning.length)
  }
 
  async function updateFromHistory() {
-     _entries = $queueCompleted.map(convertCompletedEntry).reverse();
      if (queueList) {
+         await tick(); // Wait for list size to be recalculated
          queueList.scrollTo(0, 0);
      }
-     console.warn("[ComfyQueue] BUILDHISTORY", _entries.length, $queueCompleted.length)
  }
 
  async function interrupt() {

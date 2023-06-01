@@ -2,6 +2,9 @@ import type ComfyGraphCanvas from "$lib/ComfyGraphCanvas";
 import { type ContainerLayout, type IDragItem, type TemplateLayout, type WritableLayoutStateStore } from "$lib/stores/layoutStates"
 import type { LGraphCanvas, Vector2 } from "@litegraph-ts/core";
 import { get } from "svelte/store";
+import { PhotoBrowser, f7 } from "framework7-svelte";
+import { ImageViewer } from "$lib/ImageViewer";
+import interfaceState from "$lib/stores/interfaceState";
 
 export function handleContainerConsider(layoutState: WritableLayoutStateStore, container: ContainerLayout, evt: CustomEvent<DndEvent<IDragItem>>): IDragItem[] {
     return layoutState.updateChildren(container, evt.detail.items)
@@ -44,4 +47,26 @@ function doInsertTemplate(layoutState: WritableLayoutStateStore, droppedTemplate
     canvas.insertTemplate(droppedTemplate.template, newPos, container, templateItemIndex);
 
     return get(layoutState).allItems[container.id].children;
+}
+
+let mobileLightbox = null;
+
+export function showMobileLightbox(images: any[], selectedImage: number, options: Partial<PhotoBrowser["params"]> = {}) {
+    if (!f7)
+        return
+
+    if (mobileLightbox) {
+        mobileLightbox.destroy();
+        mobileLightbox = null;
+    }
+
+    history.pushState({ type: "gallery" }, "");
+
+    mobileLightbox = f7.photoBrowser.create({
+        photos: images,
+        theme: get(interfaceState).isDarkMode ? "dark" : "light",
+        type: 'popup',
+        ...options
+    });
+    mobileLightbox.open(selectedImage)
 }

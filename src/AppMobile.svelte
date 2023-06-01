@@ -2,22 +2,22 @@
  import { onMount } from "svelte";
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
 
- import { App, View } from "framework7-svelte"
+ import { App, View, Preloader } from "framework7-svelte"
 
  import { f7, f7ready } from 'framework7-svelte';
 
  import "framework7/css/bundle"
  import "./scss/global.scss";
 
+ import MainToolbar from './mobile/MainToolbar.svelte'
  import GenToolbar from './mobile/GenToolbar.svelte'
 
- import HomePage from './mobile/routes/home.svelte';
- import AboutPage from './mobile/routes/about.svelte';
- import LoginPage from './mobile/routes/login.svelte';
- import GraphPage from './mobile/routes/graph.svelte';
- import ListSubWorkflowsPage from './mobile/routes/list-subworkflows.svelte';
- import SubWorkflowPage from './mobile/routes/subworkflow.svelte';
+ import WorkflowsPage from './mobile/routes/workflows.svelte';
+ import QueuePage from './mobile/routes/queue.svelte';
+ import GalleryPage from './mobile/routes/gallery.svelte';
+ import WorkflowPage from './mobile/routes/workflow.svelte';
  import type { Framework7Parameters, Modal } from "framework7/types";
+ import interfaceState from "$lib/stores/interfaceState";
 
  export let app: ComfyApp;
 
@@ -51,11 +51,40 @@
      }
  }
 
+ let appSetupPromise: Promise<void> = null;
+ let loading = true;
+ let lastSize = Number.POSITIVE_INFINITY;
+
+ $: f7 && f7.setDarkMode($interfaceState.isDarkMode)
+
  onMount(async () => {
-     await app.setup();
+     // let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+     $interfaceState.isDarkMode = true;
+
+     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+         $interfaceState.isDarkMode = event.matches;
+     });
+
+     appSetupPromise = app.setup().then(() => {
+         // Autosave every minute
+         setInterval(() => app.saveStateToLocalStorage(false), 60 * 1000)
+         loading = false
+     });
+
      window.addEventListener("backbutton", onBackKeyDown, false);
      window.addEventListener("popstate", onBackKeyDown, false);
- });
+
+     // Blur any input elements when the virtual keyboard closes
+     // Otherwise tapping on other input events can refocus the input from way
+     // off the screen
+     window.visualViewport.addEventListener("resize", function(e) {
+         if (e.target.height > lastSize) {
+             // Assume keyboard was hidden
+             (document.activeElement as HTMLElement)?.blur();
+         }
+         lastSize = e.target.height
+     })
+ })
 
  /*
     Now we need to map components to routes.
@@ -66,36 +95,42 @@
      routes: [
          {
              path: '/',
-             component: HomePage,
+             component: WorkflowsPage,
              options: {
                  props: { app }
              }
          },
          {
-             path: '/about/',
-             component: AboutPage,
-         },
-         {
-             path: '/login/',
-             component: LoginPage,
-         },
-         {
-             path: '/graph/',
-             component: GraphPage,
+             path: '/workflows',
+             component: WorkflowsPage,
              options: {
                  props: { app }
              }
          },
          {
-             path: '/subworkflows/',
-             component: ListSubWorkflowsPage,
+             path: '/queue/',
+             component: QueuePage,
              options: {
                  props: { app }
              }
          },
          {
-             path: '/subworkflows/:subworkflowID/',
-             component: SubWorkflowPage,
+             path: '/gallery/',
+             component: GalleryPage,
+             options: {
+                 props: { app }
+             }
+         },
+         // {
+         //     path: '/graph/',
+         //     component: GraphPage,
+         //     options: {
+         //         props: { app }
+         //     }
+         // },
+         {
+             path: '/workflows/:workflowIndex/',
+             component: WorkflowPage,
              options: {
                  props: { app }
              }
@@ -113,23 +148,90 @@
      actions: {
          closeOnEscape: true,
      },
+     touch: {
+         tapHold: true
+     }
  }
+
+ let body;
+ const bindBody = (node) => (body = node);
+ function setDarkClass(isDark: boolean) {
+     if (!body)
+         return;
+     if (isDark) {
+         body.classList.add("dark");
+     } else {
+         body.classList.remove("dark");
+     }
+ };
+ $: setDarkClass($interfaceState.isDarkMode);
 </script>
 
-{#if app}
-    <App theme="auto" name="ComfyBox" {...f7params}>
-        <View
-            url="/"
-            main={true}
-            class="safe-areas"
-            masterDetailBreakpoint={768},
-            browserHistory=true,
-            browserHistoryRoot="/mobile/"
-        >
-            <GenToolbar {app} />
-        </View>
-    </App>
-    <div class="canvas-wrapper pane-wrapper" style="display: none">
-        <canvas id="graph-canvas" />
-    </div>
-{/if}
+<svelte:body use:bindBody />
+
+<App theme="auto" name="ComfyBox" {...f7params}>
+    {#if appSetupPromise}
+        {#await appSetupPromise}
+            <div class="comfy-app-loading">
+                <div>
+                    <Preloader color="blue" size={100} />
+                </div>
+            </div>
+        {:then}
+            <View
+                url="/workflows/"
+                main={true}
+                class="safe-areas"
+                masterDetailBreakpoint={768},
+                browserHistory=true,
+                browserHistoryRoot="/mobile/"
+            >
+                <MainToolbar {app} />
+                {#if $interfaceState.selectedWorkflowIndex && $interfaceState.showingWorkflow}
+                    <GenToolbar {app} />
+                {/if}
+            </View>
+    {:catch error}
+            <div class="comfy-loading-error">
+                <div>
+                    Error loading app
+                </div>
+                <div>{error}</div>
+                {#if error != null && error.stack}
+                    {@const lines = error.stack.split("\n")}
+                    {#each lines as line}
+                        <div style:font-size="16px">{line}</div>
+                    {/each}
+                {/if}
+            </div>
+        {/await}
+    {/if}
+</App>
+<div class="canvas-wrapper pane-wrapper" style="display: none">
+    <canvas id="graph-canvas" />
+</div>
+
+<style lang="scss">
+ .comfy-app-loading, .comfy-loading-error {
+     font-size: 40px;
+     color: var(--body-text-color);
+     justify-content: center;
+     margin: auto;
+     width: 100%;
+     height: 100%;
+     text-align: center;
+     flex-direction: column;
+     display: flex;
+     position: absolute;
+     z-index: 100000000;
+     pointer-events: none;
+     user-select: none;
+     top: 0px;
+ }
+
+ .comfy-app-loading > span {
+     display: flex;
+     flex-direction: row;
+     justify-content: center;
+ }
+</style>

@@ -125,8 +125,17 @@ export default class ComfyAPI {
         }, 1000);
     }
 
+    private getHostname(): string {
+        let hostname = this.hostname || location.hostname;
+        if (hostname === "localhost") {
+            // For dev use, assume same hostname as connected server
+            hostname = location.hostname;
+        }
+        return hostname;
+    }
+
     private getBackendUrl(): string {
-        const hostname = this.hostname || location.hostname;
+        const hostname = this.getHostname()
         const port = this.port || location.port;
         return `${window.location.protocol}//${hostname}:${port}`
     }
@@ -146,7 +155,7 @@ export default class ComfyAPI {
             existingSession = "?clientId=" + existingSession;
         }
 
-        const hostname = this.hostname || location.hostname;
+        const hostname = this.getHostname()
         const port = this.port || location.port;
 
         this.socket = new WebSocket(

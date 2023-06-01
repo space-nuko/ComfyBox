@@ -211,7 +211,13 @@ export default class ComfyApp {
         this.lCanvas.allow_interaction = uiUnlocked;
 
         // await this.#invokeExtensionsAsync("init");
-        const defs = await this.api.getNodeDefs();
+        let defs;
+        try {
+            defs = await this.api.getNodeDefs();
+        }
+        catch (error) {
+            throw new Error(`Could not reach ComfyUI at ${this.api.getBackendUrl()}`);
+        }
         await this.registerNodes(defs);
 
         // Load previous workflow
@@ -362,7 +368,7 @@ export default class ComfyApp {
         }
     }
 
-    saveStateToLocalStorage() {
+    saveStateToLocalStorage(doNotify: boolean = true) {
         try {
             uiState.update(s => { s.forceSaveUserState = true; return s; })
             const state = get(workflowState)
@@ -374,10 +380,12 @@ export default class ComfyApp {
             for (const workflow of workflows)
                 workflow.isModified = false;
             workflowState.set(get(workflowState));
-            notify("Saved to local storage.")
+            if (doNotify)
+                notify("Saved to local storage.")
         }
         catch (err) {
-            notify(`Failed saving to local storage:\n${err}`, { type: "error" })
+            if (doNotify)
+                notify(`Failed saving to local storage:\n${err}`, { type: "error" })
         }
         finally {
             uiState.update(s => { s.forceSaveUserState = null; return s; })
@@ -395,6 +403,9 @@ export default class ComfyApp {
             return false;
 
         const workflows = state.workflows as SerializedAppState[];
+        if (workflows.length === 0)
+            return false;
+
         await Promise.all(workflows.map(w => {
             return this.openWorkflow(w, { refreshCombos: defs, warnMissingNodeTypes: false, setActive: false }).catch(error => {
                 console.error("Failed restoring previous workflow", error)

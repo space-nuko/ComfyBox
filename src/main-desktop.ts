@@ -1,3 +1,15 @@
+import { isMobileBrowser } from "$lib/utils"
+
+const isMobile = isMobileBrowser(navigator.userAgent);
+
+const params = new URLSearchParams(window.location.search)
+if (params.get("desktop") !== "true") {
+    if (isMobile) {
+        window.location.href = "/mobile/"
+    }
+}
+
+
 // Run node registration before anthing else, in the proper order
 import "$lib/nodeImports";
 
@@ -12,7 +24,7 @@ const comfyApp = new ComfyApp();
 
 const app = new App({
     target: document.getElementById("app-root"),
-    props: { app: comfyApp }
+    props: { app: comfyApp, isMobile }
 })
 
 export default app;

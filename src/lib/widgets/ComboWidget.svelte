@@ -8,6 +8,7 @@
  import { type WidgetLayout } from "$lib/stores/layoutStates";
  import { get, writable, type Writable } from "svelte/store";
  import { isDisabled } from "./utils"
+ import { getSafetensorsMetadata } from '$lib/utils';
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfyComboNode | null = null;
@@ -73,26 +74,10 @@
      }
  }
 
- function onSelect(e: CustomEvent<any>) {
-     if (input)
-         input.blur();
-     navigator.vibrate(20)
-
-     const item = e.detail
-
-     console.debug("[ComboWidget] SELECT", item, item.index)
-     $nodeValue = item.value;
-     activeIndex = item.index;
-     listOpen = false;
- }
-
  let activeIndex = null;
  let hoverItemIndex = null;
  let filterText = "";
  let listOpen = null;
- let scrollToIndex = null;
- let start = 0;
- let end = 0;
 
  function handleHover(index: number) {
      // console.warn("HOV", index)
@@ -107,7 +92,9 @@
      $nodeValue = item.value
      listOpen = false;
      filterText = ""
-     input?.blur()
+     setTimeout(() => {
+         input?.blur();
+     }, 100)
  }
 
  function onFilter() {
@@ -173,7 +160,10 @@
             on:select={(e) => handleSelect(e.detail.index)}
             on:blur
             on:filter={onFilter}>
-            <div class="comfy-select-list" slot="list" let:filteredItems style:--maxLabelWidth={node.maxLabelWidthChars || 100}>
+            <div class="comfy-select-list" slot="list"
+                 class:mobile={isMobile}
+                 let:filteredItems
+                 style:--maxLabelWidth={node.maxLabelWidthChars || 100}>
                 {#if filteredItems.length > 0}
                     {@const itemSize = isMobile ? 50 : 25}
                     {@const itemsToShow = isMobile ? 10 : 30}
@@ -291,9 +281,14 @@
 
  .comfy-select-list {
      --maxLabelWidth: 100;
+     --maxListWidth: 50vw;
+     &.mobile {
+         --maxListWidth: 80vw;
+     }
+
      font-size: 14px;
-     width: min(calc((var(--maxLabelWidth) + 10) * 1ch), 50vw);
      color: var(--item-color);
+     width: min(calc((var(--maxLabelWidth) + 10) * 1ch), var(--maxListWidth));
 
      > :global(.virtual-list-wrapper) {
          box-shadow: var(--block-shadow);

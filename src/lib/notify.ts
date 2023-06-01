@@ -27,6 +27,11 @@ function notifyf7(text: string, options: NotifyOptions) {
         on.click = () => options.onClick();
     }
 
+    let icon = null;
+    if (options.imageUrl) {
+        icon = `<img src="${options.imageUrl}"/>`
+    }
+
     const notification = f7.notification.create({
         title: options.title,
         titleRightText: 'now',
@@ -34,7 +39,8 @@ function notifyf7(text: string, options: NotifyOptions) {
         text: text,
         closeOnClick: true,
         closeTimeout,
-        on
+        on,
+        icon
     });
     notification.open();
 }

@@ -4,10 +4,11 @@ import type { FileData as GradioFileData } from "@gradio/upload";
 import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, type NodeID, type SlotType, type Vector4, type SerializedLGraphNode } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import type { ComfyNodeID } from "./api";
-import { type SerializedPrompt } from "./components/ComfyApp";
-import workflowState from "./stores/workflowState";
+import ComfyApp, { type SerializedPrompt } from "./components/ComfyApp";
+import workflowState, { type WorkflowReceiveOutputTargets } from "./stores/workflowState";
 import { ImageViewer } from "./ImageViewer";
 import configState from "$lib/stores/configState";
+import SendOutputModal, { type SendOutputModalResult } from "$lib/components/modal/SendOutputModal.svelte";
 
 export function clamp(n: number, min: number, max: number): number {
     if (max <= min)
@@ -618,6 +619,9 @@ export async function readFileToText(file: File): Promise<string> {
         reader.onload = async () => {
             resolve(reader.result as string);
         };
+        reader.onerror = async () => {
+            reject(reader.error);
+        }
         reader.readAsText(file);
     })
 }
@@ -708,4 +712,32 @@ export function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
     return new Promise(function(resolve) {
         canvas.toBlob(resolve);
     });
+}
+
+export type SafetensorsMetadata = Record<string, string>
+
+export async function getSafetensorsMetadata(folder: string, filename: string): Promise<SafetensorsMetadata> {
+    const url = configState.getBackendURL();
+    const params = new URLSearchParams({ filename })
+
+    return fetch(new Request(url + `/view_metadata/${folder}?` + params)).then(r => r.json())
+}
+
+export function partition<T>(myArray: T[], chunkSize: number): T[] {
+    let index = 0;
+    const arrayLength = myArray.length;
+    const tempArray = [];
+
+    for (index = 0; index < arrayLength; index += chunkSize) {
+        const myChunk = myArray.slice(index, index + chunkSize);
+        tempArray.push(myChunk);
+    }
+
+    return tempArray;
+}
+
+const MOBILE_USER_AGENTS = ["iPhone", "iPad", "Android", "BlackBerry", "WebOs"].map(a => new RegExp(a, "i"))
+
+export function isMobileBrowser(userAgent: string): boolean {
+    return MOBILE_USER_AGENTS.some(a => userAgent.match(a))
 }

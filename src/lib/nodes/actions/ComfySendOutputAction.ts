@@ -8,6 +8,7 @@ import notify from "$lib/notify";
 import workflowState from "$lib/stores/workflowState";
 import { get } from "svelte/store";
 import type ComfyApp from "$lib/components/ComfyApp";
+import interfaceState from "$lib/stores/interfaceState";
 
 export interface ComfySendOutputActionProperties extends ComfyGraphNodeProperties {
 }
@@ -41,36 +42,8 @@ export default class ComfySendOutputAction extends ComfyGraphNode {
 
         this.isActive = true;
 
-        const doSend = (modal: ModalData) => {
+        interfaceState.querySendOutput(value, type, receiveTargets, () => {
             this.isActive = false;
-
-            const { workflow, targetNode } = get(modal.state) as SendOutputModalResult;
-            console.warn("send", workflow, targetNode);
-
-            if (workflow == null || targetNode == null)
-                return
-
-            const app = (window as any).app as ComfyApp;
-            if (app == null) {
-                console.error("Couldn't get app!")
-                return
-            }
-
-            targetNode.receiveOutput(value);
-            workflowState.setActiveWorkflow(app.lCanvas, workflow.id)
-        }
-
-        modalState.pushModal({
-            title: "Send Output",
-            closeOnClick: true,
-            showCloseButton: true,
-            svelteComponent: SendOutputModal,
-            svelteProps: {
-                value,
-                type,
-                receiveTargets
-            },
-            onClose: doSend
         })
     };
 }
