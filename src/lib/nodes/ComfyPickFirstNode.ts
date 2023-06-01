@@ -40,17 +40,34 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
     }
 
     override onDrawBackground(ctx: CanvasRenderingContext2D) {
-        if (this.flags.collapsed || this.selected === -1) {
+        if (this.flags.collapsed) {
             return;
         }
 
-        ctx.fillStyle = "#AFB";
-        var y = (this.selected) * LiteGraph.NODE_SLOT_HEIGHT + 6;
-        ctx.beginPath();
-        ctx.moveTo(50, y);
-        ctx.lineTo(50, y + LiteGraph.NODE_SLOT_HEIGHT);
-        ctx.lineTo(34, y + LiteGraph.NODE_SLOT_HEIGHT * 0.5);
-        ctx.fill();
+        if (this.selected === -1) {
+            // Draw an X
+            const y = LiteGraph.NODE_SLOT_HEIGHT + 6;
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = "red";
+            ctx.beginPath();
+
+            ctx.moveTo(50 - 15, y - 15);
+            ctx.lineTo(50 + 15, y + 15);
+            ctx.stroke();
+
+            ctx.moveTo(50 + 15, y - 15);
+            ctx.lineTo(50 - 15, y + 15);
+            ctx.stroke();
+        }
+        else {
+            ctx.fillStyle = "#AFB";
+            const y = (this.selected) * LiteGraph.NODE_SLOT_HEIGHT + 6;
+            ctx.beginPath();
+            ctx.moveTo(50, y);
+            ctx.lineTo(50, y + LiteGraph.NODE_SLOT_HEIGHT);
+            ctx.lineTo(34, y + LiteGraph.NODE_SLOT_HEIGHT * 0.5);
+            ctx.fill();
+        }
     };
 
     override onConnectionsChange(
