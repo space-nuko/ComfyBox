@@ -682,6 +682,13 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 defaultValue: true
             },
             {
+                name: "queuePromptButtonDefaultWorkflow",
+                type: "string",
+                location: "workflow",
+                editable: true,
+                defaultValue: ""
+            },
+            {
                 name: "showDefaultNotifications",
                 type: "boolean",
                 location: "workflow",

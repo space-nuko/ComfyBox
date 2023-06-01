@@ -58,6 +58,12 @@ export type WorkflowAttributes = {
     queuePromptButtonRunWorkflow: boolean,
 
     /*
+     * Default subgraph to run if `queuePromptButtonRunWorkflow` is `true`. Set
+     * to blank to run the default subgraph (tagless).
+     */
+    queuePromptButtonDefaultWorkflow: string,
+
+    /*
      * If true, notifications will be shown when a prompt is queued and
      * completed. Set to false if you need more detailed control over the
      * notification type/contents, and use the `ComfyNotifyAction` node instead.

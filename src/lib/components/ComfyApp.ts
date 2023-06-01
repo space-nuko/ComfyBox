@@ -941,7 +941,11 @@ export default class ComfyApp {
         if (workflow.attrs.queuePromptButtonRunWorkflow) {
             // Hold control to queue at the front
             const num = this.ctrlDown ? -1 : 0;
-            this.queuePrompt(workflow, num, 1);
+            let tag = null;
+            if (workflow.attrs.queuePromptButtonDefaultWorkflow) {
+                tag = workflow.attrs.queuePromptButtonDefaultWorkflow
+            }
+            this.queuePrompt(workflow, num, 1, tag);
         }
     }
 
