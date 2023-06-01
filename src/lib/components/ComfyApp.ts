@@ -728,9 +728,11 @@ export default class ComfyApp {
     }
 
     private requestPermissions() {
-        if (Notification.permission === "default") {
-            Notification.requestPermission()
-                .then((result) => console.log("Notification status:", result));
+        if (window.Notification != null) {
+            if (window.Notification.permission === "default") {
+                window.Notification.requestPermission()
+                    .then((result) => console.log("Notification status:", result));
+            }
         }
     }
 
