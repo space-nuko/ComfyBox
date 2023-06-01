@@ -5,15 +5,35 @@
  import uiState from '$lib/stores/uiState';
  import type { ComfyNodeDefInputType } from "$lib/ComfyNodeDef";
  import type { INodeInputSlot, LGraphNode, LLink, Subgraph } from "@litegraph-ts/core";
- import { UpstreamNodeLocator, getUpstreamLink } from "./ComfyPromptSerializer";
+ import { UpstreamNodeLocator, getUpstreamLink, nodeHasTag } from "./ComfyPromptSerializer";
  import JsonView from "./JsonView.svelte";
 
  export let app: ComfyApp;
  export let errors: ComfyGraphErrors;
 
+ let missingTag = null;
+ let nodeToJumpTo = null;
+ let inputSlotToHighlight = null;
+ let _errors = null
+
+ $: if (_errors != errors) {
+     _errors = errors;
+     if (errors.errors[0]) {
+         jumpToError(errors.errors[0])
+     }
+ }
+
  function closeList() {
      app.lCanvas.clearErrors();
      $uiState.activeError = null;
+     clearState()
+ }
+
+ function clearState() {
+     _errors = null;
+     missingTag = null;
+     nodeToJumpTo = null;
+     inputSlotToHighlight = null;
  }
 
  function getParentNode(error: ComfyGraphErrorLocation): Subgraph | null {
@@ -24,11 +44,19 @@
      return node.graph._subgraph_node
  }
 
- function canJumpToDisconnectedInput(error: ComfyGraphErrorLocation): boolean {
-     return error.errorType === ComfyNodeErrorType.RequiredInputMissing && error.input != null;
+ function jumpToFoundNode() {
+     if (nodeToJumpTo == null) {
+         return
+     }
+
+     app.lCanvas.jumpToNodeAndInput(nodeToJumpTo, inputSlotToHighlight);
  }
 
- function jumpToDisconnectedInput(error: ComfyGraphErrorLocation) {
+ function detectDisconnected(error: ComfyGraphErrorLocation) {
+     missingTag = null;
+     nodeToJumpTo = null;
+     inputSlotToHighlight = null;
+
      if (error.errorType !== ComfyNodeErrorType.RequiredInputMissing || error.input == null) {
          return
      }
@@ -44,19 +72,32 @@
      const tag: string | null = error.queueEntry.extraData.extra_pnginfo.comfyBoxPrompt.subgraphs[0];
 
      const test = (node: LGraphNode, currentLink: LLink) => {
+         if (!nodeHasTag(node, tag, true))
+             return true;
+
          const [nextGraph, nextLink, nextInputSlot, nextNode] = getUpstreamLink(node, currentLink)
          return nextLink == null;
      };
      const nodeLocator = new UpstreamNodeLocator(test)
-     const [_, foundLink, foundInputSlot, foundPrevNode] = nodeLocator.locateUpstream(node, inputIndex, tag);
+     const [foundNode, foundLink, foundInputSlot, foundPrevNode] = nodeLocator.locateUpstream(node, inputIndex, null);
 
      if (foundInputSlot != null && foundPrevNode != null) {
-         app.lCanvas.jumpToNodeAndInput(foundPrevNode, foundInputSlot);
+         if (!nodeHasTag(foundNode, tag, true)) {
+             nodeToJumpTo = foundNode
+             missingTag = tag;
+             inputSlotToHighlight = null;
+         }
+         else {
+             nodeToJumpTo = foundPrevNode;
+             inputSlotToHighlight = foundInputSlot;
+         }
      }
  }
 
  function jumpToError(error: ComfyGraphErrorLocation) {
      app.lCanvas.jumpToError(error);
+
+     detectDisconnected(error);
  }
 
  function getInputTypeName(type: ComfyNodeDefInputType) {
@@ -91,26 +132,37 @@
                                 <div class="error-details">
                                     <button class="jump-to-error" class:execution-error={isExecutionError} on:click={() => jumpToError(error)}><span>⮎</span></button>
                                     <div class="error-details-wrapper">
-                                        <span class="error-message" class:execution-error={isExecutionError}>{error.message}</span>
+                                        {#if missingTag && nodeToJumpTo}
+                                            <div class="error-input">
+                                                <div><span class="error-message">Node "{nodeToJumpTo.title}" was missing tag used in workflow:</span><span style:padding-left="0.2rem"><b>{missingTag}</b></span></div>
+                                                <div>Tags on node: <b>[{(nodeToJumpTo?.attrs?.tags || []).join(", ")}]</b></div>
+                                            </div>
+                                        {:else}
+                                            <span class="error-message" class:execution-error={isExecutionError}>{error.message}</span>
+                                        {/if}
                                         {#if error.exceptionType}
                                             <span>({error.exceptionType})</span>
                                         {/if}
                                         {#if error.exceptionMessage && !isExecutionError}
                                             <div style:text-decoration="underline">{error.exceptionMessage}</div>
                                         {/if}
-                                        {#if error.input}
+                                        {#if nodeToJumpTo != null}
+                                            <div style:display="flex" style:flex-direction="row">
+                                                <button class="jump-to-error locate" on:click={jumpToFoundNode}><span>⮎</span></button>
+                                                {#if missingTag}
+                                                    <span>Jump to node: {nodeToJumpTo.title}</span>
+                                                {:else}
+                                                    <span>Find disconnected input</span>
+                                                {/if}
+                                            </div>
+                                        {/if}
+                                        {#if error.input && !missingTag}
                                             <div class="error-input">
                                                 <span>Input: <b>{error.input.name}</b></span>
                                                 {#if error.input.config}
                                                     <span>({getInputTypeName(error.input.config[0])})</span>
                                                 {/if}
                                             </div>
-                                            {#if canJumpToDisconnectedInput(error)}
-                                                <div style:display="flex" style:flex-direction="row">
-                                                    <button class="jump-to-error locate" on:click={() => jumpToDisconnectedInput(error)}><span>⮎</span></button>
-                                                    <span>Find disconnected input</span>
-                                                </div>
-                                            {/if}
 
                                             {#if error.input.receivedValue}
                                                 <div>

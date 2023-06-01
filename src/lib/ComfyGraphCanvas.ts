@@ -25,7 +25,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     activeErrors?: ComfyGraphErrors = null;
     blinkError: ComfyGraphErrorLocation | null = null;
     blinkErrorTime: number = 0;
-    highlightNodeAndInput: [LGraphNode, number] | null = null;
+    highlightNodeAndInput: [LGraphNode, number | null] | null = null;
 
     get comfyGraph(): ComfyGraph | null {
         return this.graph as ComfyGraph;
@@ -133,6 +133,15 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         else if (isHighlightedNode) {
             color = "cyan";
             thickness = 2
+
+            // Blink node if no input highlighted
+            if (this.highlightNodeAndInput[1] == null) {
+                if (this.blinkErrorTime > 0) {
+                    if ((Math.floor(this.blinkErrorTime / 2)) % 2 === 0) {
+                        color = null;
+                    }
+                }
+            }
         }
         else if (ss.currentHoveredNodes.has(node.id)) {
             color = "lightblue";
@@ -172,9 +181,11 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
             }
             if (draw) {
                 const [node, inputSlot] = this.highlightNodeAndInput;
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = color;
-                this.highlightNodeInput(node, inputSlot, ctx);
+                if (inputSlot != null) {
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = color;
+                    this.highlightNodeInput(node, inputSlot, ctx);
+                }
             }
         }
     }
@@ -733,7 +744,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         this.selectNode(node);
     }
 
-    jumpToNodeAndInput(node: LGraphNode, slotIndex: number) {
+    jumpToNodeAndInput(node: LGraphNode, slotIndex: number | null) {
         this.jumpToNode(node);
         this.highlightNodeAndInput = [node, slotIndex];
         this.blinkErrorTime = 20;
