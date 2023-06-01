@@ -3,7 +3,7 @@ import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode"
 import { Watch } from "@litegraph-ts/nodes-basic";
 import { nextLetter } from "$lib/utils";
 
-export type PickFirstMode = "anyActiveLink" | "truthy" | "dataNonNull"
+export type PickFirstMode = "anyActiveLink" | "dataTruthy" | "dataNonNull"
 
 export interface ComfyPickFirstNodeProperties extends ComfyGraphNodeProperties {
     mode: PickFirstMode
@@ -12,7 +12,7 @@ export interface ComfyPickFirstNodeProperties extends ComfyGraphNodeProperties {
 export default class ComfyPickFirstNode extends ComfyGraphNode {
     override properties: ComfyPickFirstNodeProperties = {
         tags: [],
-        mode: "dataNonNull"
+        mode: "anyActiveLink"
     }
 
     static slotLayout: SlotLayout = {
@@ -36,7 +36,7 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
         super(title);
         this.displayWidget = this.addWidget("text", "Value", "")
         this.displayWidget.disabled = true;
-        this.modeWidget = this.addWidget("combo", "Mode", this.properties.mode, null, { property: "mode", values: ["anyActiveLink", "truthy", "dataNonNull"] })
+        this.modeWidget = this.addWidget("combo", "Mode", this.properties.mode, null, { property: "mode", values: ["anyActiveLink", "dataTruthy", "dataNonNull"] })
     }
 
     override onDrawBackground(ctx: CanvasRenderingContext2D) {
@@ -45,7 +45,7 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
         }
 
         if (this.selected === -1) {
-            // Draw an X
+            // Draw an X indicating nothing matched the selection criteria
             const y = LiteGraph.NODE_SLOT_HEIGHT + 6;
             ctx.lineWidth = 5;
             ctx.strokeStyle = "red";
@@ -60,6 +60,7 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
             ctx.stroke();
         }
         else {
+            // Draw an arrow pointing to the selected input
             ctx.fillStyle = "#AFB";
             const y = (this.selected) * LiteGraph.NODE_SLOT_HEIGHT + 6;
             ctx.beginPath();
@@ -130,7 +131,7 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
         else {
             if (this.properties.mode === "dataNonNull")
                 return link.data != null;
-            else if (this.properties.mode === "truthy")
+            else if (this.properties.mode === "dataTruthy")
                 return Boolean(link.data)
             else // anyActiveLink
                 return true;

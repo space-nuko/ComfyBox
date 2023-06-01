@@ -4,8 +4,8 @@
  import Accordion from "./gradio/app/Accordion.svelte";
  import uiState from '$lib/stores/uiState';
  import type { ComfyNodeDefInputType } from "$lib/ComfyNodeDef";
- import type { INodeInputSlot, LGraphNode, Subgraph } from "@litegraph-ts/core";
- import { UpstreamNodeLocator } from "./ComfyPromptSerializer";
+ import type { INodeInputSlot, LGraphNode, LLink, Subgraph } from "@litegraph-ts/core";
+ import { UpstreamNodeLocator, getUpstreamLink } from "./ComfyPromptSerializer";
  import JsonView from "./JsonView.svelte";
 
  export let app: ComfyApp;
@@ -35,7 +35,7 @@
 
      const node = app.lCanvas.graph.getNodeByIdRecursive(error.nodeID);
 
-     const inputIndex =node.findInputSlotIndexByName(error.input.name);
+     const inputIndex = node.findInputSlotIndexByName(error.input.name);
      if (inputIndex === -1) {
          return
      }
@@ -43,7 +43,10 @@
      // TODO multiple tags?
      const tag: string | null = error.queueEntry.extraData.extra_pnginfo.comfyBoxPrompt.subgraphs[0];
 
-     const test = (node: LGraphNode) => (node as any).isBackendNode
+     const test = (node: LGraphNode, currentLink: LLink) => {
+         const [nextGraph, nextLink, nextInputSlot, nextNode] = getUpstreamLink(node, currentLink)
+         return nextLink == null;
+     };
      const nodeLocator = new UpstreamNodeLocator(test)
      const [_, foundLink, foundInputSlot, foundPrevNode] = nodeLocator.locateUpstream(node, inputIndex, tag);
 
