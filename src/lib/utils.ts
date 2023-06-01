@@ -721,3 +721,16 @@ export async function getSafetensorsMetadata(folder: string, filename: string): 
 
     return fetch(new Request(url + `/view_metadata/${folder}?` + params)).then(r => r.json())
 }
+
+export function partition<T>(myArray: T[], chunkSize: number): T[] {
+    let index = 0;
+    const arrayLength = myArray.length;
+    const tempArray = [];
+
+    for (index = 0; index < arrayLength; index += chunkSize) {
+        const myChunk = myArray.slice(index, index + chunkSize);
+        tempArray.push(myChunk);
+    }
+
+    return tempArray;
+}

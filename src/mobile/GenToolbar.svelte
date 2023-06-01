@@ -30,14 +30,6 @@
      await app.refreshComboInNodes()
  }
 
- function doSave(): void {
-     if (!fileInput)
-         return;
-
-     navigator.vibrate(20)
-     app.querySave()
- }
-
  function doLoad(): void {
      if (!fileInput)
          return;
@@ -55,25 +47,6 @@
      navigator.vibrate(20)
      app.saveStateToLocalStorage();
  }
-
- let queued: false;
- $: queued = Boolean($queueState.runningNodeID || $queueState.progress)
-
- let running = false;
- $: running = typeof $queueState.queueRemaining === "number" && $queueState.queueRemaining > 0;
-
- let progress;
- $: progress = $queueState.progress
-
- let progressPercent = 0
- let progressText = ""
- $: if (progress) {
-     progressPercent = (progress.value / progress.max) * 100;
-     progressText = progressPercent.toFixed(1) + "%";
- } else {
-     progressPercent = 0
-     progressText = "??.?%"
- }
 </script>
 
 <Toolbar bottom color="red" style="bottom: calc(var(--f7-toolbar-height))">
@@ -83,7 +56,6 @@
     </Link>
     {/if}
     <Link on:click={refreshCombos}>🔄</Link>
-    <Link on:click={doSave}>Save</Link>
     <Link on:click={doSaveLocal}>Save Local</Link>
     <Link on:click={doLoad}>Load</Link>
     <input bind:this={fileInput} id="comfy-file-input" type="file" accept=".json" on:change={loadWorkflow} />

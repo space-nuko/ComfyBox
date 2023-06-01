@@ -41,7 +41,7 @@ body {
     --comfy-dropdown-item-background-active: var(--secondary-600);
     --comfy-progress-bar-background: var(--neutral-300);
     --comfy-progress-bar-foreground: var(--secondary-300);
-    --comfy-node-name-background: var(--color-red-300);
+    --comfy-node-name-background: var(--color-blue-200);
     --comfy-node-name-foreground: var(--body-text-color);
     --comfy-spinner-main-color: var(--neutral-400);
     --comfy-spinner-accent-color: var(--secondary-500);
@@ -249,4 +249,16 @@ button {
 // fixes drop item shadow not appearing when dragging template items onto workflow
 :global([data-is-dnd-shadow-item]) {
     min-height: 5rem;
+}
+
+:global(.dark .photo-browser-popup) {
+    background: var(--neutral-700);
+}
+
+:global(.dark .photo-browser-popup-) {
+    background: var(--neutral-700);
+}
+
+:global(.photo-browser-exposed .toolbar ~ .toolbar.photo-browser-thumbs) {
+    transform: translate3d(0, calc(var(--f7-toolbar-height) * 2), 0);
 }

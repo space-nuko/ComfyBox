@@ -76,7 +76,7 @@
  }
 
  let centerHref = "/workflows/"
- $: if ($interfaceState.selectedWorkflowIndex) {
+ $: if ($interfaceState.selectedWorkflowIndex && !$interfaceState.showingWorkflow) {
      centerHref = `/workflows/${$interfaceState.selectedWorkflowIndex}/`
  }
  else {

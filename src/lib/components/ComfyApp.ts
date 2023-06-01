@@ -368,7 +368,7 @@ export default class ComfyApp {
         }
     }
 
-    saveStateToLocalStorage() {
+    saveStateToLocalStorage(doNotify: boolean = true) {
         try {
             uiState.update(s => { s.forceSaveUserState = true; return s; })
             const state = get(workflowState)
@@ -380,10 +380,12 @@ export default class ComfyApp {
             for (const workflow of workflows)
                 workflow.isModified = false;
             workflowState.set(get(workflowState));
-            notify("Saved to local storage.")
+            if (doNotify)
+                notify("Saved to local storage.")
         }
         catch (err) {
-            notify(`Failed saving to local storage:\n${err}`, { type: "error" })
+            if (doNotify)
+                notify(`Failed saving to local storage:\n${err}`, { type: "error" })
         }
         finally {
             uiState.update(s => { s.forceSaveUserState = null; return s; })

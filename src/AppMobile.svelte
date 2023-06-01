@@ -58,16 +58,19 @@
  $: f7 && f7.setDarkMode($interfaceState.isDarkMode)
 
  onMount(async () => {
-     let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-     $interfaceState.isDarkMode = isDarkMode;
+     // let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+     $interfaceState.isDarkMode = true;
 
      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
          $interfaceState.isDarkMode = event.matches;
      });
 
      appSetupPromise = app.setup().then(() => {
+         // Autosave every minute
+         setInterval(() => app.saveStateToLocalStorage(false), 60 * 1000)
          loading = false
      });
+
      window.addEventListener("backbutton", onBackKeyDown, false);
      window.addEventListener("popstate", onBackKeyDown, false);
 
@@ -107,10 +110,16 @@
          {
              path: '/queue/',
              component: QueuePage,
+             options: {
+                 props: { app }
+             }
          },
          {
              path: '/gallery/',
              component: GalleryPage,
+             options: {
+                 props: { app }
+             }
          },
          // {
          //     path: '/graph/',

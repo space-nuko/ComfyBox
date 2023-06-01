@@ -13,6 +13,7 @@
  async function doLoadDefault() {
      f7.dialog.confirm("Would you like to load the default workflow in a new tab?", async () => {
          await app.initDefaultWorkflow();
+         app.saveStateToLocalStorage(false);
      })
  }
 
@@ -20,7 +21,10 @@
      e.preventDefault();
      e.stopImmediatePropagation();
      f7.dialog.confirm("Are you sure you want to delete this workflow?", workflow.attrs.title || `Workflow: ${workflow.id}`,
-                       () => { app.closeWorkflow(workflow.id); })}
+                       () => {
+                           app.closeWorkflow(workflow.id);
+                           app.saveStateToLocalStorage(false);
+                       })}
 
  function onPageBeforeIn() {
      $interfaceState.selectedWorkflowIndex = null;

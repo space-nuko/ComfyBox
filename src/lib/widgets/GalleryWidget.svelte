@@ -11,6 +11,7 @@
  import { clamp, comfyBoxImageToComfyURL, type ComfyBoxImageMetadata } from "$lib/utils";
  import { f7 } from "framework7-svelte";
  import type { ComfyGalleryNode } from "$lib/nodes/widgets";
+	import { showMobileLightbox } from "$lib/components/utils";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -47,19 +48,8 @@
      object_fit: "cover",
      // preview: true
  }
- let element: HTMLDivElement;
 
- let mobileLightbox = null;
-
- function showMobileLightbox(source: HTMLImageElement) {
-     if (!f7)
-         return
-
-     if (mobileLightbox) {
-         mobileLightbox.destroy();
-         mobileLightbox = null;
-     }
-
+ function showMobileLightbox_(source: HTMLImageElement, selectedImage: number) {
      const galleryElem = source.closest<HTMLDivElement>("div.block")
      console.debug("[ImageViewer] showModal", source, galleryElem);
      if (!galleryElem || ImageViewer.all_gallery_buttons(galleryElem).length === 0) {
@@ -72,23 +62,16 @@
      const images = allGalleryButtons.map(button => {
          return {
              url: (button.children[0] as HTMLImageElement).src,
-             caption: "Image"
+             // caption: "Image"
          }
      })
 
-     history.pushState({ type: "gallery" }, "");
-
-     mobileLightbox = f7.photoBrowser.create({
-         photos: images,
-         thumbs: images.map(i => i.url),
-         type: 'popup',
-     });
-     mobileLightbox.open($selected_image)
+     showMobileLightbox(images, selectedImage, { thumbs: images });
  }
 
  function onClicked(e: CustomEvent<HTMLImageElement>) {
      if (isMobile) {
-         showMobileLightbox(e.detail)
+         showMobileLightbox_(e.detail, $selected_image)
      }
      else {
          ImageViewer.instance.showLightbox(e.detail)
@@ -103,7 +86,7 @@
 
 {#if widget && node && nodeValue && $nodeValue}
     {#if widget.attrs.variant === "image"}
-        <div class="wrapper comfy-image-widget" style={widget.attrs.style || ""} bind:this={element}>
+        <div class="wrapper comfy-image-widget" style={widget.attrs.style || ""}>
             <Block variant="solid" padding={false}>
                 {#if $nodeValue && $nodeValue.length > 0}
                     {@const value = $nodeValue[$nodeValue.length-1]}
@@ -122,7 +105,7 @@
         </div>
     {:else}
         {@const images = $nodeValue.map(comfyBoxImageToComfyURL)}
-        <div class="wrapper comfy-gallery-widget gradio-gallery" style={widget.attrs.style || ""} bind:this={element}>
+        <div class="wrapper comfy-gallery-widget gradio-gallery" style={widget.attrs.style || ""}>
             <Block variant="solid" padding={false}>
                 <div class="padding">
                     <Gallery

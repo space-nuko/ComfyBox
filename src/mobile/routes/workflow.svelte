@@ -18,6 +18,9 @@
 
  function onPageBeforeIn() {
      workflow = $workflowState.openedWorkflows[workflowIndex-1]
+     if (workflow) {
+         workflowState.setActiveWorkflow(app.lCanvas, workflow.id)
+     }
      $interfaceState.selectedWorkflowIndex = workflowIndex
      $interfaceState.showingWorkflow = true;
  }

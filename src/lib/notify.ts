@@ -18,6 +18,7 @@ function notifyf7(text: string, options: NotifyOptions) {
     if (!f7)
         return;
 
+    console.error(options)
     let closeTimeout = options.timeout
     if (closeTimeout === undefined)
         closeTimeout = 3000;
@@ -25,6 +26,11 @@ function notifyf7(text: string, options: NotifyOptions) {
     const on: Notification.Parameters["on"] = {}
     if (options.onClick) {
         on.click = () => options.onClick();
+    }
+
+    let icon = null;
+    if (options.imageUrl) {
+        icon = `<img src="${options.imageUrl}"/>`
     }
 
     const notification = f7.notification.create({
@@ -35,7 +41,7 @@ function notifyf7(text: string, options: NotifyOptions) {
         closeOnClick: true,
         closeTimeout,
         on,
-        icon: options.imageUrl
+        icon
     });
     notification.open();
 }
