@@ -9,6 +9,7 @@
  import { Page, Navbar, Button, BlockTitle, Block, List, ListItem } from "framework7-svelte"
 
  export let app: ComfyApp | null = null;
+ let fileInput: HTMLInputElement = undefined;
 
  async function doLoadDefault() {
      f7.dialog.confirm("Would you like to load the default workflow in a new tab?", async () => {
@@ -26,8 +27,22 @@
                            app.saveStateToLocalStorage(false);
                        })}
 
+ function doLoad(): void {
+     if (!fileInput)
+         return;
+
+     navigator.vibrate(20)
+     fileInput.value = null;
+     fileInput.click();
+ }
+
+ function loadWorkflow(): void {
+     app.handleFile(fileInput.files[0]);
+}
+
  function onPageBeforeIn() {
      $interfaceState.selectedWorkflowIndex = null;
+     $interfaceState.selectedTab = 1;
  }
 </script>
 
@@ -50,6 +65,10 @@
         (No workflows opened.)
     {/if}
     <Block strong outlineIos>
-        <Button fill={true} onClick={doLoadDefault}>Load Default Graph</Button>
+        <p class="grid grid-cols-2 grid-gap">
+            <Button outline onClick={doLoadDefault}>Load default graph</Button>
+            <Button outline onClick={doLoad}>Load from file...</Button>
+        </p>
     </Block>
+    <input bind:this={fileInput} id="comfy-file-input" style:display="none" type="file" accept=".json" on:change={loadWorkflow} />
 </Page>

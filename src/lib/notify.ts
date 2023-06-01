@@ -18,7 +18,6 @@ function notifyf7(text: string, options: NotifyOptions) {
     if (!f7)
         return;
 
-    console.error(options)
     let closeTimeout = options.timeout
     if (closeTimeout === undefined)
         closeTimeout = 3000;

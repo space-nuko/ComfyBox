@@ -403,6 +403,9 @@ export default class ComfyApp {
             return false;
 
         const workflows = state.workflows as SerializedAppState[];
+        if (workflows.length === 0)
+            return false;
+
         await Promise.all(workflows.map(w => {
             return this.openWorkflow(w, { refreshCombos: defs, warnMissingNodeTypes: false, setActive: false }).catch(error => {
                 console.error("Failed restoring previous workflow", error)

@@ -4,10 +4,11 @@ import type { FileData as GradioFileData } from "@gradio/upload";
 import { Subgraph, type LGraph, type LGraphNode, type LLink, type SerializedLGraph, type UUID, type NodeID, type SlotType, type Vector4, type SerializedLGraphNode } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import type { ComfyNodeID } from "./api";
-import { type SerializedPrompt } from "./components/ComfyApp";
-import workflowState from "./stores/workflowState";
+import ComfyApp, { type SerializedPrompt } from "./components/ComfyApp";
+import workflowState, { type WorkflowReceiveOutputTargets } from "./stores/workflowState";
 import { ImageViewer } from "./ImageViewer";
 import configState from "$lib/stores/configState";
+import SendOutputModal, { type SendOutputModalResult } from "$lib/components/modal/SendOutputModal.svelte";
 
 export function clamp(n: number, min: number, max: number): number {
     if (max <= min)
@@ -733,4 +734,10 @@ export function partition<T>(myArray: T[], chunkSize: number): T[] {
     }
 
     return tempArray;
+}
+
+const MOBILE_USER_AGENTS = ["iPhone", "iPad", "Android", "BlackBerry", "WebOs"].map(a => new RegExp(a, "i"))
+
+export function isMobileBrowser(userAgent: string): boolean {
+    return MOBILE_USER_AGENTS.some(a => userAgent.match(a))
 }

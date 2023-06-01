@@ -445,7 +445,6 @@ function queueCleared(type: QueueItemType) {
     store.update(s => {
         if (type === "queue") {
             s.queuePending.set([]);
-            s.queueRunning.set([]);
             s.queueRemaining = 0;
             s.runningNodeID = null;
             s.progress = null;

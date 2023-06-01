@@ -1,13 +1,8 @@
-const params = new URLSearchParams(window.location.search)
-
-const MOBILE_USER_AGENTS = ["iPhone", "iPad", "Android", "BlackBerry", "WebOs"].map(a => new RegExp(a, "i"))
-
-function isMobileBrowser(userAgent: string): boolean {
-    return MOBILE_USER_AGENTS.some(a => userAgent.match(a))
-}
+import { isMobileBrowser } from "$lib/utils"
 
 const isMobile = isMobileBrowser(navigator.userAgent);
 
+const params = new URLSearchParams(window.location.search)
 if (params.get("desktop") !== "true") {
     if (isMobile) {
         window.location.href = "/mobile/"

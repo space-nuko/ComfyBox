@@ -87,6 +87,8 @@
  $: toolbarCount = $interfaceState.showingWorkflow ? 2 : 1;
 
  const ICON_SIZE = "1.5rem";
+
+ let selectedTab = 1;
 </script>
 
 <div class="bottom" style:--toolbarCount={toolbarCount}>
@@ -108,13 +110,13 @@
     </div>
 </div>
 <Toolbar bottom tabbar color="blue" class={toolbarCount > 1 ? "hasGenToolbar" : ""}>
-    <Link transition="f7-dive" href="/queue/">
+    <Link transition="f7-dive" href="/queue/" tabLinkActive={$interfaceState.selectedTab === 0}>
         <LayoutTextSidebarReverse width={ICON_SIZE} height={ICON_SIZE} />
     </Link>
-    <Link transition="f7-dive" href={centerHref} tabLinkActive>
+    <Link transition="f7-dive" href={centerHref} tabLinkActive={$interfaceState.selectedTab === 1}>
         <Image width={ICON_SIZE} height={ICON_SIZE} />
     </Link>
-    <Link transition="f7-dive" href="/gallery/">
+    <Link transition="f7-dive" href="/gallery/" tabLinkActive={$interfaceState.selectedTab === 2}>
         <Grid width={ICON_SIZE} height={ICON_SIZE} />
     </Link>
 </Toolbar>
@@ -141,6 +143,11 @@
 
  :global(.dark .toolbar.color-blue.hasGenToolbar) {
      border-top: 2px solid var(--neutral-600);
+ }
+
+ :global(.dark .tab-link-active) {
+     --f7-tabbar-link-active-color: var(--secondary-500);
+     --f7-tabbar-link-active-bg-color: #283547;
  }
 
  .bottom {

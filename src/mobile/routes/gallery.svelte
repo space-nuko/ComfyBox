@@ -1,5 +1,5 @@
 <script lang="ts">
- import { Page, Navbar, Block, Tabs, Tab, NavLeft, NavTitle, NavRight, Link } from "framework7-svelte"
+ import { Page, Navbar, Block, Tabs, Tab, NavLeft, NavTitle, NavRight, Link, f7 } from "framework7-svelte"
  import WidgetContainer from "$lib/components/WidgetContainer.svelte";
  import type ComfyApp from "$lib/components/ComfyApp";
  import { writable, type Writable } from "svelte/store";
@@ -11,6 +11,7 @@
  import { partition, showLightbox } from "$lib/utils";
 	import uiQueueState, { type QueueUIEntry } from "$lib/stores/uiQueueState";
 	import { showMobileLightbox } from "$lib/components/utils";
+	import notify from "$lib/notify";
 
  export let app: ComfyApp
 
@@ -21,6 +22,10 @@
  let allImages: string[] = []
 
  let gridCols = 3;
+
+ function onPageBeforeIn() {
+     $interfaceState.selectedTab = 2;
+ }
 
  $: buildImageList(_entries);
 
@@ -39,14 +44,16 @@
      showMobileLightbox(allImages, index)
  }
 
-
  async function clearHistory() {
-     await app.clearQueue("history");
-     uiQueueState.updateEntries(true)
+     f7.dialog.confirm("Are you sure you want to clear the current history?", async () => {
+         await app.clearQueue("history");
+         uiQueueState.updateEntries(true)
+         notify("History cleared!")
+     })
  }
 </script>
 
-<Page name="gallery">
+<Page name="gallery" on:pageBeforeIn={onPageBeforeIn}>
     <Navbar>
         <NavLeft></NavLeft>
         <NavTitle>Gallery</NavTitle>
