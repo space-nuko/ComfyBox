@@ -94,7 +94,7 @@ function followGraphInput(graphInput: GraphInput, link: LLink): UpstreamResult {
         throw new Error("No outer subgraph!")
 
     const outerInputIndex = outerSubgraph.inputs.findIndex(i => i.name === graphInput.nameInGraph)
-    if (outerInputIndex == null)
+    if (outerInputIndex === -1)
         throw new Error("No outer input slot!")
 
     const nextLink = outerSubgraph.getInputLink(outerInputIndex)
