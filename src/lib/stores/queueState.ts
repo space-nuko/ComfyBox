@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import workflowState, { type WorkflowError, type WorkflowExecutionError, type WorkflowInstID, type WorkflowValidationError } from "./workflowState";
 import configState from "./configState";
 import uiQueueState from "./uiQueueState";
+import type { NodeID } from "@litegraph-ts/core";
 
 export type QueueEntryStatus = "success" | "validation_failed" | "error" | "interrupted" | "all_cached" | "unknown";
 
@@ -81,7 +82,21 @@ export type QueueState = {
     queuePending: Writable<QueueEntry[]>,
     queueCompleted: Writable<CompletedQueueEntry[]>,
     queueRemaining: number | "X" | null;
+
+    /*
+     * Currently executing node if any
+     */
     runningNodeID: ComfyNodeID | null;
+
+    /*
+     * Nodes which should be rendered as "executing" in the frontend (green border).
+     * This includes the running node and all its parent subgraphs
+     */
+    executingNodes: Set<NodeID>;
+
+    /*
+     * Progress for the current node reported by the frontend
+     */
     progress: Progress | null,
     /**
      * If true, user pressed the "Interrupt" button in the frontend. Disable the
@@ -98,6 +113,7 @@ const store: Writable<QueueState> = writable({
     queueCompleted: writable([]),
     queueRemaining: null,
     runningNodeID: null,
+    executingNodes: new Set(),
     progress: null,
     isInterrupting: false
 })
@@ -272,6 +288,7 @@ function executingUpdated(promptID: PromptID, runningNodeID: ComfyNodeID | null)
 
     store.update((s) => {
         s.progress = null;
+        s.executingNodes.clear();
 
         const [index, entry, queue] = findEntryInPending(promptID);
         if (runningNodeID != null) {
@@ -279,6 +296,17 @@ function executingUpdated(promptID: PromptID, runningNodeID: ComfyNodeID | null)
                 entry.nodesRan.add(runningNodeID)
             }
             s.runningNodeID = runningNodeID;
+
+            if (entry?.extraData?.workflowID) {
+                const workflow = workflowState.getWorkflow(entry.extraData.workflowID);
+                if (workflow != null) {
+                    let node = workflow.graph.getNodeByIdRecursive(s.runningNodeID);
+                    while (node != null) {
+                        s.executingNodes.add(node.id);
+                        node = node.graph?._subgraph_node;
+                    }
+                }
+            }
         }
         else {
             // Prompt finished executing.
@@ -310,6 +338,7 @@ function executingUpdated(promptID: PromptID, runningNodeID: ComfyNodeID | null)
             }
             s.progress = null;
             s.runningNodeID = null;
+            s.executingNodes.clear();
         }
         entry_ = entry;
         return s
@@ -334,6 +363,7 @@ function executionCached(promptID: PromptID, nodes: ComfyNodeID[]) {
         s.isInterrupting = false; // TODO move to start
         s.progress = null;
         s.runningNodeID = null;
+        s.executingNodes.clear();
         return s
     })
 }
@@ -351,6 +381,7 @@ function executionError(error: ComfyExecutionError): CompletedQueueEntry | null 
         }
         s.progress = null;
         s.runningNodeID = null;
+        s.executingNodes.clear();
         return s
     })
     return entry_;
@@ -384,6 +415,8 @@ function executionStart(promptID: PromptID) {
             moveToRunning(index, queue)
         }
         s.isInterrupting = false;
+        s.runningNodeID = null;
+        s.executingNodes.clear();
         return s
     })
 }
@@ -448,6 +481,7 @@ function queueCleared(type: QueueItemType) {
             s.queueRemaining = 0;
             s.runningNodeID = null;
             s.progress = null;
+            s.executingNodes.clear();
         }
         else {
             s.queueCompleted.set([])

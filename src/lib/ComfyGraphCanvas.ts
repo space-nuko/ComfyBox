@@ -104,7 +104,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         let state = get(queueState);
         let ss = get(selectionState);
 
-        const isRunningNode = node.id == state.runningNodeID
+        const isExecuting = state.executingNodes.has(node.id);
         const nodeErrors = this.activeErrors?.errorsByID[node.id];
         const isHighlightedNode = this.highlightNodeAndInput && this.highlightNodeAndInput[0].id === node.id;
 
@@ -146,7 +146,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         else if (ss.currentHoveredNodes.has(node.id)) {
             color = "lightblue";
         }
-        else if (isRunningNode) {
+        else if (isExecuting) {
             color = "#0f0";
         }
 
@@ -162,7 +162,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
             this.drawNodeOutline(node, ctx, size, mouseOver, fgColor, bgColor, color, thickness)
         }
 
-        if (isRunningNode && state.progress) {
+        if (isExecuting && state.progress) {
             ctx.fillStyle = "green";
             ctx.fillRect(0, 0, size[0] * (state.progress.value / state.progress.max), 6);
             ctx.fillStyle = bgColor;
