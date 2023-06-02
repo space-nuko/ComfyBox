@@ -12,6 +12,8 @@ import type { SerializedAppState, SerializedPrompt } from '$lib/components/Comfy
 import type ComfyReceiveOutputNode from '$lib/nodes/actions/ComfyReceiveOutputNode';
 import type { ComfyBoxPromptExtraData, PromptID } from '$lib/api';
 import type { ComfyAPIPromptErrorResponse, ComfyExecutionError } from '$lib/apiErrors';
+import type { WritableJourneyStateStore } from './journeyState';
+import journeyStates from './journeyStates';
 
 type ActiveCanvas = {
     canvas: LGraphCanvas | null;
@@ -115,7 +117,12 @@ export class ComfyBoxWorkflow {
     /*
      * Completed queue entry ID that holds the last validation/execution error.
      */
-    lastError?: PromptID
+    lastError?: PromptID;
+
+    /*
+     * Saved prompt history ("journey") for this workflow
+     */
+    journey: WritableJourneyStateStore;
 
     get layout(): WritableLayoutStateStore | null {
         return layoutStates.getLayout(this.id)
@@ -133,6 +140,7 @@ export class ComfyBoxWorkflow {
             title,
         }
         this.graph = new ComfyGraph(this.id);
+        this.journey = journeyStates.create();
     }
 
     notifyModified() {

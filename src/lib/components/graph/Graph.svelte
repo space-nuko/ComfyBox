@@ -7,49 +7,70 @@
 </script>
 
 <script lang="ts">
-  import { onMount, setContext } from "svelte"
-  import cytoscape from "cytoscape"
-  import dagre from "cytoscape-dagre"
-  import GraphStyles from "./GraphStyles"
+ import cytoscape from "cytoscape"
+ import dagre from "cytoscape-dagre"
+ import GraphStyles from "./GraphStyles"
+ import type { EdgeDataDefinition } from "cytoscape";
+ import type { NodeDataDefinition } from "cytoscape";
 
- const graphContext: GraphContext = {
-     getCyInstance: () => cyInstance
+ export let nodes: ReadonlyArray<NodeDataDefinition>;
+ export let edges: ReadonlyArray<EdgeDataDefinition>;
+
+ export let style: string = ""
+
+ $: if (nodes != null && edges != null && refElement != null) {
+     rebuildGraph()
  }
- setContext(GRAPH_STATE, graphContext)
+ else {
+     cyInstance = null;
+ }
 
-  let refElement = null
-  let cyInstance: cytoscape.Core = null
+ let _nodes: any[];
+ let _edges: any[];
 
-  onMount(() => {
-    cytoscape.use(dagre)
+ function rebuildGraph() {
+     cytoscape.use(dagre)
 
-    cyInstance = cytoscape({
-      container: refElement,
-      style: GraphStyles,
+     cyInstance = cytoscape({
+         container: refElement,
+         style: GraphStyles,
+         wheelSensitivity: 0.1,
+     })
 
-    })
+     cyInstance.on("add", () => {
+         cyInstance
+             .makeLayout({
+                 name: "dagre",
+                 rankDir: "TB",
+                 nodeSep: 150
+             })
+             .run()
+     })
 
-    cyInstance.on("add", () => {
-      cyInstance
-        .makeLayout({
-          name: "dagre",
-          rankDir: "TB",
-          nodeSep: 150
-        })
-        .run()
-    })
-  })
+     for (const node of nodes) {
+         cyInstance.add({
+             group: 'nodes',
+             data: { ...node }
+         })
+     }
 
+     for (const edge of edges) {
+         cyInstance.add({
+             group: 'edges',
+             data: { ...edge }
+         })
+     }
+ }
+
+ let refElement = null
+ let cyInstance: cytoscape.Core = null
 </script>
 
-<div class="graph" bind:this={refElement}>
-  {#if cyInstance}
-    <slot></slot>
-  {/if}
+<div class="cy-graph" {style} bind:this={refElement}>
 </div>
 
 <style lang="scss">
- .graph {
+ .cy-graph {
      background: white;
      width: 100%;
      height: 100%;

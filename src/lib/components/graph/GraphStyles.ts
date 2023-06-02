@@ -1,27 +1,30 @@
-export default [
+import type { Stylesheet } from "cytoscape";
+
+const styles: Stylesheet[] = [
     {
         selector: 'node',
         style: {
             'width': '50',
             'height': '50',
+            'font-family': 'Arial',
             'font-size': '18',
-            'font-weight': 'bold',
+            'font-weight': 'normal',
             'content': `data(label)`,
             'text-valign': 'center',
             'text-wrap': 'wrap',
             'text-max-width': '140',
-            'background-color': 'gold',
-            'border-color': 'orange',
+            'background-color': '#60a5fa',
+            'border-color': '#2563eb',
             'border-width': '3',
-            'color': 'darkred'
+            'color': '#1d3660'
         }
     },
     {
         selector: 'node:selected',
         style: {
-            'background-color': 'darkred',
+            'background-color': '#f97316',
             color: 'white',
-            'border-color': 'darkred',
+            'border-color': '#ea580c',
             'line-color': '#0e76ba',
             'target-arrow-color': '#0e76ba'
         }
@@ -36,8 +39,8 @@ export default [
             'text-background-padding': '3',
             'width': '3',
             'target-arrow-shape': 'triangle',
-            'line-color': 'darkred',
-            'target-arrow-color': 'darkred',
+            'line-color': '#1d4ed8',
+            'target-arrow-color': '#1d4ed8',
             'font-weight': 'bold'
         }
     },
@@ -55,3 +58,4 @@ export default [
         }
     }
 ]
+export default styles;
