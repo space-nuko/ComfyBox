@@ -16,6 +16,7 @@
 <script lang="ts">
  import queueState, { type CompletedQueueEntry, type QueueEntry, type QueueEntryStatus } from "$lib/stores/queueState";
  import ProgressBar from "./ProgressBar.svelte";
+ import SystemStatsBar from "./SystemStatsBar.svelte";
  import Spinner from "./Spinner.svelte";
  import PromptDisplay from "./PromptDisplay.svelte";
  import { List, ListUl, Grid } from "svelte-bootstrap-icons";
@@ -242,6 +243,9 @@
                 <span>Node: {getNodeInfo($queueState.runningNodeID)}</span>
             </div>
             <div>
+                <SystemStatsBar />
+            </div>
+            <div>
                 <ProgressBar value={$queueState.progress?.value} max={$queueState.progress?.max} />
             </div>
             <div class="queue-action-buttons">
@@ -263,7 +267,8 @@
  $bottom-bar-height: 70px;
  $workflow-tabs-height: 2.5rem;
  $mode-buttons-height: 30px;
- $queue-height: calc(100vh - #{$pending-height} - #{$pane-mode-buttons-height} - #{$mode-buttons-height} - #{$bottom-bar-height} - #{$workflow-tabs-height} - 0.9rem);
+ $system-stats-bar-height: 24px;
+ $queue-height: calc(100vh - #{$pending-height} - #{$pane-mode-buttons-height} - #{$mode-buttons-height} - #{$bottom-bar-height} - #{$workflow-tabs-height} - 0.9rem - #{$system-stats-bar-height});
  $queue-height-history: calc(#{$queue-height} - #{$display-mode-buttons-height});
 
  .prompt-modal-header {

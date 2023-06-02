@@ -155,6 +155,19 @@ const defCacheBuiltInResources: ConfigDefBoolean<"cacheBuiltInResources"> = {
     options: {}
 };
 
+const defPollSystemStatsInterval: ConfigDefNumber<"pollSystemStatsInterval"> = {
+    name: "pollSystemStatsInterval",
+    type: "number",
+    defaultValue: 1000,
+    category: "behavior",
+    description: "Interval in milliseconds to refresh system stats (total/free VRAM). Set to 0 to disable",
+    options: {
+        min: 0,
+        max: 60000,
+        step: 100
+    }
+};
+
 const defBuiltInTemplates: ConfigDefStringArray<"builtInTemplates"> = {
     name: "builtInTemplates",
     type: "string[]",
@@ -198,6 +211,7 @@ export const CONFIG_DEFS = [
     defPromptForWorkflowName,
     defConfirmWhenUnloadingUnsavedChanges,
     defCacheBuiltInResources,
+    defPollSystemStatsInterval,
     defBuiltInTemplates,
     // defLinkDisplayType
 ] as const;
