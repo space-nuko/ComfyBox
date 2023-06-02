@@ -13,7 +13,7 @@
  import Textbox from "@gradio/form/src/Textbox.svelte";
  import type { ModalData } from "$lib/stores/modalState";
  import { writable, type Writable } from "svelte/store";
-	import { negmod } from "$lib/utils";
+ import { negmod } from "$lib/utils";
  const DOMPurify = createDOMPurify(window);
 
  export let templateAndSvg: SerializedComfyBoxTemplate;

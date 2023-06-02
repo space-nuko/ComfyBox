@@ -7,7 +7,18 @@ import type { ComfyBoxWorkflow } from "./stores/workflowState";
 import { isSerializedPromptInputLink } from "./utils";
 import ComfyBoxStdPromptSerializer from "./ComfyBoxStdPromptSerializer";
 
-interface RestoreParamSource {
+export type RestoreParamType = "workflow" | "backend" | "stdPrompt";
+
+/*
+ * Data of a parameter that can be restored. Paired with a parameter name.
+ */
+export interface RestoreParamSource<T extends RestoreParamType = any> {
+    type: T,
+
+    /*
+     * The actual value to copy to the widget after all conversions have been
+     * applied.
+     */
     finalValue: any
 }
 
@@ -16,7 +27,9 @@ interface RestoreParamSource {
  * *exactly* to a node with the same ID in the current workflow. Easiest case
  * since the parameter value can just be copied without much fuss.
  */
-interface RestoreParamSourceWorkflowNode extends RestoreParamSource {
+export interface RestoreParamSourceWorkflowNode extends RestoreParamSource<"workflow"> {
+    type: "workflow",
+
     sourceNode: SerializedComfyWidgetNode
 }
 
@@ -31,7 +44,9 @@ interface RestoreParamSourceWorkflowNode extends RestoreParamSource {
  * prompt endpoint. Hence this parameter source won't account for those kinds of
  * values.)
  */
-interface RestoreParamSourceBackendNodeInput extends RestoreParamSource {
+export interface RestoreParamSourceBackendNodeInput extends RestoreParamSource<"backend"> {
+    type: "backend",
+
     backendNode: SerializedComfyWidgetNode,
 
     /*
@@ -45,7 +60,9 @@ interface RestoreParamSourceBackendNodeInput extends RestoreParamSource {
 /*
  * A value contained in the standard prompt extracted from the saved workflow.
  */
-interface RestoreParamSourceStdPrompt<T, K extends keyof T> extends RestoreParamSource {
+export interface RestoreParamSourceStdPrompt<T, K extends keyof T> extends RestoreParamSource<"stdPrompt"> {
+    type: "stdPrompt",
+
     /*
      * Name of the group containing the value to pass
      *
@@ -128,35 +145,48 @@ function findUpstreamSerializedWidgetNode(prompt: SerializedPrompt, input: INode
     return [null, null];
 }
 
-export default function restoreParameters(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): RestoreParamTargets {
-    const result = {}
+const addSource = (result: RestoreParamTargets, targetNode: ComfyWidgetNode, source: RestoreParamSource) => {
+    result[targetNode.id] ||= { targetNode, sources: [] }
+    result[targetNode.id].sources.push(source);
+}
 
-    const addSource = (targetNode: ComfyWidgetNode, source: RestoreParamSource) => {
-        result[targetNode.id] ||= { targetNode, sources: [] }
-        result[targetNode.id].sources.push(source);
+const mergeSources = (a: RestoreParamTargets, b: RestoreParamTargets) => {
+    for (const [k, vs] of Object.entries(b)) {
+        a[vs.targetNode.id] ||= { targetNode: vs.targetNode, sources: [] }
+        for (const source of vs.sources) {
+            a[vs.targetNode.id].sources.push(source);
+        }
     }
+}
+
+export function getWorkflowRestoreParams(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): RestoreParamTargets {
+    const result = {}
 
     const graph = workflow.graph;
 
-    // Step 1: Find nodes that correspond to *this* workflow exactly, since we
-    // can easily match up the nodes between each (their IDs will be the same)
     for (const serNode of prompt.workflow.nodes) {
         const foundNode = graph.getNodeByIdRecursive(serNode.id);
         if (isComfyWidgetNode(foundNode) && foundNode.type === serNode.type) {
             const finalValue = (serNode as SerializedComfyWidgetNode).comfyValue;
             if (finalValue != null) {
                 const source: RestoreParamSourceWorkflowNode = {
+                    type: "workflow",
                     finalValue,
                     sourceNode: serNode
                 }
-                addSource(foundNode, source)
+                addSource(result, foundNode, source)
             }
         }
     }
 
-    // Step 2: Figure out what parameters the backend received. If there was a
-    // widget node attached to a backend node's input upstream, then we can
-    // use that value.
+    return result
+}
+
+export function getBackendRestoreParams(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): RestoreParamTargets {
+    const result = {}
+
+    const graph = workflow.graph;
+
     for (const [serNodeID, inputs] of Object.entries(prompt.output)) {
         const serNode = prompt.workflow.nodes.find(sn => sn.id === serNodeID)
         if (serNode == null)
@@ -176,27 +206,47 @@ export default function restoreParameters(workflow: ComfyBoxWorkflow, prompt: Se
                 const foundNode = graph.getNodeByIdRecursive(serNode.id);
                 if (isComfyWidgetNode(foundNode) && foundNode.type === serNode.type) {
                     const source: RestoreParamSourceBackendNodeInput = {
+                        type: "backend",
                         finalValue: inputValue,
                         backendNode: serNode,
                         isDirectAttachment
                     }
-                    addSource(foundNode, source)
+                    addSource(result, foundNode, source)
                 }
             }
         }
     }
 
+    return result
+}
+
+export default function restoreParameters(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): RestoreParamTargets {
+    const result = {}
+
+    // Step 1: Find nodes that correspond to *this* workflow exactly, since we
+    // can easily match up the nodes between each (their IDs will be the same)
+    const workflowParams = getWorkflowRestoreParams(workflow, prompt);
+    mergeSources(result, workflowParams);
+
+    // Step 2: Figure out what parameters the backend received. If there was a
+    // widget node attached to a backend node's input upstream, then we can
+    // use that value.
+    const backendParams = getBackendRestoreParams(workflow, prompt);
+    mergeSources(result, backendParams);
+
     // Step 3: Extract the standard prompt from the workflow and use that to
     // infer parameter types
 
-    const serializer = new ComfyBoxStdPromptSerializer();
-    const stdPrompt = serializer.serialize(prompt);
+    // TODO
 
-    const allWidgetNodes = Array.from(graph.iterateNodesInOrderRecursive()).filter(isComfyWidgetNode);
+    // const serializer = new ComfyBoxStdPromptSerializer();
+    // const stdPrompt = serializer.serialize(prompt);
 
-    for (const widgetNode of allWidgetNodes) {
+    // const allWidgetNodes = Array.from(graph.iterateNodesInOrderRecursive()).filter(isComfyWidgetNode);
 
-    }
+    // for (const widgetNode of allWidgetNodes) {
+
+    // }
 
     // for (const [groupName, groups] of Object.entries(stdPrompt)) {
     // }
