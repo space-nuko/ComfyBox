@@ -45,7 +45,8 @@ export type ComfyAPIHistoryItem = [
 ]
 
 export type ComfyAPIPromptSuccessResponse = {
-    promptID: PromptID
+    promptID: PromptID,
+    number: number
 }
 
 export type ComfyAPIPromptResponse = ComfyAPIPromptSuccessResponse | ComfyAPIPromptErrorResponse
@@ -295,7 +296,7 @@ export default class ComfyAPI {
                 }
                 return res.json()
             })
-            .then(raw => { return { promptID: raw.prompt_id } })
+            .then(raw => { return { promptID: raw.prompt_id, number: raw.number } })
             .catch(error => { return error })
     }
 

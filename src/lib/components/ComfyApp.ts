@@ -728,9 +728,11 @@ export default class ComfyApp {
     }
 
     private requestPermissions() {
-        if (Notification.permission === "default") {
-            Notification.requestPermission()
-                .then((result) => console.log("Notification status:", result));
+        if (window.Notification != null) {
+            if (window.Notification.permission === "default") {
+                window.Notification.requestPermission()
+                    .then((result) => console.log("Notification status:", result));
+            }
         }
     }
 
@@ -939,7 +941,11 @@ export default class ComfyApp {
         if (workflow.attrs.queuePromptButtonRunWorkflow) {
             // Hold control to queue at the front
             const num = this.ctrlDown ? -1 : 0;
-            this.queuePrompt(workflow, num, 1);
+            let tag = null;
+            if (workflow.attrs.queuePromptButtonDefaultWorkflow) {
+                tag = workflow.attrs.queuePromptButtonDefaultWorkflow
+            }
+            this.queuePrompt(workflow, num, 1, tag);
         }
     }
 
@@ -1037,11 +1043,11 @@ export default class ComfyApp {
 
                     const p = this.graphToPrompt(workflow, tag);
                     const wf = this.serialize(workflow)
-                    console.debug(graphToGraphVis(workflow.graph))
-                    console.debug(promptToGraphVis(p))
+                    // console.debug(graphToGraphVis(workflow.graph))
+                    // console.debug(promptToGraphVis(p))
 
                     const stdPrompt = this.stdPromptSerializer.serialize(p);
-                    console.warn("STD", stdPrompt);
+                    // console.warn("STD", stdPrompt);
 
                     const extraData: ComfyBoxPromptExtraData = {
                         extra_pnginfo: {
@@ -1074,8 +1080,8 @@ export default class ComfyApp {
                             workflowState.promptError(workflow.id, errorPromptID)
                         }
                         else {
-                            queueState.afterQueued(workflow.id, response.promptID, num, p.output, extraData)
-                            workflowState.afterQueued(workflow.id, response.promptID, p, extraData)
+                            queueState.afterQueued(workflow.id, response.promptID, response.number, p.output, extraData)
+                            workflowState.afterQueued(workflow.id, response.promptID)
                         }
                     } catch (err) {
                         errorMes = err?.toString();

@@ -25,7 +25,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
     activeErrors?: ComfyGraphErrors = null;
     blinkError: ComfyGraphErrorLocation | null = null;
     blinkErrorTime: number = 0;
-    highlightNodeAndInput: [LGraphNode, number] | null = null;
+    highlightNodeAndInput: [LGraphNode, number | null] | null = null;
 
     get comfyGraph(): ComfyGraph | null {
         return this.graph as ComfyGraph;
@@ -104,7 +104,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         let state = get(queueState);
         let ss = get(selectionState);
 
-        const isRunningNode = node.id == state.runningNodeID
+        const isExecuting = state.executingNodes.has(node.id);
         const nodeErrors = this.activeErrors?.errorsByID[node.id];
         const isHighlightedNode = this.highlightNodeAndInput && this.highlightNodeAndInput[0].id === node.id;
 
@@ -133,11 +133,20 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         else if (isHighlightedNode) {
             color = "cyan";
             thickness = 2
+
+            // Blink node if no input highlighted
+            if (this.highlightNodeAndInput[1] == null) {
+                if (this.blinkErrorTime > 0) {
+                    if ((Math.floor(this.blinkErrorTime / 2)) % 2 === 0) {
+                        color = null;
+                    }
+                }
+            }
         }
         else if (ss.currentHoveredNodes.has(node.id)) {
             color = "lightblue";
         }
-        else if (isRunningNode) {
+        else if (isExecuting) {
             color = "#0f0";
         }
 
@@ -153,7 +162,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
             this.drawNodeOutline(node, ctx, size, mouseOver, fgColor, bgColor, color, thickness)
         }
 
-        if (isRunningNode && state.progress) {
+        if (isExecuting && state.progress) {
             ctx.fillStyle = "green";
             ctx.fillRect(0, 0, size[0] * (state.progress.value / state.progress.max), 6);
             ctx.fillStyle = bgColor;
@@ -172,9 +181,11 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
             }
             if (draw) {
                 const [node, inputSlot] = this.highlightNodeAndInput;
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = color;
-                this.highlightNodeInput(node, inputSlot, ctx);
+                if (inputSlot != null) {
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = color;
+                    this.highlightNodeInput(node, inputSlot, ctx);
+                }
             }
         }
     }
@@ -733,7 +744,7 @@ export default class ComfyGraphCanvas extends LGraphCanvas {
         this.selectNode(node);
     }
 
-    jumpToNodeAndInput(node: LGraphNode, slotIndex: number) {
+    jumpToNodeAndInput(node: LGraphNode, slotIndex: number | null) {
         this.jumpToNode(node);
         this.highlightNodeAndInput = [node, slotIndex];
         this.blinkErrorTime = 20;

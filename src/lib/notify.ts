@@ -92,6 +92,11 @@ function notifyToast(text: string, options: NotifyOptions) {
 }
 
 function notifyNative(text: string, options: NotifyOptions) {
+    if (window.Notification == null) {
+        console.warn("[notify] No Notification available on window")
+        return
+    }
+
     if (document.hasFocus())
         return;
 

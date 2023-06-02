@@ -3,7 +3,7 @@ import ComfyGraphNode, { type ComfyGraphNodeProperties } from "./ComfyGraphNode"
 import { Watch } from "@litegraph-ts/nodes-basic";
 import { nextLetter } from "$lib/utils";
 
-export type PickFirstMode = "anyActiveLink" | "truthy" | "dataNonNull"
+export type PickFirstMode = "anyActiveLink" | "dataTruthy" | "dataNonNull"
 
 export interface ComfyPickFirstNodeProperties extends ComfyGraphNodeProperties {
     mode: PickFirstMode
@@ -12,7 +12,7 @@ export interface ComfyPickFirstNodeProperties extends ComfyGraphNodeProperties {
 export default class ComfyPickFirstNode extends ComfyGraphNode {
     override properties: ComfyPickFirstNodeProperties = {
         tags: [],
-        mode: "dataNonNull"
+        mode: "anyActiveLink"
     }
 
     static slotLayout: SlotLayout = {
@@ -36,21 +36,39 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
         super(title);
         this.displayWidget = this.addWidget("text", "Value", "")
         this.displayWidget.disabled = true;
-        this.modeWidget = this.addWidget("combo", "Mode", this.properties.mode, null, { property: "mode", values: ["anyActiveLink", "truthy", "dataNonNull"] })
+        this.modeWidget = this.addWidget("combo", "Mode", this.properties.mode, null, { property: "mode", values: ["anyActiveLink", "dataTruthy", "dataNonNull"] })
     }
 
     override onDrawBackground(ctx: CanvasRenderingContext2D) {
-        if (this.flags.collapsed || this.selected === -1) {
+        if (this.flags.collapsed) {
             return;
         }
 
-        ctx.fillStyle = "#AFB";
-        var y = (this.selected) * LiteGraph.NODE_SLOT_HEIGHT + 6;
-        ctx.beginPath();
-        ctx.moveTo(50, y);
-        ctx.lineTo(50, y + LiteGraph.NODE_SLOT_HEIGHT);
-        ctx.lineTo(34, y + LiteGraph.NODE_SLOT_HEIGHT * 0.5);
-        ctx.fill();
+        if (this.selected === -1) {
+            // Draw an X indicating nothing matched the selection criteria
+            const y = LiteGraph.NODE_SLOT_HEIGHT + 6;
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = "red";
+            ctx.beginPath();
+
+            ctx.moveTo(50 - 15, y - 15);
+            ctx.lineTo(50 + 15, y + 15);
+            ctx.stroke();
+
+            ctx.moveTo(50 + 15, y - 15);
+            ctx.lineTo(50 - 15, y + 15);
+            ctx.stroke();
+        }
+        else {
+            // Draw an arrow pointing to the selected input
+            ctx.fillStyle = "#AFB";
+            const y = (this.selected) * LiteGraph.NODE_SLOT_HEIGHT + 6;
+            ctx.beginPath();
+            ctx.moveTo(50, y);
+            ctx.lineTo(50, y + LiteGraph.NODE_SLOT_HEIGHT);
+            ctx.lineTo(34, y + LiteGraph.NODE_SLOT_HEIGHT * 0.5);
+            ctx.fill();
+        }
     };
 
     override onConnectionsChange(
@@ -113,7 +131,7 @@ export default class ComfyPickFirstNode extends ComfyGraphNode {
         else {
             if (this.properties.mode === "dataNonNull")
                 return link.data != null;
-            else if (this.properties.mode === "truthy")
+            else if (this.properties.mode === "dataTruthy")
                 return Boolean(link.data)
             else // anyActiveLink
                 return true;

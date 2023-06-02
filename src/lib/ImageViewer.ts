@@ -165,7 +165,6 @@ export class ImageViewer {
 
         let urls = ImageViewer.get_gallery_urls(galleryElem)
         const [_currentButton, index] = ImageViewer.selected_gallery_button(galleryElem)
-        console.warn("Gallery!", index, urls, galleryElem)
 
         this.showModal(urls, index, galleryElem)
     }

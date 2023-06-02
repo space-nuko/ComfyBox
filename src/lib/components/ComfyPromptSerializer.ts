@@ -71,62 +71,62 @@ export function isActiveBackendNode(node: LGraphNode, tag: string | null = null)
     return true;
 }
 
-type UpstreamResult = [LGraph | null, LLink | null, number | null, LGraphNode | null];
+export type UpstreamResult = [LGraph | null, LLink | null, number | null, LGraphNode | null];
+
+function followSubgraph(subgraph: Subgraph, link: LLink): UpstreamResult {
+    if (link.origin_id != subgraph.id)
+        throw new Error("Invalid link and graph output!")
+
+    const innerGraphOutput = subgraph.getInnerGraphOutputByIndex(link.origin_slot)
+    if (innerGraphOutput == null)
+        throw new Error("No inner graph input!")
+
+    const nextLink = innerGraphOutput.getInputLink(0)
+    return [innerGraphOutput.graph, nextLink, 0, innerGraphOutput];
+}
+
+function followGraphInput(graphInput: GraphInput, link: LLink): UpstreamResult {
+    if (link.origin_id != graphInput.id)
+        throw new Error("Invalid link and graph input!")
+
+    const outerSubgraph = graphInput.getParentSubgraph();
+    if (outerSubgraph == null)
+        throw new Error("No outer subgraph!")
+
+    const outerInputIndex = outerSubgraph.inputs.findIndex(i => i.name === graphInput.nameInGraph)
+    if (outerInputIndex === -1)
+        throw new Error("No outer input slot!")
+
+    const nextLink = outerSubgraph.getInputLink(outerInputIndex)
+    return [outerSubgraph.graph, nextLink, outerInputIndex, outerSubgraph];
+}
+
+export function getUpstreamLink(parent: LGraphNode, currentLink: LLink): UpstreamResult {
+    if (parent.is(Subgraph)) {
+        console.debug("FollowSubgraph")
+        return followSubgraph(parent, currentLink);
+    }
+    else if (parent.is(GraphInput)) {
+        console.debug("FollowGraphInput")
+        return followGraphInput(parent, currentLink);
+    }
+    else if ("getUpstreamLink" in parent) {
+        const link = (parent as ComfyGraphNode).getUpstreamLink();
+        return [parent.graph, link, link?.target_slot, parent];
+    }
+    else if (parent.inputs.length === 1) {
+        // Only one input, so assume we can follow it backwards.
+        const link = parent.getInputLink(0);
+        if (link) {
+            return [parent.graph, link, 0, parent]
+        }
+    }
+    console.warn("[graphToPrompt] Frontend node does not support getUpstreamLink", parent.type)
+    return [null, null, null, null];
+}
 
 export class UpstreamNodeLocator {
-    constructor(private isTheTargetNode: (node: LGraphNode) => boolean) {
-    }
-
-    private followSubgraph(subgraph: Subgraph, link: LLink): UpstreamResult {
-        if (link.origin_id != subgraph.id)
-            throw new Error("Invalid link and graph output!")
-
-        const innerGraphOutput = subgraph.getInnerGraphOutputByIndex(link.origin_slot)
-        if (innerGraphOutput == null)
-            throw new Error("No inner graph input!")
-
-        const nextLink = innerGraphOutput.getInputLink(0)
-        return [innerGraphOutput.graph, nextLink, 0, innerGraphOutput];
-    }
-
-    private followGraphInput(graphInput: GraphInput, link: LLink): UpstreamResult {
-        if (link.origin_id != graphInput.id)
-            throw new Error("Invalid link and graph input!")
-
-        const outerSubgraph = graphInput.getParentSubgraph();
-        if (outerSubgraph == null)
-            throw new Error("No outer subgraph!")
-
-        const outerInputIndex = outerSubgraph.inputs.findIndex(i => i.name === graphInput.nameInGraph)
-        if (outerInputIndex == null)
-            throw new Error("No outer input slot!")
-
-        const nextLink = outerSubgraph.getInputLink(outerInputIndex)
-        return [outerSubgraph.graph, nextLink, outerInputIndex, outerSubgraph];
-    }
-
-    private getUpstreamLink(parent: LGraphNode, currentLink: LLink): UpstreamResult {
-        if (parent.is(Subgraph)) {
-            console.debug("FollowSubgraph")
-            return this.followSubgraph(parent, currentLink);
-        }
-        else if (parent.is(GraphInput)) {
-            console.debug("FollowGraphInput")
-            return this.followGraphInput(parent, currentLink);
-        }
-        else if ("getUpstreamLink" in parent) {
-            const link = (parent as ComfyGraphNode).getUpstreamLink();
-            return [parent.graph, link, link?.target_slot, parent];
-        }
-        else if (parent.inputs.length === 1) {
-            // Only one input, so assume we can follow it backwards.
-            const link = parent.getInputLink(0);
-            if (link) {
-                return [parent.graph, link, 0, parent]
-            }
-        }
-        console.warn("[graphToPrompt] Frontend node does not support getUpstreamLink", parent.type)
-        return [null, null, null, null];
+    constructor(private isTheTargetNode: (node: LGraphNode, currentLink: LLink) => boolean) {
     }
 
     /*
@@ -146,8 +146,8 @@ export class UpstreamNodeLocator {
         let currentInputSlot = inputIndex;
         let currentNode = fromNode;
 
-        const shouldFollowParent = (parent: LGraphNode) => {
-            return isActiveNode(parent, tag) && !this.isTheTargetNode(parent);
+        const shouldFollowParent = (parent: LGraphNode, currentLink: LLink) => {
+            return isActiveNode(parent, tag) && !this.isTheTargetNode(parent, currentLink);
         }
 
         // If there are non-target nodes between us and another
@@ -156,8 +156,8 @@ export class UpstreamNodeLocator {
         // will simply follow their single input, while branching
         // nodes have conditional logic that determines which link
         // to follow backwards.
-        while (shouldFollowParent(parent)) {
-            const [nextGraph, nextLink, nextInputSlot, nextNode] = this.getUpstreamLink(parent, currentLink);
+        while (shouldFollowParent(parent, currentLink)) {
+            const [nextGraph, nextLink, nextInputSlot, nextNode] = getUpstreamLink(parent, currentLink);
 
             currentInputSlot = nextInputSlot;
             currentNode = nextNode;
@@ -183,7 +183,7 @@ export class UpstreamNodeLocator {
             }
         }
 
-        if (!isActiveNode(parent, tag) || !this.isTheTargetNode(parent) || currentLink == null)
+        if (!isActiveNode(parent, tag) || !this.isTheTargetNode(parent, currentLink) || currentLink == null)
             return [null, currentLink, currentInputSlot, currentNode];
 
         return [parent, currentLink, currentInputSlot, currentNode]
