@@ -135,7 +135,7 @@
                                         {#if missingTag && nodeToJumpTo}
                                             <div class="error-input">
                                                 <div><span class="error-message">Node "{nodeToJumpTo.title}" was missing tag used in workflow:</span><span style:padding-left="0.2rem"><b>{missingTag}</b></span></div>
-                                                <div>Tags on node: <b>[{(nodeToJumpTo?.attrs?.tags || []).join(", ")}]</b></div>
+                                                <div>Tags on node: <b>{(nodeToJumpTo?.properties?.tags || []).join(", ")}</b></div>
                                             </div>
                                         {:else}
                                             <span class="error-message" class:execution-error={isExecutionError}>{error.message}</span>
