@@ -1043,11 +1043,11 @@ export default class ComfyApp {
 
                     const p = this.graphToPrompt(workflow, tag);
                     const wf = this.serialize(workflow)
-                    console.debug(graphToGraphVis(workflow.graph))
-                    console.debug(promptToGraphVis(p))
+                    // console.debug(graphToGraphVis(workflow.graph))
+                    // console.debug(promptToGraphVis(p))
 
                     const stdPrompt = this.stdPromptSerializer.serialize(p);
-                    console.warn("STD", stdPrompt);
+                    // console.warn("STD", stdPrompt);
 
                     const extraData: ComfyBoxPromptExtraData = {
                         extra_pnginfo: {
@@ -1080,8 +1080,8 @@ export default class ComfyApp {
                             workflowState.promptError(workflow.id, errorPromptID)
                         }
                         else {
-                            queueState.afterQueued(workflow.id, response.promptID, num, p.output, extraData)
-                            workflowState.afterQueued(workflow.id, response.promptID, p, extraData)
+                            queueState.afterQueued(workflow.id, response.promptID, response.number, p.output, extraData)
+                            workflowState.afterQueued(workflow.id, response.promptID)
                         }
                     } catch (err) {
                         errorMes = err?.toString();
