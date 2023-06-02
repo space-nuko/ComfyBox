@@ -1,5 +1,11 @@
 <script context="module" lang="ts">
- export const WORKFLOWS_VIEW: any = {}
+ // workaround a vite HMR bug
+ // shouts out to @rixo
+ // https://github.com/sveltejs/svelte/issues/8655
+ export const WORKFLOWS_VIEW = import.meta.hot?.data?.WORKFLOWS_VIEW || {}
+ if (import.meta.hot?.data) {
+     import.meta.hot.data.WORKFLOWS_VIEW = WORKFLOWS_VIEW
+ }
 </script>
 
 <script lang="ts">
