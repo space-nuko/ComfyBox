@@ -1,10 +1,11 @@
 import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
 import type { DragItemID, IDragItem } from './layoutStates';
-import type { LGraphNode, NodeID, UUID } from '@litegraph-ts/core';
+import { LiteGraph, type LGraphNode, type NodeID, type UUID } from '@litegraph-ts/core';
 import type { SerializedAppState } from '$lib/components/ComfyApp';
 import type { RestoreParamTargets, RestoreParamWorkflowNodeTargets } from '$lib/restoreParameters';
 import { v4 as uuidv4 } from "uuid";
+import deepEqual from "deep-equal";
 
 export type JourneyNodeType = "root" | "patch";
 
@@ -55,7 +56,7 @@ function diffParams(base: RestoreParamWorkflowNodeTargets, updated: RestoreParam
     const result = {}
 
     for (const [k, v] of Object.entries(updated)) {
-        if (!(k in base) || base[k].finalValue !== v) {
+        if (!(k in base) || !deepEqual(base[k].finalValue, v.finalValue, { strict: true })) {
             result[k] = v
         }
     }
@@ -63,7 +64,7 @@ function diffParams(base: RestoreParamWorkflowNodeTargets, updated: RestoreParam
     return result;
 }
 
-function calculatePatch(parent: JourneyNode, newParams: RestoreParamWorkflowNodeTargets): RestoreParamWorkflowNodeTargets {
+export function calculateWorkflowParamsPatch(parent: JourneyNode, newParams: RestoreParamWorkflowNodeTargets): RestoreParamWorkflowNodeTargets {
     const patch = resolvePatch(parent);
     const diff = diffParams(patch, newParams)
     return diff;
@@ -87,8 +88,9 @@ export type JourneyState = {
 
 type JourneyStateOps = {
     clear: () => void,
-    addNode: (params: RestoreParamWorkflowNodeTargets, parent?: JourneyNodeID) => JourneyNode,
-    selectNode: (id?: JourneyNodeID) => void,
+    getActiveNode: () => JourneyNode | null,
+    addNode: (params: RestoreParamWorkflowNodeTargets, parent?: JourneyNodeID | JourneyNode) => JourneyNode,
+    selectNode: (id?: JourneyNodeID | JourneyNode) => void,
     iterateBreadthFirst: (id?: JourneyNodeID | null) => Iterable<JourneyNode>
 }
 
@@ -112,15 +114,28 @@ function create() {
         })
     }
 
+    function getActiveNode(): JourneyNode | null {
+        const state = get(store)
+        if (state.activeNodeID === null)
+            return null;
+        const active = state.nodesByID[state.activeNodeID]
+        if (active == null) {
+            console.error("[journeyStates] Active node not found in graph!", state.activeNodeID);
+        }
+        return active;
+    }
+
     /*
-     * params: full state of widgets in the UI
+     * params: full state or state patch of widgets in the UI
      * parent: parent node to patch against
      */
-    function addNode(params: RestoreParamWorkflowNodeTargets, parent?: JourneyNodeID): JourneyNode {
+    function addNode(params: RestoreParamWorkflowNodeTargets, parent?: JourneyNodeID | JourneyNode): JourneyNode {
         let _node: JourneyRootNode | JourneyPatchNode;
         store.update(s => {
             let parentNode: JourneyNode | null = null
             if (parent != null) {
+                if (typeof parent === "object")
+                    parent = parent.id;
                 parentNode = s.nodesByID[parent];
                 if (parentNode == null) {
                     throw new Error(`Could not find parent node ${parent} to insert into!`)
@@ -141,7 +156,7 @@ function create() {
                     type: "patch",
                     parent: parentNode,
                     children: [],
-                    patch: calculatePatch(parentNode, params)
+                    patch: params,
                 }
                 parentNode.children.push(_node);
             }
@@ -152,9 +167,12 @@ function create() {
         return _node;
     }
 
-    function selectNode(id?: JourneyNodeID) {
+    function selectNode(obj?: JourneyNodeID | JourneyNode) {
         store.update(s => {
-            s.activeNodeID = id;
+            if (typeof obj === "string")
+                s.activeNodeID = obj;
+            else
+                s.activeNodeID = obj.id;
             return s;
         })
     }
@@ -201,6 +219,7 @@ function create() {
 
     return {
         ...store,
+        getActiveNode,
         clear,
         addNode,
         selectNode,

@@ -84,6 +84,7 @@
                  class:edit={edit}
                  class:hovered
                  class:selected
+                 class:patch-affected={$selectionState.currentPatchHoveredNodes.has(widget.node.id)}
                  class:is-executing={$queueState.runningNodeID && $queueState.runningNodeID == widget.node.id}
                  class:hidden={hidden}
             >
@@ -111,6 +112,10 @@
 
      &.selected {
          background: var(--comfy-widget-selected-background-fill);
+     }
+
+     &.patch-affected {
+         background: var(--secondary-500);
      }
  }
 

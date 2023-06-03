@@ -24,7 +24,12 @@ export type SelectionState = {
     /*
      * Currently hovered nodes.
      */
-    currentHoveredNodes: Set<NodeID>
+    currentHoveredNodes: Set<NodeID>,
+
+    /*
+     * Nodes affected by the patch hovered in the journey pane
+     */
+    currentPatchHoveredNodes: Set<NodeID>
 }
 
 type SelectionStateOps = {
@@ -38,6 +43,7 @@ const store: Writable<SelectionState> = writable(
         currentSelectionNodes: [],
         currentHovered: new Set(),
         currentHoveredNodes: new Set(),
+        currentPatchHoveredNodes: new Set(),
     })
 
 function clear() {
@@ -46,12 +52,13 @@ function clear() {
         currentSelectionNodes: [],
         currentHovered: new Set(),
         currentHoveredNodes: new Set(),
+        currentPatchHoveredNodes: new Set(),
     })
 }
 
-const uiStateStore: WritableSelectionStateStore =
+const selectionStateStore: WritableSelectionStateStore =
 {
     ...store,
     clear
 }
-export default uiStateStore;
+export default selectionStateStore;

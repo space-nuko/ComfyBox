@@ -2,7 +2,7 @@ import type { SerializedGraphCanvasState } from '$lib/ComfyGraphCanvas';
 import { clamp, LGraphNode, type LGraphCanvas, type NodeID, type SerializedLGraph, type UUID, LGraph, LiteGraph, type SlotType, NodeMode } from '@litegraph-ts/core';
 import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
-import { defaultWorkflowAttributes, type SerializedLayoutState, type WritableLayoutStateStore } from './layoutStates';
+import { defaultWorkflowAttributes, isComfyWidgetNode, type SerializedLayoutState, type WritableLayoutStateStore } from './layoutStates';
 import ComfyGraph from '$lib/ComfyGraph';
 import layoutStates from './layoutStates';
 import { v4 as uuidv4 } from "uuid";
@@ -14,6 +14,7 @@ import type { ComfyBoxPromptExtraData, PromptID } from '$lib/api';
 import type { ComfyAPIPromptErrorResponse, ComfyExecutionError } from '$lib/apiErrors';
 import type { WritableJourneyStateStore } from './journeyState';
 import journeyStates from './journeyStates';
+import type { RestoreParamWorkflowNodeTargets } from '$lib/restoreParameters';
 
 type ActiveCanvas = {
     canvas: LGraphCanvas | null;
@@ -209,6 +210,21 @@ export class ComfyBoxWorkflow {
             graph: serializedGraph,
             layout: serializedLayout,
             attrs: this.attrs
+        }
+    }
+
+    applyParamsPatch(patch: RestoreParamWorkflowNodeTargets) {
+        for (const [nodeId, source] of Object.entries(patch)) {
+            const node = this.graph.getNodeByIdRecursive(nodeId);
+            if (node == null) {
+                console.error("[applyParamsPatch] Node was missing in patch!!", nodeId, source)
+                continue;
+            }
+            if (!isComfyWidgetNode(node)) {
+                console.error("[applyParamsPatch] Node was not ComfyWidgetNode!!", nodeId, source)
+                continue;
+            }
+            node.setValue(source.finalValue);
         }
     }
 

@@ -30,9 +30,6 @@
      cyInstance = null;
  }
 
- let _nodes: any[];
- let _edges: any[];
-
  function rebuildGraph() {
      cytoscape.use(dagre)
 
@@ -41,6 +38,7 @@
          style: GraphStyles,
          wheelSensitivity: 0.1,
          maxZoom: 1,
+         minZoom: 0.5,
      })
 
      cyInstance.on("add", () => {
@@ -74,8 +72,7 @@
  let cyInstance: cytoscape.Core = null
 </script>
 
-<div class="cy-graph" {style} bind:this={refElement}>
-</div>
+<div class="cy-graph" {style} bind:this={refElement} />
 
 <style lang="scss">
  .cy-graph {

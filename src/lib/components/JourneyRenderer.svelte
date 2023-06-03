@@ -4,34 +4,19 @@
 	import { get } from 'svelte/store';
  import Graph from './graph/Graph.svelte'
  import type { NodeDataDefinition, EdgeDataDefinition } from 'cytoscape';
+ import { createEventDispatcher } from "svelte";
+	import selectionState from '$lib/stores/selectionState';
 
  export let workflow: ComfyBoxWorkflow | null = null
  export let journey: WritableJourneyStateStore | null = null
- //
- //  const nodes: NodeDataDefinition[] = [
- //      //{ id: 'N1', label: 'Start' },
- //      //{ id: 'N2', label: '4' },
- //      //{ id: 'N4', label: '8' },
- //      //{ id: 'N5', label: '15' },
- //      //{ id: 'N3', label: '16' },
- //      //{ id: 'N6', label: '23' },
- //      //{ id: 'N7', label: '42' },
- //      //{ id: 'N8', label: 'End' }
- //  ]
- //
- //  const edges: EdgeDataDefinition[] = [
- //      //{ id: 'E1', source: 'N1', target: 'N2' },
- //      //{ id: 'E2', source: 'N2', target: 'N3' },
- //      //{ id: 'E3', source: 'N3', target: 'N6' },
- //      //{ id: 'E4', source: 'N2', target: 'N4' },
- //      //{ id: 'E5', source: 'N4', target: 'N5' },
- //      //{ id: 'E6', source: 'N5', target: 'N4', label: '2' },
- //      //{ id: 'E7', source: 'N5', target: 'N6' },
- //      //{ id: 'E8', source: 'N6', target: 'N7' },
- //      //{ id: 'E9', source: 'N7', target: 'N7', label: '3' },
- //      //{ id: 'E10', source: 'N7', target: 'N8' }
- //  ]
 
+ const dispatch = createEventDispatcher<{
+     select_node: { cyto: cytoscape.Core, node: cytoscape.NodeSingular };
+     hover_node: { cyto: cytoscape.Core, node: cytoscape.NodeSingular };
+     hover_node_out: { cyto: cytoscape.Core, node: cytoscape.NodeSingular };
+ }>();
+
+ let lastSelected = null;
 
  let lastVersion = -1;
 
@@ -48,6 +33,7 @@
      }
 
      const journeyState = get(journey);
+     lastSelected = journeyState.activeNodeID;
 
      const nodes: NodeDataDefinition[] = []
      const edges: EdgeDataDefinition[] = []
@@ -86,17 +72,48 @@
 
  function onNodeSelected(e: cytoscape.InputEventObject) {
      console.warn("SELECT", e)
-     const node = e.target;
+     const node = e.target as cytoscape.NodeSingular;
      journey.selectNode(node.id());
+
+     e.cy.animate({
+         center: { eles: node }
+     }, {
+         duration: 400,
+         easing: "ease-in-out-quad"
+     });
+
      e.cy.center(node)
+
+     dispatch("select_node", { cyto: e.cy, node })
+ }
+
+ function onNodeHovered(e: cytoscape.InputEventObject) {
+     const node = e.target as cytoscape.NodeSingular;
+     dispatch("hover_node", { cyto: e.cy, node })
+ }
+
+ function onNodeHoveredOut(e: cytoscape.InputEventObject) {
+     const node = e.target as cytoscape.NodeSingular;
+     dispatch("hover_node_out", { cyto: e.cy, node })
  }
 
  function onRebuilt(e: CustomEvent<{cyto: cytoscape.Core}>) {
      const { cyto } = e.detail;
 
+     for (const node of cyto.nodes().components()) {
+         if (node.id() === lastSelected) {
+             // why doesn't passing `selected` work in the ctor?
+             node.select();
+         }
+     }
+
+     $selectionState.currentPatchHoveredNodes = new Set()
+
      cyto.nodes()
          .lock()
          .on("select", onNodeSelected)
+         .on("mouseover", onNodeHovered)
+         .on("mouseout", onNodeHoveredOut)
 
      const nodes = Array.from(journey.iterateBreadthFirst());
      if (nodes.length > 0) {
