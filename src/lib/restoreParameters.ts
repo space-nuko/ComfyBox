@@ -1,4 +1,4 @@
-import type { INodeInputSlot, NodeID } from "@litegraph-ts/core";
+import type { INodeInputSlot, NodeID, SerializedLGraph } from "@litegraph-ts/core";
 import type { SerializedPrompt } from "./components/ComfyApp";
 import type { ComfyWidgetNode } from "./nodes/widgets";
 import type { SerializedComfyWidgetNode } from "./nodes/widgets/ComfyWidgetNode";
@@ -159,14 +159,37 @@ export function concatRestoreParams2(a: RestoreParamTargets, b: RestoreParamTarg
     return a;
 }
 
-export function getWorkflowRestoreParams(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): RestoreParamWorkflowNodeTargets {
+/*
+ * Like getWorkflowRestoreParams but applies to an instanced (non-serialized) workflow
+ */
+export function getWorkflowRestoreParamsFromWorkflow(workflow: ComfyBoxWorkflow): RestoreParamWorkflowNodeTargets {
+    const result = {}
+
+    for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
+        if (!isComfyWidgetNode(node))
+            continue;
+
+        const finalValue = node.getValue();
+        if (finalValue != null) {
+            const source: RestoreParamSourceWorkflowNode = {
+                type: "workflow",
+                finalValue,
+            }
+            result[node.id] = source;
+        }
+    }
+
+    return result
+}
+
+export function getWorkflowRestoreParams(workflow: ComfyBoxWorkflow, prompt: SerializedLGraph): RestoreParamWorkflowNodeTargets {
     const result = {}
 
     const graph = workflow.graph;
 
     // Find nodes that correspond to *this* workflow exactly, since we can
     // easily match up the nodes between each (their IDs will be the same)
-    for (const serNode of prompt.workflow.nodes) {
+    for (const serNode of prompt.nodes) {
         const foundNode = graph.getNodeByIdRecursive(serNode.id);
         if (isComfyWidgetNode(foundNode) && foundNode.type === serNode.type) {
             const finalValue = (serNode as SerializedComfyWidgetNode).comfyValue;
@@ -227,7 +250,7 @@ export function getBackendRestoreParams(workflow: ComfyBoxWorkflow, prompt: Seri
 export default function restoreParameters(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): RestoreParamTargets {
     const result = {}
 
-    const workflowParams = getWorkflowRestoreParams(workflow, prompt);
+    const workflowParams = getWorkflowRestoreParams(workflow, prompt.workflow);
     concatRestoreParams(result, workflowParams);
 
     const backendParams = getBackendRestoreParams(workflow, prompt);

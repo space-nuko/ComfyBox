@@ -12,11 +12,16 @@
  import GraphStyles from "./GraphStyles"
  import type { EdgeDataDefinition } from "cytoscape";
  import type { NodeDataDefinition } from "cytoscape";
+ import { createEventDispatcher } from "svelte";
 
  export let nodes: ReadonlyArray<NodeDataDefinition>;
  export let edges: ReadonlyArray<EdgeDataDefinition>;
 
  export let style: string = ""
+
+ const dispatch = createEventDispatcher<{
+     rebuilt: { cyto: cytoscape.Core };
+ }>();
 
  $: if (nodes != null && edges != null && refElement != null) {
      rebuildGraph()
@@ -35,6 +40,7 @@
          container: refElement,
          style: GraphStyles,
          wheelSensitivity: 0.1,
+         maxZoom: 1,
      })
 
      cyInstance.on("add", () => {
@@ -60,6 +66,8 @@
              data: { ...edge }
          })
      }
+
+     dispatch("rebuilt", { cyto: cyInstance })
  }
 
  let refElement = null

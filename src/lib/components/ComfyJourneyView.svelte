@@ -10,6 +10,8 @@
  import type { WritableJourneyStateStore } from '$lib/stores/journeyStates';
  import JourneyRenderer from './JourneyRenderer.svelte';
  import { Plus } from "svelte-bootstrap-icons";
+	import { getWorkflowRestoreParams, getWorkflowRestoreParamsFromWorkflow } from '$lib/restoreParameters';
+	import notify from '$lib/notify';
 
  export let app: ComfyApp;
 
@@ -18,6 +20,20 @@
 
  $: workflow = $workflowState.activeWorkflow
  $: journey = workflow?.journey
+
+ function doAdd() {
+     if (!workflow) {
+         notify("No active workflow!", { type: "error" })
+         return;
+     }
+
+     const nodes = Array.from(journey.iterateBreadthFirst());
+     let parent = null;
+     if (nodes.length > 0)
+         parent = nodes[nodes.length - 1]
+     const workflowParams = getWorkflowRestoreParamsFromWorkflow(workflow)
+     journey.addNode(workflowParams, parent?.id);
+ }
 </script>
 
 <div class="journey-view">
@@ -25,7 +41,7 @@
     <div class="bottom">
         <button class="mode-button ternary"
                 title={"Add new"}
-                on:click={() => {}}>
+                on:click={doAdd}>
             <Plus width="100%" height="100%" />
         </button>
     </div>
