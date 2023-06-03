@@ -45,10 +45,21 @@ export interface JourneyPatchNode extends JourneyNode {
     patch: RestoreParamWorkflowNodeTargets
 }
 
-export function resolvePatch(node: JourneyNode): RestoreParamWorkflowNodeTargets {
+function isRoot(node: JourneyNode): node is JourneyRootNode {
+    return node.type === "root";
+}
+
+function isPatch(node: JourneyNode): node is JourneyPatchNode {
+    return node.type === "patch";
+}
+
+export function resolvePatch(node: JourneyNode, memoize?: Record<JourneyNodeID, RestoreParamWorkflowNodeTargets>): RestoreParamWorkflowNodeTargets {
     if (node.type === "root") {
         return { ...(node as JourneyRootNode).base }
     }
+
+    if (memoize && memoize[node.id] != null)
+        return { ...memoize[node.id] }
 
     const patchNode = (node as JourneyPatchNode);
     const patch = { ...patchNode.patch };
@@ -56,6 +67,11 @@ export function resolvePatch(node: JourneyNode): RestoreParamWorkflowNodeTargets
     for (const [k, v] of Object.entries(patch)) {
         base[k] = v;
     }
+
+    if (memoize) {
+        memoize[node.id] = base;
+    }
+
     return base;
 }
 
@@ -99,6 +115,7 @@ type JourneyStateOps = {
     // addNode: (params: RestoreParamWorkflowNodeTargets, parent?: JourneyNodeID | JourneyNode) => JourneyNode,
     selectNode: (id?: JourneyNodeID | JourneyNode) => void,
     iterateBreadthFirst: (id?: JourneyNodeID | null) => Iterable<JourneyNode>,
+    iterateLinearPath: (id: JourneyNodeID) => Iterable<JourneyNode>,
     pushPatchOntoActive: (workflow: ComfyBoxWorkflow, activeNode?: JourneyNode, showNotification?: boolean) => JourneyNode | null
     onExecuted: (promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutput, queueEntry: QueueEntry) => void
 }
@@ -265,9 +282,38 @@ function create() {
         }
     }
 
+    function* iterateNodeParents(node: JourneyNode): Iterable<JourneyNode> {
+        while (isPatch(node)) {
+            yield node.parent;
+            node = node.parent;
+        }
+    }
+
+    function iterateLinearPath(id: JourneyNodeID): Iterable<JourneyNode> {
+        const state = get(store);
+
+        const node = state.nodesByID[id];
+        if (node == null) {
+            console.error("[journeyStates] Journey node not found!", id);
+            return
+        }
+
+        let path = Array.from(iterateNodeParents(node)).reverse()
+        path.push(node)
+
+        // pick first child for nodes downstream
+        let child = node.children[0]
+        while (child != null) {
+            path.push(child);
+            child = child.children[0];
+        }
+
+        return path;
+    }
+
     function onExecuted(promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutput, queueEntry: QueueEntry) {
         const journeyNode = Array.from(iterateBreadthFirst()).find(j => j.promptID === promptID);
-        if (journeyNode === null)
+        if (journeyNode == null)
             return;
 
         // TODO
@@ -286,6 +332,7 @@ function create() {
         pushPatchOntoActive,
         selectNode,
         iterateBreadthFirst,
+        iterateLinearPath,
         onExecuted
     }
 }

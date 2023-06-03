@@ -57,9 +57,10 @@ const styles: Stylesheet[] = [
     {
         selector: ".patchNode",
         style: {
-            "width": "100",
-            "height": "data(patchNodeHeight)",
+            "width": "label",
+            "height": "label",
             "shape": "round-rectangle",
+            "padding": "20",
             "font-family": "Arial",
             "font-size": "11",
             "font-weight": "normal",

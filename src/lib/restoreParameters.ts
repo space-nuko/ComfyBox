@@ -2,7 +2,7 @@ import type { INodeInputSlot, NodeID, SerializedLGraph } from "@litegraph-ts/cor
 import type { SerializedPrompt } from "./components/ComfyApp";
 import type { ComfyWidgetNode } from "./nodes/widgets";
 import type { SerializedComfyWidgetNode } from "./nodes/widgets/ComfyWidgetNode";
-import { isComfyWidgetNode } from "./stores/layoutStates";
+import { isComfyWidgetNode, type SerializedLayoutState } from "./stores/layoutStates";
 import type { ComfyBoxWorkflow } from "./stores/workflowState";
 import { isSerializedPromptInputLink } from "./utils";
 import ComfyBoxStdPromptSerializer from "./ComfyBoxStdPromptSerializer";
@@ -14,6 +14,16 @@ export type RestoreParamType = "workflow" | "backend" | "stdPrompt";
  */
 export interface RestoreParamSource<T extends RestoreParamType = any> {
     type: T,
+
+    /*
+     * A human-readable name for this parameter
+     */
+    name?: string,
+
+    /*
+     * LiteGraph type of the widget node
+     */
+    nodeType: string,
 
     /*
      * The actual value to copy to the widget after all conversions have been
@@ -172,10 +182,22 @@ export function getWorkflowRestoreParamsFromWorkflow(workflow: ComfyBoxWorkflow,
         if (!noExclude && node.properties.excludeFromJourney)
             continue;
 
+        let name = null;
+        const realNode = workflow.graph.getNodeByIdRecursive(node.id);
+        if (realNode != null && isComfyWidgetNode(realNode)) {
+            name = realNode.title || name;
+            const widget = realNode.dragItem;
+            if (widget != null) {
+                name = widget.attrs.title || name;
+            }
+        }
+
         const finalValue = node.getValue();
         if (finalValue != null) {
             const source: RestoreParamSourceWorkflowNode = {
                 type: "workflow",
+                nodeType: node.type,
+                name,
                 finalValue,
             }
             result[node.id] = source;
@@ -185,7 +207,7 @@ export function getWorkflowRestoreParamsFromWorkflow(workflow: ComfyBoxWorkflow,
     return result
 }
 
-export function getWorkflowRestoreParams(serGraph: SerializedLGraph, noExclude: boolean = false): RestoreParamWorkflowNodeTargets {
+export function getWorkflowRestoreParams(serGraph: SerializedLGraph, workflow?: ComfyBoxWorkflow, noExclude: boolean = false): RestoreParamWorkflowNodeTargets {
     const result = {}
 
     for (const node of serGraph.nodes) {
@@ -195,13 +217,56 @@ export function getWorkflowRestoreParams(serGraph: SerializedLGraph, noExclude: 
         if (!noExclude && node.properties.excludeFromJourney)
             continue;
 
+        let name = null;
+        const realNode = workflow.graph.getNodeByIdRecursive(node.id);
+        if (realNode != null && isComfyWidgetNode(realNode)) {
+            name = realNode.title || name;
+            const widget = realNode.dragItem;
+            if (widget != null) {
+                name = widget.attrs.title || name;
+            }
+        }
+
         const finalValue = node.comfyValue
         if (finalValue != null) {
             const source: RestoreParamSourceWorkflowNode = {
                 type: "workflow",
+                nodeType: node.type,
+                name,
                 finalValue,
             }
             result[node.id] = source;
+        }
+    }
+
+    return result
+}
+
+export function getWorkflowRestoreParamsUsingLayout(serGraph: SerializedLGraph, layout?: SerializedLayoutState, noExclude: boolean = false): RestoreParamWorkflowNodeTargets {
+    const result = {}
+
+    for (const serNode of serGraph.nodes) {
+        if (!isSerializedComfyWidgetNode(serNode))
+            continue;
+
+        if (!noExclude && serNode.properties.excludeFromJourney)
+            continue;
+
+        let name = null;
+        const serWidget = Array.from(Object.values(layout?.allItems || {})).find(di => di.dragItem.type === "widget" && di.dragItem.nodeId === serNode.id)
+        if (serWidget) {
+            name = serWidget.dragItem.attrs.title;
+        }
+
+        const finalValue = serNode.comfyValue
+        if (finalValue != null) {
+            const source: RestoreParamSourceWorkflowNode = {
+                type: "workflow",
+                nodeType: serNode.type,
+                name,
+                finalValue,
+            }
+            result[serNode.id] = source;
         }
     }
 
@@ -236,6 +301,7 @@ export function getBackendRestoreParams(workflow: ComfyBoxWorkflow, prompt: Seri
                 if (isComfyWidgetNode(foundNode) && foundNode.type === serNode.type) {
                     const source: RestoreParamSourceBackendNodeInput = {
                         type: "backend",
+                        nodeType: foundNode.type,
                         finalValue: inputValue,
                         backendNode: serNode,
                         isDirectAttachment
@@ -252,7 +318,7 @@ export function getBackendRestoreParams(workflow: ComfyBoxWorkflow, prompt: Seri
 export default function getRestoreParameters(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): RestoreParamTargets {
     const result = {}
 
-    const workflowParams = getWorkflowRestoreParams(prompt.workflow);
+    const workflowParams = getWorkflowRestoreParams(prompt.workflow, workflow);
     concatRestoreParams(result, workflowParams);
 
     const backendParams = getBackendRestoreParams(workflow, prompt);

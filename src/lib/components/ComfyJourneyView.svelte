@@ -12,10 +12,10 @@
  import type { ComfyBoxWorkflow } from '$lib/stores/workflowState';
  import workflowState from '$lib/stores/workflowState';
  import uiState from '$lib/stores/uiState';
- import { calculateWorkflowParamsPatch, resolvePatch, type JourneyPatchNode, type WritableJourneyStateStore, diffParams, JourneyNode } from '$lib/stores/journeyStates';
+ import { resolvePatch, type JourneyPatchNode, type WritableJourneyStateStore, diffParams, type JourneyNode } from '$lib/stores/journeyStates';
  import JourneyRenderer, { type JourneyNodeEvent } from './JourneyRenderer.svelte';
  import { Trash, ClockHistory, Diagram3  } from "svelte-bootstrap-icons";
- import { getWorkflowRestoreParams, getWorkflowRestoreParamsFromWorkflow } from '$lib/restoreParameters';
+ import { getWorkflowRestoreParamsFromWorkflow } from '$lib/restoreParameters';
  import notify from '$lib/notify';
  import selectionState from '$lib/stores/selectionState';
  import { Checkbox } from '@gradio/form';
@@ -41,11 +41,6 @@
  $: workflow = $workflowState.activeWorkflow
  $: {
      journey = workflow?.journey
-     activeNode = null;
-     updateActiveNode();
- }
-
- function updateActiveNode() {
      activeNode = journey?.getActiveNode()
  }
 
@@ -151,7 +146,7 @@
         </button>
     </div>
     {#key $journey.version}
-        <JourneyRenderer {workflow} {journey} {mode} {activeNode}
+        <JourneyRenderer {workflow} {journey} {mode}
                          on:select_node={onSelectNode}
                          on:right_click_node={onRightClickNode}
                          on:hover_node={onHoverNode}

@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
- import type { JourneyNode, JourneyPatchNode, WritableJourneyStateStore } from '$lib/stores/journeyStates';
+ import { resolvePatch, type JourneyNode, type JourneyPatchNode, type WritableJourneyStateStore } from '$lib/stores/journeyStates';
  import { ComfyBoxWorkflow } from '$lib/stores/workflowState';
  import { get } from 'svelte/store';
  import Graph from './graph/Graph.svelte'
@@ -18,11 +18,11 @@
  import { convertComfyOutputToComfyURL, countNewLines } from '$lib/utils';
 	import type { ElementDefinition } from 'cytoscape';
 	import type { JourneyMode } from './ComfyJourneyView.svelte';
+	import type { RestoreParamWorkflowNodeTargets } from '$lib/restoreParameters';
 
  export let workflow: ComfyBoxWorkflow | null = null
  export let journey: WritableJourneyStateStore | null = null
  export let mode: JourneyMode = "linear";
- export let activeNode: JourneyNode | null = null;
 
  const dispatch = createEventDispatcher<{
      select_node: JourneyNodeEvent;
@@ -31,7 +31,6 @@
      hover_node_out: JourneyNodeEvent;
  }>();
 
- let lastSelected = null;
  let lastMode = null;
  let lastVersion = -1;
 
@@ -43,6 +42,34 @@
      lastMode = mode;
  }
 
+ function makePatchText(patch: RestoreParamWorkflowNodeTargets, prev: RestoreParamWorkflowNodeTargets): string {
+     const lines = []
+
+     let sorted = Array.from(Object.entries(patch))
+     sorted.sort((a, b) => {
+         return a[1].name > b[1].name ? 1 : -1
+     })
+
+     for (const [nodeID, source] of sorted) {
+         let line = ""
+         switch (source.nodeType) {
+             case "ui/text":
+                 line = `${source.name} (changed)`
+                 break;
+             default:
+                 const prevValue = prev[nodeID];
+                 let prevValueStr = "???"
+                 if (prevValue)
+                     prevValueStr = prevValue.finalValue
+                 line = `${source.name}: ${prevValueStr} -> ${source.finalValue}`
+                 break;
+         }
+         lines.push(line)
+     }
+
+     return lines.join("\n")
+ }
+
  /*
   * Converts the journey tree into the renderable graph format Cytoscape expects
   */
@@ -51,19 +78,31 @@
          return [[], []]
      }
 
-     const journeyState = get(journey);
+     let activeNode = journey.getActiveNode()
 
      const nodes: ElementDefinition[] = []
      const edges: ElementDefinition[] = []
 
-     for (const node of journey.iterateBreadthFirst()) {
+     let iter: Iterable<JourneyNode> = [];
+     if (mode === "linear") {
+         if (activeNode != null)
+             iter = journey.iterateLinearPath(activeNode.id);
+     }
+     else {
+         iter = journey.iterateBreadthFirst();
+     }
+
+     const showPatches = mode === "linear";
+
+     const memoize = {}
+
+     for (const node of iter) {
          if (node.type === "root") {
              nodes.push({
                  data: {
                      id: node.id,
                      label: "Start",
                  },
-                 selected: node.id === activeNode?.id,
                  classes: "historyNode"
              })
              continue;
@@ -75,44 +114,62 @@
                      id: patchNode.id,
                      label: "P",
                  },
-                 selected: node.id === activeNode?.id,
                  classes: "historyNode"
              })
 
              // Display a small node between with the patch details
              const midNodeID = `${patchNode.id}_patch`;
 
-             const patchText = "cfg: 8 -> 10\nsteps: 20->30\na";
-             const patchNodeHeight = countNewLines(patchText) * 11 + 22;
+             console.debug("get", patchNode);
 
-             nodes.push({
-                 data: {
-                     id: midNodeID,
-                     label: patchText,
-                     patchNodeHeight
-                 },
-                 selectable: false,
-                 classes: "patchNode"
-             })
+             if (showPatches) {
+                 // show a node with the changes between gens
+                 const prev = resolvePatch(patchNode.parent, memoize);
+                 const patchText = makePatchText(patchNode.patch, prev);
+                 const patchNodeHeight = countNewLines(patchText) * 11 + 22;
 
-             edges.push({
-                 data: {
-                     id: `${patchNode.parent.id}_${midNodeID}`,
-                     source: patchNode.parent.id,
-                     target: midNodeID,
-                 },
-                 selectable: false,
-             })
+                 console.debug("[JourneyRenderer] Patch text", prev, patchText);
 
-             edges.push({
-                 data: {
-                     id: `${midNodeID}_${patchNode.id}`,
-                     source: midNodeID,
-                     target: patchNode.id,
-                 },
-                 selectable: false,
-                 locked: true
-             })
+                 nodes.push({
+                     data: {
+                         id: midNodeID,
+                         label: patchText,
+                         patchNodeHeight
+                     },
+                     selectable: false,
+                     classes: "patchNode"
+                 })
+
+                 edges.push({
+                     data: {
+                         id: `${patchNode.parent.id}_${midNodeID}`,
+                         source: patchNode.parent.id,
+                         target: midNodeID,
+                     },
+                     selectable: false,
+                 })
+
+                 edges.push({
+                     data: {
+                         id: `${midNodeID}_${patchNode.id}`,
+                         source: midNodeID,
+                         target: patchNode.id,
+                     },
+                     selectable: false,
+                     locked: true
+                 })
+             }
+             else {
+                 edges.push({
+                     data: {
+                         id: `${patchNode.parent.id}_${patchNode.id}`,
+                         source: patchNode.parent.id,
+                         target: patchNode.id,
+                     },
+                     selectable: false,
+                     locked: true
+                 })
+             }
          }
      }
 
@@ -120,8 +177,9 @@
  }
 
  function onNodeSelected(e: cytoscape.InputEventObject) {
-     console.warn("SELECT", e)
+     console.warn("[JourneyNode] onNodeSelected", e)
      const node = e.target as cytoscape.NodeSingular;
+
      journey.selectNode(node.id());
 
      e.cy.animate({
@@ -154,9 +212,12 @@
  function onRebuilt(e: CustomEvent<{cyto: cytoscape.Core}>) {
      const { cyto } = e.detail;
 
-     for (const node of cyto.nodes().components()) {
+     const activeNode = journey.getActiveNode();
+
+     for (const node of cyto.nodes(".historyNode").components()) {
          const nodeID = node.id()
-         if (nodeID === lastSelected) {
+         if (nodeID === activeNode?.id) {
+             node.select();
              cyto.zoom(1.25);
              cyto.center(node)
          }
@@ -171,7 +232,6 @@
                      if (outputs) {
                          node.data("bgImage", outputs[0]);
                      }
-                     console.warn("node.classes", node.classes())
                  }
              }
          }
@@ -179,8 +239,9 @@
 
      $selectionState.currentPatchHoveredNodes = new Set()
 
-     cyto.nodes()
-         .lock()
+     cyto.nodes().lock()
+
+     cyto.nodes(".historyNode")
          .on("select", onNodeSelected)
          .on("cxttapend ", onNodeRightClicked)
          .on("mouseout", onNodeHoveredOut)
