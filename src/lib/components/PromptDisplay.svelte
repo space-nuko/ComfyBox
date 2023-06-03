@@ -10,19 +10,22 @@
  import type { Styles } from "@gradio/utils";
  import { comfyFileToComfyBoxMetadata, comfyURLToComfyFile, countNewLines } from "$lib/utils";
  import ReceiveOutputTargets from "./modal/ReceiveOutputTargets.svelte";
+ import RestoreParamsTable from "./modal/RestoreParamsTable.svelte";
  import workflowState, { type ComfyBoxWorkflow, type WorkflowReceiveOutputTargets } from "$lib/stores/workflowState";
  import type { ComfyReceiveOutputNode } from "$lib/nodes/actions";
  import type ComfyApp from "./ComfyApp";
  import { TabItem, Tabs } from "@gradio/tabs";
  import { type ComfyBoxStdPrompt } from "$lib/ComfyBoxStdPrompt";
  import ComfyBoxStdPromptSerializer from "$lib/ComfyBoxStdPromptSerializer";
-	import JsonView from "./JsonView.svelte";
-	import type { ZodError } from "zod";
+ import JsonView from "./JsonView.svelte";
+ import type { ZodError } from "zod";
+ import { concatRestoreParams, getWorkflowRestoreParams, type RestoreParamTargets, type RestoreParamWorkflowNodeTargets } from "$lib/restoreParameters";
 
  const splitLength = 50;
 
  export let prompt: SerializedPromptInputsAll;
  export let workflow: SerializedAppState | null;
+ export let restoreParams: RestoreParamTargets = {}
  export let images: string[] = []; // list of image URLs to ComfyUI's /view? endpoint
  export let isMobile: boolean = false;
  export let expandAll: boolean = false;
@@ -33,6 +36,14 @@
  let stdPromptError: ZodError<any> | null;
 
  $: {
+     restoreParams = {}
+
+     // TODO other sources than serialized workflow
+     if (workflow != null) {
+         const workflowParams = getWorkflowRestoreParams(workflow.workflow)
+         restoreParams = concatRestoreParams(restoreParams, workflowParams);
+     }
+
      const [result, orig] = new ComfyBoxStdPromptSerializer().serialize(prompt, workflow);
      if (result.success === true) {
          stdPrompt = result.data;
@@ -44,7 +55,9 @@
      }
  }
 
- let selectedTab: "restore-parameters" | "send-outputs" | "standard-prompt" | "prompt" = "standard-prompt";
+ type PromptDisplayTabID = "restore-parameters" | "send-outputs" | "standard-prompt" | "prompt"
+
+ let selectedTab: PromptDisplayTabID = "restore-parameters"
 
  let selected_image: number | null = null;
 
@@ -146,15 +159,16 @@
 
      closeModal();
  }
+
+ function doRestoreParams(e: CustomEvent) {
+ }
 </script>
 
 <div class="prompt-display">
     <div class="prompt-and-sends">
         <Tabs bind:selected={selectedTab}>
             <TabItem id="restore-parameters" name="Restore Parameters">
-                <Block>
-                    <BlockTitle>Parameters</BlockTitle>
-                </Block>
+                <RestoreParamsTable {restoreParams} on:restore={doRestoreParams} />
             </TabItem>
             {#if comfyBoxImages.length > 0}
                 <TabItem id="send-outputs" name="Send Outputs">

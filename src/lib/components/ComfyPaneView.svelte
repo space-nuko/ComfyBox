@@ -32,7 +32,6 @@
  ]
 
  function switchMode(newMode: ComfyPaneMode) {
-     console.warn("switch", mode, newMode)
      mode = newMode;
  }
 </script>

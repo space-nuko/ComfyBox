@@ -16,7 +16,7 @@ const styles: Stylesheet[] = [
         }
     },
     {
-        selector: "node",
+        selector: ".historyNode",
         style: {
             "width": "100",
             "height": "100",
@@ -35,7 +35,7 @@ const styles: Stylesheet[] = [
         }
     },
     {
-        selector: "node[bgImage]",
+        selector: "node.historyNode[bgImage]",
         style: {
             "label": "",
             "background-image": "data(bgImage)",
@@ -45,13 +45,32 @@ const styles: Stylesheet[] = [
         }
     },
     {
-        selector: "node:selected",
+        selector: ".historyNode:selected",
         style: {
             "background-color": "#f97316",
             "color": "white",
             "border-color": "#ea580c",
             "line-color": "#0e76ba",
-            "target-arrow-color": "#0e76ba"
+            "target-arrow-color": "#0e76ba",
+        }
+    },
+    {
+        selector: ".patchNode",
+        style: {
+            "width": "100",
+            "height": "data(patchNodeHeight)",
+            "shape": "round-rectangle",
+            "font-family": "Arial",
+            "font-size": "11",
+            "font-weight": "normal",
+            "content": `data(label)`,
+            "text-valign": "center",
+            "text-wrap": "wrap",
+            "text-max-width": "140",
+            "background-color": "#333",
+            "border-color": "#black",
+            "border-width": "1",
+            "color": "white",
         }
     },
     {

@@ -612,6 +612,7 @@ export default class ComfyApp {
                         node.onExecuted(output);
                     }
                     workflow.journey.onExecuted(promptID, nodeID, output, queueEntry);
+                    workflow.journey.set(get(workflow.journey))
                 }
             }
         });
@@ -1032,11 +1033,14 @@ export default class ComfyApp {
 
         let journeyNode: JourneyNode | null;
 
-        if (get(uiState).autoPushJourney) {
+        if (get(uiState).saveHistory) {
             const activeNode = targetWorkflow.journey.getActiveNode();
-            if (activeNode != null) {
-                journeyNode = targetWorkflow.journey.pushPatchOntoActive(targetWorkflow, activeNode);
-            }
+            journeyNode = targetWorkflow.journey.pushPatchOntoActive(targetWorkflow, activeNode);
+
+            // if no patch was applied, use currently selected node for prompt image
+            // output purposes
+            if (journeyNode == null)
+                journeyNode = activeNode;
         }
 
         this.processingQueue = true;

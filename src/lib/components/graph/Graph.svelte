@@ -10,12 +10,11 @@
  import cytoscape from "cytoscape"
  import dagre from "cytoscape-dagre"
  import GraphStyles from "./GraphStyles"
- import type { EdgeDataDefinition } from "cytoscape";
- import type { NodeDataDefinition } from "cytoscape";
+ import type { ElementDefinition } from "cytoscape";
  import { createEventDispatcher } from "svelte";
 
- export let nodes: ReadonlyArray<NodeDataDefinition>;
- export let edges: ReadonlyArray<EdgeDataDefinition>;
+ export let nodes: ReadonlyArray<ElementDefinition>;
+ export let edges: ReadonlyArray<ElementDefinition>;
 
  export let style: string = ""
 
@@ -32,6 +31,7 @@
 
  function rebuildGraph() {
      cytoscape.use(dagre)
+     cytoscape.warnings(false)
 
      cyInstance = cytoscape({
          container: refElement,
@@ -39,6 +39,7 @@
          wheelSensitivity: 0.1,
          maxZoom: 3,
          minZoom: 0.5,
+         selectionType: "single"
      })
 
      cyInstance.on("add", () => {
@@ -51,18 +52,25 @@
              .run()
      })
 
+     // Prevents the unselection of nodes when clicking on the background
+     cyInstance.on('click', (event) => {
+         if (event.target === cyInstance) {
+             // click on the background
+             cyInstance.nodes(".historyNode").unselectify();
+         } else {
+             cyInstance.nodes(".historyNode").selectify();
+         }
+     });
+
      for (const node of nodes) {
-         cyInstance.add({
-             group: 'nodes',
-             data: { ...node }
-         })
+         node.group = "nodes"
+         cyInstance.add(node)
      }
 
      for (const edge of edges) {
-         cyInstance.add({
-             group: 'edges',
-             data: { ...edge }
-         })
+         edge.group = "edges";
+         console.warn(edge)
+         cyInstance.add(edge)
      }
 
      dispatch("rebuilt", { cyto: cyInstance })

@@ -118,7 +118,7 @@ export default class ComfyGraphNode extends LGraphNode {
     }
 
     get dragItem(): WidgetLayout | null {
-        return layoutStates.getDragItemByNode(this);
+        return layoutStates.getDragItemByNode(this) as WidgetLayout;
     }
 
     get workflow(): ComfyBoxWorkflow | null {

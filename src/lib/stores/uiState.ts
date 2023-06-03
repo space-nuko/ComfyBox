@@ -16,7 +16,7 @@ export type UIState = {
 
     activeError: PromptID | null
 
-    autoPushJourney: boolean
+    saveHistory: boolean
 }
 
 type UIStateOps = {
@@ -38,7 +38,7 @@ const store: Writable<UIState> = writable(
 
         activeError: null,
 
-        autoPushJourney: true
+        saveHistory: true
     })
 
 function reconnecting() {

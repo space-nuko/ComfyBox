@@ -185,7 +185,8 @@ function create() {
         if (activeNode == null) {
             // add root node
             if (get(store).root != null) {
-                return;
+                console.debug("[journeyStates] Root already exists")
+                return null;
             }
             journeyNode = addNode(workflowParams, null);
             if (showNotification)
@@ -196,9 +197,10 @@ function create() {
             const patch = calculateWorkflowParamsPatch(activeNode, workflowParams);
             const patchedCount = Object.keys(patch).length;
             if (patchedCount === 0) {
+                console.debug("[journeyStates] Patch had no diff")
                 if (showNotification)
                     notify("No changes were made to active parameters yet.", { type: "warning" })
-                return;
+                return null;
             }
             journeyNode = addNode(patch, activeNode);
             if (showNotification)
@@ -209,6 +211,7 @@ function create() {
             selectNode(journeyNode);
         }
 
+        console.debug("[journeyStates] added node", journeyNode)
         return journeyNode;
     }
 
@@ -268,6 +271,11 @@ function create() {
             return;
 
         // TODO
+        store.update(s => {
+            s.version += 1;
+            s.activeNodeID = journeyNode.id;
+            return s;
+        })
     }
 
     return {

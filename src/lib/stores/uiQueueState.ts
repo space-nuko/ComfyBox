@@ -89,6 +89,13 @@ function convertEntry(entry: QueueEntry, status: QueueUIEntryStatus): QueueUIEnt
     }
 }
 
+export function getQueueEntryImages(queueEntry: QueueEntry): string[] {
+    return Object.values(queueEntry.outputs)
+        .filter(o => o.images)
+        .flatMap(o => o.images)
+        .map(convertComfyOutputToComfyURL);
+}
+
 function convertPendingEntry(entry: QueueEntry, status: QueueUIEntryStatus): QueueUIEntry {
     const result = convertEntry(entry, status);
 
@@ -97,10 +104,7 @@ function convertPendingEntry(entry: QueueEntry, status: QueueUIEntryStatus): Que
         result.images = thumbnails.map(convertComfyOutputToComfyURL);
     }
 
-    const outputs = Object.values(entry.outputs)
-        .filter(o => o.images)
-        .flatMap(o => o.images)
-        .map(convertComfyOutputToComfyURL);
+    const outputs = getQueueEntryImages(entry);
     if (outputs) {
         result.images = result.images.concat(outputs)
     }
@@ -111,11 +115,7 @@ function convertPendingEntry(entry: QueueEntry, status: QueueUIEntryStatus): Que
 function convertCompletedEntry(entry: CompletedQueueEntry): QueueUIEntry {
     const result = convertEntry(entry.entry, entry.status);
 
-    const images = Object.values(entry.entry.outputs)
-        .filter(o => o.images)
-        .flatMap(o => o.images)
-        .map(convertComfyOutputToComfyURL);
-    result.images = images
+    result.images = getQueueEntryImages(entry.entry)
 
     if (entry.message)
         result.submessage = entry.message

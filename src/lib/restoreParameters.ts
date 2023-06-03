@@ -185,24 +185,23 @@ export function getWorkflowRestoreParamsFromWorkflow(workflow: ComfyBoxWorkflow,
     return result
 }
 
-export function getWorkflowRestoreParams(workflow: ComfyBoxWorkflow, prompt: SerializedLGraph): RestoreParamWorkflowNodeTargets {
+export function getWorkflowRestoreParams(serGraph: SerializedLGraph, noExclude: boolean = false): RestoreParamWorkflowNodeTargets {
     const result = {}
 
-    const graph = workflow.graph;
+    for (const node of serGraph.nodes) {
+        if (!isSerializedComfyWidgetNode(node))
+            continue;
 
-    // Find nodes that correspond to *this* workflow exactly, since we can
-    // easily match up the nodes between each (their IDs will be the same)
-    for (const serNode of prompt.nodes) {
-        const foundNode = graph.getNodeByIdRecursive(serNode.id);
-        if (isComfyWidgetNode(foundNode) && foundNode.type === serNode.type) {
-            const finalValue = (serNode as SerializedComfyWidgetNode).comfyValue;
-            if (finalValue != null) {
-                const source: RestoreParamSourceWorkflowNode = {
-                    type: "workflow",
-                    finalValue,
-                }
-                result[foundNode.id] = source;
+        if (!noExclude && node.properties.excludeFromJourney)
+            continue;
+
+        const finalValue = node.comfyValue
+        if (finalValue != null) {
+            const source: RestoreParamSourceWorkflowNode = {
+                type: "workflow",
+                finalValue,
             }
+            result[node.id] = source;
         }
     }
 
@@ -250,10 +249,10 @@ export function getBackendRestoreParams(workflow: ComfyBoxWorkflow, prompt: Seri
     return result
 }
 
-export default function restoreParameters(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): RestoreParamTargets {
+export default function getRestoreParameters(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): RestoreParamTargets {
     const result = {}
 
-    const workflowParams = getWorkflowRestoreParams(workflow, prompt.workflow);
+    const workflowParams = getWorkflowRestoreParams(prompt.workflow);
     concatRestoreParams(result, workflowParams);
 
     const backendParams = getBackendRestoreParams(workflow, prompt);
