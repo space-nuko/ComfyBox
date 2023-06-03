@@ -29,9 +29,9 @@ export interface RestoreParamSource<T extends RestoreParamType = any> {
  */
 export interface RestoreParamSourceWorkflowNode extends RestoreParamSource<"workflow"> {
     type: "workflow",
-
-    sourceNode: SerializedComfyWidgetNode
 }
+
+export type RestoreParamWorkflowNodeTargets = Record<NodeID, RestoreParamSourceWorkflowNode>
 
 /*
  * A value received by the ComfyUI *backend* that corresponds to a value that
@@ -59,6 +59,9 @@ export interface RestoreParamSourceBackendNodeInput extends RestoreParamSource<"
 
 /*
  * A value contained in the standard prompt extracted from the saved workflow.
+ *
+ * This should only be necessary to fall back on if one workflow's parameters
+ * are to be used in a completely separate workflow's.
  */
 export interface RestoreParamSourceStdPrompt<T, K extends keyof T> extends RestoreParamSource<"stdPrompt"> {
     type: "stdPrompt",
@@ -102,19 +105,7 @@ export interface RestoreParamSourceStdPrompt<T, K extends keyof T> extends Resto
     finalValue: any
 }
 
-export type RestoreParamTarget = {
-    /*
-     * Node that will receive the parameter from the prompt
-     */
-    targetNode: ComfyWidgetNode;
-
-    /*
-     * Possible sources of values to insert into the target node
-     */
-    sources: RestoreParamSource[]
-}
-
-export type RestoreParamTargets = Record<NodeID, RestoreParamTarget>
+export type RestoreParamTargets = Record<NodeID, RestoreParamSource[]>
 
 function isSerializedComfyWidgetNode(param: any): param is SerializedComfyWidgetNode {
     return param != null && typeof param === "object" && "id" in param && "comfyValue" in param
@@ -146,24 +137,35 @@ function findUpstreamSerializedWidgetNode(prompt: SerializedPrompt, input: INode
 }
 
 const addSource = (result: RestoreParamTargets, targetNode: ComfyWidgetNode, source: RestoreParamSource) => {
-    result[targetNode.id] ||= { targetNode, sources: [] }
-    result[targetNode.id].sources.push(source);
+    result[targetNode.id] ||= []
+    result[targetNode.id].push(source);
 }
 
-const mergeSources = (a: RestoreParamTargets, b: RestoreParamTargets) => {
-    for (const [k, vs] of Object.entries(b)) {
-        a[vs.targetNode.id] ||= { targetNode: vs.targetNode, sources: [] }
-        for (const source of vs.sources) {
-            a[vs.targetNode.id].sources.push(source);
+export function concatRestoreParams(a: RestoreParamTargets, b: Record<NodeID, RestoreParamSource>): RestoreParamTargets {
+    for (const [targetNodeID, source] of Object.entries(b)) {
+        a[targetNodeID] ||= []
+        a[targetNodeID].push(source);
+    }
+    return a;
+}
+
+export function concatRestoreParams2(a: RestoreParamTargets, b: RestoreParamTargets): RestoreParamTargets {
+    for (const [targetNodeID, vs] of Object.entries(b)) {
+        a[targetNodeID] ||= []
+        for (const source of vs) {
+            a[targetNodeID].push(source);
         }
     }
+    return a;
 }
 
-export function getWorkflowRestoreParams(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): RestoreParamTargets {
+export function getWorkflowRestoreParams(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): RestoreParamWorkflowNodeTargets {
     const result = {}
 
     const graph = workflow.graph;
 
+    // Find nodes that correspond to *this* workflow exactly, since we can
+    // easily match up the nodes between each (their IDs will be the same)
     for (const serNode of prompt.workflow.nodes) {
         const foundNode = graph.getNodeByIdRecursive(serNode.id);
         if (isComfyWidgetNode(foundNode) && foundNode.type === serNode.type) {
@@ -172,9 +174,8 @@ export function getWorkflowRestoreParams(workflow: ComfyBoxWorkflow, prompt: Ser
                 const source: RestoreParamSourceWorkflowNode = {
                     type: "workflow",
                     finalValue,
-                    sourceNode: serNode
                 }
-                addSource(result, foundNode, source)
+                result[foundNode.id] = source;
             }
         }
     }
@@ -182,11 +183,14 @@ export function getWorkflowRestoreParams(workflow: ComfyBoxWorkflow, prompt: Ser
     return result
 }
 
-export function getBackendRestoreParams(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): RestoreParamTargets {
+export function getBackendRestoreParams(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): Record<NodeID, RestoreParamSourceBackendNodeInput[]> {
     const result = {}
 
     const graph = workflow.graph;
 
+    // Figure out what parameters the backend received. If there was a widget
+    // node attached to a backend node's input upstream, then we can use that
+    // value.
     for (const [serNodeID, inputs] of Object.entries(prompt.output)) {
         const serNode = prompt.workflow.nodes.find(sn => sn.id === serNodeID)
         if (serNode == null)
@@ -223,16 +227,11 @@ export function getBackendRestoreParams(workflow: ComfyBoxWorkflow, prompt: Seri
 export default function restoreParameters(workflow: ComfyBoxWorkflow, prompt: SerializedPrompt): RestoreParamTargets {
     const result = {}
 
-    // Step 1: Find nodes that correspond to *this* workflow exactly, since we
-    // can easily match up the nodes between each (their IDs will be the same)
     const workflowParams = getWorkflowRestoreParams(workflow, prompt);
-    mergeSources(result, workflowParams);
+    concatRestoreParams(result, workflowParams);
 
-    // Step 2: Figure out what parameters the backend received. If there was a
-    // widget node attached to a backend node's input upstream, then we can
-    // use that value.
     const backendParams = getBackendRestoreParams(workflow, prompt);
-    mergeSources(result, backendParams);
+    concatRestoreParams2(result, backendParams);
 
     // Step 3: Extract the standard prompt from the workflow and use that to
     // infer parameter types

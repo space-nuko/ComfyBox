@@ -9,6 +9,7 @@
  import workflowState from '$lib/stores/workflowState';
  import type { WritableJourneyStateStore } from '$lib/stores/journeyStates';
  import JourneyRenderer from './JourneyRenderer.svelte';
+ import { Plus } from "svelte-bootstrap-icons";
 
  export let app: ComfyApp;
 
@@ -21,11 +22,42 @@
 
 <div class="journey-view">
     <JourneyRenderer {workflow} {journey} />
+    <div class="bottom">
+        <button class="mode-button ternary"
+                title={"Add new"}
+                on:click={() => {}}>
+            <Plus width="100%" height="100%" />
+        </button>
+    </div>
 </div>
 
 <style lang="scss">
+ $button-height: 2.5rem;
+
  .journey-view {
      width: 100%;
-     height: 100%;
+     height: calc(100% - $button-height);
+ }
+
+ .bottom {
+     height: $button-height;
+     display: flex;
+     flex-direction: row;
+     color: var(--comfy-accent-soft);
+
+     .mode-button {
+         height: 100%;
+         width: 100%;
+         padding: 0.5rem;
+
+         @include square-button;
+
+         &:hover {
+             color: var(--body-text-color);
+         }
+         &.selected {
+             background-color: var(--panel-background-fill);
+         }
+     }
  }
 </style>
