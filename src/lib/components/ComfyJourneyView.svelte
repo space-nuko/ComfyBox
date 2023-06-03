@@ -7,12 +7,14 @@
  import type ComfyApp from './ComfyApp';
  import type { ComfyBoxWorkflow } from '$lib/stores/workflowState';
  import workflowState from '$lib/stores/workflowState';
- import { calculateWorkflowParamsPatch, resolvePatch, type JourneyPatchNode, type WritableJourneyStateStore } from '$lib/stores/journeyStates';
+ import uiState from '$lib/stores/uiState';
+ import { calculateWorkflowParamsPatch, resolvePatch, type JourneyPatchNode, type WritableJourneyStateStore, diffParams } from '$lib/stores/journeyStates';
  import JourneyRenderer from './JourneyRenderer.svelte';
  import { Plus } from "svelte-bootstrap-icons";
-	import { getWorkflowRestoreParams, getWorkflowRestoreParamsFromWorkflow } from '$lib/restoreParameters';
-	import notify from '$lib/notify';
-	import selectionState from '$lib/stores/selectionState';
+ import { getWorkflowRestoreParams, getWorkflowRestoreParamsFromWorkflow } from '$lib/restoreParameters';
+ import notify from '$lib/notify';
+ import selectionState from '$lib/stores/selectionState';
+	import { Checkbox } from '@gradio/form';
 
  export let app: ComfyApp;
 
@@ -30,32 +32,7 @@
 
      const workflowParams = getWorkflowRestoreParamsFromWorkflow(workflow)
      const activeNode = journey.getActiveNode();
-
-     let journeyNode
-
-     if (activeNode == null) {
-         // add root node
-         if ($journey.root != null) {
-             return;
-         }
-         journeyNode = journey.addNode(workflowParams, null);
-         notify("Pushed a new base workflow state.", { type: "info" })
-     }
-     else {
-         // add patch node
-         const patch = calculateWorkflowParamsPatch(activeNode, workflowParams);
-         const patchedCount = Object.keys(patch).length;
-         if (patchedCount === 0) {
-             notify("No changes were made to active parameters yet.", { type: "warning" })
-             return;
-         }
-         journeyNode = journey.addNode(patch, activeNode);
-         notify(`Pushed new state with ${patchedCount} changes.`, { type: "info" })
-     }
-
-     if (journeyNode != null) {
-         journey.selectNode(journeyNode);
-     }
+     journey.pushPatchOntoActive(workflow, activeNode, true)
  }
 
  function onSelectNode(e: CustomEvent<{ cyto: cytoscape.Core, node: cytoscape.NodeSingular }>) {
@@ -85,12 +62,11 @@
          return;
      }
 
-     if (journeyNode.type === "patch") {
-         $selectionState.currentPatchHoveredNodes = new Set(Object.keys((journeyNode as JourneyPatchNode).patch))
-     }
-     else {
-         $selectionState.currentPatchHoveredNodes = new Set();
-     }
+     const patch = resolvePatch(journeyNode);
+     const workflowParams = getWorkflowRestoreParamsFromWorkflow(workflow);
+     const diff = diffParams(patch, workflowParams);
+
+     $selectionState.currentPatchHoveredNodes = new Set(Object.keys(diff));
  }
 
  function onHoverNodeOut(e: CustomEvent<{ cyto: cytoscape.Core, node: cytoscape.NodeSingular }>) {
@@ -104,6 +80,9 @@
                      on:hover_node={onHoverNode}
                      on:hover_node_out={onHoverNodeOut}
     />
+    <div class="bottom" style:border-top="1px solid var(--panel-border-color)">
+        <Checkbox label="Auto-Push" disabled={$journey.root == null} bind:value={$uiState.autoPushJourney}/>
+    </div>
     <div class="bottom">
         <button class="mode-button ternary"
                 title={"Add new"}
@@ -119,7 +98,7 @@
 
  .journey-view {
      width: 100%;
-     height: calc(100% - $button-height);
+     height: calc(100% - $button-height * 2);
  }
 
  .bottom {
@@ -127,6 +106,7 @@
      display: flex;
      flex-direction: row;
      color: var(--comfy-accent-soft);
+     justify-content: center;
 
      .mode-button {
          height: 100%;

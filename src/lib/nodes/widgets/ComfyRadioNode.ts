@@ -16,6 +16,7 @@ export default class ComfyRadioNode extends ComfyWidgetNode<string> {
         tags: [],
         choices: ["Choice A", "Choice B", "Choice C"],
         defaultValue: "Choice A",
+        excludeFromJourney: false,
     }
 
     static slotLayout: SlotLayout = {

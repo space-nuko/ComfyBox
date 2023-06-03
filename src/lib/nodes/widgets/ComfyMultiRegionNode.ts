@@ -30,7 +30,8 @@ export default class ComfyMultiRegionNode extends ComfyWidgetNode<BoundingBox[]>
         canvasWidth: 512,
         canvasHeight: 512,
         canvasImageURL: null,
-        inputType: "size"
+        inputType: "size",
+        excludeFromJourney: false,
     }
 
     static slotLayout: SlotLayout = {

@@ -162,11 +162,14 @@ export function concatRestoreParams2(a: RestoreParamTargets, b: RestoreParamTarg
 /*
  * Like getWorkflowRestoreParams but applies to an instanced (non-serialized) workflow
  */
-export function getWorkflowRestoreParamsFromWorkflow(workflow: ComfyBoxWorkflow): RestoreParamWorkflowNodeTargets {
+export function getWorkflowRestoreParamsFromWorkflow(workflow: ComfyBoxWorkflow, noExclude: boolean = false): RestoreParamWorkflowNodeTargets {
     const result = {}
 
     for (const node of workflow.graph.iterateNodesInOrderRecursive()) {
         if (!isComfyWidgetNode(node))
+            continue;
+
+        if (!noExclude && node.properties.excludeFromJourney)
             continue;
 
         const finalValue = node.getValue();

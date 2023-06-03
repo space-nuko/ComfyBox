@@ -11,6 +11,7 @@ export default class ComfyButtonNode extends ComfyWidgetNode<boolean> {
     override properties: ComfyButtonProperties = {
         tags: [],
         defaultValue: false,
+        excludeFromJourney: true,
         param: "bang"
     }
 

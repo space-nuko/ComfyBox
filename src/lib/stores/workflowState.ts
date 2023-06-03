@@ -224,7 +224,7 @@ export class ComfyBoxWorkflow {
                 console.error("[applyParamsPatch] Node was not ComfyWidgetNode!!", nodeId, source)
                 continue;
             }
-            node.setValue(source.finalValue);
+            node.value.set(source.finalValue);
         }
     }
 

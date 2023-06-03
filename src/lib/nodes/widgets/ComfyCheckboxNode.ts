@@ -11,6 +11,7 @@ export default class ComfyCheckboxNode extends ComfyWidgetNode<boolean> {
     override properties: ComfyCheckboxProperties = {
         tags: [],
         defaultValue: false,
+        excludeFromJourney: false,
     }
 
     static slotLayout: SlotLayout = {

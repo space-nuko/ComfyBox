@@ -68,4 +68,32 @@ export default class journeyStateTests extends UnitTest {
             }
         })
     }
+
+    test__patches_exclusions() {
+        const [workflow, layoutState] = ComfyBoxWorkflow.create()
+        const { graph, journey } = workflow;
+        layoutState.initDefaultLayout() // adds 3 containers
+
+        const widget1 = LiteGraph.createNode(ComfyNumberNode);
+        const widget2 = LiteGraph.createNode(ComfyNumberNode);
+        const watch1 = LiteGraph.createNode(Watch);
+        const watch2 = LiteGraph.createNode(Watch);
+
+        graph.add(widget1)
+        graph.add(watch1)
+
+        widget1.properties.excludeFromJourney = true;
+        widget1.connect(0, watch1, 0);
+        widget1.setValue(0)
+
+        let workflowParams = getWorkflowRestoreParamsFromWorkflow(workflow)
+        const root = journey.addNode(workflowParams, null);
+
+        expect(root).toEqual({
+            id: root.id,
+            type: "root",
+            children: [],
+            base: {}
+        });
+    }
 }

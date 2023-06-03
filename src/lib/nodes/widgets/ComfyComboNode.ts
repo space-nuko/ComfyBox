@@ -19,7 +19,8 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
         tags: [],
         defaultValue: "A",
         values: ["A", "B", "C", "D"],
-        convertValueToLabelCode: ""
+        convertValueToLabelCode: "",
+        excludeFromJourney: false,
     }
 
     static slotLayout: SlotLayout = {

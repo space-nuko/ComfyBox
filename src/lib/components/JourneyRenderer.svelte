@@ -6,6 +6,7 @@
  import type { NodeDataDefinition, EdgeDataDefinition } from 'cytoscape';
  import { createEventDispatcher } from "svelte";
 	import selectionState from '$lib/stores/selectionState';
+	import uiQueueState from '$lib/stores/uiQueueState';
 
  export let workflow: ComfyBoxWorkflow | null = null
  export let journey: WritableJourneyStateStore | null = null
@@ -52,7 +53,7 @@
              const patchNode = node as JourneyPatchNode;
              nodes.push({
                  id: patchNode.id,
-                 label: "N",
+                 label: "P",
                  selected: node.id === journeyState.activeNodeID,
                  locked: true
 
@@ -101,9 +102,22 @@
      const { cyto } = e.detail;
 
      for (const node of cyto.nodes().components()) {
-         if (node.id() === lastSelected) {
+         const nodeID = node.id()
+         if (nodeID === lastSelected) {
              // why doesn't passing `selected` work in the ctor?
              node.select();
+             cyto.zoom(1.25);
+             cyto.center(node)
+         }
+
+         const journeyNode = $journey.nodesByID[nodeID]
+         if (journeyNode) {
+             if (journeyNode.promptID != null) {
+                 const queueEntry = $uiQueueState.historyUIEntries.find(e => e.entry.promptID === journeyNode.promptID)
+                 if (queueEntry != null && queueEntry.images) {
+                     node.data("bgImage", queueEntry.images[0]);
+                 }
+             }
          }
      }
 
@@ -114,13 +128,6 @@
          .on("select", onNodeSelected)
          .on("mouseover", onNodeHovered)
          .on("mouseout", onNodeHoveredOut)
-
-     const nodes = Array.from(journey.iterateBreadthFirst());
-     if (nodes.length > 0) {
-         const lastNode = nodes[nodes.length - 1]
-         const start = cyto.$(`#${lastNode.id}`)
-         cyto.center(start)
-     }
  }
 </script>
 

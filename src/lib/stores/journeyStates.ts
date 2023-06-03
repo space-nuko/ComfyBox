@@ -1,11 +1,16 @@
 import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
-import type { DragItemID, IDragItem } from './layoutStates';
+import { isComfyWidgetNode, type DragItemID, type IDragItem } from './layoutStates';
 import { LiteGraph, type LGraphNode, type NodeID, type UUID } from '@litegraph-ts/core';
 import type { SerializedAppState } from '$lib/components/ComfyApp';
-import type { RestoreParamTargets, RestoreParamWorkflowNodeTargets } from '$lib/restoreParameters';
+import { getWorkflowRestoreParamsFromWorkflow, type RestoreParamSourceWorkflowNode, type RestoreParamTargets, type RestoreParamWorkflowNodeTargets } from '$lib/restoreParameters';
 import { v4 as uuidv4 } from "uuid";
 import deepEqual from "deep-equal";
+import notify from '$lib/notify';
+import type { ComfyBoxWorkflow } from './workflowState';
+import type { ComfyNodeID, PromptID } from '$lib/api';
+import type { SerializedPromptOutput } from '$lib/utils';
+import type { QueueEntry } from './queueState';
 
 export type JourneyNodeType = "root" | "patch";
 
@@ -14,7 +19,9 @@ export type JourneyNodeID = UUID;
 export interface JourneyNode {
     id: JourneyNodeID,
     type: JourneyNodeType,
-    children: JourneyPatchNode[]
+    children: JourneyPatchNode[],
+    promptID?: PromptID,
+    images?: string[]
 }
 
 export interface JourneyRootNode extends JourneyNode {
@@ -52,7 +59,7 @@ export function resolvePatch(node: JourneyNode): RestoreParamWorkflowNodeTargets
     return base;
 }
 
-function diffParams(base: RestoreParamWorkflowNodeTargets, updated: RestoreParamWorkflowNodeTargets): RestoreParamWorkflowNodeTargets {
+export function diffParams(base: RestoreParamWorkflowNodeTargets, updated: RestoreParamWorkflowNodeTargets): RestoreParamWorkflowNodeTargets {
     const result = {}
 
     for (const [k, v] of Object.entries(updated)) {
@@ -89,9 +96,11 @@ export type JourneyState = {
 type JourneyStateOps = {
     clear: () => void,
     getActiveNode: () => JourneyNode | null,
-    addNode: (params: RestoreParamWorkflowNodeTargets, parent?: JourneyNodeID | JourneyNode) => JourneyNode,
+    // addNode: (params: RestoreParamWorkflowNodeTargets, parent?: JourneyNodeID | JourneyNode) => JourneyNode,
     selectNode: (id?: JourneyNodeID | JourneyNode) => void,
-    iterateBreadthFirst: (id?: JourneyNodeID | null) => Iterable<JourneyNode>
+    iterateBreadthFirst: (id?: JourneyNodeID | null) => Iterable<JourneyNode>,
+    pushPatchOntoActive: (workflow: ComfyBoxWorkflow, activeNode?: JourneyNode, showNotification?: boolean) => JourneyNode | null
+    onExecuted: (promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutput, queueEntry: QueueEntry) => void
 }
 
 export type WritableJourneyStateStore = Writable<JourneyState> & JourneyStateOps;
@@ -131,6 +140,7 @@ function create() {
      */
     function addNode(params: RestoreParamWorkflowNodeTargets, parent?: JourneyNodeID | JourneyNode): JourneyNode {
         let _node: JourneyRootNode | JourneyPatchNode;
+
         store.update(s => {
             let parentNode: JourneyNode | null = null
             if (parent != null) {
@@ -165,6 +175,41 @@ function create() {
             return s;
         });
         return _node;
+    }
+
+    function pushPatchOntoActive(workflow: ComfyBoxWorkflow, activeNode?: JourneyNode, showNotification: boolean = false): JourneyNode | null {
+        const workflowParams = getWorkflowRestoreParamsFromWorkflow(workflow)
+
+        let journeyNode
+
+        if (activeNode == null) {
+            // add root node
+            if (get(store).root != null) {
+                return;
+            }
+            journeyNode = addNode(workflowParams, null);
+            if (showNotification)
+                notify("Pushed a new base workflow state.", { type: "info" })
+        }
+        else {
+            // add patch node
+            const patch = calculateWorkflowParamsPatch(activeNode, workflowParams);
+            const patchedCount = Object.keys(patch).length;
+            if (patchedCount === 0) {
+                if (showNotification)
+                    notify("No changes were made to active parameters yet.", { type: "warning" })
+                return;
+            }
+            journeyNode = addNode(patch, activeNode);
+            if (showNotification)
+                notify(`Pushed new state with ${patchedCount} changes.`, { type: "info" })
+        }
+
+        if (journeyNode != null) {
+            selectNode(journeyNode);
+        }
+
+        return journeyNode;
     }
 
     function selectNode(obj?: JourneyNodeID | JourneyNode) {
@@ -217,13 +262,23 @@ function create() {
         }
     }
 
+    function onExecuted(promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutput, queueEntry: QueueEntry) {
+        const journeyNode = Array.from(iterateBreadthFirst()).find(j => j.promptID === promptID);
+        if (journeyNode === null)
+            return;
+
+        // TODO
+    }
+
     return {
         ...store,
         getActiveNode,
         clear,
-        addNode,
+        // addNode,
+        pushPatchOntoActive,
         selectNode,
-        iterateBreadthFirst
+        iterateBreadthFirst,
+        onExecuted
     }
 }
 

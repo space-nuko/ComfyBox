@@ -18,8 +18,9 @@ const styles: Stylesheet[] = [
     {
         selector: "node",
         style: {
-            "width": "50",
-            "height": "50",
+            "width": "100",
+            "height": "100",
+            "shape": "round-rectangle",
             "font-family": "Arial",
             "font-size": "18",
             "font-weight": "normal",
@@ -31,6 +32,16 @@ const styles: Stylesheet[] = [
             "border-color": "#2563eb",
             "border-width": "3",
             "color": "#1d3660"
+        }
+    },
+    {
+        selector: "node[bgImage]",
+        style: {
+            "label": "",
+            "background-image": "data(bgImage)",
+            "background-image-containment": "over",
+            "background-fit": "cover",
+            "color": "transparent"
         }
     },
     {

@@ -37,7 +37,7 @@
          container: refElement,
          style: GraphStyles,
          wheelSensitivity: 0.1,
-         maxZoom: 1,
+         maxZoom: 3,
          minZoom: 0.5,
      })
 

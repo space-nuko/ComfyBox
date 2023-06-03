@@ -512,6 +512,14 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 serialize: serializeStringArray,
                 deserialize: deserializeStringArray
             },
+            {
+                name: "excludeFromJourney",
+                type: "boolean",
+                location: "nodeProps",
+                editable: true,
+                defaultValue: false,
+                canShow: isComfyWidgetNode
+            },
 
             // Container tags are contained in the widget attributes
             {
