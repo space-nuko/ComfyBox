@@ -39,6 +39,7 @@ import DanbooruTags from "$lib/DanbooruTags";
 import { deserializeTemplateFromSVG, type SerializedComfyBoxTemplate } from "$lib/ComfyBoxTemplate";
 import templateState from "$lib/stores/templateState";
 import { formatValidationError, type ComfyAPIPromptErrorResponse, formatExecutionError, type ComfyExecutionError } from "$lib/apiErrors";
+import systemState from "$lib/stores/systemState";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -649,6 +650,23 @@ export default class ComfyApp {
                 notify(`Execution error: ${message}`, { type: "error", timeout: 10000 })
             }
         });
+
+        const config = get(configState);
+
+        if (config.pollSystemStatsInterval > 0) {
+            const interval = Math.max(config.pollSystemStatsInterval, 250);
+            const refresh = async () => {
+                try {
+                    const resp = await this.api.getSystemStats();
+                    systemState.updateState(resp)
+                } catch (error) {
+                    // console.debug("Error retrieving stats", error)
+                    systemState.updateState({ devices: [] })
+                }
+                setTimeout(refresh, interval);
+            }
+            setTimeout(refresh, interval);
+        }
 
         this.api.init();
     }

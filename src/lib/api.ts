@@ -6,7 +6,7 @@ import type { SerializedLGraph, UUID } from "@litegraph-ts/core";
 import type { SerializedLayoutState } from "./stores/layoutStates";
 import type { ComfyNodeDef, ComfyNodeDefInput } from "./ComfyNodeDef";
 import type { WorkflowInstID } from "./stores/workflowState";
-import type { ComfyAPIPromptErrorResponse } from "./apiErrors";
+import type { ComfyAPIPromptErrorResponse, ComfyExecutionError, ComfyInterruptedError } from "./apiErrors";
 
 export type ComfyPromptRequest = {
     client_id?: string,
@@ -59,6 +59,20 @@ export type ComfyAPIHistoryEntry = {
 export type ComfyAPIHistoryResponse = {
     history: Record<PromptID, ComfyAPIHistoryEntry>,
     error?: string
+}
+
+export type ComfyDevice = {
+    name: string,
+    type: string,
+    index: number,
+    vram_total: number
+    vram_free: number
+    torch_vram_total: number
+    torch_vram_free: number
+}
+
+export type ComfyAPISystemStatsResponse = {
+    devices: ComfyDevice[]
 }
 
 export type SerializedComfyBoxPromptData = {
@@ -371,5 +385,10 @@ export default class ComfyAPI {
      */
     async interrupt(): Promise<Response> {
         return fetch(this.getBackendUrl() + "/interrupt", { method: "POST" });
+    }
+
+    async getSystemStats(): Promise<ComfyAPISystemStatsResponse> {
+        return fetch(this.getBackendUrl() + "/system_stats")
+            .then(async (resp) => (await resp.json()) as ComfyAPISystemStatsResponse);
     }
 }
