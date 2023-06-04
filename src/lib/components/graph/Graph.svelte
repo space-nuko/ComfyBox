@@ -18,6 +18,9 @@
 
  export let style: string = ""
 
+ let refElement = null
+ export let cyInstance: cytoscape.Core | null = null
+
  const dispatch = createEventDispatcher<{
      rebuilt: { cyto: cytoscape.Core };
  }>();
@@ -75,9 +78,6 @@
 
      dispatch("rebuilt", { cyto: cyInstance })
  }
-
- let refElement = null
- let cyInstance: cytoscape.Core = null
 </script>
 
 <div class="cy-graph" {style} bind:this={refElement} />

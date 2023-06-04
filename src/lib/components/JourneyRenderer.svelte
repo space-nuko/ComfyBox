@@ -23,6 +23,7 @@
  export let workflow: ComfyBoxWorkflow | null = null
  export let journey: WritableJourneyStateStore | null = null
  export let mode: JourneyMode = "linear";
+ export let cyto: cytoscape.Core | null = null;
 
  const dispatch = createEventDispatcher<{
      select_node: JourneyNodeEvent;
@@ -42,7 +43,7 @@
      lastMode = mode;
  }
 
- function makePatchText(patch: RestoreParamWorkflowNodeTargets, prev: RestoreParamWorkflowNodeTargets): string {
+ function makePatchText(patch: RestoreParamWorkflowNodeTargets): string {
      const lines = []
 
      let sorted = Array.from(Object.entries(patch))
@@ -61,11 +62,7 @@
                  line = `${source.name}: (changed)`
                  break;
              default:
-                 const prevValue = prev[nodeID];
-                 let prevValueStr = "???"
-                 if (prevValue)
-                     prevValueStr = prevValue.finalValue
-                 line = `${source.name}: ${prevValueStr} → ${source.finalValue}`
+                 line = `${source.name}: ${source.prevValue} → ${source.finalValue}`
                  break;
          }
          lines.push(line)
@@ -132,8 +129,7 @@
 
              if (showPatches) {
                  // show a node with the changes between gens
-                 const prev = resolvePatch(patchNode.parent, memoize);
-                 const patchText = makePatchText(patchNode.patch, prev);
+                 const patchText = makePatchText(patchNode.patch);
                  const patchNodeHeight = countNewLines(patchText) * 11 + 22;
 
                  nodes.push({
@@ -256,7 +252,7 @@
 </script>
 
 {#if workflow && journey}
-    <Graph {nodes} {edges}
+    <Graph {nodes} {edges} bind:cyInstance={cyto}
            style="background: var(--neutral-900)"
            on:rebuilt={onRebuilt}
     />

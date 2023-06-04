@@ -81,6 +81,7 @@ export function diffParams(base: RestoreParamWorkflowNodeTargets, updated: Resto
     for (const [k, v] of Object.entries(updated)) {
         if (!(k in base) || !deepEqual(base[k].finalValue, v.finalValue, { strict: true })) {
             result[k] = v
+            v.prevValue = base[k].finalValue
         }
     }
 

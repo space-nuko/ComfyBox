@@ -39,6 +39,8 @@ export interface RestoreParamSource<T extends RestoreParamType = any> {
  */
 export interface RestoreParamSourceWorkflowNode extends RestoreParamSource<"workflow"> {
     type: "workflow",
+
+    prevValue?: any
 }
 
 export type RestoreParamWorkflowNodeTargets = Record<NodeID, RestoreParamSourceWorkflowNode>
@@ -233,6 +235,7 @@ export function getWorkflowRestoreParams(serGraph: SerializedLGraph, workflow?: 
                 type: "workflow",
                 nodeType: node.type,
                 name,
+                prevValue: finalValue,
                 finalValue,
             }
             result[node.id] = source;

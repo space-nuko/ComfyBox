@@ -14,7 +14,7 @@
  import uiState from '$lib/stores/uiState';
  import { resolvePatch, type JourneyPatchNode, type WritableJourneyStateStore, diffParams, type JourneyNode } from '$lib/stores/journeyStates';
  import JourneyRenderer, { type JourneyNodeEvent } from './JourneyRenderer.svelte';
- import { Trash, ClockHistory, Diagram3  } from "svelte-bootstrap-icons";
+ import { Trash, ClockHistory, Diagram3, GeoAlt } from "svelte-bootstrap-icons";
  import { getWorkflowRestoreParamsFromWorkflow } from '$lib/restoreParameters';
  import notify from '$lib/notify';
  import selectionState from '$lib/stores/selectionState';
@@ -32,6 +32,7 @@
  let journey: WritableJourneyStateStore | null = null;
  let activeNode: JourneyNode | null = null;
  let mode: JourneyMode = "linear";
+ let cyto: cytoscape.Core | null = null;
 
  const MODES: [JourneyMode, typeof SvelteComponent][] = [
      ["linear", ClockHistory],
@@ -60,6 +61,21 @@
 
      journey.clear();
      notify("History cleared.", { type: "info" })
+ }
+
+ function doCenter() {
+     if (cyto == null)
+         return;
+
+     const activeNode = journey.getActiveNode();
+     if (activeNode == null)
+         return;
+
+     const node = cyto.$(`#${activeNode.id}`);
+     if (node.isNode()) {
+         cyto.zoom(1.25);
+         cyto.center(node)
+     }
  }
 
  function onSelectNode(e: CustomEvent<JourneyNodeEvent>) {
@@ -141,7 +157,13 @@
 <div class="journey-view">
     <div class="top">
         <button class="mode-button ternary"
-                title={"Add new"}
+                title="Center Active"
+                disabled={$journey.root == null || $journey.activeNodeID == null}
+                on:click={doCenter}>
+            <GeoAlt width="100%" height="100%" />
+        </button>
+        <button class="mode-button ternary"
+                title="Clear"
                 disabled={$journey.root == null}
                 on:click={doClearHistory}>
             <Trash width="100%" height="100%" />
@@ -149,6 +171,7 @@
     </div>
     {#key $journey.version}
         <JourneyRenderer {workflow} {journey} {mode}
+                         bind:cyto
                          on:select_node={onSelectNode}
                          on:right_click_node={onRightClickNode}
                          on:hover_node={onHoverNode}
@@ -180,12 +203,7 @@
      height: calc(100% - $button-height * 3);
  }
 
- .top {
-     height: $button-height;
-     color: var(--comfy-accent-soft);
- }
-
- .bottom {
+ .top, .bottom {
      height: $button-height;
      display: flex;
      flex-direction: row;
