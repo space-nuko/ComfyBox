@@ -1113,7 +1113,7 @@ export default class ComfyApp {
                             queueState.afterQueued(workflow.id, response.promptID, response.number, p.output, extraData)
                             workflowState.afterQueued(workflow.id, response.promptID)
                             if (journeyNode != null) {
-                                journeyNode.promptID = response.promptID;
+                                targetWorkflow.journey.afterQueued(journeyNode, response.promptID);
                             }
                         }
                     } catch (err) {

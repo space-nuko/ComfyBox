@@ -20,7 +20,7 @@
  import selectionState from '$lib/stores/selectionState';
  import { Checkbox } from '@gradio/form';
  import modalState from '$lib/stores/modalState';
- import queueState from '$lib/stores/queueState';
+ import queueState, { type QueueEntry } from '$lib/stores/queueState';
  import PromptDisplay from "$lib/components/PromptDisplay.svelte"
  import { getQueueEntryImages } from '$lib/stores/uiQueueState';
  import { SvelteComponent } from 'svelte';
@@ -91,23 +91,25 @@
          return;
      }
 
-     const promptID = journeyNode.promptID;
-     if (promptID != null) {
-         const queueEntry = queueState.getQueueEntry(journeyNode.promptID)
-         if (queueEntry?.prompt != null) {
-             modalState.pushModal({
-                 title: "Prompt Details",
-                 svelteComponent: PromptDisplay,
-                 svelteProps: {
-                     prompt: queueEntry.prompt,
-                     workflow: queueEntry.extraData?.extra_pnginfo?.comfyBoxWorkflow,
-                     images: getQueueEntryImages(queueEntry),
-                     closeModal: () => modalState.closeAllModals(),
-                     expandAll: false,
-                     app
-                 },
-             })
-         }
+     // pick first resolved prompt
+     const queueEntry: QueueEntry | null =
+         Array.from(journeyNode.promptIDs)
+              .map(id => queueState.getQueueEntry(id))
+              .find(qe => qe?.prompt != null);
+
+     if (queueEntry) {
+         modalState.pushModal({
+             title: "Prompt Details",
+             svelteComponent: PromptDisplay,
+             svelteProps: {
+                 prompt: queueEntry.prompt,
+                 workflow: queueEntry.extraData?.extra_pnginfo?.comfyBoxWorkflow,
+                 images: getQueueEntryImages(queueEntry),
+                 closeModal: () => modalState.closeAllModals(),
+                 expandAll: false,
+                 app
+             },
+         })
      }
      else {
          notify("This journey entry has no prompts yet.", { type: "warning" })

@@ -68,8 +68,9 @@ const styles: Stylesheet[] = [
             "text-valign": "center",
             "text-wrap": "wrap",
             "text-max-width": "140",
-            "background-color": "#333",
-            "border-color": "#black",
+            "line-height": "1.5",
+            "background-color": "#374151",
+            "border-color": "#1f2937",
             "border-width": "1",
             "color": "white",
         }

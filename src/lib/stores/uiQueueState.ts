@@ -132,6 +132,10 @@ function updateFromQueue(queuePending: QueueEntry[], queueRunning: QueueEntry[])
         // newest entries appear at the top
         s.queuedEntries = queuePending.map((e) => convertPendingEntry(e, "pending")).reverse();
         s.runningEntries = queueRunning.map((e) => convertPendingEntry(e, "running")).reverse();
+
+        s.queuedEntries.sort((a, b) => a.entry.number - b.entry.number)
+        s.runningEntries.sort((a, b) => a.entry.number - b.entry.number)
+
         s.queueUIEntries = s.queuedEntries.concat(s.runningEntries);
         console.warn("[ComfyQueue] BUILDQUEUE", s.queuedEntries.length, s.runningEntries.length)
         return s;

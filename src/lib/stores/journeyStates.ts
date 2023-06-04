@@ -20,7 +20,7 @@ export interface JourneyNode {
     id: JourneyNodeID,
     type: JourneyNodeType,
     children: JourneyPatchNode[],
-    promptID?: PromptID,
+    promptIDs: Set<PromptID>,
     images?: string[]
 }
 
@@ -101,6 +101,7 @@ export function calculateWorkflowParamsPatch(parent: JourneyNode, newParams: Res
 export type JourneyState = {
     root: JourneyRootNode | null,
     nodesByID: Record<JourneyNodeID, JourneyNode>,
+    nodesByPromptID: Record<PromptID, JourneyNode>,
     activeNodeID: JourneyNodeID | null,
 
     /*
@@ -117,6 +118,7 @@ type JourneyStateOps = {
     iterateBreadthFirst: (id?: JourneyNodeID | null) => Iterable<JourneyNode>,
     iterateLinearPath: (id: JourneyNodeID) => Iterable<JourneyNode>,
     pushPatchOntoActive: (workflow: ComfyBoxWorkflow, activeNode?: JourneyNode, showNotification?: boolean) => JourneyNode | null
+    afterQueued: (journeyNode: JourneyNode, promptID: PromptID) => void,
     onExecuted: (promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutput, queueEntry: QueueEntry) => void
 }
 
@@ -127,6 +129,7 @@ function create() {
         {
             root: null,
             nodesByID: {},
+            nodesByPromptID: {},
             activeNodeID: null,
             version: 0
         })
@@ -135,6 +138,7 @@ function create() {
         store.set({
             root: null,
             nodesByID: {},
+            nodesByPromptID: {},
             activeNodeID: null,
             version: 0
         })
@@ -173,6 +177,7 @@ function create() {
                     id: uuidv4(),
                     type: "root",
                     children: [],
+                    promptIDs: new Set(),
                     base: { ...params }
                 }
                 s.root = _node
@@ -183,6 +188,7 @@ function create() {
                     type: "patch",
                     parent: parentNode,
                     children: [],
+                    promptIDs: new Set(),
                     patch: params,
                 }
                 parentNode.children.push(_node);
@@ -311,8 +317,16 @@ function create() {
         return path;
     }
 
+    function afterQueued(journeyNode: JourneyNode, promptID: PromptID) {
+        journeyNode.promptIDs.add(promptID);
+        store.update(s => {
+            s.nodesByPromptID[promptID] = journeyNode;
+            return s;
+        })
+    }
+
     function onExecuted(promptID: PromptID, nodeID: ComfyNodeID, output: SerializedPromptOutput, queueEntry: QueueEntry) {
-        const journeyNode = Array.from(iterateBreadthFirst()).find(j => j.promptID === promptID);
+        const journeyNode = get(store).nodesByPromptID[promptID];
         if (journeyNode == null)
             return;
 
@@ -333,7 +347,8 @@ function create() {
         selectNode,
         iterateBreadthFirst,
         iterateLinearPath,
-        onExecuted
+        afterQueued,
+        onExecuted,
     }
 }
 

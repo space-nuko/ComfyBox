@@ -50,21 +50,29 @@
          return a[1].name > b[1].name ? 1 : -1
      })
 
-     for (const [nodeID, source] of sorted) {
+     const MAX_ENTRIES = 5
+     const entries = sorted.slice(0, MAX_ENTRIES)
+     const leftover = sorted.length - MAX_ENTRIES
+
+     for (const [nodeID, source] of entries) {
          let line = ""
          switch (source.nodeType) {
              case "ui/text":
-                 line = `${source.name} (changed)`
+                 line = `${source.name}: (changed)`
                  break;
              default:
                  const prevValue = prev[nodeID];
                  let prevValueStr = "???"
                  if (prevValue)
                      prevValueStr = prevValue.finalValue
-                 line = `${source.name}: ${prevValueStr} -> ${source.finalValue}`
+                 line = `${source.name}: ${prevValueStr} → ${source.finalValue}`
                  break;
          }
          lines.push(line)
+     }
+
+     if (leftover > 0) {
+         lines.push(`(+ ${leftover} more)`)
      }
 
      return lines.join("\n")
@@ -127,8 +135,6 @@
                  const prev = resolvePatch(patchNode.parent, memoize);
                  const patchText = makePatchText(patchNode.patch, prev);
                  const patchNodeHeight = countNewLines(patchText) * 11 + 22;
-
-                 console.debug("[JourneyRenderer] Patch text", prev, patchText);
 
                  nodes.push({
                      data: {
@@ -224,8 +230,8 @@
 
          const journeyNode = $journey.nodesByID[nodeID]
          if (journeyNode) {
-             if (journeyNode.promptID != null) {
-                 const queueEntry = queueState.getQueueEntry(journeyNode.promptID)
+             if (journeyNode.promptIDs) {
+                 const queueEntry = Array.from(journeyNode.promptIDs).map(id => queueState.getQueueEntry(id)).find(Boolean);
                  if (queueEntry) {
                      const outputs = getQueueEntryImages(queueEntry);
 

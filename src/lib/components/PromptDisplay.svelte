@@ -8,7 +8,7 @@
  import Gallery from "$lib/components/gradio/gallery/Gallery.svelte";
  import { ImageViewer } from "$lib/ImageViewer";
  import type { Styles } from "@gradio/utils";
- import { comfyFileToComfyBoxMetadata, comfyURLToComfyFile, countNewLines } from "$lib/utils";
+ import { comfyFileToComfyBoxMetadata, comfyURLToComfyFile, countNewLines, isMultiline } from "$lib/utils";
  import ReceiveOutputTargets from "./modal/ReceiveOutputTargets.svelte";
  import RestoreParamsTable from "./modal/RestoreParamsTable.svelte";
  import workflowState, { type ComfyBoxWorkflow, type WorkflowReceiveOutputTargets } from "$lib/stores/workflowState";
@@ -41,6 +41,7 @@
      // TODO other sources than serialized workflow
      if (workflow != null) {
          const workflowParams = getWorkflowRestoreParamsUsingLayout(workflow.workflow, workflow.layout)
+         console.error("GETPARMS", workflowParams)
          restoreParams = concatRestoreParams(restoreParams, workflowParams);
      }
 
@@ -98,10 +99,6 @@
          && input.length === 2
          && typeof input[0] === "string"
          && typeof input[1] === "number"
- }
-
- function isMultiline(input: any): boolean {
-     return typeof input === "string" && (input.length > splitLength || countNewLines(input) > 1);
  }
 
  function formatInput(input: any): string {

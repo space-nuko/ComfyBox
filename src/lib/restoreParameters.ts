@@ -1,4 +1,4 @@
-import type { INodeInputSlot, NodeID, SerializedLGraph } from "@litegraph-ts/core";
+import type { INodeInputSlot, NodeID, SerializedLGraph, SerializedLGraphNode } from "@litegraph-ts/core";
 import type { SerializedPrompt } from "./components/ComfyApp";
 import type { ComfyWidgetNode } from "./nodes/widgets";
 import type { SerializedComfyWidgetNode } from "./nodes/widgets/ComfyWidgetNode";
@@ -242,15 +242,29 @@ export function getWorkflowRestoreParams(serGraph: SerializedLGraph, workflow?: 
     return result
 }
 
+function* iterateSerializedNodesRecursive(serGraph: SerializedLGraph): Iterable<SerializedLGraphNode> {
+    for (const serNode of serGraph.nodes) {
+        yield serNode;
+
+        if (serNode.type === "graph/subgraph") {
+            for (const childNode of iterateSerializedNodesRecursive((serNode as any).subgraph)) {
+                yield childNode;
+            }
+        }
+    }
+}
+
 export function getWorkflowRestoreParamsUsingLayout(serGraph: SerializedLGraph, layout?: SerializedLayoutState, noExclude: boolean = false): RestoreParamWorkflowNodeTargets {
     const result = {}
 
-    for (const serNode of serGraph.nodes) {
-        if (!isSerializedComfyWidgetNode(serNode))
+    for (const serNode of iterateSerializedNodesRecursive(serGraph)) {
+        if (!isSerializedComfyWidgetNode(serNode)) {
             continue;
+        }
 
-        if (!noExclude && serNode.properties.excludeFromJourney)
+        if (!noExclude && serNode.properties.excludeFromJourney) {
             continue;
+        }
 
         let name = null;
         const serWidget = Array.from(Object.values(layout?.allItems || {})).find(di => di.dragItem.type === "widget" && di.dragItem.nodeId === serNode.id)

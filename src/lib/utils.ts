@@ -745,3 +745,7 @@ const MOBILE_USER_AGENTS = ["iPhone", "iPad", "Android", "BlackBerry", "WebOs"].
 export function isMobileBrowser(userAgent: string): boolean {
     return MOBILE_USER_AGENTS.some(a => userAgent.match(a))
 }
+
+export function isMultiline(input: any, splitLength: number = 50): boolean {
+    return typeof input === "string" && (input.length > splitLength || countNewLines(input) > 1);
+}
