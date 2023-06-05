@@ -37,8 +37,11 @@
     on:close={close}
     on:cancel={doClose}
     on:click|self={close}
+    on:contextmenu|preventDefault|stopPropagation
 >
-    <div on:click|stopPropagation>
+    <div on:click|stopPropagation
+         on:contextmenu|stopPropagation
+    >
         <slot name="header" />
         <slot {closeDialog} />
         <div class="button-row">

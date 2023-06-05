@@ -37,7 +37,8 @@ export type SerializedComfyWidgetNode = {
  */
 
 export interface ComfyWidgetProperties extends ComfyGraphNodeProperties {
-    defaultValue: any
+    defaultValue: any,
+    excludeFromJourney: boolean
 }
 
 export type ShownOutputProperty = {

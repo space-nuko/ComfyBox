@@ -40,6 +40,7 @@ import { deserializeTemplateFromSVG, type SerializedComfyBoxTemplate } from "$li
 import templateState from "$lib/stores/templateState";
 import { formatValidationError, type ComfyAPIPromptErrorResponse, formatExecutionError, type ComfyExecutionError } from "$lib/apiErrors";
 import systemState from "$lib/stores/systemState";
+import type { JourneyNode } from "$lib/stores/journeyStates";
 
 export const COMFYBOX_SERIAL_VERSION = 1;
 
@@ -610,6 +611,8 @@ export default class ComfyApp {
                     if (node?.onExecuted) {
                         node.onExecuted(output);
                     }
+                    workflow.journey.onExecuted(promptID, nodeID, output, queueEntry);
+                    workflow.journey.set(get(workflow.journey))
                 }
             }
         });
@@ -1028,6 +1031,18 @@ export default class ComfyApp {
             notify("Prompt queued.", { type: "info", showOn: "web" });
         }
 
+        let journeyNode: JourneyNode | null;
+
+        if (get(uiState).saveHistory) {
+            const activeNode = targetWorkflow.journey.getActiveNode();
+            journeyNode = targetWorkflow.journey.pushPatchOntoActive(targetWorkflow, activeNode);
+
+            // if no patch was applied, use currently selected node for prompt image
+            // output purposes
+            if (journeyNode == null)
+                journeyNode = activeNode;
+        }
+
         this.processingQueue = true;
         let workflow: ComfyBoxWorkflow;
 
@@ -1064,9 +1079,6 @@ export default class ComfyApp {
                     // console.debug(graphToGraphVis(workflow.graph))
                     // console.debug(promptToGraphVis(p))
 
-                    const stdPrompt = this.stdPromptSerializer.serialize(p);
-                    // console.warn("STD", stdPrompt);
-
                     const extraData: ComfyBoxPromptExtraData = {
                         extra_pnginfo: {
                             comfyBoxWorkflow: wf,
@@ -1100,6 +1112,9 @@ export default class ComfyApp {
                         else {
                             queueState.afterQueued(workflow.id, response.promptID, response.number, p.output, extraData)
                             workflowState.afterQueued(workflow.id, response.promptID)
+                            if (journeyNode != null) {
+                                targetWorkflow.journey.afterQueued(journeyNode, response.promptID);
+                            }
                         }
                     } catch (err) {
                         errorMes = err?.toString();

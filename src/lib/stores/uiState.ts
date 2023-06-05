@@ -15,6 +15,8 @@ export type UIState = {
     forceSaveUserState: boolean | null,
 
     activeError: PromptID | null
+
+    saveHistory: boolean
 }
 
 type UIStateOps = {
@@ -34,7 +36,9 @@ const store: Writable<UIState> = writable(
         reconnecting: false,
         forceSaveUserState: null,
 
-        activeError: null
+        activeError: null,
+
+        saveHistory: true
     })
 
 function reconnecting() {

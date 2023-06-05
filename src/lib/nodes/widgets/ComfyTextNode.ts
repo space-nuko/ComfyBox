@@ -16,6 +16,7 @@ export default class ComfyTextNode extends ComfyWidgetNode<string> {
         multiline: false,
         lines: 5,
         maxLines: 5,
+        excludeFromJourney: false,
     }
 
     static slotLayout: SlotLayout = {

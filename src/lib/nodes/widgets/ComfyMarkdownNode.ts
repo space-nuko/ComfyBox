@@ -10,6 +10,7 @@ export default class ComfyMarkdownNode extends ComfyWidgetNode<string> {
     override properties: ComfyMarkdownProperties = {
         tags: [],
         defaultValue: false,
+        excludeFromJourney: true,
     }
 
     static slotLayout: SlotLayout = {

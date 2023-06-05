@@ -36,7 +36,7 @@ type QueueStateOps = {
 export type QueueEntry = {
     /*** Data preserved on page refresh ***/
 
-    /** Priority of the prompt. -1 means to queue at the front. */
+    /** Priority of the prompt. Lower/negative numbers get higher priority. */
     number: number,
     queuedAt?: Date,
     finishedAt?: Date,

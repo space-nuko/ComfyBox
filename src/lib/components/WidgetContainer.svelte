@@ -70,39 +70,34 @@
 
 
 {#if container}
-    {#key $attrsChanged}
-        <Container {layoutState} {container} {classes} {zIndex} {showHandles} {isMobile} />
-    {/key}
+    <Container {layoutState} {container} {classes} {zIndex} {showHandles} {isMobile} />
 {:else if widget && widget.node}
     {@const edit = $uiState.uiUnlocked && $uiState.uiEditMode === "widgets"}
     {@const hidden = isHidden(widget)}
     {@const hovered = $uiState.uiUnlocked && $selectionState.currentHovered.has(widget.id)}
     {@const selected = $uiState.uiUnlocked && $selectionState.currentSelection.includes(widget.id)}
-    {#key $attrsChanged}
-        {#key $propsChanged}
-            <div class="widget {widget.attrs.classes} {getWidgetClass()}"
-                 class:edit={edit}
-                 class:hovered
-                 class:selected
-                 class:is-executing={$queueState.runningNodeID && $queueState.runningNodeID == widget.node.id}
-                 class:hidden={hidden}
-            >
-                <svelte:component this={widget.node.svelteComponentType} {widget} {isMobile} />
-            </div>
-            {#if hidden && edit}
-                <div class="handle handle-hidden" class:hidden={!edit} />
-            {/if}
-            {#if showHandles || hovered}
-                <div class="handle handle-widget"
-                     class:hovered
-                     data-drag-item-id={widget.id}
-                     on:mousedown={_startDrag}
-                     on:touchstart={_startDrag}
-                     on:mouseup={_stopDrag}
-                     on:touchend={_stopDrag}/>
-            {/if}
-        {/key}
-    {/key}
+    <div class="widget {widget.attrs.classes} {getWidgetClass()}"
+         class:edit={edit}
+         class:hovered
+         class:selected
+         class:patch-affected={$selectionState.currentPatchHoveredNodes.has(widget.node.id)}
+         class:is-executing={$queueState.runningNodeID && $queueState.runningNodeID == widget.node.id}
+         class:hidden={hidden}
+    >
+        <svelte:component this={widget.node.svelteComponentType} {widget} {isMobile} />
+    </div>
+    {#if hidden && edit}
+        <div class="handle handle-hidden" class:hidden={!edit} />
+    {/if}
+    {#if showHandles || hovered}
+        <div class="handle handle-widget"
+             class:hovered
+             data-drag-item-id={widget.id}
+             on:mousedown={_startDrag}
+             on:touchstart={_startDrag}
+             on:mouseup={_stopDrag}
+             on:touchend={_stopDrag}/>
+    {/if}
 {/if}
 
 <style lang="scss">
@@ -111,6 +106,10 @@
 
      &.selected {
          background: var(--comfy-widget-selected-background-fill);
+     }
+
+     &.patch-affected {
+         background: var(--secondary-500);
      }
  }
 

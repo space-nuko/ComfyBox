@@ -173,7 +173,7 @@
  }
 
  .comfy-settings-entries {
-     padding: 3rem 3rem;
+     padding: 2rem 0.75rem;
      height: 100%;
  }
 

@@ -259,18 +259,18 @@
                     <Row>
                         {#if canMask}
                             <div>
-                                {#if editMask}
-                                    <Button variant="secondary" on:click={() => { clearMask(); notify("Mask cleared."); }}>
-                                        Clear Mask
-                                    </Button>
-                                {/if}
-                                <Button disabled={!_value} on:click={toggleEditMask}>
+                                <Button variant="primary" disabled={!_value} on:click={toggleEditMask}>
                                     {#if editMask}
                                         Show Image
                                     {:else}
                                         Edit Mask
                                     {/if}
                                 </Button>
+                                {#if editMask}
+                                    <Button variant="secondary" on:click={() => { clearMask(); notify("Mask cleared."); }}>
+                                        Clear Mask
+                                    </Button>
+                                {/if}
                             </div>
                         {/if}
                         <div>

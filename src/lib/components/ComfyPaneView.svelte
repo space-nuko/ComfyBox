@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
- export type ComfyPaneMode = "none" | "activeWorkflow" | "graph" | "properties" | "templates" | "queue"
+ export type ComfyPaneMode = "none" | "activeWorkflow" | "graph" | "properties" | "templates" | "queue" | "journey"
 </script>
 
 <script lang="ts">
@@ -8,15 +8,17 @@
   */
  import workflowState from "$lib/stores/workflowState";
  import type ComfyApp from "./ComfyApp";
- import { Sliders2, BoxSeam, LayoutTextSidebarReverse } from "svelte-bootstrap-icons";
+ import { SvelteComponent } from "svelte";
+ import { capitalize } from "$lib/utils";
+
+ import { Sliders2, BoxSeam, LayoutTextSidebarReverse, Signpost2 } from "svelte-bootstrap-icons";
 
  import ComfyBoxWorkflowView from "./ComfyBoxWorkflowView.svelte";
  import ComfyGraphView from "./ComfyGraphView.svelte";
  import ComfyProperties from "./ComfyProperties.svelte";
  import ComfyQueue from "./ComfyQueue.svelte";
  import ComfyTemplates from "./ComfyTemplates.svelte";
- import { SvelteComponent } from "svelte";
-	import { capitalize } from "$lib/utils";
+ import ComfyJourneyView from "./ComfyJourneyView.svelte";
 
  export let app: ComfyApp
  export let mode: ComfyPaneMode = "none";
@@ -25,11 +27,11 @@
  const MODES: [ComfyPaneMode, typeof SvelteComponent][] = [
      ["properties", Sliders2],
      ["templates", BoxSeam],
+     ["journey", Signpost2],
      ["queue", LayoutTextSidebarReverse]
  ]
 
  function switchMode(newMode: ComfyPaneMode) {
-     console.warn("switch", mode, newMode)
      mode = newMode;
  }
 </script>
@@ -46,8 +48,10 @@
             <ComfyTemplates {app} />
         {:else if mode === "queue"}
             <ComfyQueue {app} />
+        {:else if mode === "journey"}
+            <ComfyJourneyView {app} />
         {:else}
-            <div class="blank-panel">(Blank)</div>
+            <div class="blank-panel">(Blank: {mode})</div>
         {/if}
     </div>
     {#if showSwitcher}

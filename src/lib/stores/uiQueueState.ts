@@ -62,7 +62,7 @@ function convertEntry(entry: QueueEntry, status: QueueUIEntryStatus): QueueUIEnt
 
     const subgraphs: string[] | null = entry.extraData?.extra_pnginfo?.comfyBoxPrompt?.subgraphs;
 
-    let message = "Prompt";
+    let message = `#${entry.number}: Prompt`;
     if (entry.extraData?.workflowTitle != null) {
         message = `${entry.extraData.workflowTitle}`
     }
@@ -89,6 +89,13 @@ function convertEntry(entry: QueueEntry, status: QueueUIEntryStatus): QueueUIEnt
     }
 }
 
+export function getQueueEntryImages(queueEntry: QueueEntry): string[] {
+    return Object.values(queueEntry.outputs)
+        .filter(o => o.images)
+        .flatMap(o => o.images)
+        .map(convertComfyOutputToComfyURL);
+}
+
 function convertPendingEntry(entry: QueueEntry, status: QueueUIEntryStatus): QueueUIEntry {
     const result = convertEntry(entry, status);
 
@@ -97,10 +104,7 @@ function convertPendingEntry(entry: QueueEntry, status: QueueUIEntryStatus): Que
         result.images = thumbnails.map(convertComfyOutputToComfyURL);
     }
 
-    const outputs = Object.values(entry.outputs)
-        .filter(o => o.images)
-        .flatMap(o => o.images)
-        .map(convertComfyOutputToComfyURL);
+    const outputs = getQueueEntryImages(entry);
     if (outputs) {
         result.images = result.images.concat(outputs)
     }
@@ -111,11 +115,7 @@ function convertPendingEntry(entry: QueueEntry, status: QueueUIEntryStatus): Que
 function convertCompletedEntry(entry: CompletedQueueEntry): QueueUIEntry {
     const result = convertEntry(entry.entry, entry.status);
 
-    const images = Object.values(entry.entry.outputs)
-        .filter(o => o.images)
-        .flatMap(o => o.images)
-        .map(convertComfyOutputToComfyURL);
-    result.images = images
+    result.images = getQueueEntryImages(entry.entry)
 
     if (entry.message)
         result.submessage = entry.message
@@ -132,6 +132,10 @@ function updateFromQueue(queuePending: QueueEntry[], queueRunning: QueueEntry[])
         // newest entries appear at the top
         s.queuedEntries = queuePending.map((e) => convertPendingEntry(e, "pending")).reverse();
         s.runningEntries = queueRunning.map((e) => convertPendingEntry(e, "running")).reverse();
+
+        s.queuedEntries.sort((a, b) => a.entry.number - b.entry.number)
+        s.runningEntries.sort((a, b) => a.entry.number - b.entry.number)
+
         s.queueUIEntries = s.queuedEntries.concat(s.runningEntries);
         console.warn("[ComfyQueue] BUILDQUEUE", s.queuedEntries.length, s.runningEntries.length)
         return s;

@@ -18,7 +18,8 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
         defaultValue: [],
         index: 0,
         updateMode: "replace",
-        autoSelectOnUpdate: true
+        autoSelectOnUpdate: true,
+        excludeFromJourney: true,
     }
 
     static slotLayout: SlotLayout = {
@@ -129,8 +130,6 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
         }
 
         const meta = parseWhateverIntoImageMetadata(param) || [];
-
-        console.debug("[ComfyGalleryNode] Received output!", param)
 
         if (updateMode === "append") {
             const currentValue = get(this.value)

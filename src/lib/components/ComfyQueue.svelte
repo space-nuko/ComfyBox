@@ -32,6 +32,7 @@
  import ComfyQueueGridDisplay from "./ComfyQueueGridDisplay.svelte";
 	import { WORKFLOWS_VIEW } from "./ComfyBoxWorkflowsView.svelte";
 	import uiQueueState from "$lib/stores/uiQueueState";
+	import type { SerializedAppState, SerializedPromptInputsAll } from "./ComfyApp";
 
  export let app: ComfyApp;
 
@@ -124,19 +125,22 @@
 
  let showModal = false;
  let expandAll = false;
- let selectedPrompt = null;
+ let selectedPrompt: SerializedPromptInputsAll | null = null;
+ let selectedWorkflow: SerializedAppState | null = null;
  let selectedImages = [];
  function showPrompt(entry: QueueUIEntry) {
      if (entry.error != null) {
          showModal = false;
          expandAll = false;
          selectedPrompt = null;
+         selectedWorkflow = null;
          selectedImages = [];
 
          showError(entry.entry.promptID);
      }
      else {
-         selectedPrompt = entry.entry.prompt;
+         selectedPrompt = entry.entry.prompt,
+         selectedWorkflow = entry.entry.extraData.extra_pnginfo.comfyBoxWorkflow
          selectedImages = entry.images;
          showModal = true;
          expandAll = false
@@ -145,6 +149,7 @@
 
  function closeModal() {
      selectedPrompt = null
+     selectedWorkflow = null;
      selectedImages = []
      showModal = false;
      expandAll = false;
@@ -165,7 +170,7 @@
     </div>
     <svelte:fragment let:closeDialog>
         {#if selectedPrompt}
-            <PromptDisplay closeModal={() => { closeModal(); closeDialog(); }} {app} prompt={selectedPrompt} images={selectedImages} {expandAll} />
+            <PromptDisplay closeModal={() => { closeModal(); closeDialog(); }} {app} prompt={selectedPrompt} workflow={selectedWorkflow} images={selectedImages} {expandAll} />
         {/if}
     </svelte:fragment>
     <div slot="buttons" let:closeDialog>

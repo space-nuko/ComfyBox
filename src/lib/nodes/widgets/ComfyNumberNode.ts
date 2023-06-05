@@ -20,7 +20,8 @@ export default class ComfyNumberNode extends ComfyWidgetNode<number> {
         min: 0,
         max: 10,
         step: 1,
-        precision: 1
+        precision: 1,
+        excludeFromJourney: false,
     }
 
     override svelteComponentType = NumberWidget
