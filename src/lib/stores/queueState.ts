@@ -22,6 +22,7 @@ type QueueStateOps = {
     executionCached: (promptID: PromptID, nodes: ComfyNodeID[]) => void,
     executionError: (error: ComfyExecutionError) => CompletedQueueEntry | null,
     progressUpdated: (progress: Progress) => void
+    previewUpdated: (imageBlob: Blob) => void
     getQueueEntry: (promptID: PromptID) => QueueEntry | null;
     afterQueued: (workflowID: WorkflowInstID, promptID: PromptID, number: number, prompt: SerializedPromptInputsAll, extraData: any) => void
     queueItemDeleted: (type: QueueItemType, id: PromptID) => void;
@@ -89,6 +90,11 @@ export type QueueState = {
     runningNodeID: ComfyNodeID | null;
 
     /*
+     * Currently executing prompt if any
+     */
+    runningPromptID: PromptID | null;
+
+    /*
      * Nodes which should be rendered as "executing" in the frontend (green border).
      * This includes the running node and all its parent subgraphs
      */
@@ -98,6 +104,12 @@ export type QueueState = {
      * Progress for the current node reported by the frontend
      */
     progress: Progress | null,
+
+    /*
+     * Image preview URL
+     */
+    previewURL: string | null,
+
     /**
      * If true, user pressed the "Interrupt" button in the frontend. Disable the
      * button and wait until the next prompt starts running to re-enable it
@@ -115,6 +127,7 @@ const store: Writable<QueueState> = writable({
     runningNodeID: null,
     executingNodes: new Set(),
     progress: null,
+    preview: null,
     isInterrupting: false
 })
 
@@ -168,6 +181,19 @@ function progressUpdated(progress: Progress) {
     store.update((s) => {
         s.progress = progress;
         return s
+    })
+}
+
+function previewUpdated(imageBlob: Blob) {
+    console.debug("[queueState] previewUpdated", imageBlob?.type)
+    store.update(s => {
+        if (s.runningNodeID == null) {
+            s.previewURL = null;
+            return s;
+        }
+
+        s.previewURL = URL.createObjectURL(imageBlob);
+        return s;
     })
 }
 
@@ -296,6 +322,7 @@ function executingUpdated(promptID: PromptID, runningNodeID: ComfyNodeID | null)
                 entry.nodesRan.add(runningNodeID)
             }
             s.runningNodeID = runningNodeID;
+            s.runningPromptID = promptID;
 
             if (entry?.extraData?.workflowID) {
                 const workflow = workflowState.getWorkflow(entry.extraData.workflowID);
@@ -337,7 +364,9 @@ function executingUpdated(promptID: PromptID, runningNodeID: ComfyNodeID | null)
                 console.debug("[queueState] Could not find in pending! (executingUpdated)", promptID)
             }
             s.progress = null;
+            s.previewURL = null;
             s.runningNodeID = null;
+            s.runningPromptID = null;
             s.executingNodes.clear();
         }
         entry_ = entry;
@@ -362,7 +391,9 @@ function executionCached(promptID: PromptID, nodes: ComfyNodeID[]) {
         }
         s.isInterrupting = false; // TODO move to start
         s.progress = null;
+        s.previewURL = null;
         s.runningNodeID = null;
+        s.runningPromptID = null;
         s.executingNodes.clear();
         return s
     })
@@ -380,7 +411,9 @@ function executionError(error: ComfyExecutionError): CompletedQueueEntry | null 
             console.error("[queueState] Could not find in pending! (executionError)", error.prompt_id)
         }
         s.progress = null;
+        s.previewURL = null;
         s.runningNodeID = null;
+        s.runningPromptID = null;
         s.executingNodes.clear();
         return s
     })
@@ -416,6 +449,7 @@ function executionStart(promptID: PromptID) {
         }
         s.isInterrupting = false;
         s.runningNodeID = null;
+        s.runningPromptID = promptID;
         s.executingNodes.clear();
         return s
     })
@@ -480,7 +514,9 @@ function queueCleared(type: QueueItemType) {
             s.queuePending.set([]);
             s.queueRemaining = 0;
             s.runningNodeID = null;
+            s.runningPromptID = null;
             s.progress = null;
+            s.previewURL = null;
             s.executingNodes.clear();
         }
         else {
@@ -535,6 +571,7 @@ const queueStateStore: WritableQueueStateStore =
     historyUpdated,
     statusUpdated,
     progressUpdated,
+    previewUpdated,
     executionStart,
     executingUpdated,
     executionCached,

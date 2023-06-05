@@ -9,7 +9,8 @@ import ComfyWidgetNode from "./ComfyWidgetNode";
 export interface ComfyGalleryProperties extends ComfyWidgetProperties {
     index: number | null,
     updateMode: "replace" | "append",
-    autoSelectOnUpdate: boolean
+    autoSelectOnUpdate: boolean,
+    showPreviews: boolean
 }
 
 export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetadata[]> {
@@ -18,7 +19,8 @@ export default class ComfyGalleryNode extends ComfyWidgetNode<ComfyBoxImageMetad
         defaultValue: [],
         index: 0,
         updateMode: "replace",
-        autoSelectOnUpdate: true
+        autoSelectOnUpdate: true,
+        showPreviews: true
     }
 
     static slotLayout: SlotLayout = {
