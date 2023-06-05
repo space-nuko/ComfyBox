@@ -20,6 +20,7 @@
  import JsonView from "./JsonView.svelte";
  import type { ZodError } from "zod";
  import { concatRestoreParams, getWorkflowRestoreParams, getWorkflowRestoreParamsUsingLayout, type RestoreParamTargets, type RestoreParamWorkflowNodeTargets } from "$lib/restoreParameters";
+	import notify from "$lib/notify";
 
  const splitLength = 50;
 
@@ -38,9 +39,12 @@
  $: {
      restoreParams = {}
 
+     // TODO exclude from both history and journey patch
+     const noExclude = true;
+
      // TODO other sources than serialized workflow
      if (workflow != null) {
-         const workflowParams = getWorkflowRestoreParamsUsingLayout(workflow.workflow, workflow.layout)
+         const workflowParams = getWorkflowRestoreParamsUsingLayout(workflow.workflow, workflow.layout, noExclude)
          console.error("GETPARMS", workflowParams)
          restoreParams = concatRestoreParams(restoreParams, workflowParams);
      }
@@ -158,6 +162,24 @@
  }
 
  function doRestoreParams(e: CustomEvent) {
+     const activeWorkflow = workflowState.getActiveWorkflow();
+     if (activeWorkflow == null) {
+         notify("No active workflow!", { type: "error" })
+     }
+
+     // TODO other param sources
+     const patch: RestoreParamWorkflowNodeTargets = {};
+
+     for (const [nodeID, sources] of Object.entries(restoreParams)) {
+         for (const source of sources) {
+             if (source.type === "workflow") {
+                 patch[nodeID] = source;
+             }
+         }
+     }
+
+     activeWorkflow.applyParamsPatch(patch);
+     closeModal();
  }
 </script>
 

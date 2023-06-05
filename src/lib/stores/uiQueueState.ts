@@ -62,7 +62,7 @@ function convertEntry(entry: QueueEntry, status: QueueUIEntryStatus): QueueUIEnt
 
     const subgraphs: string[] | null = entry.extraData?.extra_pnginfo?.comfyBoxPrompt?.subgraphs;
 
-    let message = "Prompt";
+    let message = `#${entry.number}: Prompt`;
     if (entry.extraData?.workflowTitle != null) {
         message = `${entry.extraData.workflowTitle}`
     }
