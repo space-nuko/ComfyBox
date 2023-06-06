@@ -61,7 +61,7 @@
         ],
         "title": "UI.Gallery",
         "properties": {
-          "tags": [],
+          "tags": ["gen"],
           "defaultValue": [],
           "index": 3,
           "updateMode": "append",
@@ -1694,7 +1694,7 @@
         ],
         "title": "UI.Gallery",
         "properties": {
-          "tags": [],
+          "tags": ["hr"],
           "defaultValue": [],
           "index": 1,
           "updateMode": "append",
