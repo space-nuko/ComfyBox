@@ -1,7 +1,8 @@
 import type { PromptID, QueueItemType } from '$lib/api';
+import type { ComfyImageLocation } from "$lib/utils";
 import { get, writable } from 'svelte/store';
 import type { Readable, Writable } from 'svelte/store';
-import queueState, { type CompletedQueueEntry, type QueueEntry } from './queueState';
+import queueState, { QueueEntryStatus, type CompletedQueueEntry, type QueueEntry } from './queueState';
 import type { WorkflowError } from './workflowState';
 import { convertComfyOutputToComfyURL } from '$lib/utils';
 
@@ -13,7 +14,7 @@ export type QueueUIEntry = {
     submessage: string,
     date?: string,
     status: QueueUIEntryStatus,
-    images?: string[], // URLs
+    images?: ComfyImageLocation[], // URLs
     details?: string, // shown in a tooltip on hover
     error?: WorkflowError
 }
@@ -94,13 +95,12 @@ function convertPendingEntry(entry: QueueEntry, status: QueueUIEntryStatus): Que
 
     const thumbnails = entry.extraData?.thumbnails
     if (thumbnails) {
-        result.images = thumbnails.map(convertComfyOutputToComfyURL);
+        result.images = [...thumbnails]
     }
 
     const outputs = Object.values(entry.outputs)
         .filter(o => o.images)
         .flatMap(o => o.images)
-        .map(convertComfyOutputToComfyURL);
     if (outputs) {
         result.images = result.images.concat(outputs)
     }
@@ -114,7 +114,6 @@ function convertCompletedEntry(entry: CompletedQueueEntry): QueueUIEntry {
     const images = Object.values(entry.entry.outputs)
         .filter(o => o.images)
         .flatMap(o => o.images)
-        .map(convertComfyOutputToComfyURL);
     result.images = images
 
     if (entry.message)
@@ -132,6 +131,8 @@ function updateFromQueue(queuePending: QueueEntry[], queueRunning: QueueEntry[])
         // newest entries appear at the top
         s.queuedEntries = queuePending.map((e) => convertPendingEntry(e, "pending")).reverse();
         s.runningEntries = queueRunning.map((e) => convertPendingEntry(e, "running")).reverse();
+        s.queuedEntries.sort((a, b) => a.entry.number - b.entry.number)
+        s.runningEntries.sort((a, b) => a.entry.number - b.entry.number)
         s.queueUIEntries = s.queuedEntries.concat(s.runningEntries);
         console.warn("[ComfyQueue] BUILDQUEUE", s.queuedEntries.length, s.runningEntries.length)
         return s;

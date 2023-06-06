@@ -1,18 +1,3 @@
-<script lang="ts" context="module">
- export type QueueUIEntryStatus = QueueEntryStatus | "pending" | "running";
-
- export type QueueUIEntry = {
-     entry: QueueEntry,
-     message: string,
-     submessage: string,
-     date?: string,
-     status: QueueUIEntryStatus,
-     images?: string[], // URLs
-     details?: string, // shown in a tooltip on hover
-     error?: WorkflowError
- }
-</script>
-
 <script lang="ts">
  import queueState, { type CompletedQueueEntry, type QueueEntry, type QueueEntryStatus } from "$lib/stores/queueState";
  import ProgressBar from "./ProgressBar.svelte";
@@ -20,7 +5,7 @@
  import Spinner from "./Spinner.svelte";
  import PromptDisplay from "./PromptDisplay.svelte";
  import { List, ListUl, Grid } from "svelte-bootstrap-icons";
- import { convertComfyOutputToComfyURL, convertFilenameToComfyURL, getNodeInfo, truncateString } from "$lib/utils"
+ import { getNodeInfo, type ComfyImageLocation } from "$lib/utils"
  import type { Writable } from "svelte/store";
  import type { QueueItemType } from "$lib/api";
  import { Button } from "@gradio/button";
@@ -31,7 +16,7 @@
  import ComfyQueueListDisplay from "./ComfyQueueListDisplay.svelte";
  import ComfyQueueGridDisplay from "./ComfyQueueGridDisplay.svelte";
 	import { WORKFLOWS_VIEW } from "./ComfyBoxWorkflowsView.svelte";
-	import uiQueueState from "$lib/stores/uiQueueState";
+	import uiQueueState, { type QueueUIEntry } from "$lib/stores/uiQueueState";
 
  export let app: ComfyApp;
 
@@ -125,7 +110,7 @@
  let showModal = false;
  let expandAll = false;
  let selectedPrompt = null;
- let selectedImages = [];
+ let selectedImages: ComfyImageLocation[] = [];
  function showPrompt(entry: QueueUIEntry) {
      if (entry.error != null) {
          showModal = false;

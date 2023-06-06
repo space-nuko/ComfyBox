@@ -1,6 +1,6 @@
 <script lang="ts">
  import type { QueueItemType } from "$lib/api";
- import { showLightbox } from "$lib/utils";
+ import { convertComfyOutputToComfyURL, showLightbox } from "$lib/utils";
  import type { QueueUIEntry } from "./ComfyQueue.svelte";
  import queueState from "$lib/stores/queueState";
 
@@ -19,7 +19,7 @@
      allEntries = []
      for (const entry of entries) {
          for (const image of entry.images) {
-             allEntries.push([entry, image]);
+             allEntries.push([entry, convertComfyOutputToComfyURL(image, true)]);
          }
      }
      allImages = allEntries.map(p => p[1]);
@@ -56,6 +56,7 @@
                     <img class="grid-entry-image"
                          on:click={(e) => handleClick(e, entry, i)}
                     src={image}
+                    loading="lazy"
                     alt="thumbnail" />
                 </div>
             {/each}
@@ -130,6 +131,8 @@
  .grid-entry-image {
      aspect-ratio: 1 / 1;
      object-fit: cover;
+     width: 100%;
+     max-width: unset;
 
      &:hover {
          cursor: pointer;

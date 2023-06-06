@@ -1,17 +1,11 @@
 <script lang="ts">
  import { Page, Navbar, Block, Tabs, Tab, NavLeft, NavTitle, NavRight, Link, f7 } from "framework7-svelte"
- import WidgetContainer from "$lib/components/WidgetContainer.svelte";
  import type ComfyApp from "$lib/components/ComfyApp";
- import { writable, type Writable } from "svelte/store";
- import type { IDragItem, WritableLayoutStateStore } from "$lib/stores/layoutStates";
- import workflowState, { type ComfyBoxWorkflow, type WorkflowInstID } from "$lib/stores/workflowState";
  import interfaceState from "$lib/stores/interfaceState";
- import { onMount } from "svelte";
- import GenToolbar from '../GenToolbar.svelte'
- import { partition, showLightbox } from "$lib/utils";
-	import uiQueueState, { type QueueUIEntry } from "$lib/stores/uiQueueState";
-	import { showMobileLightbox } from "$lib/components/utils";
-	import notify from "$lib/notify";
+ import { convertComfyOutputToComfyURL, partition, showLightbox } from "$lib/utils";
+ import uiQueueState, { type QueueUIEntry } from "$lib/stores/uiQueueState";
+ import { showMobileLightbox } from "$lib/components/utils";
+ import notify from "$lib/notify";
 
  export let app: ComfyApp
 
@@ -33,7 +27,7 @@
      const _allEntries = []
      for (const entry of entries) {
          for (const image of entry.images) {
-             _allEntries.push([entry, image]);
+             _allEntries.push([entry, convertComfyOutputToComfyURL(image, true)]);
          }
      }
      allEntries = partition(_allEntries, gridCols);
