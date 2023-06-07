@@ -615,6 +615,14 @@ const ALL_ATTRIBUTES: AttributesSpecList = [
                 validNodeTypes: ["ui/gallery"],
                 defaultValue: true
             },
+            {
+                name: "showPreviews",
+                type: "boolean",
+                location: "nodeProps",
+                editable: true,
+                validNodeTypes: ["ui/gallery"],
+                defaultValue: true
+            },
 
             // ImageUpload
             {

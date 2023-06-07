@@ -386,6 +386,9 @@
                 <span style="display: inline-flex !important; padding: 0 0.75rem;">
                     <Checkbox label="Auto-Add UI" bind:value={$uiState.autoAddUI}/>
                 </span>
+                <span style="display: inline-flex !important; padding: 0 0.75rem;">
+                    <Checkbox label="Hide Previews" bind:value={$uiState.hidePreviews}/>
+                </span>
                 <!-- <span class="label" for="ui-edit-mode">
                      <BlockTitle>UI Edit mode</BlockTitle>
                      <select id="ui-edit-mode" name="ui-edit-mode" bind:value={$uiState.uiEditMode}>

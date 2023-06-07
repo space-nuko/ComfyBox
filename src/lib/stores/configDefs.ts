@@ -119,6 +119,36 @@ const defNotifications: ConfigDefEnum<"notifications", NotificationState> = {
     }
 };
 
+export enum OutputThumbnailsMode {
+    Auto,
+    AlwaysThumbnail,
+    AlwaysFullSize
+}
+
+const defOutputThumbnails: ConfigDefEnum<"outputThumbnails", OutputThumbnailsMode> = {
+    name: "outputThumbnails",
+    type: "enum",
+    defaultValue: OutputThumbnailsMode.Auto,
+    category: "ui",
+    description: "If enabled, send back smaller sized output image thumbnails for gallery/queue/history. Enable if you have slow network or are using Colab.",
+    options: {
+        values: [
+            {
+                value: OutputThumbnailsMode.Auto,
+                label: "Autodetect"
+            },
+            {
+                value: OutputThumbnailsMode.AlwaysThumbnail,
+                label: "Always use thumbnails"
+            },
+            {
+                value: OutputThumbnailsMode.AlwaysFullSize,
+                label: "Always use full size"
+            },
+        ]
+    }
+};
+
 const defAlwaysStripUserState: ConfigDefBoolean<"alwaysStripUserState"> = {
     name: "alwaysStripUserState",
     type: "boolean",
@@ -207,6 +237,7 @@ export const CONFIG_DEFS = [
     defComfyUIHostname,
     defComfyUIPort,
     defNotifications,
+    defOutputThumbnails,
     defAlwaysStripUserState,
     defPromptForWorkflowName,
     defConfirmWhenUnloadingUnsavedChanges,

@@ -651,6 +651,10 @@ export default class ComfyApp {
             }
         });
 
+        this.api.addEventListener("b_preview", (imageBlob: Blob) => {
+            queueState.previewUpdated(imageBlob);
+        });
+
         const config = get(configState);
 
         if (config.pollSystemStatsInterval > 0) {

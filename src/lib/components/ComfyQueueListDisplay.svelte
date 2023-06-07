@@ -1,8 +1,8 @@
 <script lang="ts">
  import type { QueueItemType } from "$lib/api";
- import { showLightbox, truncateString } from "$lib/utils";
- import type { QueueUIEntry } from "./ComfyQueue.svelte";
+ import { convertComfyOutputToComfyURL, showLightbox, truncateString } from "$lib/utils";
  import queueState from "$lib/stores/queueState";
+ import type { QueueUIEntry } from "$lib/stores/uiQueueState";
 
  export let entries: QueueUIEntry[] = [];
  export let showPrompt: (entry: QueueUIEntry) => void;
@@ -39,11 +39,13 @@
                     <div class="list-entry-images"
                          style="--cols: {Math.ceil(Math.sqrt(Math.min(entry.images.length, 4)))}" >
                         {#each entry.images.slice(0, 4) as image, i}
+                            {@const imageURL = convertComfyOutputToComfyURL(image, true)}
                             <div>
                                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                                 <img class="list-entry-image"
                                      on:click={(e) => showLightbox(entry.images, i, e)}
-                                src={image}
+                                src={imageURL}
+                                loading="lazy"
                                 alt="thumbnail" />
                             </div>
                         {/each}

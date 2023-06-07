@@ -8,7 +8,7 @@
  import Gallery from "$lib/components/gradio/gallery/Gallery.svelte";
  import { ImageViewer } from "$lib/ImageViewer";
  import type { Styles } from "@gradio/utils";
- import { comfyFileToComfyBoxMetadata, comfyURLToComfyFile, countNewLines } from "$lib/utils";
+ import { comfyFileToComfyBoxMetadata, comfyURLToComfyFile, countNewLines, type ComfyImageLocation, convertComfyOutputToComfyURL } from "$lib/utils";
  import ReceiveOutputTargets from "./modal/ReceiveOutputTargets.svelte";
  import workflowState, { type ComfyBoxWorkflow, type WorkflowReceiveOutputTargets } from "$lib/stores/workflowState";
  import type { ComfyReceiveOutputNode } from "$lib/nodes/actions";
@@ -17,7 +17,7 @@
  const splitLength = 50;
 
  export let prompt: SerializedPromptInputsAll;
- export let images: string[] = []; // list of image URLs to ComfyUI's /view? endpoint
+ export let images: ComfyImageLocation[] = [];
  export let isMobile: boolean = false;
  export let expandAll: boolean = false;
  export let closeModal: () => void;
@@ -36,10 +36,7 @@
  let litegraphType = "(none)"
 
  $: if (images.length > 0) {
-     // since the image links come from gradio, have to parse the URL for the
-     // ComfyImageLocation params
-     comfyBoxImages = images.map(comfyURLToComfyFile)
-                            .map(comfyFileToComfyBoxMetadata);
+     comfyBoxImages = images.map(comfyFileToComfyBoxMetadata);
  }
  else {
      comfyBoxImages = []
@@ -199,7 +196,7 @@
         <div class="image-container">
             <Block>
                 <Gallery
-                    value={images}
+                    value={images.map(convertComfyOutputToComfyURL)}
                     label=""
                     show_label={false}
                     style={galleryStyle}

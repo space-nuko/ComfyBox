@@ -8,7 +8,7 @@
  import interfaceState from "$lib/stores/interfaceState";
  import { onMount } from "svelte";
  import GenToolbar from '../GenToolbar.svelte'
- import { partition, showLightbox, truncateString } from "$lib/utils";
+ import { convertComfyOutputToComfyURL, partition, showLightbox, truncateString } from "$lib/utils";
 	import uiQueueState, { type QueueUIEntry } from "$lib/stores/uiQueueState";
 	import { showMobileLightbox } from "$lib/components/utils";
 	import queueState from "$lib/stores/queueState";
@@ -68,7 +68,7 @@
 
  function getCardImage(entry: QueueUIEntry): string {
      if (entry.images.length > 0)
-         return entry.images[0]
+         return convertComfyOutputToComfyURL(entry.images[0])
      return "https://cdn.framework7.io/placeholder/nature-1000x600-3.jpg"
  }
 </script>

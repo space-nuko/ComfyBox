@@ -11,7 +11,11 @@
  import { clamp, comfyBoxImageToComfyURL, type ComfyBoxImageMetadata } from "$lib/utils";
  import { f7 } from "framework7-svelte";
  import type { ComfyGalleryNode } from "$lib/nodes/widgets";
-	import { showMobileLightbox } from "$lib/components/utils";
+ import { showMobileLightbox } from "$lib/components/utils";
+ import queueState from "$lib/stores/queueState";
+ import uiState from "$lib/stores/uiState";
+ import { loadImage } from "./utils";
+ import Spinner from "$lib/components/Spinner.svelte";
 
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
@@ -25,6 +29,47 @@
 
  $: widget && setNodeValue(widget);
 
+ function tagsMatch(tags: string[] | null): boolean {
+     if(tags != null && tags.length > 0)
+         return node.properties.tags.length > 0 && node.properties.tags.every(t => tags.includes(t));
+     else
+         return node.properties.tags.length === 0;
+ }
+
+ let previewURL: string | null;
+ let previewImage: HTMLImageElement | null = null;
+ let previewElem: HTMLImageElement | null = null
+ $: {
+     previewURL = $queueState.previewURL;
+
+     if (previewURL && $queueState.runningPromptID != null && !$uiState.hidePreviews && node.properties.showPreviews) {
+         const queueEntry = queueState.getQueueEntry($queueState.runningPromptID)
+         if (queueEntry != null) {
+             const tags = queueEntry.extraData?.extra_pnginfo?.comfyBoxPrompt?.subgraphs;
+             if (tagsMatch(tags)) {
+                 loadImage(previewURL).then((img) => {
+                     previewImage = img;
+                 })
+             }
+             else {
+                 previewImage = null;
+             }
+         }
+         else {
+             previewImage = null;
+         }
+     }
+     else {
+         previewImage = null;
+     }
+ }
+
+ function showPreview() {
+ }
+
+ function hidePreview() {
+ }
+
  function setNodeValue(widget: WidgetLayout) {
      if (widget) {
          node = widget.node as ComfyGalleryNode
@@ -34,6 +79,8 @@
          imageHeight = node.imageHeight
          selected_image = node.selectedImage;
          forceSelectImage = node.forceSelectImage;
+         previewURL = null;
+         previewImage = null;
 
          if ($nodeValue != null) {
              if (node.properties.index < 0 || node.properties.index >= $nodeValue.length) {
@@ -108,6 +155,11 @@
         <div class="wrapper comfy-gallery-widget gradio-gallery" style={widget.attrs.style || ""}>
             <Block variant="solid" padding={false}>
                 <div class="padding">
+                    {#if previewImage}
+                        <div class="comfy-gallery-preview" on:mouseover={hidePreview} on:mouseout={showPreview} >
+                            <img src={previewImage.src} bind:this={previewElem} on:mouseout={showPreview} />
+                        </div>
+                    {/if}
                     <Gallery
                         value={images}
                         label={widget.attrs.title}
@@ -152,6 +204,29 @@
                  object-fit: contain;
              }
          }
+     }
+
+     &:hover .comfy-gallery-preview {
+         opacity: 0%;
+     }
+ }
+
+ .comfy-gallery-preview {
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     z-index: var(--layer-top);
+     pointer-events: none;
+     transition: opacity 0.1s linear;
+     opacity: 100%;
+
+     > img {
+         width: var(--size-full);
+         height: var(--size-full);
+         object-fit: contain;
+         border: 5px dashed var(--secondary-400);
      }
  }
 

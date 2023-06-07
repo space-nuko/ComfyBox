@@ -10,6 +10,7 @@ export type UIState = {
     autoAddUI: boolean,
     uiUnlocked: boolean,
     uiEditMode: UIEditMode,
+    hidePreviews: boolean,
 
     reconnecting: boolean,
     forceSaveUserState: boolean | null,
@@ -30,6 +31,7 @@ const store: Writable<UIState> = writable(
         autoAddUI: true,
         uiUnlocked: false,
         uiEditMode: "widgets",
+        hidePreviews: false,
 
         reconnecting: false,
         forceSaveUserState: null,
