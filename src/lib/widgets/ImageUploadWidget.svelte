@@ -230,7 +230,7 @@
         />
     {:else}
         <div class="comfy-image-editor-panel">
-            {#if _value && canMask}
+            {#if _value && _value.length > 0 && canMask}
                 {@const comfyURL = convertComfyOutputToComfyURL(_value[0])}
                 <div class="mask-canvas-wrapper" style:display={editMask ? "block" : "none"}>
                     <MaskCanvas bind:this={maskCanvasComp} fileURL={comfyURL} on:release={onMaskReleased} on:loaded={onMaskReleased} />

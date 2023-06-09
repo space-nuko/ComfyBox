@@ -15,8 +15,8 @@
  import { type WorkflowError } from "$lib/stores/workflowState";
  import ComfyQueueListDisplay from "./ComfyQueueListDisplay.svelte";
  import ComfyQueueGridDisplay from "./ComfyQueueGridDisplay.svelte";
-	import { WORKFLOWS_VIEW } from "./ComfyBoxWorkflowsView.svelte";
-	import uiQueueState, { type QueueUIEntry } from "$lib/stores/uiQueueState";
+ import { WORKFLOWS_VIEW } from "./ComfyBoxWorkflowsView.svelte";
+ import uiQueueState, { type QueueUIEntry } from "$lib/stores/uiQueueState";
 
  export let app: ComfyApp;
 
