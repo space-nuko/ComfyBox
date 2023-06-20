@@ -357,9 +357,4 @@ export default abstract class ComfyWidgetNode<T = any> extends ComfyGraphNode {
         this.value.set(value);
         this.shownOutputProperties = (o as any).shownOutputProperties;
     }
-
-    override stripUserState(o: SerializedLGraphNode) {
-        super.stripUserState(o);
-        (o as any).comfyValue = LiteGraph.cloneObject(this.properties.defaultValue);
-    }
 }

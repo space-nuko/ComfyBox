@@ -170,7 +170,6 @@ export default class ComfyComboNode extends ComfyWidgetNode<string> {
         super.stripUserState(o);
         o.properties.values = []
         o.properties.defaultValue = null;
-        (o as any).comfyValue = null
     }
 }
 

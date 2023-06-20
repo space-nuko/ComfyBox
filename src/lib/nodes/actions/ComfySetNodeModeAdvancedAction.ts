@@ -73,10 +73,10 @@ export default class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
 
                 if (hasTag) {
                     let newMode: NodeMode;
-                    if (enable && action.enable) {
-                        newMode = NodeMode.ALWAYS;
+                    if (action.enable) {
+                        newMode = enable ? NodeMode.ALWAYS : NodeMode.NEVER;
                     } else {
-                        newMode = NodeMode.NEVER;
+                        newMode = enable ? NodeMode.NEVER : NodeMode.ALWAYS;
                     }
                     nodeChanges[node.id] = newMode
                 }
@@ -88,7 +88,12 @@ export default class ComfySetNodeModeAdvancedAction extends ComfyGraphNode {
                 const container = entry.dragItem;
                 const hasTag = container.attrs.tags.indexOf(action.tag) != -1;
                 if (hasTag) {
-                    const hidden = !(enable && action.enable)
+                    let hidden: boolean;
+                    if (action.enable) {
+                        hidden = !enable
+                    } else {
+                        hidden = enable;
+                    }
                     widgetChanges[container.id] = hidden
                 }
             }
