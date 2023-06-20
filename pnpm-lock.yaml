@@ -70,6 +70,15 @@ importers:
       '@gradio/utils':
         specifier: workspace:*
         version: link:gradio/js/utils
+      '@lezer/generator':
+        specifier: ^1.2.3
+        version: 1.2.3
+      '@lezer/highlight':
+        specifier: ^1.1.3
+        version: 1.1.4
+      '@lezer/lr':
+        specifier: ^1.3.6
+        version: 1.3.6
       '@litegraph-ts/core':
         specifier: workspace:*
         version: link:litegraph/packages/core
@@ -105,10 +114,10 @@ importers:
         version: 1.0.3
       cm6-theme-basic-dark:
         specifier: ^0.2.0
-        version: 0.2.0(@codemirror/language@6.6.0)(@codemirror/state@6.2.0)(@codemirror/view@6.11.0)
+        version: 0.2.0(@codemirror/language@6.6.0)(@codemirror/state@6.2.0)(@codemirror/view@6.11.0)(@lezer/highlight@1.1.4)
       cm6-theme-basic-light:
         specifier: ^0.2.0
-        version: 0.2.0(@codemirror/language@6.6.0)(@codemirror/state@6.2.0)(@codemirror/view@6.11.0)
+        version: 0.2.0(@codemirror/language@6.6.0)(@codemirror/state@6.2.0)(@codemirror/view@6.11.0)(@lezer/highlight@1.1.4)
       codemirror:
         specifier: ^6.0.1
         version: 6.0.1
@@ -1363,7 +1372,6 @@ packages:
       '@codemirror/language': ^6.0.0
       '@codemirror/state': ^6.0.0
       '@codemirror/view': ^6.0.0
-      '@lezer/common': ^1.0.0
     dependencies:
       '@codemirror/language': 6.6.0
       '@codemirror/state': 6.2.0
@@ -1469,7 +1477,7 @@ packages:
       '@codemirror/view': 6.11.0
       '@lezer/common': 1.0.2
       '@lezer/highlight': 1.1.4
-      '@lezer/lr': 1.3.4
+      '@lezer/lr': 1.3.6
       style-mod: 4.0.3
     dev: false
 
@@ -2035,6 +2043,14 @@ packages:
       '@lezer/lr': 1.3.4
     dev: false
 
+  /@lezer/generator@1.2.3:
+    resolution: {integrity: sha512-xRmNryYbJpWs7novjWtQLCGHOj71B4X1QHQ4SgJqwm11tl6COEVAGhuFTXKX16JMJUhumdXaX8We6hEMd4clDg==}
+    hasBin: true
+    dependencies:
+      '@lezer/common': 1.0.2
+      '@lezer/lr': 1.3.6
+    dev: false
+
   /@lezer/highlight@1.1.4:
     resolution: {integrity: sha512-IECkFmw2l7sFcYXrV8iT9GeY4W0fU4CxX0WMwhmhMIVjoDdD1Hr6q3G2NqVtLg/yVe5n7i4menG3tJ2r4eCrPQ==}
     dependencies:
@@ -2065,6 +2081,12 @@ packages:
 
   /@lezer/lr@1.3.4:
     resolution: {integrity: sha512-7o+e4og/QoC/6btozDPJqnzBhUaD1fMfmvnEKQO1wRRiTse1WxaJ3OMEXZJnkgT6HCcTVOctSoXK9jGJw2oe9g==}
+    dependencies:
+      '@lezer/common': 1.0.2
+    dev: false
+
+  /@lezer/lr@1.3.6:
+    resolution: {integrity: sha512-IDhcWjfxwWACnatUi0GzWBCbochfqxo3LZZlS27LbJh8RVYYXXyR5Ck9659IhkWkhSW/kZlaaiJpUO+YZTUK+Q==}
     dependencies:
       '@lezer/common': 1.0.2
     dev: false
@@ -3045,19 +3067,6 @@ packages:
       wrap-ansi: 7.0.0
     dev: true
 
-  /cm6-theme-basic-dark@0.2.0(@codemirror/language@6.6.0)(@codemirror/state@6.2.0)(@codemirror/view@6.11.0):
-    resolution: {integrity: sha512-+mNNJecRtxS/KkloMDCQF0oTrT6aFGRZTjnBcdT5UG1pcDO4Brq8l1+0KR/8dZ7hub2gOGOzoi3rGFD8GzlH7Q==}
-    peerDependencies:
-      '@codemirror/language': ^6.0.0
-      '@codemirror/state': ^6.0.0
-      '@codemirror/view': ^6.0.0
-      '@lezer/highlight': ^1.0.0
-    dependencies:
-      '@codemirror/language': 6.6.0
-      '@codemirror/state': 6.2.0
-      '@codemirror/view': 6.11.0
-    dev: false
-
   /cm6-theme-basic-dark@0.2.0(@codemirror/language@6.6.0)(@codemirror/state@6.2.0)(@codemirror/view@6.11.0)(@lezer/highlight@1.1.4):
     resolution: {integrity: sha512-+mNNJecRtxS/KkloMDCQF0oTrT6aFGRZTjnBcdT5UG1pcDO4Brq8l1+0KR/8dZ7hub2gOGOzoi3rGFD8GzlH7Q==}
     peerDependencies:
@@ -3070,19 +3079,6 @@ packages:
       '@codemirror/state': 6.2.0
       '@codemirror/view': 6.11.0
       '@lezer/highlight': 1.1.4
-    dev: false
-
-  /cm6-theme-basic-light@0.2.0(@codemirror/language@6.6.0)(@codemirror/state@6.2.0)(@codemirror/view@6.11.0):
-    resolution: {integrity: sha512-1prg2gv44sYfpHscP26uLT/ePrh0mlmVwMSoSd3zYKQ92Ab3jPRLzyCnpyOCQLJbK+YdNs4HvMRqMNYdy4pMhA==}
-    peerDependencies:
-      '@codemirror/language': ^6.0.0
-      '@codemirror/state': ^6.0.0
-      '@codemirror/view': ^6.0.0
-      '@lezer/highlight': ^1.0.0
-    dependencies:
-      '@codemirror/language': 6.6.0
-      '@codemirror/state': 6.2.0
-      '@codemirror/view': 6.11.0
     dev: false
 
   /cm6-theme-basic-light@0.2.0(@codemirror/language@6.6.0)(@codemirror/state@6.2.0)(@codemirror/view@6.11.0)(@lezer/highlight@1.1.4):
@@ -3118,8 +3114,6 @@ packages:
       '@codemirror/search': 6.4.0
       '@codemirror/state': 6.2.0
       '@codemirror/view': 6.11.0
-    transitivePeerDependencies:
-      - '@lezer/common'
     dev: false
 
   /codemirror@6.0.1(@lezer/common@1.0.2):

@@ -8,6 +8,7 @@ import removeConsole from 'vite-plugin-svelte-console-remover';
 import glsl from 'vite-plugin-glsl';
 import { execSync } from "child_process"
 import { visualizer } from "rollup-plugin-visualizer";
+import { lezer } from "@lezer/generator/rollup"
 
 const isProduction = process.env.NODE_ENV === "production";
 console.log("Production build: " + isProduction)
@@ -31,6 +32,7 @@ export default defineConfig({
         isProduction && removeConsole(),
         glsl(),
         svelte(),
+        lezer(),
         visualizer(),
         viteStaticCopy({
             targets: [
