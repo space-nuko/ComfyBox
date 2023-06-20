@@ -1,11 +1,12 @@
 import ComfyGraph from "$lib/ComfyGraph";
-import { ComfyNumberNode } from "$lib/nodes/widgets";
+import { ComfyNumberNode, ComfyComboNode } from "$lib/nodes/widgets";
 import { ComfyBoxWorkflow } from "$lib/stores/workflowState";
 import { LiteGraph, Subgraph } from "@litegraph-ts/core";
 import { get } from "svelte/store";
 import { expect } from 'vitest';
 import UnitTest from "./UnitTest";
 import { Watch } from "@litegraph-ts/nodes-basic";
+import type { SerializedComfyWidgetNode } from "$lib/nodes/widgets/ComfyWidgetNode";
 
 export default class ComfyGraphTests extends UnitTest {
     test__onNodeAdded__updatesLayoutState() {
@@ -106,5 +107,25 @@ export default class ComfyGraphTests extends UnitTest {
         const serNode = result.nodes.find(n => n.id === widget.id);
 
         expect(serNode.outputs[0]._data).toBeUndefined()
+    }
+
+    test__serialize__savesComboData() {
+        const [{ graph }, layoutState] = ComfyBoxWorkflow.create()
+        layoutState.initDefaultLayout()
+
+        const widget = LiteGraph.createNode(ComfyComboNode);
+        const watch = LiteGraph.createNode(Watch);
+        graph.add(widget)
+        graph.add(watch)
+
+        widget.connect(0, watch, 0)
+        widget.properties.values = ["A", "B", "C"]
+        widget.setValue("B");
+
+        const result = graph.serialize();
+
+        const serNode = result.nodes.find(n => n.id === widget.id) as SerializedComfyWidgetNode;
+
+        expect(serNode.comfyValue).toBe("B")
     }
 }

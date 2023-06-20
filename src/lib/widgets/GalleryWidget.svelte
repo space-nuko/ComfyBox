@@ -42,7 +42,7 @@
  $: {
      previewURL = $queueState.previewURL;
 
-     if (previewURL && $queueState.runningPromptID != null && !$uiState.hidePreviews && node.properties.showPreviews) {
+     if (previewURL && $queueState.runningPromptID && !$uiState.hidePreviews && node.properties.showPreviews) {
          const queueEntry = queueState.getQueueEntry($queueState.runningPromptID)
          if (queueEntry != null) {
              const tags = queueEntry.extraData?.extra_pnginfo?.comfyBoxPrompt?.subgraphs;
@@ -51,12 +51,6 @@
                      previewImage = img;
                  })
              }
-             else {
-                 previewImage = null;
-             }
-         }
-         else {
-             previewImage = null;
          }
      }
      else {
@@ -155,7 +149,7 @@
         <div class="wrapper comfy-gallery-widget gradio-gallery" style={widget.attrs.style || ""}>
             <Block variant="solid" padding={false}>
                 <div class="padding">
-                    {#if previewImage}
+                    {#if previewImage && $queueState.runningPromptID != null}
                         <div class="comfy-gallery-preview" on:mouseover={hidePreview} on:mouseout={showPreview} >
                             <img src={previewImage.src} bind:this={previewElem} on:mouseout={showPreview} />
                         </div>
