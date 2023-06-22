@@ -22,7 +22,7 @@
  export let mode: ComfyPaneMode = "none";
  export let showSwitcher: boolean = false;
 
- const MODES: [ComfyPaneMode, typeof SvelteComponent][] = [
+ const MODES: [ComfyPaneMode, typeof SvelteComponent<any>][] = [
      ["properties", Sliders2],
      ["templates", BoxSeam],
      ["queue", LayoutTextSidebarReverse]
