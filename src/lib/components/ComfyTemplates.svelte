@@ -197,7 +197,7 @@
                                 <div class="template-desc">{item.template.metadata.description}</div>
                             </div>
                             {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
-                                <div in:fade={{duration:200, easing: cubicIn}} class='template-drag-item-shadow'/>
+                                <div in:fade|global={{duration:200, easing: cubicIn}} class='template-drag-item-shadow'/>
                             {/if}
                         {/each}
                     </div>

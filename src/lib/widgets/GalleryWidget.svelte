@@ -110,6 +110,16 @@
      showMobileLightbox(images, selectedImage, { thumbs: images });
  }
 
+ function onClickedSingle(e: CustomEvent<GradioSelectData>) {
+     const images = $nodeValue.map(comfyBoxImageToComfyURL)
+     if (isMobile) {
+         showMobileLightbox(images, 0, { thumbs: images });
+     }
+     else {
+         ImageViewer.instance.showModal(images, 0)
+     }
+ }
+
  function onClicked(e: CustomEvent<HTMLImageElement>) {
      if (isMobile) {
          showMobileLightbox_(e.detail, $selected_image)
@@ -136,6 +146,7 @@
                         value={url}
                         show_label={widget.attrs.title != ""}
                         label={widget.attrs.title}
+                        on:select={onClickedSingle}
                         bind:imageWidth={$imageWidth}
                         bind:imageHeight={$imageHeight}
                     />

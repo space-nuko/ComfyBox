@@ -14,7 +14,8 @@ import {
     indentOnInput,
     syntaxHighlighting,
     defaultHighlightStyle,
-    foldKeymap
+    foldKeymap,
+    LRLanguage, LanguageSupport, indentNodeProp, foldNodeProp, foldInside, delimitedIndent
 } from "@codemirror/language";
 import { history, defaultKeymap, historyKeymap } from "@codemirror/commands";
 import {
@@ -27,7 +28,25 @@ import {
     type CompletionSource, autocompletion, CompletionContext, startCompletion,
     currentCompletions, completionStatus, completeFromList, acceptCompletion
 } from "@codemirror/autocomplete"
+import { styleTags, tags as t } from "@lezer/highlight"
 import DanbooruTags from "$lib/DanbooruTags";
+
+import { parser } from "./ComfyUI.grammar"
+
+export const comfyUILanguage = LRLanguage.define({
+    name: "ComfyUI",
+    parser: parser.configure({
+        props: [
+            styleTags({
+                LineComment: t.lineComment,
+                BlockComment: t.blockComment,
+            })
+        ]
+    }),
+    languageData: {
+        commentTokens: { line: "//", block: { open: "/*", close: "*/" } },
+    }
+})
 
 export const basicSetup: Extension = /*@__PURE__*/ (() => [
     lineNumbers(),
@@ -43,6 +62,7 @@ export const basicSetup: Extension = /*@__PURE__*/ (() => [
     crosshairCursor(),
     EditorView.lineWrapping,
     DanbooruTags.getCompletionExt(),
+    new LanguageSupport(comfyUILanguage),
 
     keymap.of([
         ...closeBracketsKeymap,

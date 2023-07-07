@@ -104,7 +104,7 @@
                             >
                                 <WidgetContainer {layoutState} dragItem={item} zIndex={zIndex+1} {isMobile} />
                                 {#if item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
-                                    <div in:fade={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
+                                    <div in:fade|global={{duration:200, easing: cubicIn}} class='drag-item-shadow'/>
                                 {/if}
                             </div>
                         {/each}
