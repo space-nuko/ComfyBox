@@ -73,7 +73,7 @@ function convertEntry(entry: QueueEntry, status: QueueUIEntryStatus): QueueUIEnt
         message += ` (${subgraphsString})`
     }
 
-    let submessage = `Nodes: ${Object.keys(entry.prompt).length}`
+    let submessage = `#: ${entry.number}, Nodes: ${Object.keys(entry.prompt).length}`
 
     if (Object.keys(entry.outputs).length > 0) {
         const imageCount = Object.values(entry.outputs).filter(o => o.images).flatMap(o => o.images).length

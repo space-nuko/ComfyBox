@@ -37,10 +37,13 @@ Also note that the saved workflow format is subject to change until it's been fi
 
 ### Requirements
 
+- `git`
 - `pnpm`
 - An installation of vanilla [ComfyUI](https://github.com/comfyanonymous/ComfyUI) for the backend
 
 ### Installation
+
+**NOTE:** If you're using Windows, the following commands must be run with [Git Bash](https://git-scm.com/downloads).
 
 1. Clone the repo with submodules:
 
