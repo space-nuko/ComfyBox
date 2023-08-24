@@ -8,7 +8,7 @@
  import { type WidgetLayout } from "$lib/stores/layoutStates";
  import { get, writable, type Writable } from "svelte/store";
  import { isDisabled } from "./utils"
- import { clamp, getSafetensorsMetadata } from '$lib/utils';
+ import { clamp, getSafetensorsMetadata, vibrateIfPossible } from '$lib/utils';
  export let widget: WidgetLayout | null = null;
  export let isMobile: boolean = false;
  let node: ComfyComboNode | null = null;
@@ -70,7 +70,7 @@
  function onFocus() {
      // console.warn("FOCUS")
      if (listOpen) {
-         navigator.vibrate(20)
+         vibrateIfPossible(20)
      }
  }
 
@@ -86,7 +86,7 @@
 
  function handleSelect(index: number) {
      // console.warn("SEL", index)
-     navigator.vibrate(20)
+     vibrateIfPossible(20)
      const item = $valuesForCombo[index]
      activeIndex = index;
      $nodeValue = item.value

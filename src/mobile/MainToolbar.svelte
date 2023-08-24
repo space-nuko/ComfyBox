@@ -2,7 +2,7 @@
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
  import queueState from "$lib/stores/queueState";
  import workflowState, { ComfyBoxWorkflow } from "$lib/stores/workflowState";
- import { getNodeInfo } from "$lib/utils"
+ import { getNodeInfo, vibrateIfPossible } from "$lib/utils"
  import { LayoutTextSidebarReverse, Image, Grid } from "svelte-bootstrap-icons";
 
  import { Link, Toolbar } from "framework7-svelte"
@@ -21,12 +21,12 @@
  $: workflow = $workflowState.activeWorkflow;
 
  function queuePrompt() {
-     navigator.vibrate(20)
+     vibrateIfPossible(20)
      app.runDefaultQueueAction()
  }
 
  async function refreshCombos() {
-     navigator.vibrate(20)
+     vibrateIfPossible(20)
      await app.refreshComboInNodes()
  }
 
@@ -34,7 +34,7 @@
      if (!fileInput)
          return;
 
-     navigator.vibrate(20)
+     vibrateIfPossible(20)
      app.querySave()
  }
 
@@ -42,7 +42,7 @@
      if (!fileInput)
          return;
 
-     navigator.vibrate(20)
+     vibrateIfPossible(20)
      fileInput.value = null;
      fileInput.click();
  }
@@ -52,7 +52,7 @@
 }
 
  function doSaveLocal(): void {
-     navigator.vibrate(20)
+     vibrateIfPossible(20)
      app.saveStateToLocalStorage();
  }
 

@@ -5,7 +5,7 @@
  import { get, type Writable, writable } from "svelte/store";
  import { isDisabled } from "./utils"
  import type { SelectData } from "@gradio/utils";
-	import { clamp } from "$lib/utils";
+ import { clamp, vibrateIfPossible } from "$lib/utils";
  import type { ComfyRadioNode } from "$lib/nodes/widgets";
 
  export let widget: WidgetLayout | null = null;
@@ -34,7 +34,7 @@
  function onSelect(e: CustomEvent<SelectData>) {
      node.setValue(e.detail.value)
      node.index = e.detail.index as number
-     navigator.vibrate(20)
+     vibrateIfPossible(20)
  }
 </script>
 

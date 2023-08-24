@@ -828,3 +828,9 @@ const MOBILE_USER_AGENTS = ["iPhone", "iPad", "Android", "BlackBerry", "WebOs"].
 export function isMobileBrowser(userAgent: string): boolean {
     return MOBILE_USER_AGENTS.some(a => userAgent.match(a))
 }
+
+export function vibrateIfPossible(strength: number | Array<number>) {
+  if (window.navigator.vibrate) {
+    window.navigator.vibrate(strength);
+  }
+}

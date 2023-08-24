@@ -3,7 +3,7 @@
  import { type WidgetLayout } from "$lib/stores/layoutStates";
  import { Range } from "$lib/components/gradio/form";
  import { get, type Writable } from "svelte/store";
- import { debounce } from "$lib/utils";
+ import { debounce, vibrateIfPossible } from "$lib/utils";
  import interfaceState from "$lib/stores/interfaceState";
  import { isDisabled } from "./utils"
  export let widget: WidgetLayout | null = null;
@@ -96,7 +96,7 @@
          lastDisplayValue = option;
          canVibrate = false;
          setTimeout(() => { canVibrate = true }, 30)
-         navigator.vibrate(10)
+         vibrateIfPossible(10)
      }
  }
 </script>

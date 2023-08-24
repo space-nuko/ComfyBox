@@ -34,12 +34,12 @@
  }
 
  async function refreshCombos() {
-     navigator.vibrate(20)
+     vibrateIfPossible(20)
      await app.refreshComboInNodes()
  }
 
  function doSaveLocal(): void {
-     navigator.vibrate(20)
+     vibrateIfPossible(20)
      app.saveStateToLocalStorage();
  }
 
