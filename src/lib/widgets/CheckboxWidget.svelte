@@ -12,7 +12,7 @@
  export let isMobile: boolean = false;
  let node: ComfyCheckboxNode | null = null;
  let nodeValue: Writable<boolean> | null = null;
- let attrsChanged: Wrivtable<number> | null = null;
+ let attrsChanged: Writable<number> | null = null;
 
  $: widget && setNodeValue(widget);
 
