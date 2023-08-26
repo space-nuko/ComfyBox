@@ -3,6 +3,7 @@
  import { Button } from "@gradio/button";
  import { get, type Writable, writable } from "svelte/store";
  import { isDisabled } from "./utils"
+ import { vibrateIfPossible } from "$lib/utils";
  import type { ComfyButtonNode } from "$lib/nodes/widgets";
 
  export let widget: WidgetLayout | null = null;
@@ -24,7 +25,7 @@
 
  function onClick(e: MouseEvent) {
      node.onClick();
-     navigator.vibrate(20)
+     vibrateIfPossible(20)
  }
 
  const style = {

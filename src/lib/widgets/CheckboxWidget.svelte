@@ -4,6 +4,7 @@
  import { Checkbox } from "@gradio/form";
  import { get, type Writable, writable } from "svelte/store";
  import { isDisabled } from "./utils"
+ import { vibrateIfPossible } from "$lib/utils";
  import type { SelectData } from "@gradio/utils";
  import type { ComfyCheckboxNode } from "$lib/nodes/widgets";
 
@@ -25,7 +26,7 @@
 
  function onSelect(e: CustomEvent<SelectData>) {
      $nodeValue = e.detail.selected
-     navigator.vibrate(20)
+     vibrateIfPossible(20)
  }
 </script>
 

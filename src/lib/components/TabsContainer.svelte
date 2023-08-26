@@ -12,7 +12,7 @@
  import {cubicIn} from 'svelte/easing';
  import { flip } from 'svelte/animate';
  import { type ContainerLayout, type WidgetLayout, type IDragItem, type WritableLayoutStateStore } from "$lib/stores/layoutStates";
- import { startDrag, stopDrag } from "$lib/utils"
+ import { startDrag, stopDrag, vibrateIfPossible } from "$lib/utils"
  import type { Writable } from "svelte/store";
  import { isHidden } from "$lib/widgets/utils";
 	import { handleContainerConsider, handleContainerFinalize } from "./utils";
@@ -62,7 +62,7 @@
  }
 
  function handleSelect() {
-     navigator.vibrate(20)
+     vibrateIfPossible(20)
  }
 
  function _startDrag(e: MouseEvent | TouchEvent) {

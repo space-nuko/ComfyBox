@@ -1,6 +1,7 @@
 <script lang="ts">
  import ComfyApp, { type SerializedAppState } from "$lib/components/ComfyApp";
  import workflowState, { ComfyBoxWorkflow } from "$lib/stores/workflowState";
+ import { vibrateIfPossible } from "$lib/utils";
 
  import { Link, Toolbar } from "framework7-svelte"
 
@@ -11,7 +12,7 @@
  $: workflow = $workflowState.activeWorkflow;
 
  function queuePrompt() {
-     navigator.vibrate(20)
+     vibrateIfPossible(20) 
      app.runDefaultQueueAction()
  }
 </script>

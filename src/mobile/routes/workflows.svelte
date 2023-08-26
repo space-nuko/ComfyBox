@@ -3,6 +3,7 @@
  import workflowState, { ComfyBoxWorkflow, type WorkflowInstID } from "$lib/stores/workflowState";
  import { onMount } from "svelte";
  import interfaceState from "$lib/stores/interfaceState";
+ import { vibrateIfPossible } from "$lib/utils";
  import { f7 } from 'framework7-svelte';
  import { XCircle } from 'svelte-bootstrap-icons';
 
@@ -31,7 +32,7 @@
      if (!fileInput)
          return;
 
-     navigator.vibrate(20)
+     vibrateIfPossible(20);
      fileInput.value = null;
      fileInput.click();
  }
