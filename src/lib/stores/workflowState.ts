@@ -7,7 +7,6 @@ import ComfyGraph from '$lib/ComfyGraph';
 import layoutStates from './layoutStates';
 import { v4 as uuidv4 } from "uuid";
 import type ComfyGraphCanvas from '$lib/ComfyGraphCanvas';
-import { blankGraph } from '$lib/defaultGraph';
 import type { SerializedAppState, SerializedPrompt } from '$lib/components/ComfyApp';
 import type ComfyReceiveOutputNode from '$lib/nodes/actions/ComfyReceiveOutputNode';
 import type { ComfyBoxPromptExtraData, PromptID } from '$lib/api';
@@ -23,6 +22,12 @@ export type SerializedWorkflowState = {
     graph: SerializedLGraph,
     layout: SerializedLayoutState,
     attrs: WorkflowAttributes
+}
+
+export enum OpenWorkflowMode {
+    Append,
+    AppendAndSetActive,
+    ReplaceActive,
 }
 
 /*
@@ -265,6 +270,7 @@ export type WorkflowState = {
     openedWorkflows: ComfyBoxWorkflow[],
     openedWorkflowsByID: Record<WorkflowInstID, ComfyBoxWorkflow>,
     activeWorkflowID: WorkflowInstID | null,
+    activeWorkflowIndex: number | null,
     activeWorkflow: ComfyBoxWorkflow | null,
 }
 
@@ -279,9 +285,9 @@ type WorkflowStateOps = {
     getWorkflowByNode: (node: LGraphNode) => ComfyBoxWorkflow | null
     getWorkflowByNodeID: (id: NodeID) => ComfyBoxWorkflow | null
     getActiveWorkflow: () => ComfyBoxWorkflow | null
-    createNewWorkflow: (canvas: ComfyGraphCanvas, title?: string, setActive?: boolean) => ComfyBoxWorkflow,
-    openWorkflow: (canvas: ComfyGraphCanvas, data: SerializedAppState, setActive?: boolean) => ComfyBoxWorkflow,
-    addWorkflow: (canvas: ComfyGraphCanvas, data: ComfyBoxWorkflow, setActive?: boolean) => void,
+    createNewWorkflow: (canvas: ComfyGraphCanvas, title?: string, mode?: OpenWorkflowMode) => ComfyBoxWorkflow,
+    openWorkflow: (canvas: ComfyGraphCanvas, data: SerializedAppState, mode?: OpenWorkflowMode) => ComfyBoxWorkflow,
+    addWorkflow: (canvas: ComfyGraphCanvas, data: ComfyBoxWorkflow, mode?: OpenWorkflowMode) => void,
     closeWorkflow: (canvas: ComfyGraphCanvas, index: number) => void,
     closeAllWorkflows: (canvas: ComfyGraphCanvas) => void,
     setActiveWorkflow: (canvas: ComfyGraphCanvas, index: number | WorkflowInstID) => ComfyBoxWorkflow | null,
@@ -297,6 +303,7 @@ const store: Writable<WorkflowState> = writable(
         openedWorkflows: [],
         openedWorkflowsByID: {},
         activeWorkflowID: null,
+        activeWorkflowIndex: null,
         activeWorkflow: null
     })
 
@@ -328,39 +335,51 @@ function getActiveWorkflow(): ComfyBoxWorkflow | null {
     return state.openedWorkflowsByID[state.activeWorkflowID];
 }
 
-function createNewWorkflow(canvas: ComfyGraphCanvas, title: string = "New Workflow", setActive: boolean = false): ComfyBoxWorkflow {
+function createNewWorkflow(canvas: ComfyGraphCanvas, title: string = "New Workflow", mode: OpenWorkflowMode = OpenWorkflowMode.AppendAndSetActive): ComfyBoxWorkflow {
     const workflow = new ComfyBoxWorkflow(title);
     const layoutState = layoutStates.create(workflow);
     layoutState.initDefaultLayout();
 
-    const state = get(store);
-    state.openedWorkflows.push(workflow);
-    state.openedWorkflowsByID[workflow.id] = workflow;
-
-    if (setActive || state.activeWorkflowID == null)
-        setActiveWorkflow(canvas, state.openedWorkflows.length - 1)
-
-    store.set(state)
-
-    return workflow;
+    return addWorkflow(canvas, workflow, mode);
 }
 
-function openWorkflow(canvas: ComfyGraphCanvas, data: SerializedAppState, setActive: boolean = true): ComfyBoxWorkflow {
+function openWorkflow(canvas: ComfyGraphCanvas, data: SerializedAppState, mode: OpenWorkflowMode = OpenWorkflowMode.AppendAndSetActive): ComfyBoxWorkflow {
     const [workflow, layoutState] = ComfyBoxWorkflow.create("Workflow")
     workflow.deserialize(layoutState, { graph: data.workflow, layout: data.layout, attrs: data.attrs })
 
-    addWorkflow(canvas, workflow, setActive);
+    addWorkflow(canvas, workflow, mode);
 
     return workflow;
 }
 
-function addWorkflow(canvas: ComfyGraphCanvas, workflow: ComfyBoxWorkflow, setActive: boolean = true) {
+function addWorkflow(canvas: ComfyGraphCanvas, workflow: ComfyBoxWorkflow, mode: OpenWorkflowMode = OpenWorkflowMode.AppendAndSetActive) {
     const state = get(store);
-    state.openedWorkflows.push(workflow);
+
+    let resultIndex: number = state.openedWorkflows.length;
+    if (mode == OpenWorkflowMode.ReplaceActive && state.activeWorkflowIndex != null) {
+        resultIndex = state.activeWorkflowIndex;
+        closeWorkflow(canvas, resultIndex);
+        state.openedWorkflows.splice(resultIndex, 0, workflow);
+    }
+    else {
+        state.openedWorkflows.push(workflow);
+    }
+
     state.openedWorkflowsByID[workflow.id] = workflow;
 
+    let setActive: boolean;
+    switch (mode) {
+        case OpenWorkflowMode.Append:
+            setActive = false;
+            break;
+        case OpenWorkflowMode.AppendAndSetActive:
+        case OpenWorkflowMode.ReplaceActive:
+            setActive = true;
+            break;
+    }
+
     if (setActive || state.activeWorkflowID == null)
-        setActiveWorkflow(canvas, state.openedWorkflows.length - 1)
+        setActiveWorkflow(canvas, resultIndex)
 
     store.set(state)
 
@@ -397,6 +416,7 @@ function setActiveWorkflow(canvas: ComfyGraphCanvas, index: number | WorkflowIns
 
     if (state.openedWorkflows.length === 0) {
         state.activeWorkflowID = null;
+        state.activeWorkflowIndex = null;
         state.activeWorkflow = null
         return null;
     }
@@ -416,6 +436,7 @@ function setActiveWorkflow(canvas: ComfyGraphCanvas, index: number | WorkflowIns
         state.activeWorkflow.stop("app")
 
     state.activeWorkflowID = workflow.id;
+    state.activeWorkflowIndex = index;
     state.activeWorkflow = workflow;
 
     workflow.start("app", canvas);

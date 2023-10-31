@@ -28,7 +28,7 @@ import modalState from "$lib/stores/modalState";
 import queueState from "$lib/stores/queueState";
 import selectionState from "$lib/stores/selectionState";
 import uiState from "$lib/stores/uiState";
-import workflowState, { ComfyBoxWorkflow, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
+import workflowState, { ComfyBoxWorkflow, OpenWorkflowMode, type WorkflowAttributes, type WorkflowInstID } from "$lib/stores/workflowState";
 import { playSound, readFileToText, type SerializedPromptOutput } from "$lib/utils";
 import { basename, capitalize, download, graphToGraphVis, jsonToJsObject, promptToGraphVis, range } from "$lib/utils";
 import { tick } from "svelte";
@@ -49,7 +49,7 @@ if (typeof window !== "undefined") {
 }
 
 export type OpenWorkflowOptions = {
-    setActive?: boolean,
+    mode: OpenWorkflowMode,
     refreshCombos?: boolean | Record<string, ComfyNodeDef>,
     warnMissingNodeTypes?: boolean,
 }
@@ -234,7 +234,7 @@ export default class ComfyApp {
         if (!restored) {
             const options: OpenWorkflowOptions = {
                 refreshCombos: defs,
-                setActive: false
+                mode: OpenWorkflowMode.Append
             }
             await this.initDefaultWorkflow("defaultWorkflow", options);
             await this.initDefaultWorkflow("upscaleByModel", options);
@@ -408,7 +408,7 @@ export default class ComfyApp {
             return false;
 
         await Promise.all(workflows.map(w => {
-            return this.openWorkflow(w, { refreshCombos: defs, warnMissingNodeTypes: false, setActive: false }).catch(error => {
+            return this.openWorkflow(w, { refreshCombos: defs, warnMissingNodeTypes: false, mode: OpenWorkflowMode.Append }).catch(error => {
                 console.error("Failed restoring previous workflow", error)
                 notify(`Failed restoring previous workflow: ${error}`, { type: "error" })
             })
@@ -778,7 +778,7 @@ export default class ComfyApp {
     }
 
     async openWorkflow(data: SerializedAppState, options: OpenWorkflowOptions = {
-        setActive: true,
+        mode: OpenWorkflowMode.AppendAndSetActive,
         refreshCombos: true,
         warnMissingNodeTypes: true
     }
@@ -793,7 +793,7 @@ export default class ComfyApp {
 
         let workflow: ComfyBoxWorkflow;
         try {
-            workflow = workflowState.openWorkflow(this.lCanvas, data, options.setActive);
+            workflow = workflowState.openWorkflow(this.lCanvas, data, options.mode);
         }
         catch (error) {
             modalState.pushModal({
@@ -827,7 +827,11 @@ export default class ComfyApp {
         return workflow;
     }
 
-    async openVanillaWorkflow(data: SerializedLGraph, filename: string) {
+    async openVanillaWorkflow(data: SerializedLGraph, filename: string, options: OpenWorkflowOptions = {
+        mode: OpenWorkflowMode.AppendAndSetActive,
+        refreshCombos: true,
+        warnMissingNodeTypes: true
+    }) {
         const title = basename(filename)
 
         const attrs: WorkflowAttributes = {
@@ -844,7 +848,7 @@ export default class ComfyApp {
 
         const addWorkflow = () => {
             notify("Converted ComfyUI workflow to ComfyBox format.", { type: "info" })
-            workflowState.addWorkflow(this.lCanvas, comfyBoxWorkflow)
+            workflowState.addWorkflow(this.lCanvas, comfyBoxWorkflow, options.mode)
             this.lCanvas.deserialize(canvas);
         }
 
@@ -886,7 +890,7 @@ export default class ComfyApp {
     }
 
     createNewWorkflow() {
-        workflowState.createNewWorkflow(this.lCanvas, undefined, true);
+        workflowState.createNewWorkflow(this.lCanvas, undefined, OpenWorkflowMode.AppendAndSetActive);
         selectionState.clear();
     }
 
@@ -1146,13 +1150,13 @@ export default class ComfyApp {
     /**
      * Loads workflow data from the specified file
      */
-    async handleFile(file: File) {
+    async handleFile(file: File, openOptions?: OpenWorkflowOptions) {
         if (file.type === "image/png") {
             const buffer = await file.arrayBuffer();
             const pngInfo = await parsePNGMetadata(buffer);
             if (pngInfo) {
                 if (pngInfo.comfyBoxWorkflow) {
-                    await this.openWorkflow(JSON.parse(pngInfo.comfyBoxWorkflow));
+                    await this.openWorkflow(JSON.parse(pngInfo.comfyBoxWorkflow), openOptions);
                 } else if (pngInfo.workflow) {
                     const workflow = JSON.parse(pngInfo.workflow);
                     await this.openVanillaWorkflow(workflow, file.name);
@@ -1187,7 +1191,7 @@ export default class ComfyApp {
             reader.onload = async () => {
                 const result = JSON.parse(reader.result as string)
                 if (isComfyBoxWorkflow(result)) {
-                    await this.openWorkflow(result);
+                    await this.openWorkflow(result, openOptions);
                 }
                 else if (isVanillaWorkflow(result)) {
                     await this.openVanillaWorkflow(result, file.name);

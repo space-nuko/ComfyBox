@@ -12,11 +12,12 @@
  import type ComfyApp from "./ComfyApp";
  import { getContext, tick } from "svelte";
  import Modal from "./Modal.svelte";
- import { type WorkflowError } from "$lib/stores/workflowState";
  import ComfyQueueListDisplay from "./ComfyQueueListDisplay.svelte";
  import ComfyQueueGridDisplay from "./ComfyQueueGridDisplay.svelte";
  import { WORKFLOWS_VIEW } from "./ComfyBoxWorkflowsView.svelte";
  import uiQueueState, { type QueueUIEntry } from "$lib/stores/uiQueueState";
+	import type { SerializedPromptInputsAll } from "./ComfyApp";
+	import { OpenWorkflowMode } from "$lib/stores/workflowState";
 
  export let app: ComfyApp;
 
@@ -109,18 +110,21 @@
 
  let showModal = false;
  let expandAll = false;
- let selectedPrompt = null;
+ let selectedQueueEntry: QueueUIEntry = null;
+ let selectedPrompt: SerializedPromptInputsAll = null;
  let selectedImages: ComfyImageLocation[] = [];
  function showPrompt(entry: QueueUIEntry) {
      if (entry.error != null) {
          showModal = false;
          expandAll = false;
+         selectedQueueEntry = null;
          selectedPrompt = null;
          selectedImages = [];
 
          showError(entry.entry.promptID);
      }
      else {
+         selectedQueueEntry = entry;
          selectedPrompt = entry.entry.prompt;
          selectedImages = entry.images;
          showModal = true;
@@ -129,11 +133,30 @@
  }
 
  function closeModal() {
+     selectedQueueEntry = null;
      selectedPrompt = null
      selectedImages = []
      showModal = false;
      expandAll = false;
      console.warn("CLOSEMODAL")
+ }
+
+ async function restoreWorkflow(closeDialog: () => void, mode: OpenWorkflowMode) {
+     if (selectedQueueEntry == null) {
+         console.error("No active prompt!");
+         return;
+     }
+
+     let workflow = selectedQueueEntry.entry.extraData.extra_pnginfo.comfyBoxWorkflow;
+     if (workflow == null) {
+         console.error("No workflow found in PNG info!");
+         return;
+     }
+
+     closeDialog();
+     closeModal();
+
+     await app.openWorkflow(structuredClone(workflow), { mode: mode, refreshCombos: true, warnMissingNodeTypes: true });
  }
 
  let queued = false
@@ -159,6 +182,12 @@
         </Button>
         <Button variant="secondary" on:click={() => (expandAll = !expandAll)}>
             Expand All
+        </Button>
+        <Button variant="primary" on:click={() => restoreWorkflow(closeDialog, OpenWorkflowMode.ReplaceActive)}>
+            Restore
+        </Button>
+        <Button variant="primary" on:click={() => restoreWorkflow(closeDialog, OpenWorkflowMode.AppendAndSetActive)}>
+            Load
         </Button>
     </div>
 </Modal>
