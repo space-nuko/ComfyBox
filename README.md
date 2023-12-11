@@ -1,4 +1,4 @@
-# ComfyBox_ReOpened
+# ComfyBox-ReOpened, officially forked.
 
 This is a very broken down version of spacenuko's orifinal ComfyBox concept. "https://github.com/space-nuko/ComfyBox.git"
 _
