@@ -14,7 +14,7 @@ findstr /m "Starting server" "..\backend_log.txt"
 if errorlevel 1 goto waitForBackend
 
 REM Start the frontend server
-cd "..\ComfyBox_ReOpened"
+cd "..\ComfyBox-ReOpened-Forked-"
 start run.bat
 
 REM Optional: Insert a delay here to allow some time for the frontend to start
