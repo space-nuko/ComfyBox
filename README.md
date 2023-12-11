@@ -21,9 +21,7 @@ You can import your existing workflows from ComfyUI into ComfyBox by clicking `L
 ### Requirements
 1) Clone/Install [ComfyUI](https://github.com/comfyanonymous/ComfyUI) for the backend and follow all of their instructions.
 2) Clone this repo and place it into the "ComfyUI_windows_portable" folder.
-** 3) Most important step: Move "start_servers.bat" to the root folder of ComfyUI.
-4) Run start_servers.bet.
-5) All set!
+3) Run start_servers.bet.
+4) All set!
 
 ### Installation **WINDOWS ONLY FOR NOW**
-
