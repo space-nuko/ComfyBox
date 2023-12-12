@@ -1,6 +1,6 @@
 # ComfyBox-ReOpened, officially forked.
 
-This is a very broken down version of spacenuko's orifinal ComfyBox concept. "https://github.com/space-nuko/ComfyBox.git"
+This is a very broken down version of spacenuko's original ComfyBox concept. "https://github.com/space-nuko/ComfyBox.git"
 _
 All credit for the coding goes to them. I have only removed any files that were not integral for running the program on my Windows computer (I cannot say if this will work on other systems such as Linux, Google Colab, etc). If you find out it does, let me know and I'll update the README.md. It is my hope that this will help others to have at least SOMETHING to use.  I am not a coder, I only know beginner/intermediate Python, so any features, requests, updates are going to be on the community to figure out. Thank you._
  
