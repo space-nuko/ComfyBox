@@ -20,8 +20,9 @@ You can import your existing workflows from ComfyUI into ComfyBox by clicking `L
 ## **_Updated_ Installation**
 ### Requirements
 1) Clone/Install [ComfyUI](https://github.com/comfyanonymous/ComfyUI) for the backend and follow all of their instructions.
-2) Clone this repo and place it into the "ComfyUI_windows_portable" folder.
-3) Run start_servers.bet.
-4) All set!
+2) Add the argument "--enable-cors-header" to the "run_nvidia_gpu.bat" file.
+3) Clone this repo and place it into the "ComfyUI_windows_portable" folder.
+4) Run start_servers.bet.
+5) All set!
 
 ### Installation **WINDOWS ONLY FOR NOW**
